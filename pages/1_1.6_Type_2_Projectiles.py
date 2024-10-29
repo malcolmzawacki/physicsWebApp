@@ -149,7 +149,8 @@ def main():
             step=None,  # Remove step to allow any decimal input
             format="%f",  # Use %f to allow flexible decimal places
             key=f"user_input2_{st.session_state.question_id}"  # Unique key for each question
-            )
+        )
+            
 
             
 
