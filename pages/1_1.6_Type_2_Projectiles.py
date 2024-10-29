@@ -160,6 +160,7 @@ def main():
             st.session_state.submitted = True
             if user_input and user_input2 is not None:
                 st.session_state.user_answer = user_input
+                st.session_state.user_answer2 = user_input2
                 correct_answer = st.session_state.correct_answer
                 tolerance = correct_answer * 0.05  # 5% tolerance
                 correct_answer2 = st.session_state.correct_answer2
