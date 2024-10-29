@@ -142,8 +142,7 @@ def main():
             format="%f",  # Use %f to allow flexible decimal places
             key=f"user_input_{st.session_state.question_id}"  # Unique key for each question
         )
-        if difficulty == "Hard":
-            unit2 = st.session_state.unit2
+        unit2 = st.session_state.unit2
             user_input2 = st.number_input(
             f"{unit2}:",
             value=None,
@@ -151,6 +150,7 @@ def main():
             format="%f",  # Use %f to allow flexible decimal places
             key=f"user_input2_{st.session_state.question_id}"  # Unique key for each question
             )
+            
 
         if st.button("Submit"): # this should not change from one thing to another
             st.session_state.submitted = True
