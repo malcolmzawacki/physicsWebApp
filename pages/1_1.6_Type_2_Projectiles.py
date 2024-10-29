@@ -143,13 +143,13 @@ def main():
             key=f"user_input_{st.session_state.question_id}"  # Unique key for each question
         )
         unit2 = st.session_state.unit2
-            user_input2 = st.number_input(
+        user_input2 = st.number_input(
             f"{unit2}:",
             value=None,
             step=None,  # Remove step to allow any decimal input
             format="%f",  # Use %f to allow flexible decimal places
             key=f"user_input2_{st.session_state.question_id}"  # Unique key for each question
-            )
+        )
             
 
         if st.button("Submit"): # this should not change from one thing to another
