@@ -17,7 +17,7 @@ from utils.word_lists import random_noun, random_proj_verb
 def challenge(difficulty): #test and adjust range
     if difficulty == "Easy":
         range = 10
-    elif difficulty == "Hard":
+    elif difficulty == "Hard" or "Extra Hard":
         range = 50
     else:
         range = 20
@@ -87,6 +87,20 @@ def generate_question(difficulty):
             unit = "Launch Angle (degrees)"
             answer2 = d_x
             unit2 = "Horizontal Distance (m)"
+    elif difficulty == "Extra Hard":
+        choice = random.choice(1,2)
+        if choice == 1: # gives velocity and distance, asks for height and angle
+            question = f"A {verb} {object} is launched at {v_r:.2f} m/s and lands {d_x:.2f} m away from where it started. What maximum height did it reach, and what angle was it laucned at?"
+            answer = d_y
+            unit = "Maximum Height (m)"
+            answer2 = theta
+            unit2 = "Launch Angle (degrees)"
+        elif choice == 2: # gives distance and angle, asks for velocity and height
+            question = f"A {object} is {verb} at {theta:.2f} degrees, and lands {d_x:.2f} m away. What was its initial speed and how high did it go up before falling back down?"
+            answer = v_r
+            unit = "m/s"
+            answer2 = d_y
+            unit2 = "Maximum Height (m)"
     return question, answer, answer2, unit, unit2
 
 
@@ -126,7 +140,7 @@ def main():
 
     difficulty = st.selectbox(
         "Select Difficulty",
-        ("Easy", "Hard"),
+        ("Easy", "Hard","Extra Hard"),
         key="problem_difficulty_select"
     )
 
