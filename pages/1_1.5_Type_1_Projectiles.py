@@ -63,15 +63,15 @@ def generate_question(difficulty):
         answer2 = 0
         unit2 = ""
         if choice == 1: # solve for distance
-            question = f"If a {object} is {verb} horizontally off of a {d_y:.2f} m cliff with an initial velocity of {v_x:.2f} m/s, how far away does it land? (m)"
+            question = f"If a {object} is {verb} horizontally off of a {d_y:.2f} m cliff with an initial velocity of {v_x:.2f} m/s, how far away from the base of the cliff does it land? (m)"
             answer = d_x
             unit = "Horizontal Distance (m)"
         elif choice == 2: # solve for height
-            question = f"If a {object} is {verb} horizontally off of a cliff at {v_x:.2f} m/s, and lands {d_x:.2f} m away, what was the height of the cliff? (m)"
+            question = f"If a {object} is {verb} horizontally off of a cliff at {v_x:.2f} m/s, and lands {d_x:.2f} m away from the base of the cliff, what was the height of the cliff? (m)"
             answer = d_y
             unit = "Cliff Height (m)"
         elif choice == 3:
-            question = f"If a {object} is {verb} horizontally off of a {d_y:.2f} m cliff, and lands {d_x:.2f} m away, how fast was it {verb}? (m/s)"
+            question = f"If a {object} is {verb} horizontally off of a {d_y:.2f} m cliff, and lands {d_x:.2f} m away from the base of the cliff, how fast was it {verb}? (m/s)"
             answer = v_x
             unit = "Initial Velocity (m/s)"
     elif difficulty == "Hard":
@@ -83,7 +83,7 @@ def generate_question(difficulty):
             answer2 = d_y
             unit2 = "Cliff Height (m)"
         elif choice == 2: # solve for final velocity and angle
-            question = f"If a {object} is {verb} horizontally off of a cliff at {v_x:.2f} m/s, and lands {d_x:.2f} m away, what speed and angle does it land with?"
+            question = f"If a {object} is {verb} horizontally off of a cliff at {v_x:.2f} m/s, and lands {d_x:.2f} m away from the base of the cliff, what speed and angle does it land with?"
             answer = v_r
             unit = "m/s"
             answer2 = theta
