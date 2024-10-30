@@ -9,13 +9,13 @@ root_dir = Path(__file__).parent.parent
 sys.path.append(str(root_dir))
 
 # Now you can import from utils
-from utils.word_lists import random_noun, random_proj_verb
+from utils.word_lists import random_noun
 
 def challenge(difficulty): #test and adjust range
     if difficulty == "Easy":
         range = 10
     elif difficulty == "Hard":
-        range = 50
+        range = 30
     else:
         range = 20
     return range
@@ -23,14 +23,13 @@ def challenge(difficulty): #test and adjust range
 def numbers(difficulty): #selects from list of triples and calculates vars
     coin = random.randint(0,1)
     m1 = random.randint(1,difficulty)
+    g = random.randint(2,difficulty)
+    h = random.randint(1,difficulty)
+    j = random.randint(1,difficulty)
     if coin == 1:
-        g = random.randint(2,difficulty)
-        h = random.randint(1,difficulty)
-        j = random.randint(1,difficulty)
-    else:
-        g = random.randint((-1)*difficulty,-2)
-        h = random.randint((-1)*difficulty,-1)
-        j = random.randint((-1)*difficulty,-1)
+        g *= -1
+        h *= -1
+        j *= -1
     
     m2 = m1*g*h
     v2 = j*(1+g*h)
