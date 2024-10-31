@@ -53,7 +53,7 @@ def generate_equation(difficulty):
 
     # Generate wrong answers
     wrong_answers = []
-    for _ in range(3):
+    for _ in range(4):
         wrong = solution_steps.copy()
         # Modify one step
         change_idx = random.randrange(len(wrong))
