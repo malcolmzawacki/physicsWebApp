@@ -1,6 +1,5 @@
 import streamlit as st
 import random
-import math
 import sys
 from pathlib import Path
 
