@@ -240,7 +240,7 @@ class ProjectileGenerator(BaseGenerator):
                     degree angle. It lands {d_x} m away from the base of the cliff. 
                     How far back from the cliff's edge was it {verb}, 
                     and at what time after it was launched was it again at the height of the cliff?"""
-                    answer = {x_back}
+                    answer = x_back
                     unit = "Launch-to-cliff Distance (m)"
                     answer2 = t_level
                     unit2 = "Time to return to same Height (s)"
