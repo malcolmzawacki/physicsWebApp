@@ -10,7 +10,7 @@ def generate_equation(difficulty):
         'div': ('÷', 'Multiply by'),
         'exp': ('^', 'Take the root'),
         'root': ('√', 'Square'),
-        'log': ('log', 'Take the antilog')
+
     }
 
     if difficulty == 'easy':
@@ -54,18 +54,18 @@ def generate_equation(difficulty):
             right_side = f"({right_side} ^ {value})"
         elif op_name == 'root':
             right_side = f"\\sqrt[{value}]{{{right_side}}}"
-        elif op_name == 'log':
-            right_side = f"\\log_{{{value}}}({right_side})"
+
 
     equation = f"{var_solve} = {right_side}"
 
     wrong_answers = []
     for _ in range(4):
-        wrong = solution_steps.copy()
-        change_idx = random.randrange(len(wrong))
-        ops = list(operations.values())
-        wrong[change_idx] = (random.choice([op for op in ops if op[1] != wrong[change_idx][0]]), wrong[change_idx][1])
-        wrong_answers.append(wrong)
+      wrong = solution_steps.copy()
+      change_idx = random.randrange(len(wrong))
+      ops = list(operations.values())
+      new_inverse = random.choice([op[1] for op in ops if op[1] != wrong[change_idx][0]])
+      wrong[change_idx] = (new_inverse, wrong[change_idx][1])
+      wrong_answers.append(wrong)
 
     all_answers = wrong_answers + [solution_steps]
     random.shuffle(all_answers)
@@ -118,7 +118,33 @@ def main():
         if st.button("Submit"):
             selected_index = int(answer[7]) - 1
             if st.session_state.problem['choices'][selected_index] == st.session_state.problem['solution_steps']:
-                st.success("Correct!")
+                var_target = st.session_state.problem['target_var']
+                var_solve = st.session_state.problem['solve_var']
+                rearranged = f"{var_target} = "
+                right_side = var_solve
+                for step in reversed(st.session_state.problem['solution_steps']):
+                    op = step[0].lower()
+                    val = step[1]
+                    if op.startswith('multiply'):
+                        right_side = f"({right_side} · {val})"
+                    elif op.startswith('divide'):
+                        right_side = f"\\frac{{{right_side}}}{{{val}}}"
+                    elif op.startswith('add'):
+                        right_side = f"({right_side} + {val})"
+                    elif op.startswith('subtract'):
+                        right_side = f"({right_side} - {val})"
+                    elif op.startswith('take the root'):
+                        right_side = f"\\sqrt[{val}]{{{right_side}}}"
+                    elif op.startswith('square'):
+                        right_side = f"({right_side} ^ {val})"
+
+                rearranged += right_side
+
+                col1, col2 = st.columns([1, 1])
+                with col1:
+                    st.latex(rearranged)
+                with col2:
+                    st.success("Correct!")
             else:
                 st.error("Try again!")
 
