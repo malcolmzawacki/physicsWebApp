@@ -10,7 +10,6 @@ def generate_equation(difficulty):
         'div': ('÷', 'Multiply by'),
         'exp': ('^', 'Take the root'),
         'root': ('√', 'Square'),
-
     }
 
     if difficulty == 'easy':
