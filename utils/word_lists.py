@@ -5,12 +5,12 @@ objects = ["cactus","turtle","bowl of soup","block of ice","barrel of monkeys",
            "broken treadmill","villainous character","stunt-seeking daredevil","Minecraft villager",
            "mischievious rapscalion","clown","giant spider","miniature elephant","kitschy porcelain figurine","priceless artifact",
            "crown jewel","tuba","snare drum","block of concrete","kindergartener's action figure","bonsai tree", 
-           "The Infamous Epi Demick","box of tnt"
+           "The Infamous Epi Demick","box of tnt", "physics student", "crazy karen", "yard stick"
            ]
 
 proj_verbs = ["catapulted","cannon-fired","launched","chucked","thrown","propelled","kaboomed into the air",
               "hurled","pitched","tossed","flung","lobbed","blasted","ejected","deployed",
-              "heaved","set into motion","put into flight","sent skyward"
+              "heaved","set into motion","put into flight","sent skyward", "exploded"
               ]
 
 def random_noun():
