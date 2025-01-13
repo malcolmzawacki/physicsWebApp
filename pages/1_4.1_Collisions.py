@@ -88,7 +88,7 @@ def main():
             correct_answer = st.session_state[f"{prefix}correct_answer"]
             tolerance = correct_answer * 0.05
             
-            if abs(user_input - correct_answer) < tolerance:
+            if abs(user_input - correct_answer) < abs(tolerance):
                 st.success("Correct!")
             else:
                 st.error(f"Incorrect. The correct answer is {correct_answer:.2f}.")
