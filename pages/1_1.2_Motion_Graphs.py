@@ -288,6 +288,8 @@ def app():
                 with sample_col1:
                     st.pyplot(fig_pt)
                 with sample_col2:
+                    st.write(" ")
+                    st.write(" ")
                     st.write("""Which of the Velocity-Time Graphs below match 
                              the Position-Time Graph on the left?""")
                     
@@ -352,6 +354,8 @@ def app():
                 with sample_col1:
                     st.pyplot(fig_vt)
                 with sample_col2:
+                    st.write(" ")
+                    st.write(" ")
                     st.write("""Which of the Position-Time Graphs below match 
                              the Velocity-Time Graph on the left?""")
                 col1,col2,col3 = st.columns(3)
