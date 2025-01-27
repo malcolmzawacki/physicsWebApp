@@ -364,9 +364,9 @@ def app():
                     option_columns = col1,col2,col3
                     labels = ["A", "B", "C"]
 
-                    for col, label, (fig_vt, dir_vt, state_vt) in zip(option_columns, labels, st.session_state.option_graphs):
+                    for col, label, (fig_pt, dir_pt, state_pt) in zip(option_columns, labels, st.session_state.option_graphs):
                         with col:
-                            st.pyplot(fig_vt)
+                            st.pyplot(fig_pt)
                             st.markdown(
                                 f"<p style='text-align: center; font-size:16px;'>{label}</p>",
                                 unsafe_allow_html=True)
