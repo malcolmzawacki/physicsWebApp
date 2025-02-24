@@ -143,12 +143,11 @@ def main():
                     if user_input2 is not None:
                         st.session_state.user_answer2 = user_input2
                         correct_answer2 = st.session_state.ans2
-                       # tolerance2 = abs(correct_answer2 * 0.05)
-                        
-                        #if (abs(user_input1 - correct_answer) < tolerance and 
-                            #abs(user_input2 - correct_answer2) < tolerance2):
                         if (user_input1 == correct_answer) and (user_input2 == correct_answer2):
                             st.success("Correct!")
+                        elif (user_input1 * 10**user_input2 == correct_answer * 10**correct_answer2):
+                            st.error(f"Right math, wrong format")
+
                         else:
                             st.error(f"Incorrect.")
                 else:
