@@ -3,7 +3,7 @@ import random
 import math
 
 def sci_not_format(term,exponent):
-    if abs(term) < 10:
+    if abs(term) < 10 and abs(term)>=1:
         return term, exponent
     else:
         logtest = math.floor( math.log10( abs(term) ) )
@@ -29,6 +29,7 @@ def generate_sci_not_problem(difficulty):
             ans_term, q_term_1 = q_term_1, ans_term
             ans_exp = q_exp_1 - q_exp_2
             q_term_1, q_exp_1 = sci_not_format(q_term_1, q_exp_1)
+            ans_term, ans_exp = sci_not_format(ans_term,ans_exp)
             question = f"\\frac{{{q_term_1}\;\cdot\;10^{{{q_exp_1}}}}}{{{q_term_2}\;\cdot\;10^{{{q_exp_2}}}}}"
     elif difficulty == 'medium': # three inputs, negatives (combo mul, div)
         q_term_3 = random.randint(1,9)
@@ -137,15 +138,16 @@ def main():
                 if user_input1 is not None:
                     st.session_state.user_answer1 = user_input1
                     correct_answer = st.session_state.ans1
-                    tolerance = abs(correct_answer * 0.05)
+                    #tolerance = abs(correct_answer * 0.05)
                     
                     if user_input2 is not None:
                         st.session_state.user_answer2 = user_input2
                         correct_answer2 = st.session_state.ans2
-                        tolerance2 = abs(correct_answer2 * 0.05)
+                       # tolerance2 = abs(correct_answer2 * 0.05)
                         
-                        if (abs(user_input1 - correct_answer) < tolerance and 
-                            abs(user_input2 - correct_answer2) < tolerance2):
+                        #if (abs(user_input1 - correct_answer) < tolerance and 
+                            #abs(user_input2 - correct_answer2) < tolerance2):
+                        if (user_input1 == correct_answer) and (user_input2 == correct_answer2):
                             st.success("Correct!")
                         else:
                             st.error(f"Incorrect.")
