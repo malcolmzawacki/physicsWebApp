@@ -424,8 +424,13 @@ class linear_fns:
         generator = LinearMotionGenerator()
 
         problem_type_dict, problem_types, difficulties = linear_fns.question_parameters()
+
+        with st.expander("Your Performance", expanded=False):
+            performance_df = linear_fns.create_performance_dataframe()
+            st.dataframe(performance_df, use_container_width=True)
+
         # UI Controls
-        col1, col2, col3,col4 = st.columns([2,2,1,2])
+        col1, col2 = st.columns(2)
         with col1:
 
             selected_problem_type = st.selectbox(
@@ -451,20 +456,7 @@ class linear_fns:
             if selected_problem_type == "Mixed":
                 st.latex(r"v_f = v_i + a \cdot t")
                 st.latex(r"x = \frac{(v_f + v_i)}{2} \cdot t")
-        with col3:
-            st.write("")
-        with col4:
-            st.write("")
-            st.write("")
-            if st.button("New Question",key=f"{prefix}_new_question"):
-                question, answer, unit = linear_fns.generate_question(generator, problem_type, difficulty)
-                st.session_state[f"{prefix}_question_id"] += 1
-                st.session_state[f"{prefix}_current_question"] = question
-                st.session_state[f"{prefix}_correct_answer"] = answer
-                st.session_state[f"{prefix}_unit"] = unit
-                st.session_state[f"{prefix}_submitted"] = False
-                generator.clear_answers()
-                st.rerun()
+            
         # Check if we need a new question
         if (problem_type != st.session_state[f"{prefix}_problem_type"] or 
             st.session_state[f"{prefix}_current_question"] is None):
@@ -481,22 +473,18 @@ class linear_fns:
         # Display current question
         st.subheader("Question:")
         st.write(st.session_state[f"{prefix}_current_question"])
-        in_col1, in_col2, in_col3 = st.columns(3)
-        # Input fields
-        with in_col1:
-            user_input = st.number_input(
+
+        user_input = st.number_input(
                 f"Answer (in {st.session_state[f'{prefix}_unit']}):",
                 value=None,
                 step=None,
                 format="%f",
                 key=f"{prefix}_input_{st.session_state[f'{prefix}_question_id']}"
             )
-        with in_col2:
-            st.write("")
-           
-        with in_col3:
-            st.write("")
-             # Submit button
+        
+        in_col1, in_col2, in_col3 = st.columns(3)
+        # Input fields
+        with in_col1:
             if st.button("Submit",key=f"{prefix}_submit"):
                 if user_input is not None:
                     correct_answer = st.session_state[f"{prefix}_correct_answer"]
@@ -514,12 +502,27 @@ class linear_fns:
                         st.error(f"Incorrect. The correct answer is {correct_answer:.2f}.")
                 else:
                     st.error("Please enter an answer before submitting.")
+            
+        with in_col2:
+            st.write("")
+           
+        with in_col3:
+            if st.button("New Question",key=f"{prefix}_new_question"):
+                question, answer, unit = linear_fns.generate_question(generator, problem_type, difficulty)
+                st.session_state[f"{prefix}_question_id"] += 1
+                st.session_state[f"{prefix}_current_question"] = question
+                st.session_state[f"{prefix}_correct_answer"] = answer
+                st.session_state[f"{prefix}_unit"] = unit
+                st.session_state[f"{prefix}_submitted"] = False
+                generator.clear_answers()
+                st.rerun()
+            st.write("")
+             # Submit button
+            
             # New Question button
             
         
-        with st.expander("Your Performance", expanded=False):
-            performance_df = linear_fns.create_performance_dataframe()
-            st.dataframe(performance_df, use_container_width=True)
+        
         
         # Add a reset performance button
         if st.button("Reset Performance Statistics",key=f"{prefix}_performance_reset"):
@@ -627,41 +630,43 @@ class Projectile_fns:
                     format="%f",
                     key=f"user_input2_{st.session_state.question_id}"
                 )
-
-            # Submit button
-            if st.button("Submit", key = "proj_submit_button"):
-                st.session_state.submitted = True
-                if user_input is not None:
-                    st.session_state.user_answer = user_input
-                    correct_answer = st.session_state.correct_answer
-                    tolerance = abs(correct_answer * 0.05)
-                    
-                    if show_second_input:
-                        if user_input2 is not None:
-                            st.session_state.user_answer2 = user_input2
-                            correct_answer2 = st.session_state.correct_answer2
-                            tolerance2 = abs(correct_answer2 * 0.05)
-                            
-                            if (abs(user_input - correct_answer) < tolerance and 
-                                abs(user_input2 - correct_answer2) < tolerance2):
+            end_col1, end_col2 = st.columns(2)
+            with end_col1:
+                # Submit button
+                if st.button("Submit", key = "proj_submit_button"):
+                    st.session_state.submitted = True
+                    if user_input is not None:
+                        st.session_state.user_answer = user_input
+                        correct_answer = st.session_state.correct_answer
+                        tolerance = abs(correct_answer * 0.05)
+                        
+                        if show_second_input:
+                            if user_input2 is not None:
+                                st.session_state.user_answer2 = user_input2
+                                correct_answer2 = st.session_state.correct_answer2
+                                tolerance2 = abs(correct_answer2 * 0.05)
+                                
+                                if (abs(user_input - correct_answer) < tolerance and 
+                                    abs(user_input2 - correct_answer2) < tolerance2):
+                                    st.success("Correct!")
+                                else:
+                                    st.error(f"Incorrect. The correct answers are {correct_answer:.2f} {st.session_state.unit} "
+                                        f"and {correct_answer2:.2f} {st.session_state.unit2}")
+                            else:
+                                st.error("Please enter both answers before submitting.")
+                        else:
+                            if abs(user_input - correct_answer) < tolerance:
                                 st.success("Correct!")
                             else:
-                                st.error(f"Incorrect. The correct answers are {correct_answer:.2f} {st.session_state.unit} "
-                                    f"and {correct_answer2:.2f} {st.session_state.unit2}")
-                        else:
-                            st.error("Please enter both answers before submitting.")
+                                st.error(f"Incorrect. The correct answer is {correct_answer:.2f} {st.session_state.unit}")
                     else:
-                        if abs(user_input - correct_answer) < tolerance:
-                            st.success("Correct!")
-                        else:
-                            st.error(f"Incorrect. The correct answer is {correct_answer:.2f} {st.session_state.unit}")
-                else:
-                    st.error("Please enter an answer before submitting.")
-
-            # New Question button
-            if st.button("New Question"):
-                Projectile_fns.generate_new_projectile_question(generator, proj_problem_type, difficulty)
-                st.rerun()
+                        st.error("Please enter an answer before submitting.")
+            
+            with end_col2:
+                # New Question button
+                if st.button("New Question"):
+                    Projectile_fns.generate_new_projectile_question(generator, proj_problem_type, difficulty)
+                    st.rerun()
 
 
 def main():
