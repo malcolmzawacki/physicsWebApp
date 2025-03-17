@@ -170,7 +170,7 @@ class energy_basics:
         energy_basics.initialize_session_state()
 
 
-        st.session_state[f"{prefix}_level"] = st.checkbox("Conceptual?", value=False,key=f"{prefix}_level_check")
+        st.session_state[f"{prefix}_level"] = st.checkbox("Need Re-Arrangements?", value=False,key=f"{prefix}_level_check")
 
         generator = EnergyGenerator()
 
@@ -430,7 +430,7 @@ class energy_conservation:
         st.title("Conservation of Energy Problems")
         prefix = "energy_conservation"
         energy_conservation.initialize_session_state()
-        st.session_state[f"{prefix}_level"] = st.checkbox("Conceptual?", value=False,key=f"{prefix}_level_check")
+        st.session_state[f"{prefix}_level"] = st.checkbox("Need Re-Arrangements?", value=False,key=f"{prefix}_level_check")
         generator = EnergyGenerator()
 
         problem_type_dict, problem_types, difficulties = energy_conservation.question_parameters()
