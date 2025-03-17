@@ -11,10 +11,30 @@ class energy_basics:
     def question_parameters():
         """Holds current options for questions for centralized updating"""
         problem_type_dict = {
-            "Elastic Potential Energy": r"EPE = \frac{1}{2} k \Delta x^2",
-            "Kinetic Energy": r"KE = \frac{1}{2} m v^2",
-            "Gravitational Potential Energy" : r"GPE = mgh",
-            "Work": r"W = Fd",
+            "Elastic Potential Energy": {
+                "honors" : r"EPE = \frac{1}{2} k \Delta x^2", 
+                "conceptual": r"""EPE = \frac{1}{2} k \Delta x^2 \;\; , 
+                \;\; k = \frac{2 \cdot EPE}{\Delta x^2} \;\; , 
+                \;\; \Delta x = \sqrt{\frac{2 \cdot EPE}{k}}"""
+                },
+            "Kinetic Energy": {
+                "honors": r"KE = \frac{1}{2} m v^2",
+                "conceptual": r"""KE = \frac{1}{2} m v^2\;\; ,
+                \;\; m = \frac{2 \cdot K}{v^2} \;\; ,
+                \;\; v = \sqrt{\frac{2 \cdot K}{m}}"""
+            },               
+            "Gravitational Potential Energy" : {
+                "honors": r"GPE = mgh",
+                "conceptual": r"""GPE = mgh\;\; ,
+                \;\; m = \frac{GPE}{gh} \;\; ,
+                \;\; h = \frac{GPE}{mg}"""
+            },
+            "Work": {
+                "honors": r"W = Fd",
+                "conceptual": r"""W = Fd\;\; ,
+                \;\; F = \frac{W}{d} \;\; ,
+                \;\; d = \frac{W}{F}"""
+            },
             }
         problem_types = list(problem_type_dict.keys())
         difficulties = ["Easy","Medium","Hard"]
@@ -75,6 +95,9 @@ class energy_basics:
         # Initialize performance tracking dictionary if it doesn't exist
         if f"{prefix}_performance" not in st.session_state:
             st.session_state[f"{prefix}_performance"] = energy_basics.clear_performance_dataframe()
+        
+        if f"{prefix}_level" not in st.session_state:
+            st.session_state[f"{prefix}_level"] = False
     
 
 
@@ -144,6 +167,9 @@ class energy_basics:
         prefix = "energy_basics"
         energy_basics.initialize_session_state()
 
+        with st.sidebar:
+            st.session_state[f"{prefix}_level"] = st.checkbox("Conceptual?", value=False)
+
         generator = EnergyGenerator()
 
         problem_type_dict, problem_types, difficulties = energy_basics.question_parameters()
@@ -183,7 +209,10 @@ class energy_basics:
             generator.clear_answers()
 
         # Display current question
-        st.latex(problem_type_dict[st.session_state[f"{prefix}_problem_type"]])
+        if st.session_state[f"{prefix}_level"] == False:
+            st.latex(problem_type_dict[st.session_state[f"{prefix}_problem_type"]]["honors"])
+        else:
+            st.latex(problem_type_dict[st.session_state[f"{prefix}_problem_type"]]["conceptual"])
         st.subheader("Question:")
         st.write(st.session_state[f"{prefix}_current_question"])
         
