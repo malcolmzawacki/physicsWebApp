@@ -183,6 +183,7 @@ class energy_basics:
             generator.clear_answers()
 
         # Display current question
+        st.latex(problem_type_dict[st.session_state[f"{prefix}_problem_type"]])
         st.subheader("Question:")
         st.write(st.session_state[f"{prefix}_current_question"])
         
@@ -420,6 +421,7 @@ class energy_conservation:
             generator.clear_answers()
 
         # Display current question
+        st.latex(problem_type_dict[st.session_state[f"{prefix}_problem_type"]])
         st.subheader("Question:")
         st.write(st.session_state[f"{prefix}_current_question"])
         user_input = st.number_input(
