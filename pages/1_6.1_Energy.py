@@ -5,6 +5,7 @@ import pandas as pd
 
 sys.path.append(str(Path(__file__).parent.parent))
 from utils.generators.energy_generator import EnergyGenerator
+from utils.word_lists import random_error_message, random_correct_message
 class energy_basics:
 
     @staticmethod
@@ -167,8 +168,8 @@ class energy_basics:
         prefix = "energy_basics"
         energy_basics.initialize_session_state()
 
-        with st.sidebar:
-            st.session_state[f"{prefix}_level"] = st.checkbox("Conceptual?", value=False)
+
+        st.session_state[f"{prefix}_level"] = st.checkbox("Conceptual?", value=False,key=f"{prefix}_level_check")
 
         generator = EnergyGenerator()
 
@@ -240,9 +241,9 @@ class energy_basics:
                         st.session_state[f"{prefix}_submitted"] = True
                     
                     if is_correct:
-                        st.success("Correct!")
+                        st.success(f"{random_correct_message()}")
                     else:
-                        st.error(f"Incorrect. The correct answer is {correct_answer:.2f}.")
+                        st.error(f"{random_error_message()} The correct answer is {correct_answer:.2f}.")
                 else:
                     st.error("Please enter an answer before submitting.")
         with in_col2: # spacing
@@ -280,9 +281,25 @@ class energy_conservation:
     def question_parameters():
         """Holds current options for questions for centralized updating"""
         problem_type_dict = {
-            "Elastic <--> Kinetic": r"\frac{1}{2} m v^2 = \frac{1}{2} k \Delta x^2",
-            "Gravitational <--> Kinetic": r"mgh = \frac{1}{2} m v^2",
-            "Gravitational <--> Elastic" : r"mgh = \frac{1}{2} k \Delta x^2",
+            "Elastic <--> Kinetic": {
+                "honors": r"\frac{1}{2} m v^2 = \frac{1}{2} k \Delta x^2",
+                "conceptual": r""" m = k \cdot \left( \frac{ \Delta x}{v} \right)^2 \;\; ,
+                \;\; v = \Delta x \cdot \sqrt{\frac{k}{m}} \;\; ,
+                \;\; k = m \cdot \left( \frac{v}{ \Delta x} \right)^2 \;\; ,
+                \;\; \Delta x = v \cdot \sqrt{\frac{m}{k}}"""
+                },
+            "Gravitational <--> Kinetic": {
+                "honors": r"mgh = \frac{1}{2} m v^2",
+                "conceptual": r"""h = \frac{v^2}{2g} \;\;,
+                 \;\; v = \sqrt{2gh}"""
+                },
+            "Gravitational <--> Elastic" : {
+                "honors": r"mgh = \frac{1}{2} k \Delta x^2",
+                "conceptual": r"""m = \frac{k \Delta x^2}{2gh}\;\;,
+                \;\; h = \frac{k \Delta x^2}{2mg} \;\;,
+                \;\; k = \frac{2mgh}{\Delta x^2}\;\;,
+                \;\; \Delta x = \sqrt{\frac{2mgh}{k}}"""
+                                            }
             }
         problem_types = list(problem_type_dict.keys())
         difficulties = ["Easy","Medium","Hard"]
@@ -341,6 +358,9 @@ class energy_conservation:
         # Initialize performance tracking dictionary if it doesn't exist
         if f"{prefix}_performance" not in st.session_state:
             st.session_state[f"{prefix}_performance"] = energy_conservation.clear_performance_dataframe()
+
+        if f"{prefix}_level" not in st.session_state:
+            st.session_state[f"{prefix}_level"] = False
     
 
 
@@ -409,7 +429,7 @@ class energy_conservation:
         st.title("Conservation of Energy Problems")
         prefix = "energy_conservation"
         energy_conservation.initialize_session_state()
-
+        st.session_state[f"{prefix}_level"] = st.checkbox("Conceptual?", value=False,key=f"{prefix}_level_check")
         generator = EnergyGenerator()
 
         problem_type_dict, problem_types, difficulties = energy_conservation.question_parameters()
@@ -450,7 +470,10 @@ class energy_conservation:
             generator.clear_answers()
 
         # Display current question
-        st.latex(problem_type_dict[st.session_state[f"{prefix}_problem_type"]])
+        if st.session_state[f"{prefix}_level"] == False:
+            st.latex(problem_type_dict[st.session_state[f"{prefix}_problem_type"]]["honors"])
+        else:
+            st.latex(problem_type_dict[st.session_state[f"{prefix}_problem_type"]]["conceptual"])
         st.subheader("Question:")
         st.write(st.session_state[f"{prefix}_current_question"])
         user_input = st.number_input(
@@ -475,9 +498,9 @@ class energy_conservation:
                         st.session_state[f"{prefix}_submitted"] = True
                     
                     if is_correct:
-                        st.success("Correct!")
+                        st.success(f"{random_correct_message()}")
                     else:
-                        st.error(f"Incorrect. The correct answer is {correct_answer:.2f}.")
+                        st.error(f"{random_error_message()} The correct answer is {correct_answer:.2f}.")
                 else:
                     st.error("Please enter an answer before submitting.")
             
