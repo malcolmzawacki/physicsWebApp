@@ -2,6 +2,7 @@ import streamlit as st
 import random
 import math
 import sympy as sp
+import re
 
 
 class algebra:
