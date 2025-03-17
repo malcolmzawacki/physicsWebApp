@@ -5,7 +5,8 @@ import pandas as pd
 
 sys.path.append(str(Path(__file__).parent.parent))
 from utils.generators.energy_generator import EnergyGenerator
-from utils.word_lists import random_error_message, random_correct_message
+from utils.word_lists import random_error_message
+from utils.word_lists import random_correct_message
 class energy_basics:
 
     @staticmethod
