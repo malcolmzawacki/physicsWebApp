@@ -43,7 +43,7 @@ class EnergyGenerator(BaseGenerator):
 
     def elastic_potential_energy(self,difficulty):
         upper = self.get_difficulty_range(difficulty)
-        spring_constant = ri(1,upper)
+        spring_constant = ri(2,upper)
         compression = ri(1,upper)
         flip = ri(0,1)
         if flip == 0:
@@ -165,8 +165,8 @@ class EnergyGenerator(BaseGenerator):
     def elastic_gravitational_problem(self, difficulty):
         spring_constant, compression, elastic_e = self.elastic_potential_energy(difficulty)
         upper = self.get_difficulty_range(difficulty)
-        mass = ri(1,upper)
-        height = elastic_e / 20*mass
+        mass = ri(1,elastic_e)
+        height = elastic_e / (10*mass)
 
         q_type = ri(0,3)
         noun = random_noun()
@@ -184,12 +184,12 @@ class EnergyGenerator(BaseGenerator):
             unit = "meters"
         elif q_type == 2:
             # find compression
-            question = f"""A {mass} kg {noun} is dropped from {height} meters onto a spring of strength {spring_constant} N/m.
+            question = f"""A {mass} kg {noun} is dropped from {height:.2f} meters onto a spring of strength {spring_constant} N/m.
             How much does the spring have to compress to bring the {noun} to rest?"""
             answer = compression
             unit = "meters"
         else:
-            question = f"""A {noun} is dropped from {height} meters onto a spring of strength {spring_constant} N/m.
+            question = f"""A {noun} is dropped from {height:.2f} meters onto a spring of strength {spring_constant} N/m.
             If the spring compresses by {compression} meters to bring the {noun} to rest, how much mass does the {noun} have?"""
             answer = mass
             unit = "kilograms"

@@ -27,7 +27,8 @@ def random_proj_verb():
 error_messages = [
     "M'thinks thou hast miss'd the mark!","Oh mon Dieu, je suis désolé mais c'est terrible.",
     "Lo siento, esto no es correcto.","Soooo actually...you're wrong.","Yikes. Just, yikes.",
-    "Oof, this is not it pal.","Swing and a miss, champ.", "Aw shucks :/"
+    "Oof, this is not it pal.","Swing and a miss, champ.", "Aw shucks :/","Aw drats!","Gosh dang it!",
+    "Not quite..."
     ]
 
 def random_error_message():
@@ -37,7 +38,7 @@ def random_error_message():
 correct_messages = [
     "Correct!","¡Excelente! Es correcto.", "C'est correct, bon travail!",
     "Hey hey hey, we got a smart one over here!","Not too shabby kid, not too shabby.",
-    "Thine brains art formidable indeed", "Incroyable!","¡Increible!"
+    "Thine brains art formidable indeed", "Incroyable!","¡Increible!","Dataway!"
     ]
 
 def random_correct_message():

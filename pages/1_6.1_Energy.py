@@ -7,6 +7,8 @@ sys.path.append(str(Path(__file__).parent.parent))
 from utils.generators.energy_generator import EnergyGenerator
 from utils.word_lists import random_error_message
 from utils.word_lists import random_correct_message
+
+
 class energy_basics:
 
     @staticmethod
@@ -219,19 +221,17 @@ class energy_basics:
         st.write(st.session_state[f"{prefix}_current_question"])
         
         # Input fields
-        user_input = st.number_input(
+        user_input = st.text_input(
                 f"Answer (in {st.session_state[f'{prefix}_unit']}):",
-                value=None,
-                step=None,
-                format="%f",
                 key=f"{prefix}_input_{st.session_state[f'{prefix}_question_id']}"
             )
         
-        in_col1, in_col2, in_col3 = st.columns(3)
+        in_col1, in_col2, in_col3 = st.columns([2,2,1])
 
         with in_col1: # submit button
-            if st.button("Submit",key=f"{prefix}_submit"):
-                if user_input is not None:
+            if st.button("Submit",key=f"{prefix}_submit") or user_input:
+                try:
+                    user_input = float(user_input)
                     correct_answer = st.session_state[f"{prefix}_correct_answer"]
                     tolerance = correct_answer * 0.05
                     is_correct = abs(user_input - correct_answer) < abs(tolerance)
@@ -245,12 +245,10 @@ class energy_basics:
                         st.success(f"{random_correct_message()}")
                     else:
                         st.error(f"{random_error_message()} The correct answer is {correct_answer:.2f}.")
-                else:
-                    st.error("Please enter an answer before submitting.")
-        with in_col2: # spacing
-            st.write("")            
-           
-        with in_col3: #new question button
+                except ValueError:
+                    st.error("Please enter a valid number")
+                
+        with in_col2:
             if st.button("New Question",key=f"{prefix}_new_question"):
                 question, answer, unit = energy_basics.generate_question(generator, problem_type, difficulty)
                 st.session_state[f"{prefix}_question_id"] += 1
@@ -259,21 +257,26 @@ class energy_basics:
                 st.session_state[f"{prefix}_unit"] = unit
                 st.session_state[f"{prefix}_submitted"] = False
                 generator.clear_answers()
+                st.rerun()         
+           
+        with in_col3:
+            # reset performance button
+            st.subheader("")
+            st.subheader("")
+            st.subheader("")
+            st.subheader("")
+            st.subheader("")
+            if st.button("Reset Stats",key=f"{prefix}_performance_reset"):
+                energy_basics.initialize_session_state()
+                st.session_state[f"{prefix}_performance"] = energy_basics.clear_performance_dataframe()
+                question, answer, unit = energy_basics.generate_question(generator, problem_type, difficulty)
+                st.session_state[f"{prefix}_question_id"] += 1
+                st.session_state[f"{prefix}_current_question"] = question
+                st.session_state[f"{prefix}_correct_answer"] = answer
+                st.session_state[f"{prefix}_unit"] = unit
+                st.session_state[f"{prefix}_submitted"] = False
+                generator.clear_answers()
                 st.rerun()
-
-        # reset performance button
-
-        if st.button("Reset Performance Statistics",key=f"{prefix}_performance_reset"):
-            energy_basics.initialize_session_state()
-            st.session_state[f"{prefix}_performance"] = energy_basics.clear_performance_dataframe()
-            question, answer, unit = energy_basics.generate_question(generator, problem_type, difficulty)
-            st.session_state[f"{prefix}_question_id"] += 1
-            st.session_state[f"{prefix}_current_question"] = question
-            st.session_state[f"{prefix}_correct_answer"] = answer
-            st.session_state[f"{prefix}_unit"] = unit
-            st.session_state[f"{prefix}_submitted"] = False
-            generator.clear_answers()
-            st.rerun()
 
 
 class energy_conservation:
@@ -477,38 +480,33 @@ class energy_conservation:
             st.latex(problem_type_dict[st.session_state[f"{prefix}_problem_type"]]["conceptual"])
         st.subheader("Question:")
         st.write(st.session_state[f"{prefix}_current_question"])
-        user_input = st.number_input(
+        user_input = st.text_input(
                 f"Answer (in {st.session_state[f'{prefix}_unit']}):",
-                value=None,
-                step=None,
-                format="%f",
                 key=f"{prefix}_input_{st.session_state[f'{prefix}_question_id']}"
             )
-        in_col1, in_col2, in_col3 = st.columns(3)
+        in_col1, in_col2, in_col3 = st.columns([2,2,1])
         # Input fields
         with in_col1:
-            if st.button("Submit",key=f"{prefix}_submit"):
-                if user_input is not None:
+            if st.button("Submit",key=f"{prefix}_submit") or user_input:
+                try:
+                    user_input = float(user_input)
                     correct_answer = st.session_state[f"{prefix}_correct_answer"]
                     tolerance = correct_answer * 0.05
                     is_correct = abs(user_input - correct_answer) < abs(tolerance)
                     
                     # Only update performance if not already submitted for this question
                     if not st.session_state[f"{prefix}_submitted"]:
-                        energy_conservation.update_performance(problem_type, difficulty, is_correct)
+                        energy_basics.update_performance(problem_type, difficulty, is_correct)
                         st.session_state[f"{prefix}_submitted"] = True
                     
                     if is_correct:
                         st.success(f"{random_correct_message()}")
                     else:
                         st.error(f"{random_error_message()} The correct answer is {correct_answer:.2f}.")
-                else:
-                    st.error("Please enter an answer before submitting.")
+                except ValueError:
+                    st.error("Please enter a valid number")
             
         with in_col2:
-            st.write("")
-           
-        with in_col3:
             if st.button("New Question",key=f"{prefix}_new_question"):
                 question, answer, unit = energy_conservation.generate_question(generator, problem_type, difficulty)
                 st.session_state[f"{prefix}_question_id"] += 1
@@ -519,26 +517,24 @@ class energy_conservation:
                 generator.clear_answers()
                 st.rerun()
             st.write("")
-             # Submit button
-            
-            # New Question button
-            
-        
-
-        
-        # Add a reset performance button
-
-        if st.button("Reset Performance Statistics",key=f"{prefix}_performance_reset"):
-            energy_conservation.initialize_session_state()
-            st.session_state[f"{prefix}_performance"] = energy_conservation.clear_performance_dataframe()
-            question, answer, unit = energy_conservation.generate_question(generator, problem_type, difficulty)
-            st.session_state[f"{prefix}_question_id"] += 1
-            st.session_state[f"{prefix}_current_question"] = question
-            st.session_state[f"{prefix}_correct_answer"] = answer
-            st.session_state[f"{prefix}_unit"] = unit
-            st.session_state[f"{prefix}_submitted"] = False
-            generator.clear_answers()
-            st.rerun()
+           
+        with in_col3:
+            st.subheader("")
+            st.subheader("")
+            st.subheader("")
+            st.subheader("")
+            # Add a reset performance button
+            if st.button("Reset Stats",key=f"{prefix}_performance_reset"):
+                energy_conservation.initialize_session_state()
+                st.session_state[f"{prefix}_performance"] = energy_conservation.clear_performance_dataframe()
+                question, answer, unit = energy_conservation.generate_question(generator, problem_type, difficulty)
+                st.session_state[f"{prefix}_question_id"] += 1
+                st.session_state[f"{prefix}_current_question"] = question
+                st.session_state[f"{prefix}_correct_answer"] = answer
+                st.session_state[f"{prefix}_unit"] = unit
+                st.session_state[f"{prefix}_submitted"] = False
+                generator.clear_answers()
+                st.rerun()
 
 
 def main():
