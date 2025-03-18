@@ -102,6 +102,9 @@ class energy_basics:
         
         if f"{prefix}_level" not in st.session_state:
             st.session_state[f"{prefix}_level"] = False
+
+        if f"{prefix}_stars" not in st.session_state:
+            st.session_state[f"{prefix}_stars"] = 0
     
 
 
@@ -170,9 +173,18 @@ class energy_basics:
         st.title("Types of Energy Problems")
         prefix = "energy_basics"
         energy_basics.initialize_session_state()
-
-
-        st.session_state[f"{prefix}_level"] = st.checkbox("Need Re-Arrangements?", value=False,key=f"{prefix}_level_check")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.session_state[f"{prefix}_level"] = st.checkbox(
+                "Need Re-Arrangements?", 
+                value=False,
+                key=f"{prefix}_level_check")
+        with col2:
+            if st.session_state[f"{prefix}_stars"] != 0:
+                star_count = st.session_state[f"{prefix}_stars"]
+                st.subheader(f"⭐ x {star_count}")
+            else:
+                st.write("")
 
         generator = EnergyGenerator()
 
@@ -239,20 +251,22 @@ class energy_basics:
         with st.form(f"{prefix}_form"):
                 user_input = st.number_input(
                     "Enter your answer:", 
-                    min_value=0, value=None, 
+                    min_value=0.00, value=None, 
                     key=f"{prefix}_input")
                 submitted = st.form_submit_button("Submit")
                 if submitted:
+                    user_input = float(user_input)
                     correct_answer = st.session_state[f"{prefix}_correct_answer"]
                     tolerance = correct_answer * 0.05
                     is_correct = abs(user_input - correct_answer) < abs(tolerance)
                     if not st.session_state[f"{prefix}_submitted"]:
                         energy_basics.update_performance(problem_type, difficulty, is_correct)
                         st.session_state[f"{prefix}_submitted"] = True 
-                    if is_correct:
-                        st.success(f"{random_correct_message()}")
-                    else:
-                        st.error(f"{random_error_message()} The correct answer is {correct_answer:.2f}.")
+                        if is_correct:
+                            st.success(f"{random_correct_message()}")
+                            st.session_state[f"{prefix}_stars"] += 1
+                        else:
+                            st.error(f"{random_error_message()} The correct answer is {correct_answer:.2f}.")
         in_col1, in_col2, in_col3 = st.columns([2,2,1])
 
         with in_col1: # submit button
@@ -368,6 +382,9 @@ class energy_conservation:
 
         if f"{prefix}_level" not in st.session_state:
             st.session_state[f"{prefix}_level"] = False
+
+        if f"{prefix}_stars" not in st.session_state:
+            st.session_state[f"{prefix}_stars"] = 0
     
 
 
@@ -436,10 +453,18 @@ class energy_conservation:
         st.title("Conservation of Energy Problems")
         prefix = "energy_conservation"
         energy_conservation.initialize_session_state()
-        st.session_state[f"{prefix}_level"] = st.checkbox(
-            "Need Re-Arrangements?", 
-            value=False,
-            key=f"{prefix}_level_check")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.session_state[f"{prefix}_level"] = st.checkbox(
+                "Need Re-Arrangements?", 
+                value=False,
+                key=f"{prefix}_level_check")
+        with col2:
+            if st.session_state[f"{prefix}_stars"] != 0:
+                star_count = st.session_state[f"{prefix}_stars"]
+                st.subheader(f"⭐ x {star_count}")
+            else:
+                st.write("")
         
         generator = EnergyGenerator()
 
@@ -506,20 +531,22 @@ class energy_conservation:
         with st.form(f"{prefix}_form"):
                 user_input = st.number_input(
                     "Enter your answer:", 
-                    min_value=0, value=None, 
+                    min_value=0.00, value=None,
                     key=f"{prefix}_input")
                 submitted = st.form_submit_button("Submit")
                 if submitted:
+                    user_input = float(user_input)
                     correct_answer = st.session_state[f"{prefix}_correct_answer"]
                     tolerance = correct_answer * 0.05
                     is_correct = abs(user_input - correct_answer) < abs(tolerance)
                     if not st.session_state[f"{prefix}_submitted"]:
                         energy_conservation.update_performance(problem_type, difficulty, is_correct)
                         st.session_state[f"{prefix}_submitted"] = True 
-                    if is_correct:
-                        st.success(f"{random_correct_message()}")
-                    else:
-                        st.error(f"{random_error_message()} The correct answer is {correct_answer:.2f}.")
+                        if is_correct:
+                            st.success(f"{random_correct_message()}")
+                            st.session_state[f"{prefix}_stars"] += 1
+                        else:
+                            st.error(f"{random_error_message()} The correct answer is {correct_answer:.2f}.")
         in_col1, in_col2, in_col3 = st.columns([2,2,1])
         # Input fields
         with in_col1:
