@@ -237,10 +237,12 @@ class energy_basics:
         # Input fields
  
         with st.form(f"{prefix}_form"):
-                user_input = st.number_input("Enter your answer:", key=f"{prefix}_input")
+                user_input = st.number_input(
+                    "Enter your answer:", 
+                    min_value=0, value=None, 
+                    key=f"{prefix}_input")
                 submitted = st.form_submit_button("Submit")
                 if submitted:
-                    user_input = float(user_input)
                     correct_answer = st.session_state[f"{prefix}_correct_answer"]
                     tolerance = correct_answer * 0.05
                     is_correct = abs(user_input - correct_answer) < abs(tolerance)
@@ -502,10 +504,12 @@ class energy_conservation:
 
 
         with st.form(f"{prefix}_form"):
-                user_input = st.number_input("Enter your answer:", key=f"{prefix}_input")
+                user_input = st.number_input(
+                    "Enter your answer:", 
+                    min_value=0, value=None, 
+                    key=f"{prefix}_input")
                 submitted = st.form_submit_button("Submit")
                 if submitted:
-                    user_input = float(user_input)
                     correct_answer = st.session_state[f"{prefix}_correct_answer"]
                     tolerance = correct_answer * 0.05
                     is_correct = abs(user_input - correct_answer) < abs(tolerance)
