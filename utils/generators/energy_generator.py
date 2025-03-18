@@ -164,7 +164,7 @@ class EnergyGenerator(BaseGenerator):
     
     def elastic_gravitational_problem(self, difficulty):
         spring_constant, compression, elastic_e = self.elastic_potential_energy(difficulty)
-        mass = ri(1, int(elastic_e//5  + 1))
+        mass = ri(1, int(elastic_e//5  + 2))
         height = elastic_e / (10*mass)
 
         q_type = ri(0,3)
