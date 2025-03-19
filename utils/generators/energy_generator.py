@@ -163,26 +163,26 @@ class EnergyGenerator(BaseGenerator):
     
     def elastic_gravitational_problem(self, difficulty):
         spring_constant, compression, elastic_e = self.elastic_potential_energy(difficulty)
-        mass = ri(1, int(elastic_e//5  + 2))
-        height = elastic_e / (10*mass)
+        height = compression * ri(2, int(elastic_e//5  + 3))
+        mass = elastic_e / (10*height)
 
         q_type = ri(0,3)
         noun = random_noun()
         if q_type == 0:
             # find k
-            question = f"""A {mass} kg {noun} is dropped from a height of {height:.2f} meters.
+            question = f"""A {mass:.2f} kg {noun} is dropped from a height of {height:.2f} meters.
             A spring has to compress by {compression} meters to stop it. How strong is the spring?"""
             answer = spring_constant
             unit = "N/m"
         elif q_type == 1:
             # find height
-            question = f"""A {mass} kg {noun} is released from rest and dropped on a spring of strength {spring_constant} N/m.
+            question = f"""A {mass:.2f} kg {noun} is released from rest and dropped on a spring of strength {spring_constant} N/m.
             If the spring compresses {compression} meters before the {noun} comes to rest, how high up was it dropped from?"""
             answer = height
             unit = "meters"
         elif q_type == 2:
             # find compression
-            question = f"""A {mass} kg {noun} is dropped from {height:.2f} meters onto a spring of strength {spring_constant} N/m.
+            question = f"""A {mass:.2f} kg {noun} is dropped from {height:.2f} meters onto a spring of strength {spring_constant} N/m.
             How much does the spring have to compress to bring the {noun} to rest?"""
             answer = compression
             unit = "meters"
@@ -228,3 +228,17 @@ class EnergyGenerator(BaseGenerator):
                 unit = "kilograms"
 
             return question, answer, unit
+    
+    def choose_problem(self,problem_type, difficulty):
+        if problem_type == "Elastic Potential Energy":
+            question, answer, unit = self.elastic_problem(difficulty)
+        elif problem_type == "Kinetic Energy":
+            question, answer, unit = self.kinetic_problem(difficulty)
+        elif problem_type == "Gravitational Potential Energy":
+            question, answer, unit = self.gravitational_problem(difficulty)
+        elif problem_type == "Work":
+            question, answer, unit = self.work_problem(difficulty)
+        else:
+            pass
+        
+        return question, answer, unit

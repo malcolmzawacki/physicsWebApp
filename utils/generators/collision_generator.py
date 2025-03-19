@@ -77,3 +77,5 @@ class CollisionGenerator(BaseGenerator):
             answer = v3
             unit = f"{object1} and {object2} combined final velocity (m/s)"
         return question, answer, unit, answer2, unit2
+    
+    

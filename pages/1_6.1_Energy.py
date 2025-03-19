@@ -9,6 +9,7 @@ from utils.word_lists import random_error_message
 from utils.word_lists import random_correct_message
 
 
+
 class energy_basics:
 
     @staticmethod
@@ -247,7 +248,6 @@ class energy_basics:
         st.write(st.session_state[f"{prefix}_current_question"])
         
         # Input fields
- 
         with st.form(f"{prefix}_form"):
                 st.session_state[f"{prefix}user_answer"] = st.number_input(
                     "Enter your answer:", 
@@ -268,8 +268,7 @@ class energy_basics:
                         else:
                             st.error(f"{random_error_message()} The correct answer is {correct_answer:.2f}.")
         in_col1, in_col2, in_col3 = st.columns([2,2,1])
-
-        with in_col1: # submit button
+        with in_col1: 
             st.write("")
                 
         with in_col2:

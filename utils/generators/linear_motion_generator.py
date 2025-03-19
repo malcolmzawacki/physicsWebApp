@@ -517,3 +517,17 @@ class LinearMotionGenerator(BaseGenerator):
                 question, answer, unit = self.no_vf_question(difficulty)
 
         return question, answer, unit
+    
+    def choose_problem(self,problem_type, difficulty):
+        if problem_type == "No Time":
+            question, answer, unit = self.no_time_question(difficulty)
+        elif problem_type == "No Distance":
+            question, answer, unit = self.no_dist_question(difficulty)
+        elif problem_type == "No Acceleration":
+            question, answer, unit = self.no_acc_question(difficulty)
+        elif problem_type == "No Final Velocity":
+            question, answer, unit = self.no_vf_question(difficulty)
+        else:  # Mixed
+            question, answer, unit = self.mixed_question(difficulty)
+        return question, answer, unit
+        
