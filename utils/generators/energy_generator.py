@@ -63,7 +63,6 @@ class EnergyGenerator(BaseGenerator):
         q_type = ri(0,2)
         dirn = ri(0,1)
         dirn_string = "compressed" if dirn == 0 else "stretched"
-        {}
         if q_type == 0:
             question = f"""A spring with strength {spring_constant} N/m is {dirn_string} by {compression} meters.
             What is the amount of elastic potential energy held in the spring?"""

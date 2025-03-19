@@ -6,7 +6,9 @@ objects = [
     "broken treadmill","villainous character","stunt-seeking daredevil","Minecraft villager",
     "mischievious rapscalion","clown","giant spider","miniature elephant","kitschy porcelain figurine","priceless artifact",
     "crown jewel","tuba","snare drum","block of concrete","kindergartener's action figure","bonsai tree", 
-    "The Infamous Epi Demick","box of tnt", "physics student", "crazy karen", "yard stick"
+    "The Infamous Epi Demick","box of tnt", "physics student", "crazy karen", "yard stick","bat-a-rang",
+    "jar of dephlogisticated air","jar of rephlogisticated air","literal horse","concerning omen",
+    "very antiquated textbook","horse and buggy","potted fern","whale"
     ]
 
 def random_noun():
@@ -28,7 +30,8 @@ error_messages = [
     "M'thinks thou hast miss'd the mark!","Oh mon Dieu, je suis désolé mais c'est terrible.",
     "Lo siento, esto no es correcto.","Soooo actually...you're wrong.","Yikes. Just, yikes.",
     "Oof, this is not it pal.","Swing and a miss, champ.", "Aw shucks :/","Aw drats!","Gosh dang it!",
-    "Not quite..."
+    "Not quite...","Raise your hand if you're RIGHT! Put your hand down.",
+    "You'll get 'em next time bud. But not this time."
     ]
 
 def random_error_message():
