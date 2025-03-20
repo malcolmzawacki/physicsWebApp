@@ -613,9 +613,7 @@ class thermal:
         problem_type_dict = {
             "Quantifying Thermal Energy": {
                 "honors": r"\Delta E = W_f",
-                "conceptual": r"""W_f = E_f - E_i\;\; ,
-                \;\; E_i = E_f + W_f \;\; ,
-                \;\; E_f = E_i - W_f \;\;
+                "conceptual": r"""W_f = E_f - E_i\;\;
                 \newline ~ \newline ~ \newline
                 EPE = \frac{1}{2} k \Delta x^2 \quad ,
                 \quad KE = \frac{1}{2} m v^2 \quad ,
