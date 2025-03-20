@@ -229,6 +229,50 @@ class EnergyGenerator(BaseGenerator):
 
             return question, answer, unit
     
+    def thermal_problem(self, difficulty):
+        noun = random_noun()
+        flip = ri(0,2)
+        if flip == 0:
+            #grav -> Kin
+            mass, height, grav = self.gravitational_potential_energy("Hard")
+            thermal = ri(1,int(grav//2 + 2))
+            kinetic = grav - thermal
+            velocity = (2*kinetic/mass)**(1/2)
+            question = f"""A {mass} kg {noun} is released from rest and slides down a {height} meter tall ramp.
+            If the {noun}'s velocity at the bottom is {velocity:.2f} m/s, how much energy was lost as heat?"""
+            answer = thermal
+            unit = "Joules"
+        elif flip == 1:
+            #grav -> elastic
+            mass, height, grav = self.gravitational_potential_energy("Hard")
+            thermal = ri(1,grav//2 + 2)
+            elastic = grav - thermal
+            spring_constant = ri(2,int(elastic//2 + 3))
+            compression = (2*elastic/spring_constant)**(1/2)
+            question = f"""A {mass} kg {noun} is released from rest and slides down a {height} meter tall ramp.
+            It collides with a spring of strength {spring_constant} N/m, which compresses {compression:.2f} meters before coming to rest.
+            How much energy was lost as heat?"""
+            answer = thermal
+            unit = "Joules"
+        elif flip == 2:
+            #kinetic -> elastic
+            mass, velocity, kinetic = self.kinetic_energy("Hard")
+            thermal = ri(1,kinetic//2 + 2)
+            elastic = kinetic - thermal
+            spring_constant = ri(2,int(elastic//2 + 3))
+            compression = (2*elastic/spring_constant)**(1/2)
+            question = f"""A {mass} kg {noun} is moving at {velocity} m/s when it collides with a spring of strength {spring_constant} N/m.
+            If the spring compresses {compression:.2f} meters before coming to rest, how much energy was lost as heat?"""
+            answer = thermal
+            unit = "Joules"
+
+
+
+
+            
+
+        return question, answer, unit
+
     def choose_problem(self,problem_type, difficulty):
         if problem_type == "Elastic Potential Energy":
             question, answer, unit = self.elastic_problem(difficulty)
@@ -238,6 +282,8 @@ class EnergyGenerator(BaseGenerator):
             question, answer, unit = self.gravitational_problem(difficulty)
         elif problem_type == "Work":
             question, answer, unit = self.work_problem(difficulty)
+        elif problem_type == "Quantifying Thermal Energy":
+            question, answer, unit = self.thermal_problem(difficulty)
         else:
             pass
         

@@ -5,6 +5,7 @@ import pandas as pd
 
 sys.path.append(str(Path(__file__).parent.parent))
 from utils.generators.energy_generator import EnergyGenerator
+from utils.rendering import rendering
 from utils.word_lists import random_error_message
 from utils.word_lists import random_correct_message
 
@@ -575,15 +576,80 @@ class energy_conservation:
                 st.rerun()
 
 
+# for updating thermal as backend is completed
+def question_parameters():
+        """Holds current options for questions for centralized updating"""
+        problem_type_dict = {
+            "Quantifying Thermal Energy": {
+                "honors": r"\Delta E = W_f",
+                "conceptual": r"""\Delta E = W_f \;\; ,
+                \;\; E_i = E_f + W_f \;\; ,
+                \;\; E_f = E_i - W_f \;\;
+                """
+                },
+            "Friction and Distance": {
+                "honors": r"W_f = F_f x",
+                "conceptual": r"""W_f = F_f x \;\;,
+                 \;\ x = \frac{W_f}{F_f} \;\;
+                 \;\; F_f = \frac{W_f}{x}"""
+                },
+            "Coefficient of Friction" : {
+                "honors": r"F_f = \mu F_n",
+                "conceptual": r"""F_f = \mu m g\;\;,
+                \;\; m = \frac{F_f}{\mu g} \;\;,
+                \;\; \mu = \frac{F_f}{mg}
+                """
+                                            }
+            }
+        problem_types = list(problem_type_dict.keys())
+        difficulties = ["Easy","Medium","Hard"]
+        return problem_type_dict, problem_types, difficulties
+
+
+class thermal:
+    @staticmethod
+    def question_parameters():
+        """Holds current options for questions for centralized updating"""
+        problem_type_dict = {
+            "Quantifying Thermal Energy": {
+                "honors": r"\Delta E = W_f",
+                "conceptual": r"""W_f = E_f - E_i\;\; ,
+                \;\; E_i = E_f + W_f \;\; ,
+                \;\; E_f = E_i - W_f \;\;
+                \newline ~ \newline ~ \newline
+                EPE = \frac{1}{2} k \Delta x^2 \quad ,
+                \quad KE = \frac{1}{2} m v^2 \quad ,
+                \quad GPE = mgh
+                """
+                }
+            }
+        problem_types = list(problem_type_dict.keys())
+        difficulties = ["Easy","Medium","Hard"]
+        return problem_type_dict, problem_types, difficulties
+
+    @staticmethod
+    def main():
+        st.title("Thermal Energy")
+        prefix = "thermal"
+        problem_type_dict, problem_types, difficulties = thermal.question_parameters()
+        render = rendering()
+        generator = EnergyGenerator()
+        render.initialize_session_state(prefix, problem_types, difficulties)
+        performance = st.session_state[f"{prefix}_performance"]
+        render.subheader_ui(prefix,performance)
+        render.question_ui(prefix, problem_type_dict, problem_types ,difficulties, generator)
+
 def main():
     # Add tabs for quiz and explorer modes
-    tab1, tab2 = st.tabs(["Types of Energy", "Conservation of Energy"])
+    tab1, tab2, tab3 = st.tabs(["Types of Energy", "Conservation of Energy","Thermal Energy"])
     
     
     with tab1:
         energy_basics.energy_basics_tab()
     with tab2:
         energy_conservation.energy_conservation_tab()
+    with tab3:
+        thermal.main()
 
 if __name__ == "__main__":
     main()
