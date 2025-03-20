@@ -257,7 +257,7 @@ class EnergyGenerator(BaseGenerator):
         elif flip == 2:
             #kinetic -> elastic
             mass, velocity, kinetic = self.kinetic_energy("Hard")
-            thermal = ri(1,kinetic//2 + 2)
+            thermal = ri(1,int(kinetic//2 + 2))
             elastic = kinetic - thermal
             spring_constant = ri(2,int(elastic//2 + 3))
             compression = (2*elastic/spring_constant)**(1/2)
