@@ -637,10 +637,10 @@ class thermal:
         render.subheader_ui(prefix,performance)
         render.question_ui(prefix, problem_type_dict, problem_types ,difficulties, generator)
 
+
 def main():
     # Add tabs for quiz and explorer modes
-    tab1, tab2, tab3 = st.tabs(["Types of Energy", "Conservation of Energy","Thermal Energy"])
-    
+    tab1, tab2, tab3 = st.tabs(["Types of Energy", "Conservation of Energy","Thermal Energy"])  
     
     with tab1:
         energy_basics.energy_basics_tab()

@@ -185,8 +185,9 @@ class rendering:
         st.subheader("Question:")
         st.write(st.session_state[f"{prefix}_current_question"])
         with st.form(f"{prefix}_form"):
+                unit =  st.session_state[f"{prefix}_unit"]
                 st.session_state[f"{prefix}user_answer"] = st.number_input(
-                    "Enter your answer:", 
+                    f"Enter your answer (in {unit}):", 
                     min_value=0.00, value=None, step=0.01,
                     key=f"{prefix}_input")
                 submitted = st.form_submit_button("Submit")

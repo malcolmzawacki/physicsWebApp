@@ -63,7 +63,7 @@ class EnergyGenerator(BaseGenerator):
         q_type = ri(0,2)
         dirn = ri(0,1)
         dirn_string = "compressed" if dirn == 0 else "stretched"
-        if q_type == 0:
+        if q_type == 0 or difficulty == "Easy":
             question = f"""A spring with strength {spring_constant} N/m is {dirn_string} by {compression} meters.
             What is the amount of elastic potential energy held in the spring?"""
             answer = elastic_e
@@ -85,7 +85,7 @@ class EnergyGenerator(BaseGenerator):
         mass, velocity, kinetic_e = self.kinetic_energy(difficulty)
         q_type = ri(0,2)
         noun = random_noun()
-        if q_type == 0:
+        if q_type == 0 or difficulty == "Easy":
             question = f"""How much kinetic energy does a {mass} kg {noun} moving at {velocity} m/s have?"""
             answer = kinetic_e
             unit = "Joules"
@@ -104,7 +104,7 @@ class EnergyGenerator(BaseGenerator):
         mass, height, gravit_e = self.gravitational_potential_energy(difficulty)
         q_type = ri(0,2)
         noun = random_noun()
-        if q_type == 0:
+        if q_type == 0 or difficulty == "Easy":
             question = f"""How much gravitational potential energy does a {mass} kg {noun} 
             held {height} meters above the ground have?"""
             answer = gravit_e
@@ -126,7 +126,7 @@ class EnergyGenerator(BaseGenerator):
         force, distance, work = self.work(difficulty)
         q_type = ri(0,2)
         noun = random_noun()
-        if q_type == 0:
+        if q_type == 0 or difficulty == "Easy":
             question = f"""A {noun} is moved {distance} meters by a {force} Newton force. How much work was done?"""
             answer = work
             unit = "Joules"
@@ -229,47 +229,142 @@ class EnergyGenerator(BaseGenerator):
 
             return question, answer, unit
     
-    def thermal_problem(self, difficulty):
-        noun = random_noun()
+    def grav_kin_thermal(self, difficulty):
+        #grav -> Kin
         flip = ri(0,2)
-        if flip == 0:
-            #grav -> Kin
-            mass, height, grav = self.gravitational_potential_energy("Hard")
-            thermal = ri(1,int(grav//2 + 2))
-            kinetic = grav - thermal
-            velocity = (2*kinetic/mass)**(1/2)
+        noun = random_noun()
+        mass, height, grav = self.gravitational_potential_energy("Hard")
+        thermal = ri(1,int(grav//2 + 2))
+        kinetic = grav - thermal
+        velocity = (2*kinetic/mass)**(1/2)
+        if flip == 0 or difficulty == "Easy":
+            # just find the difference
             question = f"""A {mass} kg {noun} is released from rest and slides down a {height} meter tall ramp.
             If the {noun}'s velocity at the bottom is {velocity:.2f} m/s, how much energy was lost as heat?"""
             answer = thermal
             unit = "Joules"
         elif flip == 1:
-            #grav -> elastic
-            mass, height, grav = self.gravitational_potential_energy("Hard")
-            thermal = ri(1,grav//2 + 2)
-            elastic = grav - thermal
-            spring_constant = ri(2,int(elastic//2 + 3))
-            compression = (2*elastic/spring_constant)**(1/2)
+            # give the initial and the loss, find final info
+            question = f"""A {mass} kg {noun} is released from rest and slides down a {height} meter tall ramp.
+            If the {noun} loses {thermal} Joules due to friction / heat along the way, 
+            what will it's velocity be when it reaches the bottom?"""
+            answer = velocity
+            unit = "m/s"
+        elif flip == 2:
+            # give the final and the loss, find initial info
+            question = f"""A {mass} kg {noun} is released from rest and slides down a ramp,
+            losing {thermal} Joules due to friction / heat along the way. If the {noun} reaches the bottom moving at 
+            {velocity:.2f} m/s, what was the original height of the ramp?"""
+            answer = height
+            unit = "m/s"
+        return question, answer, unit
+
+    def grav_elastic_thermal(self, difficulty):
+        
+        mass, height, grav = self.gravitational_potential_energy("Hard")
+        thermal = ri(1,grav//2 + 2)
+        elastic = grav - thermal
+        spring_constant = ri(2,int(elastic//2 + 3))
+        compression = (2*elastic/spring_constant)**(1/2)
+
+        noun = random_noun()
+        flip = ri(0,4)
+        if flip == 0 or difficulty == "Easy":
+            # just find the difference
             question = f"""A {mass} kg {noun} is released from rest and slides down a {height} meter tall ramp.
             It collides with a spring of strength {spring_constant} N/m, which compresses {compression:.2f} meters before coming to rest.
             How much energy was lost as heat?"""
             answer = thermal
             unit = "Joules"
+        elif flip == 1:
+            # give the initial and the loss, find final info
+            question = f"""A {mass} kg {noun} is released from rest and slides down a {height} meter tall ramp.
+            The {noun} loses {thermal} Joules due to friction / heat along the way, and ends up compressing the spring at the bottom by
+            {compression:.2f} meters. How strong is the spring?"""
+            answer = spring_constant
+            unit = "N/m"
         elif flip == 2:
-            #kinetic -> elastic
-            mass, velocity, kinetic = self.kinetic_energy("Hard")
-            thermal = ri(1,int(kinetic//2 + 2))
-            elastic = kinetic - thermal
-            spring_constant = ri(2,int(elastic//2 + 3))
-            compression = (2*elastic/spring_constant)**(1/2)
+            # give the initial and the loss, find final info
+            question = f"""A {mass} kg {noun} is released from rest and slides down a {height} meter tall ramp.
+            The {noun} loses {thermal} Joules due to friction / heat along the way, and ends up compressing a
+            spring that has a strength of {spring_constant} N/m. How much does the spring compress?"""
+            answer = compression
+            unit = "meters"
+        elif flip == 3:
+            # give final and loss, find initial
+            question = f"""A {noun} is released from rest and slides down a {height} meter tall ramp.
+            The {noun} loses {thermal} Joules due to friction / heat along the way, and ends up compressing a
+            spring that has a strength of {spring_constant} N/m by {compression:.2f} meters. 
+            How much mass does the {noun} have?"""
+            answer = mass
+            unit = "kg"
+        elif flip == 4:
+            question = f"""A {mass} kg {noun} is released from rest and slides down a ramp.
+            The {noun} loses {thermal} Joules due to friction / heat along the way, and ends up compressing a
+            spring that has a strength of {spring_constant} N/m by {compression:.2f} meters. 
+            How tall is the ramp?"""
+            answer = height
+            unit = "meters"
+        return question, answer, unit
+
+    def kinetic_elastic_thermal(self,difficulty):
+
+        mass, velocity, kinetic = self.kinetic_energy("Hard")
+        thermal = ri(1,int(kinetic//2 + 2))
+        elastic = kinetic - thermal
+        spring_constant = ri(2,int(elastic//2 + 3))
+        compression = (2*elastic/spring_constant)**(1/2)
+        
+        noun = random_noun()
+        flip = ri(0,4)
+        if flip == 0 or difficulty == "Easy":
+            # just find the difference
             question = f"""A {mass} kg {noun} is moving at {velocity} m/s when it collides with a spring of strength {spring_constant} N/m.
             If the spring compresses {compression:.2f} meters before coming to rest, how much energy was lost as heat?"""
             answer = thermal
             unit = "Joules"
+        elif flip == 1:
+            # give the initial and the loss, find final info
+            question = f"""A {mass} kg {noun} is moving at {velocity} m/s when it collides with a spring, and ends up 
+            compressing the spring at the bottom by {compression:.2f} meters.
+            The {noun} lost {thermal} Joules due to friction / heat along the way. How strong is the spring?"""
+            answer = spring_constant
+            unit = "N/m"
+        elif flip == 2:
+            # give the initial and the loss, find final info
+            question = f"""A {mass} kg {noun} is moving at {velocity} m/s when it collides with a spring 
+            that has a strength of {spring_constant} N/m.
+            The {noun} lost {thermal} Joules due to friction / heat along the way. How much does the spring compress?"""
+            answer = compression
+            unit = "meters"
+        elif flip == 3:
+            # give final and loss, find initial
+            question = f"""A {noun} is moving at {velocity} m/s, and ends up compressing a
+            spring that has a strength of {spring_constant} N/m by {compression:.2f} meters.
+            The {noun} loses {thermal} Joules due to friction / heat along the way. 
+            How much mass does the {noun} have?"""
+            answer = mass
+            unit = "kg"
+        elif flip == 4:
+            question = f"""A {mass} kg {noun} collides with a spring that has a strength of {spring_constant} N/m,
+            compressing it by {compression:.2f} meters.
+            The {noun} loses {thermal} Joules due to friction / heat along the way. How fast was it moving?"""
+            answer = velocity
+            unit = "m/s"
+        return question, answer, unit
 
-
-
-
-            
+    def thermal_quant_problems(self, difficulty):
+        noun = random_noun()
+        flip = ri(0,2)
+        if flip == 0:
+            #grav -> Kin
+            question, answer, unit = self.grav_kin_thermal(difficulty)
+        elif flip == 1:
+            #grav -> elastic
+            question, answer, unit = self.grav_elastic_thermal(difficulty)
+        elif flip == 2:
+            #kinetic -> elastic
+            question, answer, unit = self.kinetic_elastic_thermal(difficulty)
 
         return question, answer, unit
 
@@ -283,7 +378,7 @@ class EnergyGenerator(BaseGenerator):
         elif problem_type == "Work":
             question, answer, unit = self.work_problem(difficulty)
         elif problem_type == "Quantifying Thermal Energy":
-            question, answer, unit = self.thermal_problem(difficulty)
+            question, answer, unit = self.thermal_quant_problems(difficulty)
         else:
             pass
         
