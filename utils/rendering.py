@@ -288,7 +288,7 @@ class rendering:
                 # Single input case
                 unit = st.session_state[f"{prefix}_units"][0]
                 user_answers = [st.number_input(
-                    f"Answer ({unit}):", 
+                    f"{unit}:", 
                     min_value=0.00, value=None, step=0.01,
                     key=f"{prefix}_input_0_{st.session_state[f'{prefix}_question_id']}"
                 )]
