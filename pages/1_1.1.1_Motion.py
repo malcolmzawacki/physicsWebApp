@@ -12,6 +12,7 @@ plt.style.use("dark_background")
 sys.path.append(str(Path(__file__).parent.parent))
 from utils.generators.linear_motion_generator import LinearMotionGenerator
 from utils.generators.projectile_generator import ProjectileGenerator
+from utils.rendering import rendering
 
 class graphing:
     def generate_position_time_graph():
@@ -284,389 +285,123 @@ class graphing:
 
 
 class linear_fns:
-
-    @staticmethod
+    @ staticmethod
     def question_parameters():
         """Holds current options for questions for centralized updating"""
+
         problem_type_dict = {
-            "Mixed": "Mixed",
-            "No Time": r"v_f^2 = v_i^2 + 2a \cdot x",
-            "No Distance": r"v_f = v_i + a \cdot t",
-            "No Acceleration": r"x = \frac{(v_f + v_i)}{2} \cdot t",
-            "No Final Velocity": r"x = v_i \cdot t + \frac{1}{2} a \cdot t^2",
-            }
+                        "Mixed": {
+                            "honors": r"""v_f^2 = v_i^2 + 2ax \quad ,
+                            \quad v_f = v_i +at  \quad ,
+                            \quad x = \frac{v_f + v_i}{2} t  \quad ,
+                            \quad x = v_i t + \frac{1}{2} at^2""",
+
+                            "conceptual": r"""
+                            \quad x = \frac{v_f + v_i}{2} t  \quad
+                            \quad x = \frac{1}{2} at^2  \quad
+                            \quad x = \frac{v_f^2 - v_i^2}{2a}  \quad
+
+                            \newline ~ \newline ~ \newline
+                            \quad v_f = \frac{2x}{t} - v_i  \quad
+                            \quad v_f = \sqrt{v_i^2 + 2ax}  \quad
+                            \quad v_f = v_i + at  \quad
+                            
+                            \newline ~ \newline ~ \newline
+                            \quad v_i = \sqrt{2ax - v_f^2}  \quad
+                            \quad v_i = at - v_f  \quad
+                            \quad v_i = \frac{2x}{t} - v_f  \quad
+                            \newline ~ \newline ~ \newline
+                            \quad t = \frac{2x}{v_f + v_i}  \quad 
+                            \quad t = \sqrt{ \frac{2x}{a} }  \quad
+                            \quad t = \frac{v_f - v_i}{a}  \quad
+                            \newline ~ \newline ~ \newline
+                                \quad a = \frac{2x}{t^2}  \quad 
+                                \quad a = \frac{v_f - v_i}{t}  \quad
+                                \quad a = \frac{v_f^2 - v_i^2}{2x}  \quad
+                            
+                            """},
+                        "No Time": {
+                            "honors" : r"v_f^2 = v_i^2 + 2ax", 
+                            "conceptual": r"""v_f = \sqrt{v_i^2 + 2ax}  \quad , 
+                            \quad v_i = \sqrt{2ax - v_f^2}  \quad , 
+                            \quad  x = \frac{v_f^2 - v_i^2}{2a}  \quad,
+                            \quad  a = \frac{v_f^2 - v_i^2}{2x}"""
+                            },
+                        "No Distance": {
+                            "honors": r"v_f = v_i + at",
+                            "conceptual": r"""v_f = v_i +at  \quad ,
+                            \quad v_i = at - v_f  \quad ,
+                            \quad a = \frac{v_f - v_i}{t}  \quad,
+                            \quad t = \frac{v_f - v_i}{a}"""
+                        },               
+                        "No Acceleration" : {
+                            "honors": r"x = \frac{v_f + v_i}{2} t",
+                            "conceptual": r"""x = \frac{v_f + v_i}{2} t  \quad ,
+                            \quad t = \frac{2d}{v_f + v_i}  \quad ,
+                            \quad v_f = \frac{2d}{t} - v_i  \quad , 
+                            \quad v_i = \frac{2d}{t} - v_f  \quad """
+                        },
+                        "No Final Velocity": {
+                            "honors": r"x = v_i t + \frac{1}{2} at^2",
+                            "conceptual": r"""x = \frac{1}{2} at^2  \quad ,
+                            \quad a = \frac{2x}{t^2}  \quad ,
+                            \quad t = \sqrt{ \frac{2d}{a} }"""
+                        },
+                        }
+
+
         problem_types = list(problem_type_dict.keys())
-        difficulties = ["Easy", "Medium", "Hard"]
+        difficulties = ["Easy","Medium","Hard"]
         return problem_type_dict, problem_types, difficulties
 
     @staticmethod
-    def clear_performance_dataframe():
-        """Reset the performance tracking dictionary"""
-        prefix = "linear_motion"
-        _, problem_types, difficulties = linear_fns.question_parameters()
-            
-        performance_dict = {}
-        for p_type in problem_types:
-            performance_dict[p_type] = {}
-            for diff in difficulties:
-                performance_dict[p_type][diff] = {'attempts': 0, 'correct': 0}     
-        st.session_state[f"{prefix}_performance"] = performance_dict
-        return performance_dict
-
-    @staticmethod
-    def initialize_session_state():
-        prefix = "linear_motion"
-        base_vars = [
-        'current_question',
-        'correct_answer',
-        'unit',
-        'user_answer',
-        'submitted',
-        '_question_id',
-        'difficulty',
-        'problem_type'
-        ]
-
-        # initialize question_id to 0
-        if f"{prefix}_question_id" not in st.session_state:
-            st.session_state[f"{prefix}_question_id"] = 0
-
-        # initialize all vars with prefix
-        for var in base_vars:
-            if f"{prefix}_{var}" not in st.session_state:
-                st.session_state[f"{prefix}_{var}"] = None if var != "_question_id" else 0
-    
-        # Initialize performance tracking dictionary if it doesn't exist
-        if f"{prefix}_performance" not in st.session_state:
-            st.session_state[f"{prefix}_performance"] = linear_fns.clear_performance_dataframe()
-    
-    @staticmethod
-    def generate_question(generator, problem_type, difficulty):
-        prefix = "linear_motion"
-        if problem_type == "No Time":
-            question, answer, unit = generator.no_time_question(difficulty)
-        elif problem_type == "No Distance":
-            question, answer, unit = generator.no_dist_question(difficulty)
-        elif problem_type == "No Acceleration":
-            question, answer, unit = generator.no_acc_question(difficulty)
-        elif problem_type == "No Final Velocity":
-            question, answer, unit = generator.no_vf_question(difficulty)
-        else:  # Mixed
-            question, answer, unit = generator.mixed_question(difficulty)
-        return question, answer, unit
-
-    @staticmethod
-    def create_performance_dataframe():
-        """Create a pandas DataFrame from the performance tracking dictionary"""
-        prefix = "linear_motion"
-        performance = st.session_state[f"{prefix}_performance"]
-        
-        # Create lists to hold data
-        rows = []
-        
-        # Format data for dataframe
-        for problem_type, difficulties in performance.items():
-            for difficulty, stats in difficulties.items():
-                attempts = stats['attempts']
-                correct = stats['correct']
-                
-                # Calculate percentage or display NA if no attempts
-                if attempts > 0:
-                    percentage = f"{(correct / attempts * 100):.1f}%"
-                    display = f"{correct}/{attempts} ({percentage})"
-                else:
-                    display = "0/0 (0.0%)"
-                    
-                rows.append({
-                    "Problem Type": problem_type,
-                    "Difficulty": difficulty,
-                    "Performance": display
-                })
-        
-        # Create DataFrame
-        df = pd.DataFrame(rows)
-        
-        # Pivot the dataframe to get desired format
-        pivot_df = df.pivot(index="Problem Type", columns="Difficulty", values="Performance")
-        
-        # Ensure all difficulty levels are present
-        for col in ["Easy", "Medium", "Hard"]:
-            if col not in pivot_df.columns:
-                pivot_df[col] = "0/0 (0.0%)"
-        
-        # Reorder columns
-        pivot_df = pivot_df[["Easy", "Medium", "Hard"]]
-        
-        return pivot_df
-
-    @staticmethod
-    def update_performance(problem_type, difficulty, is_correct):
-        """Update the performance tracking dictionary when an answer is submitted"""
-        prefix = "linear_motion"
-        performance = st.session_state[f"{prefix}_performance"]
-        
-        # Increment attempts
-        performance[problem_type][difficulty]['attempts'] += 1
-        
-        # Increment correct if answer was correct
-        if is_correct:
-            performance[problem_type][difficulty]['correct'] += 1
-        
-        # Update session state
-        st.session_state[f"{prefix}_performance"] = performance
-
-    @staticmethod
-    def linear_motion_problems():
-        st.title("Linear Motion Problems")
-        prefix = "linear_motion"
-        linear_fns.initialize_session_state()
-
-        generator = LinearMotionGenerator()
-
+    def main():
+        st.title("Linear Motion")
+        prefix = "linear"
         problem_type_dict, problem_types, difficulties = linear_fns.question_parameters()
-
-        with st.expander("Your Performance", expanded=False):
-            performance_df = linear_fns.create_performance_dataframe()
-            st.dataframe(performance_df, use_container_width=True)
-
-        # UI Controls
-        col1, col2 = st.columns(2)
-        with col1:
-
-            selected_problem_type = st.selectbox(
-                "Problem Type",
-                options=list(problem_types),
-                key="problem_type_select")
-                
-            if selected_problem_type != "Mixed":
-                equation = problem_type_dict[selected_problem_type]  # Exclude Mixed from standalone LaTeX rendering
-                st.latex(equation)
-            else:
-                st.latex(r"v_f^2 = v_i^2 + 2a \cdot x")
-                st.latex(r"x = v_i \cdot t + \frac{1}{2} a \cdot t^2")
-            problem_type = selected_problem_type
-
-        with col2:
-            difficulty = st.selectbox(
-                "Difficulty",
-                difficulties,
-                key="difficulty_select"
-            )
-            
-            if selected_problem_type == "Mixed":
-                st.latex(r"v_f = v_i + a \cdot t")
-                st.latex(r"x = \frac{(v_f + v_i)}{2} \cdot t")
-            
-        # Check if we need a new question
-        if (problem_type != st.session_state[f"{prefix}_problem_type"] or 
-            st.session_state[f"{prefix}_current_question"] is None):
-            
-            # Generate new question and store in session state
-            question, answer, unit = linear_fns.generate_question(generator, problem_type, difficulty)
-            st.session_state[f"{prefix}_current_question"] = question
-            st.session_state[f"{prefix}_correct_answer"] = answer
-            st.session_state[f"{prefix}_unit"] = unit
-            st.session_state[f"{prefix}_problem_type"] = problem_type
-            st.session_state[f"{prefix}_submitted"] = False
-            generator.clear_answers()
-
-        # Display current question
-        st.subheader("Question:")
-        st.write(st.session_state[f"{prefix}_current_question"])
-
-        user_input = st.number_input(
-                f"Answer (in {st.session_state[f'{prefix}_unit']}):",
-                value=None,
-                step=None,
-                format="%f",
-                key=f"{prefix}_input_{st.session_state[f'{prefix}_question_id']}"
-            )
-        
-        in_col1, in_col2, in_col3 = st.columns(3)
-        # Input fields
-        with in_col1:
-            if st.button("Submit",key=f"{prefix}_submit"):
-                if user_input is not None:
-                    correct_answer = st.session_state[f"{prefix}_correct_answer"]
-                    tolerance = correct_answer * 0.05
-                    is_correct = abs(user_input - correct_answer) < abs(tolerance)
-                    
-                    # Only update performance if not already submitted for this question
-                    if not st.session_state[f"{prefix}_submitted"]:
-                        linear_fns.update_performance(problem_type, difficulty, is_correct)
-                        st.session_state[f"{prefix}_submitted"] = True
-                    
-                    if is_correct:
-                        st.success("Correct!")
-                    else:
-                        st.error(f"Incorrect. The correct answer is {correct_answer:.2f}.")
-                else:
-                    st.error("Please enter an answer before submitting.")
-            
-        with in_col2:
-            st.write("")
-           
-        with in_col3:
-            if st.button("New Question",key=f"{prefix}_new_question"):
-                question, answer, unit = linear_fns.generate_question(generator, problem_type, difficulty)
-                st.session_state[f"{prefix}_question_id"] += 1
-                st.session_state[f"{prefix}_current_question"] = question
-                st.session_state[f"{prefix}_correct_answer"] = answer
-                st.session_state[f"{prefix}_unit"] = unit
-                st.session_state[f"{prefix}_submitted"] = False
-                generator.clear_answers()
-                st.rerun()
-            st.write("")
-             # Submit button
-            
-            # New Question button
-            
-        
-        
-        
-        # Add a reset performance button
-        if st.button("Reset Performance Statistics",key=f"{prefix}_performance_reset"):
-            linear_fns.initialize_session_state()
-            st.session_state[f"{prefix}_performance"] = linear_fns.clear_performance_dataframe()
-            question, answer, unit = linear_fns.generate_question(generator, problem_type, difficulty)
-            st.session_state[f"{prefix}_question_id"] += 1
-            st.session_state[f"{prefix}_current_question"] = question
-            st.session_state[f"{prefix}_correct_answer"] = answer
-            st.session_state[f"{prefix}_unit"] = unit
-            st.session_state[f"{prefix}_submitted"] = False
-            generator.clear_answers()
-            st.rerun()
-
+        render = rendering()
+        generator = LinearMotionGenerator()
+        render.initialize_session_state(prefix, problem_types, difficulties)
+        performance = st.session_state[f"{prefix}_performance"]
+        render.subheader_ui(prefix,performance)
+        render.question_ui_2(prefix, problem_type_dict, problem_types ,difficulties, generator)
 
 
 class Projectile_fns:
-    @staticmethod
-    def initialize_projectile_session_state():
-        if 'current_question' not in st.session_state:
-            st.session_state.current_question = None
-        if 'correct_answer' not in st.session_state:
-            st.session_state.correct_answer = None
-        if 'correct_answer2' not in st.session_state:
-            st.session_state.correct_answer2 = None
-        if 'unit' not in st.session_state:
-            st.session_state.unit = None
-        if 'unit2' not in st.session_state:
-            st.session_state.unit2 = None
-        if 'user_answer' not in st.session_state:
-            st.session_state.user_answer = None
-        if 'user_answer2' not in st.session_state:
-            st.session_state.user_answer2 = None
-        if 'submitted' not in st.session_state:
-            st.session_state.submitted = False
-        if 'question_id' not in st.session_state:
-            st.session_state.question_id = 0
-        if 'difficulty' not in st.session_state:
-            st.session_state.difficulty = None
-        if 'problem_type' not in st.session_state:
-            st.session_state.problem_type = None
-    @staticmethod
-    def generate_new_projectile_question(generator, problem_type, difficulty):
-        st.session_state.current_question, st.session_state.correct_answer, \
-        st.session_state.correct_answer2, st.session_state.unit, st.session_state.unit2 = \
-            generator.generate_question(problem_type, difficulty)
-        st.session_state.difficulty = difficulty
-        st.session_state.problem_type = problem_type
-        st.session_state.user_answer = None
-        st.session_state.user_answer2 = None
-        st.session_state.submitted = False
-        st.session_state.question_id += 1
-    
-    @staticmethod
-    def projectile_practice():
-        st.title("Projectile Motion")
-        
-        Projectile_fns.initialize_projectile_session_state()
-        
-        # Create generator instance
+     @ staticmethod
+     def question_parameters():
+            """Holds current options for questions for centralized updating"""
+
+            problem_type_dict = {
+                "Type 1": {
+                      "honors": r"""currently under construction, ask your teacher to hurry up!""",
+
+                      "conceptual": r"""currently under construction, ask your teacher to hurry up!
+                      """},
+                "Type 2": {
+                    "honors" : r"currently under construction, ask your teacher to hurry up!", 
+                    "conceptual": r"""currently under construction, ask your teacher to hurry up!"""
+                    },
+                "Type 3": {
+                    "honors": r"currently under construction, ask your teacher to hurry up!",
+                    "conceptual": r"""currently under construction, ask your teacher to hurry up!"""
+                }
+                }
+            problem_types = list(problem_type_dict.keys())
+            difficulties = ["Easy","Medium","Hard"]
+            return problem_type_dict, problem_types, difficulties
+
+     @staticmethod
+     def main():
+        st.title("Projectiles")
+        prefix = "projectiles"
+        problem_type_dict, problem_types, difficulties = Projectile_fns.question_parameters()
+        render = rendering()
         generator = ProjectileGenerator()
-        
-        # UI Controls
-        col1, col2 = st.columns(2)
-        with col1:
-            proj_problem_type = st.selectbox(
-                "Select Problem Type",
-                ["Type 1", "Type 2","Type 3"],
-                key="proj_problem_type_select"
-            )
-        with col2:
-            difficulty = st.selectbox(
-                "Select Difficulty",
-                ["Easy", "Hard"],
-                key="proj_difficulty_select"
-            )
-
-        # Generate new question if type or difficulty changes
-        if (proj_problem_type != st.session_state.problem_type or 
-            difficulty != st.session_state.difficulty or 
-            st.session_state.current_question is None):
-            Projectile_fns.generate_new_projectile_question(generator, proj_problem_type, difficulty)
-
-        if st.session_state.current_question:
-            st.write(st.session_state.current_question)
-            
-            # Input fields
-            unit = st.session_state.unit
-            user_input = st.number_input(
-                f"{unit}:",
-                value=None,
-                step=None,
-                format="%f",
-                key=f"user_input_{st.session_state.question_id}"
-            )
-            
-            # Second input for hard difficulty or type 2
-            show_second_input = difficulty == "Hard" or ((proj_problem_type == "Type 2" or proj_problem_type == "Type 3") and difficulty == "Easy")
-            if show_second_input:
-                unit2 = st.session_state.unit2
-                user_input2 = st.number_input(
-                    f"{unit2}:",
-                    value=None,
-                    step=None,
-                    format="%f",
-                    key=f"user_input2_{st.session_state.question_id}"
-                )
-            end_col1, end_col2 = st.columns(2)
-            with end_col1:
-                # Submit button
-                if st.button("Submit", key = "proj_submit_button"):
-                    st.session_state.submitted = True
-                    if user_input is not None:
-                        st.session_state.user_answer = user_input
-                        correct_answer = st.session_state.correct_answer
-                        tolerance = abs(correct_answer * 0.05)
-                        
-                        if show_second_input:
-                            if user_input2 is not None:
-                                st.session_state.user_answer2 = user_input2
-                                correct_answer2 = st.session_state.correct_answer2
-                                tolerance2 = abs(correct_answer2 * 0.05)
-                                
-                                if (abs(user_input - correct_answer) < tolerance and 
-                                    abs(user_input2 - correct_answer2) < tolerance2):
-                                    st.success("Correct!")
-                                else:
-                                    st.error(f"Incorrect. The correct answers are {correct_answer:.2f} {st.session_state.unit} "
-                                        f"and {correct_answer2:.2f} {st.session_state.unit2}")
-                            else:
-                                st.error("Please enter both answers before submitting.")
-                        else:
-                            if abs(user_input - correct_answer) < tolerance:
-                                st.success("Correct!")
-                            else:
-                                st.error(f"Incorrect. The correct answer is {correct_answer:.2f} {st.session_state.unit}")
-                    else:
-                        st.error("Please enter an answer before submitting.")
-            
-            with end_col2:
-                # New Question button
-                if st.button("New Question"):
-                    Projectile_fns.generate_new_projectile_question(generator, proj_problem_type, difficulty)
-                    st.rerun()
+        render.initialize_session_state(prefix, problem_types, difficulties)
+        performance = st.session_state[f"{prefix}_performance"]
+        render.subheader_ui(prefix,performance)
+        render.question_ui_2(prefix, problem_type_dict, problem_types ,difficulties, generator)
 
 
 def main():
@@ -675,11 +410,11 @@ def main():
     
     
     with tab1:
-        linear_fns.linear_motion_problems()
+        linear_fns.main()
     with tab2:
         graphing.graphing_practice()
     with tab3:
-        Projectile_fns.projectile_practice()
+        Projectile_fns.main()
 
 if __name__ == "__main__":
     main()

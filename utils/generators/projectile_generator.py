@@ -147,15 +147,15 @@ class ProjectileGenerator(BaseGenerator):
             answer2 = 0
             unit2 = ""
             if choice == 1:
-                question = f"If a {object_name} is {verb} horizontally off of a {d_y:.2f} m cliff with an initial velocity of {v_x:.2f} m/s, how far away does it land? (m)"
+                question = f"If a {object_name} is {verb} horizontally off of a {d_y:.2f} m cliff with an initial velocity of {v_x:.2f} m/s, how far away does it land?"
                 answer = d_x
                 unit = "Horizontal Distance (m)"
             elif choice == 2:
-                question = f"If a {object_name} is {verb} horizontally off of a cliff at {v_x:.2f} m/s, and lands {d_x:.2f} m away, what was the height of the cliff? (m)"
+                question = f"If a {object_name} is {verb} horizontally off of a cliff at {v_x:.2f} m/s, and lands {d_x:.2f} m away, what was the height of the cliff?"
                 answer = d_y
                 unit = "Cliff Height (m)"
             else:
-                question = f"If a {object_name} is {verb} horizontally off of a {d_y:.2f} m cliff, and lands {d_x:.2f} m away, how fast was it {verb}? (m/s)"
+                question = f"If a {object_name} is {verb} horizontally off of a {d_y:.2f} m cliff, and lands {d_x:.2f} m away, how fast was it {verb}?"
                 answer = v_x
                 unit = "Initial Velocity (m/s)"
         else:  # Hard
@@ -169,9 +169,9 @@ class ProjectileGenerator(BaseGenerator):
             elif choice == 2:
                 question = f"If a {object_name} is {verb} horizontally off of a cliff at {v_x:.2f} m/s, and lands {d_x:.2f} m away, what speed and angle does it land with?"
                 answer = v_r
-                unit = "m/s"
+                unit = "Final Velocity (m/s)"
                 answer2 = theta
-                unit2 = "degrees"
+                unit2 = "Angle (degrees)"
             else:
                 question = f"A {object_name} is {verb} horizontally off of a {d_y:.2f} m cliff, and lands at a {theta:.2f} degree angle, with what speed did it land, and how far from the base of the cliff?"
                 answer = v_r
@@ -203,7 +203,7 @@ class ProjectileGenerator(BaseGenerator):
             elif choice == 2:
                 question = f"A {object_name} is {verb} at {theta:.2f} degrees, and reaches a maximum height of {d_y:.2f} m. What was its initial speed and how far away does it land?"
                 answer = v_r
-                unit = "m/s"
+                unit = "Initial Velocity (m/s)"
                 answer2 = d_x
                 unit2 = "Horizontal Distance (m)"
             else:
@@ -232,7 +232,7 @@ class ProjectileGenerator(BaseGenerator):
                     answer = d_x
                     unit = "Horizontal Distance (m)"
                     answer2 = v_f
-                    unit2 = "Final (Impact) Velocity (m/s)"
+                    unit2 = "Final Velocity (m/s)"
             else: # hard: setback, add more options later
                 choice = 1 #random.randint(1,3) # room for more variations
                 if choice == 1:
@@ -281,3 +281,15 @@ class ProjectileGenerator(BaseGenerator):
                     unit2 = "Horizontal distance from launch site to cliff face (m)"
         
         return question, answer, answer2, unit, unit2
+    
+
+    def choose_problem(self, problem_type, difficulty):
+        if problem_type == "Type 1":
+            question, answer, answer2, unit, unit2 = self._generate_type1_question(difficulty)
+            if difficulty == "Easy":
+                return question, [answer], [unit]
+        elif problem_type == "Type 2":
+            question, answer, answer2, unit, unit2 = self._generate_type2_question(difficulty)
+        else:  # Type 3
+            question, answer, answer2, unit, unit2 = self._generate_type3_question(difficulty)
+        return question, [answer,answer2],[unit,unit2]

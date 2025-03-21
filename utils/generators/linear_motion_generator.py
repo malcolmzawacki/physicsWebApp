@@ -147,7 +147,7 @@ class LinearMotionGenerator(BaseGenerator):
 
         if difficulty in ["Easy", "Medium"]:
             if var_dice == 0:  # Solve for acceleration
-                unit = "m/s²"
+                unit = "Acceleration (m/s²)"
                 answer = a
                 if verb == "speeds up":
                     question = f"""What acceleration would a {noun} at rest need to experience \
@@ -156,16 +156,18 @@ class LinearMotionGenerator(BaseGenerator):
                     question = f"""How much deceleration would a {noun} moving at {v_f} m/s \
                     need in order to come to rest over a distance of {x} meters?"""
             elif var_dice in [1,2]:  # Solve for final velocity, swap for 'initial' if slowing
-                unit = "m/s"
+                
                 answer = v_f
                 if verb == "speeds up":
                     question = f"""If a {noun} starts from rest and accelerates at {a} m/s² \
                     over a distance of {x} meters, what velocity does it reach?"""
+                    unit = "Final Velocity (m/s)"
                 else:
                     question = f"""If a {noun} decelerates at {-1*a} m/s² to rest \
                     over {x} meters, what was its initial velocity?"""
+                    unit = "Initial Velocity (m/s)"
             elif var_dice == 3:  # Solve for distance
-                unit = "meters"
+                unit = "Distance (meters)"
                 answer = x
                 if verb == "speeds up":
                     question = f"""A {noun} at rest accelerates at {a} m/s² to a velocity of {v_f} m/s. \
@@ -175,7 +177,7 @@ class LinearMotionGenerator(BaseGenerator):
                     How far did it travel during this time?"""
         else:  # HARD difficulty
             if var_dice == 0:  # Solve for acceleration
-                unit = "m/s²"
+                unit = "Acceleration (m/s²)"
                 answer = a
                 if verb == "speeds up":
                     question = f"""What acceleration would a {noun} moving at {v_i} m/s need to experience \
@@ -184,7 +186,7 @@ class LinearMotionGenerator(BaseGenerator):
                     question = f"""What deceleration would a {noun} moving at {v_f} m/s need to experience \
                     to slow down to {v_i} m/s over a distance of {x} meters?"""
             elif var_dice == 1:  # Solve for final velocity
-                unit = "m/s"
+                unit = "Final Velocity (m/s)"
                 answer = v_f
                 if verb == "speeds up":
                     question = f"""If a {noun} starts at {v_i} m/s and accelerates at {a} m/s² \
@@ -193,7 +195,7 @@ class LinearMotionGenerator(BaseGenerator):
                     question = f"""If a {noun} decelerates at {-1*a} m/s² from {v_f} m/s \
                     to {v_i} m/s over {x} meters, what is the final velocity?"""
             elif var_dice == 2:  # Solve for initial velocity
-                unit = "m/s"
+                unit = "Initial Velocity (m/s)"
                 answer = v_i
                 if verb == "speeds up":
                     question = f"""If a {noun} accelerates at {a} m/s² to {v_f} m/s \
@@ -202,7 +204,7 @@ class LinearMotionGenerator(BaseGenerator):
                     question = f"""If a {noun} decelerates at {-1*a} m/s² to {v_f} m/s \
                     over {x} meters, what was its initial velocity?"""
             elif var_dice == 3:  # Solve for distance
-                unit = "meters"
+                unit = "Distance (meters)"
                 answer = x
                 if verb == "speeds up":
                     question = f"""A {noun} accelerates from {v_i} m/s to {v_f} m/s at {a} m/s². \
@@ -227,7 +229,7 @@ class LinearMotionGenerator(BaseGenerator):
             verb = "slows down"
         if difficulty == "Easy":
             if var_dice == 0:  # Solve for acceleration
-                unit = "m/s²"
+                unit = "Acceleration (m/s²)"
                 answer = a
                 if coin == 0: # speeding up
                     question = f"""What acceleration would a {noun} initially at rest need to \
@@ -236,16 +238,17 @@ class LinearMotionGenerator(BaseGenerator):
                     question = f"""What deceleration would a {noun} initally moving at {v_f} m/s need to \
                     experience to get to rest in {t} seconds?"""
             elif var_dice in [1,2]:  # Solve for final velocity since initial is zero in easy
-                unit = "m/s"
                 answer = v_f
                 if coin == 0:
                     question = f"""If a {noun} starts at rest and accelerates at {a} m/s² for \
                     {t} seconds, what velocity does it reach?"""
+                    unit = "Final Velocity (m/s)"
                 else:
                     question = f"""If a {noun} decelerates at {-1*a} m/s² for \
                     {t} seconds in order to come to rest, what velocity did it start with?"""
+                    unit = "Initial Velocity (m/s)"
             elif var_dice == 3:  # Solve for time
-                unit = "seconds"
+                unit = "Time (seconds)"
                 answer = t
                 if coin == 0: #speeding up
                     question = f"""A {noun} accelerates from rest at {a} m/s², reaching {v_f} m/s. \
@@ -255,7 +258,7 @@ class LinearMotionGenerator(BaseGenerator):
                     How long does it take?"""
         elif difficulty == "Medium":
             if var_dice == 0:  # Solve for acceleration
-                unit = "m/s²"
+                unit = "Acceleration (m/s²)"
                 answer = a
                 if coin == 0:
                     question = f"""Determine the acceleration required for a {noun} moving at {v_i} m/s \
@@ -264,16 +267,16 @@ class LinearMotionGenerator(BaseGenerator):
                     question = f"""Determine the deceleration required for a {noun} moving at {v_f} m/s \
                     to slow to {v_i} m/s in {t} seconds."""
             elif var_dice in [1,2]:  # Solve for final velocity, they are reversible
-                unit = "m/s"
-                answer = v_f
                 if coin == 0:
                     question = f"""A {noun} starts at {v_i} m/s and accelerates at {a} m/s² for {t} seconds. \
                     What is its final velocity?"""
+                    unit = "Final Velocity (m/s)"
                 else:
                     question = f"""A {noun} slows to {v_i} m/s after decelerating at {-1*a} m/s² for {t} seconds. \
                     What was its initial velocity?"""
+                    unit = "Initial Velocity (m/s)"
             elif var_dice == 3:  # Solve for time
-                unit = "seconds"
+                unit = "Time (seconds)"
                 answer = t
                 if coin == 0:
                     question = f"""A {noun} accelerates from {v_i} m/s to {v_f} m/s with an acceleration of {a} m/s². \
@@ -283,22 +286,22 @@ class LinearMotionGenerator(BaseGenerator):
                     How much time does it take?"""
         else:  # HARD difficulty
             if var_dice == 0:  # Solve for acceleration
-                unit = "m/s²"
+                unit = "Acceleration (m/s²)"
                 answer = a
                 question = f"""What acceleration would a {noun} moving at {v_i} m/s need to experience \
                 to {verb} to {v_f} m/s in {t} seconds?"""
             elif var_dice == 1:  # Solve for final velocity
-                unit = "m/s"
+                unit = "Final Velocity (m/s)"
                 answer = v_f
                 question = f"""If a {noun} starts at {v_i} m/s and {verb} at {a} m/s² for {t} seconds, \
                 what velocity does it reach?"""
             elif var_dice == 2:  # Solve for initial velocity
-                unit = "m/s"
+                unit = "Initial Velocity (m/s)"
                 answer = v_i
                 question = f"""If a {noun} {verb} at {a} m/s² to reach {v_f} m/s in {t} seconds, \
                 what was its initial velocity?"""
             elif var_dice == 3:  # Solve for time
-                unit = "seconds"
+                unit = "Time (seconds)"
                 answer = t
                 question = f"""A {noun} {verb} at {a} m/s² from {v_i} m/s to {v_f} m/s. \
                 How long does it take?"""
@@ -316,7 +319,7 @@ class LinearMotionGenerator(BaseGenerator):
             "so clearly, for easy, one of the velocities should be zero"
             "and the other should be positive. default is speeding up"
             if var_dice == 0: # time
-                unit = "seconds"
+                unit = "Time (seconds)"
                 answer = t
                 if coin == 0: # speeding up
                     question = f"""A {noun} initially at rest accelerates at a constant rate over a distance of {x} meters. 
@@ -325,7 +328,7 @@ class LinearMotionGenerator(BaseGenerator):
                     question = f"""A {noun} initially moving at a velocity of {v_f} m/s decelerates at a constant rate 
                     until it is at a full stop. If this occurred over a distance of {x} meters, how much time did it take?"""
             elif var_dice == 1: # x
-                unit = "meters"
+                unit = "Distance (meters)"
                 answer = x
                 if coin == 0: # speeding up
                     question = f"""A {noun} initially at rest accelerates at a constant rate for {t} seconds. 
@@ -334,19 +337,20 @@ class LinearMotionGenerator(BaseGenerator):
                     question = f"""A {noun} initially moving at a velocity of {v_f} m/s decelerates at a constant rate 
                     until it is at a full stop. If this occurred over {t} seconds, how much distance did it cover?"""
             elif var_dice in [2,3]: # velocity, reversible
-                unit = "m/s"
                 answer = v_f
                 if coin == 0: # speeding up
                     question = f"""A {noun} initially at rest accelerates at a constant rate for {t} seconds. \
                     If this occurred over {x} meters, what velocity did the {noun} reach?"""
+                    unit = "Final Velocity (m/s)"
                 else:
                     question = f"""A noun reaches rest after decelerating at a constant rate for {t} seconds. \ 
                     If this occurred over {x} meters, what velocity did {noun} start with?"""
+                    unit = "Initial Velocity (m/s)"
 
         elif difficulty == "Medium":
             "maybe both non-zero, but positive? no negatives here, no reason"
             if var_dice == 0: # time
-                unit = "seconds"
+                unit = "Time (seconds)"
                 answer = t
                 if coin == 0: # speeding up
                     question = f"""A {noun} initially moving at {v_i} m/s accelerates at a constant rate over a distance of {x} meters. 
@@ -355,7 +359,7 @@ class LinearMotionGenerator(BaseGenerator):
                     question = f"""A {noun} initially moving at a velocity of {v_f} m/s decelerates at a constant rate 
                     until it is at a new velocity of {v_i} m/s. If this occurred over a distance of {x} meters, how much time did it take?"""
             elif var_dice == 1: # x
-                unit = "meters"
+                unit = "Distance (meters)"
                 answer = x
                 if coin == 0: # speeding up
                     question = f"""A {noun} initially moving at {v_i} m/s accelerates at a constant rate for {t} seconds. 
@@ -364,11 +368,11 @@ class LinearMotionGenerator(BaseGenerator):
                     question = f"""A {noun} initially moving at a velocity of {v_f} m/s decelerates at a constant rate 
                     until it is at a new velocity of {v_i} m/s. If this occurred over {t} seconds, how much distance did it cover?"""
             elif var_dice in [2,3]: # v_f,vi
-                unit = "m/s"
+                unit = "Final Velocity (m/s)"
                 if coin == 0:
                     answer = v_f
                     question = f"""A {noun} initially moving at {v_i} m/s accelerates at a constant rate for {t} seconds.\
-                        If this occurred over a distance of {x} meters, what velocity did it reach?"""
+                        If this occurred over a distance of {x} meters, what velocity did it reach?""" 
                 else:
                     answer = v_i
                     question = f"""A {noun} initially moving at {v_f} m/s decelerates at a constant rate for {t} seconds.\
@@ -381,7 +385,7 @@ class LinearMotionGenerator(BaseGenerator):
             else:
                 direction_phrase = "to the left"
             if var_dice == 0: # time
-                unit = "seconds"
+                unit = "Time (seconds)"
                 answer = t
                 if coin == 0: # vi>0, vf<0
                     question = f"""A {noun}, initially moving at {v_i} m/s to the right, slows all the way down,
@@ -394,7 +398,7 @@ class LinearMotionGenerator(BaseGenerator):
                     The {noun} travels {abs(x)} meters {direction_phrase} in the process. 
                     How much time did this take?"""
             elif var_dice == 1: # x
-                unit = "meters"
+                unit = "Distance (meters)"
                 answer = x
                 if coin == 0: # vi>0, vf<0
                     question = f"""A {noun}, initially moving at {v_i} m/s to the right,  
@@ -405,7 +409,7 @@ class LinearMotionGenerator(BaseGenerator):
                     slows all the way down, and gets back up to {v_i} m/s to the right in {t} seconds.  
                     What is the {noun}'s displacement?"""
             elif var_dice in [2,3]:
-                unit = "m/s"
+                unit = "Final Velocity (m/s)"
                 if coin == 0:
                     answer = v_f
                     question = f"""A {noun}, initially moving at {v_i} m/s to the right, experiences a constant acceleration that 
@@ -434,15 +438,15 @@ class LinearMotionGenerator(BaseGenerator):
                 question = f"""A {noun}, initially at rest, accelerates at a rate of {a} m/s² for {t} seconds.
                 How far does it go during this time?"""
                 answer = x
-                unit = "meters"
+                unit = "Distance (meters)"
             elif var_dice == 1: # time
                 answer = t
-                unit = "seconds"
+                unit = "Time (seconds)"
                 question = f"""A {noun}, initially at rest, accelerates at a rate of {a} m/s² over {x} meters.
                 How long does this take?"""
             else:
                 answer = a
-                unit = "m/s²"
+                unit = "Acceleration (m/s²)"
                 question = f"""A {noun}, initially at rest, accelerates at a constant rate for {t} seconds over {x} meters.
                 How big was the acceleration?"""
         elif difficulty == "Medium":
@@ -452,7 +456,7 @@ class LinearMotionGenerator(BaseGenerator):
                 question = f"""A {noun}, initially moving at {v_i} m/s, accelerates at a rate of {a} m/s² for {t} seconds.
                 How far does it go during this time?"""
                 answer = x
-                unit = "meters"
+                unit = "Distance (meters)"
             elif var_dice == 1: # vi
                 question = f"""A {noun}, initially moving to the right, accelerates at a rate of {a} m/s² for {t} seconds.
                 The {noun} covers {x} meters. How fast was it initially moving?"""
@@ -460,7 +464,7 @@ class LinearMotionGenerator(BaseGenerator):
                 unit = "m/s"
             else: # a
                 answer = a
-                unit = "m/s²"
+                unit = "Acceleration (m/s²)"
                 question = f"""A {noun}, initially moving at {v_i} m/s, accelerates at a constant rate for {t} seconds over {x} meters.
                 How big was the acceleration?"""
         else: # hard
@@ -477,7 +481,7 @@ class LinearMotionGenerator(BaseGenerator):
                     but is slowed by an acceleration of {-1*a} m/s² for {t} seconds.
                     How far does it go during this time?"""
                     answer = x
-                    unit = "meters"
+                    unit = "Distance (meters)"
                 elif var_dice == 1: #v_i
                     question = f"""A {noun}, initially moving to the right, is slowed at a rate of {-1*a} m/s² for {t} seconds.
                     Despite this, {noun} covers {x} meters. How fast was it initially moving?"""
@@ -485,12 +489,12 @@ class LinearMotionGenerator(BaseGenerator):
                     unit = "m/s"
                 elif var_dice == 2: # a
                     answer = a
-                    unit = "m/s²"
+                    unit = "Acceleration (m/s²)"
                     question = f"""A {noun}, initially moving at {v_i} m/s to the right, is slowed at a constant rate for {t} seconds over {x} meters.
                     What was the acceleration?"""
                 else: # time
                     answer = t
-                    unit = "seconds"
+                    unit = "Time (seconds)"
                     question = f"""A {noun}, initially moving at {v_i} m/s to the right, is slowed at a constant rate {-1*a} m/s².
                     How much time does this take for the {noun} to cover {x} meters?"""
 
@@ -529,5 +533,5 @@ class LinearMotionGenerator(BaseGenerator):
             question, answer, unit = self.no_vf_question(difficulty)
         else:  # Mixed
             question, answer, unit = self.mixed_question(difficulty)
-        return question, answer, unit
+        return question, [answer], [unit]
         
