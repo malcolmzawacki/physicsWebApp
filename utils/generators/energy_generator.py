@@ -64,17 +64,17 @@ class EnergyGenerator(BaseGenerator):
         dirn = ri(0,1)
         dirn_string = "compressed" if dirn == 0 else "stretched"
         if q_type == 0 or difficulty == "Easy":
-            question = f"""A spring with strength {spring_constant} N/m is {dirn_string} by {compression} meters.
+            question = f"""A spring with strength {spring_constant:.2f} N/m is {dirn_string} by {compression:.2f} meters.
             \n What is the amount of elastic potential energy held in the spring?"""
             answer = elastic_e
             unit = "Elastic Potential Energy (Joules)"
         elif q_type == 1:
-            question = f"""A spring with strength {spring_constant} N/m contains {elastic_e} Joules of elastic potential energy.
+            question = f"""A spring with strength {spring_constant:.2f} N/m contains {elastic_e} Joules of elastic potential energy.
             \n How much was this spring {dirn_string}?"""
             answer = compression
             unit = "Compression Distance (meters)"
         else:
-            question = f"""A spring is {dirn_string} by {compression} meters, and contains {elastic_e} Joules of elastic potential energy.
+            question = f"""A spring is {dirn_string} by {compression:.2f} meters, and contains {elastic_e} Joules of elastic potential energy.
             \n What is the strength of the spring constant?"""
             answer = spring_constant
             unit = "Spring Strength (N/m)"
@@ -86,15 +86,15 @@ class EnergyGenerator(BaseGenerator):
         q_type = ri(0,2)
         noun = random_noun()
         if q_type == 0 or difficulty == "Easy":
-            question = f"""How much kinetic energy does a {mass} kg {noun} moving at {velocity} m/s have?"""
+            question = f"""How much kinetic energy does a {mass:.2f} kg {noun} moving at {velocity:.2f} m/s have?"""
             answer = kinetic_e
             unit = "Kinetic Energy (Joules)"
         elif q_type == 1:
-            question = f"""How fast would a {mass} kg {noun} have to move to have {kinetic_e} Joules of kinetic energy?"""
+            question = f"""How fast would a {mass:.2f} kg {noun} have to move to have {kinetic_e} Joules of kinetic energy?"""
             answer = velocity
             unit = "Velocity (m/s)"
         else:
-            question = f"""How much mass would a {noun} moving at {velocity} m/s need to have to contain {kinetic_e} Joules of kinetic energy?"""
+            question = f"""How much mass would a {noun} moving at {velocity:.2f} m/s need to have to contain {kinetic_e} Joules of kinetic energy?"""
             answer = mass
             unit = "Mass (kilograms)"
 
@@ -105,17 +105,17 @@ class EnergyGenerator(BaseGenerator):
         q_type = ri(0,2)
         noun = random_noun()
         if q_type == 0 or difficulty == "Easy":
-            question = f"""How much gravitational potential energy does a {mass} kg {noun} 
-            held {height} meters above the ground have?"""
+            question = f"""How much gravitational potential energy does a {mass:.2f} kg {noun} 
+            held {height:.2f} meters above the ground have?"""
             answer = gravit_e
             unit = "Gravitational Potential Energy (Joules)"
         elif q_type == 1:
-            question = f"""How high up would a {mass} kg {noun} have to be to have 
+            question = f"""How high up would a {mass:.2f} kg {noun} have to be to have 
             {gravit_e} Joules of gravitational potential energy?"""
             answer = height
             unit = "Height (meters)"
         else:
-            question = f"""How much mass would a {noun} at a height of {height} meters need to have 
+            question = f"""How much mass would a {noun} at a height of {height:.2f} meters need to have 
             to contain {gravit_e} Joules of gravitational potential energy?"""
             answer = mass
             unit = "Mass (kilograms)"
@@ -127,7 +127,7 @@ class EnergyGenerator(BaseGenerator):
         q_type = ri(0,2)
         noun = random_noun()
         if q_type == 0 or difficulty == "Easy":
-            question = f"""A {noun} is moved {distance} meters by a {force} Newton force. 
+            question = f"""A {noun} is moved {distance:.2f} meters by a {force} Newton force. 
             \n How much work was done?"""
             answer = work
             unit = "Work (Joules)"
@@ -137,7 +137,7 @@ class EnergyGenerator(BaseGenerator):
             answer = distance
             unit = "Distance (meters)"
         else:
-            question = f"""{work} Joules of work are done on a {noun} over a distance of {distance} meters.
+            question = f"""{work} Joules of work are done on a {noun} over a distance of {distance:.2f} meters.
             \n How much force was applied?"""
             answer = force
             unit = "Force (Newtons)"
@@ -151,22 +151,22 @@ class EnergyGenerator(BaseGenerator):
         q_type = ri(0,3)
         noun = random_noun()
         if q_type == 0:
-            question = f"""A {mass} kg {noun} is dropped from a height of {height:.2f} meters.
+            question = f"""A {mass:.2f} kg {noun} is dropped from a height of {height:.2f} meters.
             \n How fast is it moving when it hits the ground?"""
             answer = velocity
             unit = "Velocity (m/s)"
         elif q_type == 1:
-            question = f"""A {mass} kg {noun} is released from rest and hits the ground at {velocity} m/s.
+            question = f"""A {mass:.2f} kg {noun} is released from rest and hits the ground at {velocity:.2f} m/s.
             \n How high up was it dropped from?"""
             answer = height
             unit = "Height (meters)"
         elif q_type == 2:
-            question = f"""A {mass} kg {noun} is thrown upwards with an initial velocity of {velocity} m/s.
+            question = f"""A {mass:.2f} kg {noun} is thrown upwards with an initial velocity of {velocity:.2f} m/s.
            \nWhat is the highest point the {noun} reaches?"""
             answer = height
             unit = "Height (meters)"
         else:
-            question = f"""A {mass} kg {noun} is thrown upwards, 
+            question = f"""A {mass:.2f} kg {noun} is thrown upwards, 
             reaching a maximum height of {height:.2f} meters.
             \n How fast was the {noun} originally thrown?"""
             answer = velocity
@@ -184,32 +184,32 @@ class EnergyGenerator(BaseGenerator):
         if q_type == 0:
             # find k
             question = f"""A {mass:.2f} kg {noun} is dropped from a height of {height:.2f} meters.
-            \n A spring has to compress by {compression} meters to stop it. 
+            \n A spring has to compress by {compression:.2f} meters to stop it. 
             \n How strong is the spring?"""
             answer = spring_constant
             unit = "Spring Strength (N/m)"
         elif q_type == 1:
             # find height
-            question = f"""A {mass:.2f} kg {noun} is released from rest and dropped on a spring of strength {spring_constant} N/m.
-            \n If the spring compresses {compression} meters before the {noun} comes to rest, how high up was it dropped from?"""
+            question = f"""A {mass:.2f} kg {noun} is released from rest and dropped on a spring of strength {spring_constant:.2f} N/m.
+            \n If the spring compresses {compression:.2f} meters before the {noun} comes to rest, how high up was it dropped from?"""
             answer = height
             unit = "Height (meters)"
         elif q_type == 2:
             # find compression
-            question = f"""A {mass:.2f} kg {noun} is dropped from {height:.2f} meters onto a spring of strength {spring_constant} N/m.
+            question = f"""A {mass:.2f} kg {noun} is dropped from {height:.2f} meters onto a spring of strength {spring_constant:.2f} N/m.
             \n How much does the spring have to compress to bring the {noun} to rest?"""
             answer = compression
             unit = "Compression Distance (meters)"
         elif q_type == 3: 
-            question = f"""A {noun} is dropped from {height:.2f} meters onto a spring of strength {spring_constant} N/m.
-            \n If the spring compresses by {compression} meters to bring the {noun} to rest, how much mass does the {noun} have?"""
+            question = f"""A {noun} is dropped from {height:.2f} meters onto a spring of strength {spring_constant:.2f} N/m.
+            \n If the spring compresses by {compression:.2f} meters to bring the {noun} to rest, how much mass does the {noun} have?"""
             answer = mass
             unit = "Mass (kilograms)"
         elif q_type == 4:# NEW STARTS HERE
             # find height
             question = f"""A {mass:.2f} kg {noun} is launched by
-              a spring of strength {spring_constant} N/m.
-              \n If the spring was compressed {compression} meters before launch, 
+              a spring of strength {spring_constant:.2f} N/m.
+              \n If the spring was compressed {compression:.2f} meters before launch, 
               how high up did the {noun} get?"""
             answer = height
             unit = "Height (meters)"
@@ -217,21 +217,21 @@ class EnergyGenerator(BaseGenerator):
             # find compression
             question = f"""A {mass:.2f} kg {noun} is 
             launched {height:.2f} meters into the air by 
-            a spring of strength {spring_constant} N/m.
+            a spring of strength {spring_constant:.2f} N/m.
             \n How much did the spring have to compress to launch the {noun} that high?"""
             answer = compression
             unit = "Compression Distance (meters)"
         elif q_type == 6:
             # find k
             question = f"""A {mass:.2f} kg {noun} is launched to a height of {height:.2f} meters.
-            \n A spring had to be compressed by {compression} meters to do this. 
+            \n A spring had to be compressed by {compression:.2f} meters to do this. 
             \n How strong is the spring?"""
             answer = spring_constant
             unit = "Spring Strength (N/m)"
         else:
             question = f"""A {noun} is launched to a height of {height:.2f} meters 
-            by a spring of strength {spring_constant} N/m.
-            \n If the spring was compressed {compression} meters to do this, 
+            by a spring of strength {spring_constant:.2f} N/m.
+            \n If the spring was compressed {compression:.2f} meters to do this, 
             how much mass does the {noun} have?"""
             answer = mass
             unit = "Mass (kilograms)"
@@ -249,60 +249,60 @@ class EnergyGenerator(BaseGenerator):
             noun = random_noun()
             if q_type == 0:
                 # find k
-                question = f"""A {mass} kg {noun} strikes a spring while moving as {velocity:.2f} m/s. 
-                 \n The spring has to compress by {compression} meters to stop it. 
+                question = f"""A {mass:.2f} kg {noun} strikes a spring while moving as {velocity:.2f} m/s. 
+                 \n The spring has to compress by {compression:.2f} meters to stop it. 
                  \n How strong is the spring?"""
                 answer = spring_constant
                 unit = "Spring Strength (N/m)"
             elif q_type == 1:
                 # find velocity
-                question = f"""A {mass} kg {noun} hits a spring of strength {spring_constant} N/m.
-                \n If the spring compresses {compression} meters before the {noun} comes to rest,
+                question = f"""A {mass:.2f} kg {noun} hits a spring of strength {spring_constant:.2f} N/m.
+                \n If the spring compresses {compression:.2f} meters before the {noun} comes to rest,
                   how fast was the {noun} initially moving?"""
                 answer = velocity
                 unit = "Velocity (m/s)"
 
             elif q_type == 2:
                 # find compression
-                question = f"""A {mass} kg {noun} moving at {velocity:.2f} m/s 
-                hits a spring of strength {spring_constant} N/m.
+                question = f"""A {mass:.2f} kg {noun} moving at {velocity:.2f} m/s 
+                hits a spring of strength {spring_constant:.2f} N/m.
                 \n How much does the spring have to compress to bring the {noun} to rest?"""
                 answer = compression
                 unit = "Compression Distance (meters)"
             elif q_type == 3:
                 question = f"""A {noun} moving as {velocity:.2f} m/s hits 
-                a spring of strength {spring_constant} N/m.
-                \n If the spring compresses by {compression} meters to bring the {noun} to rest, 
+                a spring of strength {spring_constant:.2f} N/m.
+                \n If the spring compresses by {compression:.2f} meters to bring the {noun} to rest, 
                 how much mass does the {noun} have?"""
                 answer = mass
                 unit =  "Mass (kilograms)"
             elif q_type == 4: # REVERSE STARTS HERE
                 # find k
-                question = f"""A {mass} kg {noun} is accelerated from rest by 
-                a spring that was compressed by {compression} meters.
+                question = f"""A {mass:.2f} kg {noun} is accelerated from rest by 
+                a spring that was compressed by {compression:.2f} meters.
                 \n If the {noun} is now moving at {velocity:.2f} m/s, how strong is the spring?"""
                 answer = spring_constant
                 unit = "Spring Strength (N/m)"
             elif q_type == 5:
                 # find velocity
-                question = f"""A {mass} kg {noun} is accelerated from rest by 
-                a spring of strength {spring_constant} N/m.
-                \n If the spring was compressed by {compression} meters, 
+                question = f"""A {mass:.2f} kg {noun} is accelerated from rest by 
+                a spring of strength {spring_constant:.2f} N/m.
+                \n If the spring was compressed by {compression:.2f} meters, 
                 how fast is the {noun} now moving?"""
                 answer = velocity
                 unit = "Velocity (m/s)"
 
             elif q_type == 6:
                 # find compression
-                question = f"""A {mass} kg {noun} is moving at {velocity:.2f} m/s 
-                after being accelerated from rest by a spring of strength {spring_constant} N/m.
+                question = f"""A {mass:.2f} kg {noun} is moving at {velocity:.2f} m/s 
+                after being accelerated from rest by a spring of strength {spring_constant:.2f} N/m.
                 \n How much did the spring have to compress to achieve this?"""
                 answer = compression
                 unit = "Compression Distance (meters)"
             else:
                 question = f"""A {noun} is moving at {velocity:.2f} m/s 
-                after being accelerated from rest by a spring of strength {spring_constant} N/m.
-                \n If the spring was compressed by {compression} meters,  
+                after being accelerated from rest by a spring of strength {spring_constant:.2f} N/m.
+                \n If the spring was compressed by {compression:.2f} meters,  
                 how much mass does the {noun} have?"""
                 answer = mass
                 unit =  "Mass (kilograms)"
@@ -334,20 +334,20 @@ class EnergyGenerator(BaseGenerator):
             mass, height, velocity, thermal = self.grav_to_kin_thermal_nums()
             if flip == 0 or difficulty == "Easy":
                 # just find the difference
-                question = f"""A {mass} kg {noun} is released from rest and slides down a {height} meter tall ramp.
+                question = f"""A {mass:.2f} kg {noun} is released from rest and slides down a {height:.2f} meter tall ramp.
                 \n If the {noun}'s velocity at the bottom is {velocity:.2f} m/s, how much energy was lost as heat?"""
                 answer = thermal
                 unit = "Work done by Friction (Joules)"
             elif flip == 1:
                 # give the initial and the loss, find final info
-                question = f"""A {mass} kg {noun} is released from rest and slides down a {height} meter tall ramp.
+                question = f"""A {mass:.2f} kg {noun} is released from rest and slides down a {height:.2f} meter tall ramp.
                 \n If the {noun} loses {thermal} Joules due to friction / heat along the way, 
                 what will its velocity be when it reaches the bottom?"""
                 answer = velocity
                 unit = "Velocity (m/s)"
             elif flip == 2:
                 # give the final and the loss, find initial info
-                question = f"""A {mass} kg {noun} is released from rest and slides down a ramp,
+                question = f"""A {mass:.2f} kg {noun} is released from rest and slides down a ramp,
                 losing {thermal} Joules due to friction / heat along the way. 
                 \n If the {noun} reaches the bottom moving at 
                 {velocity:.2f} m/s, what was the original height of the ramp?"""
@@ -357,21 +357,21 @@ class EnergyGenerator(BaseGenerator):
             mass, height, velocity, thermal = self.kin_to_grav_thermal_nums()
             if flip == 0 or difficulty == "Easy":
                 # just find the difference
-                question = f"""A {mass} kg {noun} is initially moving with a velocity of {velocity:.2f} m/s.
-                \n The {noun} slides up a ramp, reaching a height of {height} meters.
+                question = f"""A {mass:.2f} kg {noun} is initially moving with a velocity of {velocity:.2f} m/s.
+                \n The {noun} slides up a ramp, reaching a height of {height:.2f} meters.
                 \n How much energy was lost as heat?"""
                 answer = thermal
                 unit = "Work done by Friction (Joules)"
             elif flip == 1:
                 # give the initial and the loss, find final info
-                question = f"""A {mass} kg {noun} slides {height} meters up a ramp.
+                question = f"""A {mass:.2f} kg {noun} slides {height:.2f} meters up a ramp.
                 \n If the {noun} lost {thermal} Joules due to friction / heat along the way, 
                 what was its velocity at the bottom of the ramp?"""
                 answer = velocity
                 unit = "Velocity (m/s)"
             elif flip == 2:
                 # give the final and the loss, find initial info
-                question = f"""A {mass} kg {noun} slides up a ramp,
+                question = f"""A {mass:.2f} kg {noun} slides up a ramp,
                 losing {thermal} Joules due to friction / heat along the way. 
                 \n If the {noun} was moving at 
                 {velocity:.2f} m/s at the bottom of the ramp,
@@ -407,14 +407,14 @@ class EnergyGenerator(BaseGenerator):
             mass, height, spring_constant, compression, thermal = self.grav_to_elastic_thermal_nums()        
             if flip == 0 or difficulty == "Easy":
                 # just find the difference
-                question = f"""A {mass} kg {noun} is released from rest and slides down a {height} meter tall ramp.
-                \n It collides with a spring of strength {spring_constant} N/m, which compresses {compression:.2f} meters before coming to rest.
+                question = f"""A {mass:.2f} kg {noun} is released from rest and slides down a {height:.2f} meter tall ramp.
+                \n It collides with a spring of strength {spring_constant:.2f} N/m, which compresses {compression:.2f} meters before coming to rest.
                 \n How much energy was lost as heat?"""
                 answer = thermal
                 unit = "Work done by Friction (Joules)"
             elif flip == 1:
                 # give the initial and the loss, find final info
-                question = f"""A {mass} kg {noun} is released from rest and slides down a {height} meter tall ramp.
+                question = f"""A {mass:.2f} kg {noun} is released from rest and slides down a {height:.2f} meter tall ramp.
                 \n The {noun} loses {thermal} Joules due to friction / heat along the way, and ends up compressing the spring at the bottom by
                 {compression:.2f} meters. 
                 \n How strong is the spring?"""
@@ -422,24 +422,24 @@ class EnergyGenerator(BaseGenerator):
                 unit = "Spring Strength (N/m)"
             elif flip == 2:
                 # give the initial and the loss, find final info
-                question = f"""A {mass} kg {noun} is released from rest and slides down a {height} meter tall ramp.
+                question = f"""A {mass:.2f} kg {noun} is released from rest and slides down a {height:.2f} meter tall ramp.
                 \n The {noun} loses {thermal} Joules due to friction / heat along the way, and ends up compressing a
-                spring that has a strength of {spring_constant} N/m. 
+                spring that has a strength of {spring_constant:.2f} N/m. 
                 \n How much does the spring compress?"""
                 answer = compression
                 unit = "Compression Distance (meters)"
             elif flip == 3:
                 # give final and loss, find initial
-                question = f"""A {noun} is released from rest and slides down a {height} meter tall ramp.
+                question = f"""A {noun} is released from rest and slides down a {height:.2f} meter tall ramp.
             \n The {noun} loses {thermal} Joules due to friction / heat along the way, and ends up compressing a
-                spring that has a strength of {spring_constant} N/m by {compression:.2f} meters. 
+                spring that has a strength of {spring_constant:.2f} N/m by {compression:.2f} meters. 
                 \n How much mass does the {noun} have?"""
                 answer = mass
                 unit = "Mass (kilograms)"
             elif flip == 4:
-                question = f"""A {mass} kg {noun} is released from rest and slides down a ramp.
+                question = f"""A {mass:.2f} kg {noun} is released from rest and slides down a ramp.
                 \n The {noun} loses {thermal} Joules due to friction / heat along the way, and ends up compressing a
-                spring that has a strength of {spring_constant} N/m by {compression:.2f} meters. 
+                spring that has a strength of {spring_constant:.2f} N/m by {compression:.2f} meters. 
                 \n How tall is the ramp?"""
                 answer = height
                 unit = "Ramp Height (meters)"
@@ -449,7 +449,7 @@ class EnergyGenerator(BaseGenerator):
                 # just find the difference
                 question = f"""A {mass:.2f} kg {noun} compresses a spring of strength 
                 {spring_constant:.2f} N/m by {compression:.2f} meters.
-                \n It slides up a ramp to a height of {height} meters.
+                \n It slides up a ramp to a height of {height:.2f} meters.
                 \n How much energy was lost as heat?"""
                 answer = thermal
                 unit = "Work done by Friction (Joules)"
@@ -518,13 +518,13 @@ class EnergyGenerator(BaseGenerator):
             mass, velocity, spring_constant, compression, thermal = self.kinetic_to_elastic_thermal_nums()
             if flip == 0 or difficulty == "Easy":
                 # just find the difference
-                question = f"""A {mass} kg {noun} is moving at {velocity} m/s when it collides with a spring of strength {spring_constant} N/m.
+                question = f"""A {mass:.2f} kg {noun} is moving at {velocity:.2f} m/s when it collides with a spring of strength {spring_constant:.2f} N/m.
                 \n If the spring compresses {compression:.2f} meters before coming to rest, how much energy was lost as heat?"""
                 answer = thermal
                 unit = "Work done by Friction (Joules)"
             elif flip == 1:
                 # give the initial and the loss, find final info
-                question = f"""A {mass} kg {noun} is moving at {velocity} m/s when it collides with a spring, and ends up 
+                question = f"""A {mass:.2f} kg {noun} is moving at {velocity:.2f} m/s when it collides with a spring, and ends up 
                 compressing the spring at the bottom by {compression:.2f} meters.
                 \n The {noun} lost {thermal} Joules due to friction / heat along the way. 
                 \n How strong is the spring?"""
@@ -532,22 +532,22 @@ class EnergyGenerator(BaseGenerator):
                 unit = "Spring Strength (N/m)"
             elif flip == 2:
                 # give the initial and the loss, find final info
-                question = f"""A {mass} kg {noun} is moving at {velocity} m/s when it collides with a spring 
-                that has a strength of {spring_constant} N/m.
+                question = f"""A {mass:.2f} kg {noun} is moving at {velocity:.2f} m/s when it collides with a spring 
+                that has a strength of {spring_constant:.2f} N/m.
                 \n The {noun} lost {thermal} Joules due to friction / heat along the way. 
                 \n How much does the spring compress?"""
                 answer = compression
                 unit = "Compression Distance (meters)"
             elif flip == 3:
                 # give final and loss, find initial
-                question = f"""A {noun} is moving at {velocity} m/s, and ends up compressing a
-                spring that has a strength of {spring_constant} N/m by {compression:.2f} meters.
+                question = f"""A {noun} is moving at {velocity:.2f} m/s, and ends up compressing a
+                spring that has a strength of {spring_constant:.2f} N/m by {compression:.2f} meters.
                 \n The {noun} loses {thermal} Joules due to friction / heat along the way. 
                 \n How much mass does the {noun} have?"""
                 answer = mass
                 unit = "Mass (kilograms)"
             elif flip == 4:
-                question = f"""A {mass} kg {noun} collides with a spring that has a strength of {spring_constant} N/m,
+                question = f"""A {mass:.2f} kg {noun} collides with a spring that has a strength of {spring_constant:.2f} N/m,
                 compressing it by {compression:.2f} meters.
                 \n The {noun} loses {thermal} Joules due to friction / heat along the way. 
                 \n How fast was it moving?"""
@@ -557,15 +557,15 @@ class EnergyGenerator(BaseGenerator):
             mass, velocity, spring_constant, compression, thermal = self.elastic_to_kinetic_thermal_nums()
             if flip == 0 or difficulty == "Easy":
                 # just find the difference
-                question = f"""A {mass} kg {noun} is moving at {velocity:.2f} m/s 
-                after being pushed by a spring of strength {spring_constant} N/m.
+                question = f"""A {mass:.2f} kg {noun} is moving at {velocity:.2f} m/s 
+                after being pushed by a spring of strength {spring_constant:.2f} N/m.
                 \n If the spring was originally compressed by {compression:.2f} meters, 
                 how much energy has been lost as heat?"""
                 answer = thermal
                 unit = "Work done by Friction (Joules)"
             elif flip == 1:
                 # give the initial and the loss, find final info
-                question = f"""A {mass} kg {noun} is moving at {velocity:.2f} m/s 
+                question = f"""A {mass:.2f} kg {noun} is moving at {velocity:.2f} m/s 
                 after being pushed by a spring originally compressed by {compression:.2f} meters.
                 \n If the {noun} lost {thermal} Joules due to friction / heat along the way, 
                 how strong is the spring?"""
@@ -573,8 +573,8 @@ class EnergyGenerator(BaseGenerator):
                 unit = "Spring Strength (N/m)"
             elif flip == 2:
                 # give the initial and the loss, find final info
-                question = f"""A {mass} kg {noun} is moving at {velocity:.2f} m/s 
-                after being pushed by a spring that has a strength of {spring_constant} N/m.
+                question = f"""A {mass:.2f} kg {noun} is moving at {velocity:.2f} m/s 
+                after being pushed by a spring that has a strength of {spring_constant:.2f} N/m.
                 \n The {noun} was lost {thermal} Joules due to friction / heat. 
                 \n How much was the spring compressed?"""
                 answer = compression
@@ -582,15 +582,15 @@ class EnergyGenerator(BaseGenerator):
             elif flip == 3:
                 # give final and loss, find initial
                 question = f"""A {noun} is moving at {velocity:.2f} m/s 
-                after being pushed by a spring that has a strength of {spring_constant} N/m.
+                after being pushed by a spring that has a strength of {spring_constant:.2f} N/m.
                 \n If the spring was compressed by {compression:.2f} meters, and 
                 the {noun} has lost {thermal} Joules due to friction / heat,  
                 how much mass does the {noun} have?"""
                 answer = mass
                 unit = "Mass (kilograms)"
             elif flip == 4:
-                question = f"""A {mass} kg {noun} was accelerated by a spring that has 
-                a strength of {spring_constant} N/m,
+                question = f"""A {mass:.2f} kg {noun} was accelerated by a spring that has 
+                a strength of {spring_constant:.2f} N/m,
                 and was compressed by {compression:.2f} meters.
                 \n If the {noun} has lost {thermal} Joules due to friction / heat, 
                 how fast is it currently moving?"""
@@ -677,16 +677,16 @@ class EnergyGenerator(BaseGenerator):
                 answer = mass
                 unit = "Mass (kilograms)"
             elif flip == 3:
-                question = f"""A {mass} kg {noun} is released from rest and slides down a {height:.2f} meter tall ramp, 
+                question = f"""A {mass:.2f} kg {noun} is released from rest and slides down a {height:.2f} meter tall ramp, 
                 reaching a velocity of {velocity:.2f} m/s at the bottom.
                 \n It experiences {friction:.2f} N of frictional force. 
                 \n What is the length of the ramp?"""
                 answer = distance
                 unit = "Ramp Length (meters)"
             else:
-                question = f"""A {mass} kg {noun} is released from rest and slides down a {height:.2f} meter tall ramp, 
+                question = f"""A {mass:.2f} kg {noun} is released from rest and slides down a {height:.2f} meter tall ramp, 
                 reaching a velocity of {velocity:.2f} m/s at the bottom.
-                \n If the ramp is {distance} meters long, how strong was the force of friction?"""
+                \n If the ramp is {distance:.2f} meters long, how strong was the force of friction?"""
                 answer = friction
                 unit = "Force of Friction (Newtons)"
             return question, [answer], [unit]
@@ -731,7 +731,7 @@ class EnergyGenerator(BaseGenerator):
         else:
             flip = ri(0,4)
             if flip == 0: 
-                question = f"""A {mass:.2f} kg {noun} increases its height by {height} meters
+                question = f"""A {mass:.2f} kg {noun} increases its height by {height:.2f} meters
                  by sliding up a ramp.
                 \n It experiences {friction:.2f} N of frictional force over the {distance:.2f} m ramp length. 
                 \n How fast was it moving initially?"""
@@ -822,7 +822,7 @@ class EnergyGenerator(BaseGenerator):
                 question = f"""A {mass:.2f} kg {noun} is released from rest and 
                 slides down a {height:.2f} meter tall ramp.
                 \n It experiences {friction:.2f} N of frictional force over the {distance:.2f} m ramp length, 
-                and compresses a spring of strength {spring_constant} N/m at the bottom.
+                and compresses a spring of strength {spring_constant:.2f} N/m at the bottom.
                 \n How much does the spring compress?"""
                 answer = compression
                 unit = "Spring Compression (meters)"
@@ -844,7 +844,7 @@ class EnergyGenerator(BaseGenerator):
             elif flip == 3:
                 question = f"""A {mass:.2f} kg {noun} is released from rest 
                 and slides down a {height:.2f} meter tall ramp, 
-                and compresses a spring of strength {spring_constant} N/m by {compression:.2f} meters.
+                and compresses a spring of strength {spring_constant:.2f} N/m by {compression:.2f} meters.
                 \n It experiences {friction:.2f} N of frictional force.
                 \n What is the length of the ramp?"""
                 answer = distance
@@ -860,7 +860,7 @@ class EnergyGenerator(BaseGenerator):
             else:
                 question = f"""A {mass:.2f} kg {noun} is released from rest 
                 and slides down a {height:.2f} meter tall ramp, 
-                and compresses a spring of strength {spring_constant} N/m by {compression:.2f} meters.
+                and compresses a spring of strength {spring_constant:.2f} N/m by {compression:.2f} meters.
                 \n If the ramp is {distance:.2f} meters long, how strong was the force of friction?"""
                 answer = friction
                 unit = "Force of Friction (Newtons)"
@@ -893,7 +893,7 @@ class EnergyGenerator(BaseGenerator):
                 answer2 = compression
                 unit2 = "Spring Compression (meters)"
             elif flip == 2:
-                question = f"""A {mass} kg {noun} is launched to a height of {height:.2f} meters up a ramp 
+                question = f"""A {mass:.2f} kg {noun} is launched to a height of {height:.2f} meters up a ramp 
                 by a spring compressed by {compression:.2f} meters.
                 \n It experiences {friction:.2f} N of frictional force over the {distance:.2f} m ramp length.
                 \n How much energy was lost as heat, and how strong is the spring?"""
@@ -1082,7 +1082,7 @@ class EnergyGenerator(BaseGenerator):
                 answer2 = compression
                 unit2 = "Spring Compression (meters)"
             elif flip == 2:
-                question = f"""A spring is compressed by {compression:.2f} m and launches a {mass} kg {noun}.
+                question = f"""A spring is compressed by {compression:.2f} m and launches a {mass:.2f} kg {noun}.
                 \n After the {noun} slides along a surface with {friction:.2f} N of friction over {distance:.2f} m,
                 the {noun} is moving at a velocity of {velocity:.2f} m/s
                 \n How much energy was lost to heat, and what is the strength of the spring?"""
