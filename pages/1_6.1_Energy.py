@@ -114,8 +114,8 @@ def question_parameters():
                 """
                 },
             "Friction and Distance": {
-                "honors": r"W_f = F_f x",
-                "conceptual": r"""W_f = F_f x \;\;,
+                "honors": r"W_f = F_f \; x",
+                "conceptual": r"""W_f = F_f \; x \;\;,
                  \;\ x = \frac{W_f}{F_f} \;\;
                  \;\; F_f = \frac{W_f}{x}"""
                 },
@@ -145,7 +145,13 @@ class thermal:
                 \quad KE = \frac{1}{2} m v^2 \quad ,
                 \quad GPE = mgh
                 """
-                }
+                },
+                "Friction and Distance": {
+                "honors": r"W_f = F_f \; x",
+                "conceptual": r"""W_f = F_f \; x \;\;,
+                 \;\ x = \frac{W_f}{F_f} \;\;
+                 \;\; F_f = \frac{W_f}{x}"""
+                },
             }
         problem_types = list(problem_type_dict.keys())
         difficulties = ["Easy","Medium","Hard"]
