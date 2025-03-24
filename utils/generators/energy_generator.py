@@ -384,7 +384,7 @@ class EnergyGenerator(BaseGenerator):
     def grav_to_elastic_thermal_nums(self):
         
         mass, height, grav = self.gravitational_potential_energy("Hard")
-        thermal = ri(1,grav//2 + 2)
+        thermal = ri(1,int(grav//2 + 2))
         elastic = grav - thermal
         spring_constant = height / ri(2,10)
         compression = (2*elastic/spring_constant)**(1/2)
@@ -392,7 +392,7 @@ class EnergyGenerator(BaseGenerator):
 
     def elastic_to_grav_thermal_nums(self):
         spring_constant, compression, elastic_e = self.elastic_potential_energy("Hard")
-        thermal = ri(1,elastic_e//2 +2)
+        thermal = ri(1,int(elastic_e//2 +2))
         grav = elastic_e - thermal
         height = spring_constant * ri(2,10)
         mass = grav / 10*height
@@ -746,7 +746,7 @@ class EnergyGenerator(BaseGenerator):
                 unit = "Ramp Height (meters)"
             elif flip == 2:
                 question = f"""A {mass:.2f} kg {noun} initially moving at {velocity:.2f} m/s 
-                slides up a ramp, increasing its height by {height} meters.
+                slides up a ramp, increasing its height by {height:.2f} meters.
                 \n It experiences {friction:.2f} N of frictional force over the {distance:.2f} m ramp length.
                 \n How much mass does the {noun} have?"""
                 answer = mass
@@ -761,7 +761,7 @@ class EnergyGenerator(BaseGenerator):
                 unit = "Ramp Length (meters)"
             else:
                 question = f"""A {mass:.2f} kg {noun} initially moving at {velocity:.2f} m/s 
-                slides up a ramp, increasing its height by {height} meters.
+                slides up a ramp, increasing its height by {height:.2f} meters.
                 \n If the ramp is {distance:.2f} meters long, how strong was the force of friction?"""
                 answer = friction
                 unit = "Force of Friction (Newtons)"
