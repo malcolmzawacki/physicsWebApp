@@ -317,3 +317,125 @@ class rendering:
                             st.error(f"{random_error_message()} The correct answers are: {answer_display}.")
                 else:
                     st.error("Please enter all answers before submitting")
+    
+
+    def question_ui_3(self, prefix: str, problem_type_dict: dict, problem_types: list, 
+                difficulties: list, generator):
+        """Produces questions with logic passed in from the generator class, and evaluates answers.
+            **Requires the imported generator class to have a choose_problem(problem_type, difficulty) function"""
+        # UI Controls
+        col1, col2, col3,col4 = st.columns([10,5,2,5])
+        with col1:
+
+            selected_problem_type = st.selectbox(
+                "Problem Type",
+                options=list(problem_types),
+                key=f"{prefix}_problem_type_select")
+                
+            problem_type = selected_problem_type
+
+        with col2:
+            difficulty = st.selectbox(
+                "Difficulty",
+                difficulties,
+                key=f"{prefix}_difficulty_select"
+            )
+        with col3:
+            st.write("")
+        with col4:
+            st.write("")
+            st.write("")
+            if st.button("New Question",key=f"{prefix}_new_question"):
+                question, answers, units = generator.choose_problem(problem_type, difficulty)
+                st.session_state[f"{prefix}_question_id"] += 1
+                st.session_state[f"{prefix}_current_question"] = question
+                st.session_state[f"{prefix}_correct_answers"] = answers
+                st.session_state[f"{prefix}_units"] = units
+                st.session_state[f"{prefix}_submitted"] = False
+                generator.clear_answers()
+                st.rerun()  
+        # Check if we need a new question
+    
+        # Generate questions - modified to handle multiple answers
+        if (problem_type != st.session_state[f"{prefix}_problem_type"] or 
+            st.session_state[f"{prefix}_current_question"] is None):
+            question, answers, units = generator.choose_problem(problem_type, difficulty)
+            num_inputs = len(answers)
+            st.session_state[f"{prefix}_current_question"] = question
+            st.session_state[f"{prefix}_correct_answers"] = answers  # Now a list
+            st.session_state[f"{prefix}_units"] = units  # Now a list
+            st.session_state[f"{prefix}_problem_type"] = problem_type
+            st.session_state[f"{prefix}_submitted"] = False
+            generator.clear_answers()
+            # ... rest of your code ...
+        
+        with st.expander("equation(s)",expanded=True):
+            if st.session_state[f"{prefix}_level"] == False:
+                st.latex(problem_type_dict[st.session_state[f"{prefix}_problem_type"]]["honors"])
+            else:
+                st.latex(problem_type_dict[st.session_state[f"{prefix}_problem_type"]]["conceptual"])
+
+        # Display current question
+        st.subheader("Question:")
+        st.write(st.session_state[f"{prefix}_current_question"])
+        
+        # Modified form to handle multiple inputs
+        with st.form(f"{prefix}_form"):
+            num_inputs = st.session_state[f"{prefix}_correct_answers"]
+            num_inputs = len(num_inputs)
+            if num_inputs > 1:
+                cols = st.columns(num_inputs)
+                user_answers = []
+                
+                for i, col in enumerate(cols):
+                    unit = st.session_state[f"{prefix}_units"][i]
+                    with col:
+                        if type(st.session_state[f"{prefix}_correct_answers"][i]) == str:
+                            input_value = st.text_input(f"{i+1}: {unit}", max_chars= 20,
+                                key=f"{prefix}_input_{i}_{st.session_state[f'{prefix}_question_id']}"
+                            )
+                            user_answers.append(input_value)
+                        else:
+                            input_value = st.number_input(
+                                f"{i+1}: {unit}", 
+                                min_value=0.00, value=None, step=0.01,
+                                key=f"{prefix}_input_{i}_{st.session_state[f'{prefix}_question_id']}"
+                            )
+                            user_answers.append(input_value)
+                            
+            else:
+                # Single input case
+                unit = st.session_state[f"{prefix}_units"][0]
+                user_answers = [st.number_input(
+                    f"{unit}:", 
+                    min_value=0.00, value=None, step=0.01,
+                    key=f"{prefix}_input_0_{st.session_state[f'{prefix}_question_id']}"
+                )]
+                
+            submitted = st.form_submit_button("Submit")
+            if submitted:
+                correct_answers = st.session_state[f"{prefix}_correct_answers"]
+                all_correct = True
+                if None not in user_answers:
+                    # Check all answers
+                    for i, (user_input, correct_answer) in enumerate(zip(user_answers, correct_answers)):
+                        if type(user_input) == str:
+                            is_correct == True if user_input.lower() == correct_answer.lower() else False
+                        else:
+                            tolerance = correct_answer * 0.05
+                            is_correct = abs(user_input - correct_answer) < abs(tolerance)
+                            all_correct = all_correct and is_correct
+                    
+                    # Update performance based on overall correctness
+                    if not st.session_state[f"{prefix}_submitted"]:
+                        self.update_performance(prefix, problem_type, difficulty, all_correct)
+                        st.session_state[f"{prefix}_submitted"] = True 
+                        
+                        if all_correct:
+                            st.success(f"{random_correct_message()}")
+                            st.session_state[f"{prefix}_stars"] += 1
+                        else:
+                            answer_display = ", ".join([f"{ans:.2f}" for ans in correct_answers])
+                            st.error(f"{random_error_message()} The correct answers are: {answer_display}.")
+                else:
+                    st.error("Please enter all answers before submitting")

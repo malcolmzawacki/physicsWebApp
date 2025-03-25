@@ -1,6 +1,7 @@
 import random
 import sys
 from pathlib import Path
+from random import randint as ri
 
 sys.path.append(str(Path(__file__).parent.parent.parent))
 try:
@@ -130,6 +131,96 @@ class LinearMotionGenerator(BaseGenerator):
         return x, v_i,t,a
 
 
+
+    def distance_and_displacement_1D(self,difficulty):
+        noun = random_noun()
+        directions = [["right","left"],["up","down"],["North","South"],["East","West"]]
+        # note that the positive direction is listed first 
+        problem_directions = random.choice(directions)
+        distance = 0
+        displacement = 0
+        max_val = 2*self.get_difficulty_range(difficulty)
+        question = f"A {noun} goes on a walk, and makes the following movements: \n"
+
+        if difficulty == "Easy":
+            steps = 2
+        elif difficulty == "Medium":
+            steps = 3
+        else: #hard
+            steps  = 4
+        for i in range(steps):
+            dirn = ri(0,1)
+            step = ri(1,max_val)
+            distance += step
+            if dirn == 0:
+                displacement += step
+            else: 
+                displacement -= step
+            step_dirn = problem_directions[dirn]
+            question += f"{i+1}. {step} meters {step_dirn} \n"
+        question += f"\nWhat is the total distance and net displacment of the {noun}?"
+        if displacement > 0:
+            direction = problem_directions[0]
+        elif displacement < 0:
+            direction = problem_directions[1]
+        else:
+            direction = "None"
+        displacement = abs(displacement)
+        return question, [distance, displacement, direction], ["Total Distance (meters)", "Net Displacement (meters)", "Direction (Say 'None' for zero)"]
+    
+
+    def distance_and_displacement_2D(self,difficulty):
+        noun = random_noun()
+        problem_directions = [["East","West"],["North","South"]]
+        # note that the positive direction is listed first, x and y
+        distance = 0
+        disp_x = 0
+        disp_y = 0
+        max_val = 20
+        question = f"A {noun} goes on a walk, and makes the following movements: \n"
+        if difficulty == "Easy":
+            steps = 1
+        elif difficulty == "Medium":
+            steps = 2
+        else: #hard
+            steps  = 3
+        for i in range(steps):
+            dirn_x = ri(0,1)
+            dirn_y = ri(0,1)
+            step_x = ri(1,max_val)
+            step_y = ri(1,max_val)
+            distance += step_x + step_y
+            if dirn_x == 0:
+                disp_x += step_x
+            else: 
+                disp_x -= step_x
+            if dirn_y == 0:
+                disp_y += step_y
+            else: 
+                disp_y -= step_y
+            step_dirn_x = problem_directions[0][dirn_x]
+            step_dirn_y = problem_directions[1][dirn_y]
+            question += f"{2*i+1}. {step_x} meters {step_dirn_x} \n"
+            question += f"{2*i+2}. {step_y} meters {step_dirn_y} \n"
+        if disp_x > 0:
+            dirn_x_final = "East"
+        elif disp_x < 0:
+            dirn_x_final = "West"
+        else:
+            dirn_x_final = ""
+        if disp_y > 0:
+            dirn_y_final = "North"
+        elif disp_y < 0:
+            dirn_y_final = "South"
+        else:
+            dirn_y_final = ""
+        dirn_final = dirn_y_final + dirn_x_final
+        dirn_final = None if len(dirn_final) < 4 else dirn_final
+        displacement = (disp_x**2  + disp_y**2)**(1/2)
+        return question, [distance, displacement, dirn_final], ["Total Distance (meters)", "Net Displacement (meters)", "Direction (Say 'None' for zero)"]
+    
+
+
     "E X T R A   S P A C E   F O R   Q U E S T I O N   F U N C T I O N S"
 
 
@@ -213,7 +304,7 @@ class LinearMotionGenerator(BaseGenerator):
                     question = f"""A {noun} decelerates from {v_f} m/s to {v_i} m/s at {-1*a} m/s². \
                     How far did it travel?"""
 
-        return question, answer, unit
+        return question, [answer], [unit]
             
     "Formatting on HARD here could be improved to state direction textually. still includes negative signs. gotta ship something tho"
     def no_dist_question(self, difficulty):
@@ -306,7 +397,7 @@ class LinearMotionGenerator(BaseGenerator):
                 question = f"""A {noun} {verb} at {a} m/s² from {v_i} m/s to {v_f} m/s. \
                 How long does it take?"""
 
-        return question, answer, unit
+        return question, [answer], [unit]
 
     
     def no_acc_question(self,difficulty):
@@ -425,7 +516,7 @@ class LinearMotionGenerator(BaseGenerator):
                     traveling {abs(x)} meters {direction_phrase}.
                     What is the final velocity of the {noun}?"""
 
-        return question, answer, unit
+        return question, [answer], [unit]
     
     def no_vf_question(self,difficulty):
         "has x, needs a, vi, t -> (for easy, hard only)"
@@ -500,7 +591,7 @@ class LinearMotionGenerator(BaseGenerator):
 
 
 
-        return question, answer, unit
+        return question, [answer], [unit]
     
     def mixed_question(self,difficulty):
         dice = random.randint(0,3)
@@ -531,7 +622,11 @@ class LinearMotionGenerator(BaseGenerator):
             question, answer, unit = self.no_acc_question(difficulty)
         elif problem_type == "No Final Velocity":
             question, answer, unit = self.no_vf_question(difficulty)
+        elif problem_type == "One Dimensional":
+            question, answer, unit = self.distance_and_displacement_1D(difficulty)
+        elif problem_type == "Two Dimensional":
+            question, answer, unit = self.distance_and_displacement_2D(difficulty)
         else:  # Mixed
             question, answer, unit = self.mixed_question(difficulty)
-        return question, [answer], [unit]
+        return question, answer, unit
         

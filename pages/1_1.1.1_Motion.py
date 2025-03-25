@@ -356,8 +356,8 @@ class linear_fns:
 
     @staticmethod
     def main():
-        st.title("Linear Motion")
-        prefix = "linear"
+        st.title("Accelerated Motion")
+        prefix = "accelerated_motion"
         problem_type_dict, problem_types, difficulties = linear_fns.question_parameters()
         render = rendering()
         generator = LinearMotionGenerator()
@@ -403,17 +403,51 @@ class Projectile_fns:
         render.subheader_ui(prefix,performance)
         render.question_ui_2(prefix, problem_type_dict, problem_types ,difficulties, generator)
 
+class constant_motion:
+    @ staticmethod
+    def question_parameters():
+            """Holds current options for questions for centralized updating"""
+
+            problem_type_dict = {
+                "One Dimensional": {
+                      "honors": r"""\textrm{currently under construction, ask your teacher to hurry up!}""",
+
+                      "conceptual": r"""\textrm{currently under construction, ask your teacher to hurry up!}
+                      """},
+                "Two Dimensional": {
+                      "honors": r"""\textrm{currently under construction, ask your teacher to hurry up!}""",
+
+                      "conceptual": r"""\textrm{currently under construction, ask your teacher to hurry up!}
+                      """},
+                
+                }
+            problem_types = list(problem_type_dict.keys())
+            difficulties = ["Easy","Medium","Hard"]
+            return problem_type_dict, problem_types, difficulties
+
+    @staticmethod
+    def main():
+        st.title("Constant Motion")
+        prefix = "constant"
+        problem_type_dict, problem_types, difficulties = constant_motion.question_parameters()
+        render = rendering()
+        generator = LinearMotionGenerator()
+        render.initialize_session_state(prefix, problem_types, difficulties)
+        performance = st.session_state[f"{prefix}_performance"]
+        render.subheader_ui(prefix,performance)
+        render.question_ui_3(prefix, problem_type_dict, problem_types ,difficulties, generator)
 
 def main():
     # Add tabs for quiz and explorer modes
-    tab1, tab2,tab3 = st.tabs(["Linear Motion Problems", "Graphing Practice","Projectile Practice"])
-    
+    tab1, tab2,tab3,tab4 = st.tabs(["Constant Motion","Accelerated Motion", "Graphing Practice","Projectile Practice"])
     
     with tab1:
-        linear_fns.main()
+        constant_motion.main()
     with tab2:
-        graphing.graphing_practice()
+        linear_fns.main()
     with tab3:
+        graphing.graphing_practice()
+    with tab4:
         Projectile_fns.main()
 
 if __name__ == "__main__":
