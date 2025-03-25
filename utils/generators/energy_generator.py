@@ -325,7 +325,7 @@ class EnergyGenerator(BaseGenerator):
     def kin_to_grav_thermal_nums(self):
         mass, velocity, kinetic_e = self.kinetic_energy("Hard")
         thermal = ri(1,int(kinetic_e//2 + 2))
-        grav = kinetic_e = thermal
+        grav = kinetic_e - thermal
         height = grav/ (10*mass)
         return mass, height, velocity, thermal
 
