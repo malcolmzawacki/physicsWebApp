@@ -308,7 +308,7 @@ class linear_fns:
                             
                             \newline ~ \newline ~ \newline
                             \quad v_i = \sqrt{2ax - v_f^2}  \quad
-                            \quad v_i = at - v_f  \quad
+                            \quad v_i = v_f - at  \quad
                             \quad v_i = \frac{2x}{t} - v_f  \quad
                             \newline ~ \newline ~ \newline
                             \quad t = \frac{2x}{v_f + v_i}  \quad 
@@ -330,7 +330,7 @@ class linear_fns:
                         "No Distance": {
                             "honors": r"v_f = v_i + at",
                             "conceptual": r"""v_f = v_i +at  \quad ,
-                            \quad v_i = at - v_f  \quad ,
+                            \quad v_i =  v_f - at  \quad ,
                             \quad a = \frac{v_f - v_i}{t}  \quad,
                             \quad t = \frac{v_f - v_i}{a}"""
                         },               
