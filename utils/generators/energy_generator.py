@@ -23,7 +23,8 @@ class EnergyGenerator(BaseGenerator):
         elif difficulty == "Hard":
             return 20
         return 10
-
+    
+    # # # B A S I C    E N E R G Y    N U M B E R S # # # 
     def kinetic_energy(self,difficulty):
         upper = self.get_difficulty_range(difficulty)
         mass = ri(1,upper)
@@ -58,6 +59,8 @@ class EnergyGenerator(BaseGenerator):
         distance = ri(1,upper)
         return force, distance, force*distance
 
+
+    # # # B A S I C    E N E R G Y    P R 0 B L E M S # # # 
     def elastic_problem(self,difficulty):
         spring_constant, compression, elastic_e = self.elastic_potential_energy(difficulty)
         q_type = ri(0,2)
@@ -145,6 +148,7 @@ class EnergyGenerator(BaseGenerator):
         return question, [answer], [unit]
 
     
+    # # # E N E R G Y   C 0 N S E R V A T I 0 N   P R 0 B L E M S # # # 
     def kinetic_gravitational_problem(self,difficulty):
         mass, velocity, _ = self.kinetic_energy(difficulty)
         height = velocity**2 / 20
@@ -238,7 +242,6 @@ class EnergyGenerator(BaseGenerator):
 
         return question, [answer], [unit]
 
-
     def elastic_kinetic_problem(self, difficulty):
             spring_constant, compression, _ = self.elastic_potential_energy(difficulty)
             upper = self.get_difficulty_range(difficulty)
@@ -309,7 +312,8 @@ class EnergyGenerator(BaseGenerator):
 
             return question, [answer], [unit]
 
-    
+
+    # # # T H E R M A L    E N E R G Y   L 0 S S   N U M B E R S # # # 
     def grav_to_kin_thermal_nums(self):
         #grav -> Kin
         mass, height, grav = self.gravitational_potential_energy("Hard")
@@ -322,9 +326,48 @@ class EnergyGenerator(BaseGenerator):
         mass, velocity, kinetic_e = self.kinetic_energy("Hard")
         thermal = ri(1,int(kinetic_e//2 + 2))
         grav = kinetic_e = thermal
-        height = grav/10*mass
+        height = grav/ (10*mass)
         return mass, height, velocity, thermal
 
+    def grav_to_elastic_thermal_nums(self):
+        
+        mass, height, grav = self.gravitational_potential_energy("Hard")
+        thermal = ri(1,int(grav//2 + 2))
+        elastic = grav - thermal
+        spring_constant = height / ri(2,10)
+        compression = (2*elastic/spring_constant)**(1/2)
+        return mass, height, spring_constant, compression, thermal
+
+    def elastic_to_grav_thermal_nums(self):
+        spring_constant, compression, elastic_e = self.elastic_potential_energy("Hard")
+        thermal = ri(1,int(elastic_e//2 +2))
+        grav = elastic_e - thermal
+        height = compression * ri(2,10)
+        mass = grav / (10*height)
+        return mass, height, spring_constant, compression, thermal
+
+    def kinetic_to_elastic_thermal_nums(self):
+
+        mass, velocity, kinetic = self.kinetic_energy("Hard")
+        thermal = ri(1,int(kinetic//2 + 2))
+        elastic = kinetic - thermal
+        spring_constant = ri(2,int(elastic//2 + 3))
+        compression = (2*elastic/spring_constant)**(1/2)
+
+        return mass, velocity, spring_constant, compression, thermal
+    
+    def elastic_to_kinetic_thermal_nums(self):
+
+        spring_constant, compression, elastic_e = self.elastic_potential_energy("Hard")
+        thermal = ri(1,int(elastic_e//2 + 2))
+        kinetic = elastic_e - thermal
+        mass = ri(2,int(kinetic//2 + 3))
+        velocity = (2*kinetic/mass)**(1/2)
+
+        return mass, velocity, spring_constant, compression, thermal
+
+
+    # # # T H E R M A L    E N E R G Y   L 0 S S   P R 0 B L E M S # # # 
     def grav_kin_thermal(self, difficulty):
         #grav -> Kin
         flip = ri(0,2)
@@ -380,24 +423,6 @@ class EnergyGenerator(BaseGenerator):
                 unit = "Height (meters)"
 
         return question, [answer], [unit]
-
-    def grav_to_elastic_thermal_nums(self):
-        
-        mass, height, grav = self.gravitational_potential_energy("Hard")
-        thermal = ri(1,int(grav//2 + 2))
-        elastic = grav - thermal
-        spring_constant = height / ri(2,10)
-        compression = (2*elastic/spring_constant)**(1/2)
-        return mass, height, spring_constant, compression, thermal
-
-    def elastic_to_grav_thermal_nums(self):
-        spring_constant, compression, elastic_e = self.elastic_potential_energy("Hard")
-        thermal = ri(1,int(elastic_e//2 +2))
-        grav = elastic_e - thermal
-        height = spring_constant * ri(2,10)
-        mass = grav / 10*height
-        return mass, height, spring_constant, compression, thermal
-
 
     def grav_elastic_thermal(self, difficulty):
         noun = random_noun()
@@ -489,27 +514,6 @@ class EnergyGenerator(BaseGenerator):
                 unit = "Ramp Height (meters)"
         return question, [answer], [unit]
 
-    def kinetic_to_elastic_thermal_nums(self):
-
-        mass, velocity, kinetic = self.kinetic_energy("Hard")
-        thermal = ri(1,int(kinetic//2 + 2))
-        elastic = kinetic - thermal
-        spring_constant = ri(2,int(elastic//2 + 3))
-        compression = (2*elastic/spring_constant)**(1/2)
-
-        return mass, velocity, spring_constant, compression, thermal
-    
-    def elastic_to_kinetic_thermal_nums(self):
-
-        spring_constant, compression, elastic_e = self.elastic_potential_energy("Hard")
-        thermal = ri(1,int(elastic_e//2 + 2))
-        kinetic = elastic_e - thermal
-        mass = ri(2,int(kinetic//2 + 3))
-        velocity = (2*kinetic/mass)**(1/2)
-
-        return mass, velocity, spring_constant, compression, thermal
-
-
     def kinetic_elastic_thermal(self,difficulty):
         noun = random_noun()
         flip = ri(0,4)
@@ -598,8 +602,8 @@ class EnergyGenerator(BaseGenerator):
                 unit = "Velocity (m/s)"
         return question, [answer], [unit]
 
+    # chooser for thermal energy problems
     def thermal_quant_problems(self, difficulty):
-        noun = random_noun()
         flip = ri(0,2)
         if flip == 0:
             #grav -> Kin
@@ -615,7 +619,7 @@ class EnergyGenerator(BaseGenerator):
 
 
 
-
+    # # # F R I C T I 0 N   A N D   D I S T A N C E   P R 0 B L E M S # # # 
     def grav_to_kinetic_friction_distance_q(self, difficulty):
         
         mass, height, velocity, thermal = self.grav_to_kin_thermal_nums()
@@ -691,7 +695,6 @@ class EnergyGenerator(BaseGenerator):
                 unit = "Force of Friction (Newtons)"
             return question, [answer], [unit]
         
-
     def kinetic_to_grav_friction_distance_q(self, difficulty):
         
         mass, height, velocity, thermal = self.kin_to_grav_thermal_nums()
@@ -766,7 +769,6 @@ class EnergyGenerator(BaseGenerator):
                 answer = friction
                 unit = "Force of Friction (Newtons)"
             return question, [answer], [unit]
-
 
     def grav_to_elastic_friction_distance_q(self, difficulty):
         mass, height, spring_constant, compression, thermal = self.grav_to_elastic_thermal_nums()        
@@ -1152,7 +1154,7 @@ class EnergyGenerator(BaseGenerator):
                 unit = "Force of Friction (Newtons)"
             return question, [answer], [unit]
 
-
+    # chooser for friction and distance problems
     def friction_and_distance_problems(self,difficulty):
         flip = ri(0,5)
         if flip == 0:
@@ -1171,6 +1173,7 @@ class EnergyGenerator(BaseGenerator):
         return question, answer, unit
 
 
+    # # # I N T E R F A C E  W I T H   R E N D E R E R # # # 
     def choose_problem(self,problem_type, difficulty):
         if problem_type == "Elastic Potential Energy":
             question, answer, unit = self.elastic_problem(difficulty)
@@ -1194,5 +1197,4 @@ class EnergyGenerator(BaseGenerator):
             question, answer, unit = self.friction_and_distance_problems(difficulty)
         else:
             pass
-        
         return question, answer, unit
