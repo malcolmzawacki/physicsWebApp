@@ -435,7 +435,7 @@ class constant_motion:
         render.initialize_session_state(prefix, problem_types, difficulties)
         performance = st.session_state[f"{prefix}_performance"]
         render.subheader_ui(prefix,performance)
-        render.question_ui_3(prefix, problem_type_dict, problem_types ,difficulties, generator)
+        render.question_ui_3_with_diagrams(prefix, problem_type_dict, problem_types ,difficulties, generator)
 
 def main():
     # Add tabs for quiz and explorer modes

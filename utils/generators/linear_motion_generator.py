@@ -134,12 +134,23 @@ class LinearMotionGenerator(BaseGenerator):
 
     def distance_and_displacement_1D(self,difficulty):
         noun = random_noun()
-        directions = [["right","left"],["up","down"],["North","South"],["East","West"]]
+        directions = [
+            ["right","left"],
+            ["up","down"],
+            ["North","South"],
+            ["East","West"]
+            ]
         # note that the positive direction is listed first 
         problem_directions = random.choice(directions)
         distance = 0
         displacement = 0
+        movements =[]
         max_val = 2*self.get_difficulty_range(difficulty)
+        label_set = [
+            "Total Distance (meters)", 
+            "Net Displacement (meters)", 
+            "Direction (Say 'None' for zero)"
+            ]
         question = f"A {noun} goes on a walk, and makes the following movements: \n"
 
         if difficulty == "Easy":
@@ -157,6 +168,8 @@ class LinearMotionGenerator(BaseGenerator):
             else: 
                 displacement -= step
             step_dirn = problem_directions[dirn]
+            movements.append((step_dirn, step))
+
             question += f"{i+1}. {step} meters {step_dirn} \n"
         question += f"\nWhat is the total distance and net displacment of the {noun}?"
         if displacement > 0:
@@ -166,7 +179,7 @@ class LinearMotionGenerator(BaseGenerator):
         else:
             direction = "None"
         displacement = abs(displacement)
-        return question, [distance, displacement, direction], ["Total Distance (meters)", "Net Displacement (meters)", "Direction (Say 'None' for zero)"]
+        return question, [distance, displacement, direction], label_set, movements
     
 
     def distance_and_displacement_2D(self,difficulty):
@@ -177,6 +190,11 @@ class LinearMotionGenerator(BaseGenerator):
         disp_x = 0
         disp_y = 0
         max_val = 20
+        movements = []
+        label_set = [
+            "Total Distance (meters)", 
+            "Net Displacement (meters)", 
+            "Direction (Say 'None' for zero)"]
         question = f"A {noun} goes on a walk, and makes the following movements: \n"
         if difficulty == "Easy":
             steps = 1
@@ -200,6 +218,8 @@ class LinearMotionGenerator(BaseGenerator):
                 disp_y -= step_y
             step_dirn_x = problem_directions[0][dirn_x]
             step_dirn_y = problem_directions[1][dirn_y]
+            movements.append((step_dirn_x, step_x))
+            movements.append((step_dirn_y, step_y))
             question += f"{2*i+1}. {step_x} meters {step_dirn_x} \n"
             question += f"{2*i+2}. {step_y} meters {step_dirn_y} \n"
         if disp_x > 0:
@@ -215,9 +235,10 @@ class LinearMotionGenerator(BaseGenerator):
         else:
             dirn_y_final = ""
         dirn_final = dirn_y_final + dirn_x_final
-        dirn_final = None if len(dirn_final) < 4 else dirn_final
+        dirn_final = "None" if len(dirn_final) < 4 else dirn_final
         displacement = (disp_x**2  + disp_y**2)**(1/2)
-        return question, [distance, displacement, dirn_final], ["Total Distance (meters)", "Net Displacement (meters)", "Direction (Say 'None' for zero)"]
+
+        return question, [distance, displacement, dirn_final], label_set, movements
     
 
 
@@ -623,10 +644,126 @@ class LinearMotionGenerator(BaseGenerator):
         elif problem_type == "No Final Velocity":
             question, answer, unit = self.no_vf_question(difficulty)
         elif problem_type == "One Dimensional":
-            question, answer, unit = self.distance_and_displacement_1D(difficulty)
+            question, answer, unit, movements = self.distance_and_displacement_1D(difficulty)
+            return question, answer, unit, movements
         elif problem_type == "Two Dimensional":
-            question, answer, unit = self.distance_and_displacement_2D(difficulty)
+            question, answer, unit, movements = self.distance_and_displacement_2D(difficulty)
+            return question, answer, unit, movements
         else:  # Mixed
             question, answer, unit = self.mixed_question(difficulty)
         return question, answer, unit
+
+    def generate_movement_diagram(self,movements: list, problem_type: str):
+        """
+        Generate a diagram showing the movement path
+        
+        Parameters:
+        movements: list of tuples (direction, distance)
+        problem_type: "1D" or "2D"
+        
+        Returns:
+        matplotlib figure
+        """
+        import matplotlib.pyplot as plt
+        
+        fig, ax = plt.subplots(figsize=(4, 4))
+        
+        # Set up the plot
+        if problem_type == "One Dimensional":
+            # For 1D, we'll draw on a horizontal line
+            ax.axhline(y=0, color='gray', linestyle='-', alpha=0.3)
+            ax.set_ylim(-1, 1)
+            
+            # Start at origin
+            current_x = 0
+            points_x = [current_x]
+            points_y = [0]
+            
+            # Plot each movement
+            for direction, distance in movements:
+                if direction == "right":
+                    current_x += distance
+                else:  # "left"
+                    current_x -= distance
+                
+                points_x.append(current_x)
+                points_y.append(0)
+                
+            # Plot the path
+            ax.plot(points_x, points_y, 'o-', color='cyan')
+            
+            # Add arrows to show direction
+            for i in range(len(points_x) - 1):
+                dx = points_x[i+1] - points_x[i]
+                ax.arrow(points_x[i], points_y[i], dx * 0.8, 0, 
+                        head_width=0.1, head_length=abs(dx) * 0.2, 
+                        fc='cyan', ec='cyan')
+            
+            # Add displacement vector
+            ax.arrow(
+                points_x[0], points_y[0], 
+                points_x[-1] - points_x[0], 0,
+                head_width=0.1, 
+                head_length=abs(points_x[-1] - points_x[0]) * 0.1,
+                fc='red', ec='red', linestyle='dashed', linewidth=2
+                )
+            
+            # Add labels
+            ax.set_xlabel('Position (meters)')
+            ax.set_title('1D Movement Diagram \n path in blue \n displacement in red')
+            
+        else:  # 2D
+            # Start at origin
+            current_x, current_y = 0, 0
+            points_x = [current_x]
+            points_y = [current_y]
+            
+            # Plot each movement
+            for direction, distance in movements:
+                if direction == "East":
+                    current_x += distance
+                elif direction == "West":
+                    current_x -= distance
+                elif direction == "North":
+                    current_y += distance
+                elif direction == "South":
+                    current_y -= distance
+                
+                points_x.append(current_x)
+                points_y.append(current_y)
+            
+            # Plot the path
+            ax.plot(points_x, points_y, 'o-', color='cyan')
+            
+            # Add arrows to show direction
+            for i in range(len(points_x) - 1):
+                dx = points_x[i+1] - points_x[i]
+                dy = points_y[i+1] - points_y[i]
+                ax.arrow(points_x[i], points_y[i], dx * 0.8, dy * 0.8, 
+                        head_width=0.3, head_length=0.5, 
+                        fc='cyan', ec='cyan')
+            
+            # Add displacement vector
+            ax.arrow(points_x[0], points_y[0], 
+                    points_x[-1] - points_x[0], 
+                    points_y[-1] - points_y[0],
+                    head_width=0.3, head_length=0.5,
+                    fc='red', ec='red', linestyle='dashed', linewidth=2)
+            
+            # Add grid
+            ax.grid(True, linestyle='--', alpha=0.6)
+            
+            # Add labels
+            ax.set_xlabel('X Position (meters)')
+            ax.set_ylabel('Y Position (meters)')
+            ax.set_title('2D Movement Diagram \n path in blue \n displacement in red')
+            
+            # Make axes equal scale
+            ax.set_aspect('equal')
+        
+        # Make the plot clean
+        plt.tight_layout()
+        plt.style.use("dark_background")
+        
+        return fig
         
