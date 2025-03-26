@@ -708,7 +708,7 @@ class LinearMotionGenerator(BaseGenerator):
                 # Add displacement vector
                 ax.arrow(
                     points_x[0], steps+1, 
-                    points_x[-1] - points_x[0], 0,
+                    (points_x[-1] - points_x[0])*0.9, 0,
                     head_width=0.1, 
                     head_length=abs(points_x[-1] - points_x[0]) * 0.1,
                     fc='red', ec='red', linewidth=2
@@ -760,7 +760,7 @@ class LinearMotionGenerator(BaseGenerator):
                 # Add displacement vector
                 ax.arrow(
                     steps+1,points_y[0], 0,
-                    points_y[-1] - points_y[0],
+                    (points_y[-1] - points_y[0])*0.9,
                     head_width=0.1, 
                     head_length=abs(points_y[-1] - points_y[0]) * 0.1,
                     fc='red', ec='red', linestyle='dashed', linewidth=2
