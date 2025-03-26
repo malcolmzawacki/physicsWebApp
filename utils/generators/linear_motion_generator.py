@@ -130,7 +130,13 @@ class LinearMotionGenerator(BaseGenerator):
         x = v_i*t + 0.5*a*t**2
         return x, v_i,t,a
 
-
+    def get_step_num(self,difficulty):
+        if difficulty == "Easy":
+            return 2
+        elif difficulty == "Medium":
+            return 4
+        else: #hard
+            return 6
 
     def distance_and_displacement_1D(self,difficulty):
         noun = random_noun()
@@ -153,12 +159,8 @@ class LinearMotionGenerator(BaseGenerator):
             ]
         question = f"A {noun} goes on a walk, and makes the following movements: \n"
 
-        if difficulty == "Easy":
-            steps = 2
-        elif difficulty == "Medium":
-            steps = 3
-        else: #hard
-            steps  = 4
+        steps = self.get_step_num(difficulty)
+
         for i in range(steps):
             dirn = ri(0,1)
             step = ri(1,max_val)
@@ -196,12 +198,7 @@ class LinearMotionGenerator(BaseGenerator):
             "Net Displacement (meters)", 
             "Direction (Say 'None' for zero)"]
         question = f"A {noun} goes on a walk, and makes the following movements: \n"
-        if difficulty == "Easy":
-            steps = 1
-        elif difficulty == "Medium":
-            steps = 2
-        else: #hard
-            steps  = 3
+        steps = int(self.get_step_num(difficulty) / 2)
         for i in range(steps):
             dirn_x = ri(0,1)
             dirn_y = ri(0,1)
@@ -653,7 +650,7 @@ class LinearMotionGenerator(BaseGenerator):
             question, answer, unit = self.mixed_question(difficulty)
         return question, answer, unit
 
-    def generate_movement_diagram(self,movements: list, problem_type: str):
+    def generate_movement_diagram(self,movements: list, problem_type: str, difficulty: str):
         """
         Generate a diagram showing the movement path
         
@@ -671,46 +668,112 @@ class LinearMotionGenerator(BaseGenerator):
         # Set up the plot
         if problem_type == "One Dimensional":
             # For 1D, we'll draw on a horizontal line
-            ax.axhline(y=0, color='gray', linestyle='-', alpha=0.3)
-            ax.set_ylim(-1, 1)
-            
-            # Start at origin
-            current_x = 0
-            points_x = [current_x]
-            points_y = [0]
-            
-            # Plot each movement
-            for direction, distance in movements:
-                if direction == "right":
-                    current_x += distance
-                else:  # "left"
-                    current_x -= distance
+            horizontal_directions = {"left","right","East", "West"}
+            if movements[0][0] in horizontal_directions:
+                ax.axhline(y=0, color='gray', linestyle='-', alpha=0.3)
+                steps = self.get_step_num(difficulty)
+                ax.set_ylim(0, steps+2)
+                # Start at origin
+                current_x = 0
+                current_y = 1
+                points_x = [current_x]
+                points_y = [current_y]
+                step_count = 0
+                positive_directions = {"right","East","North","up"}
+                # Plot each movement
+                for i in range(len(movements)):
+                    if movements[i][0] in positive_directions:
+                        current_x += movements[i][1]
+                    else:
+                        current_x -= movements[i][1]
+                    
+                    points_x.append(current_x)
+                    points_y.append(current_y)
+                    current_y+=1
+                    if i < len(movements) - 1:
+                        points_x.append(current_x)
+                        points_y.append(current_y)
+                    
+                # Plot the path
+                #ax.plot(points_x, points_y, 'o-', color='yellow')
                 
-                points_x.append(current_x)
-                points_y.append(0)
+                # Add arrows to show direction
+                for i in range(len(points_x) - 1):
+                    dx = points_x[i+1] - points_x[i]
+                    
+                    ax.arrow(points_x[i], points_y[i], dx * 0.8, 0, 
+                            head_width=0.1, head_length=abs(dx) * 0.2, 
+                            fc='cyan', ec='cyan')
                 
-            # Plot the path
-            ax.plot(points_x, points_y, 'o-', color='cyan')
-            
-            # Add arrows to show direction
-            for i in range(len(points_x) - 1):
-                dx = points_x[i+1] - points_x[i]
-                ax.arrow(points_x[i], points_y[i], dx * 0.8, 0, 
-                        head_width=0.1, head_length=abs(dx) * 0.2, 
-                        fc='cyan', ec='cyan')
-            
-            # Add displacement vector
-            ax.arrow(
-                points_x[0], points_y[0], 
-                points_x[-1] - points_x[0], 0,
-                head_width=0.1, 
-                head_length=abs(points_x[-1] - points_x[0]) * 0.1,
-                fc='red', ec='red', linestyle='dashed', linewidth=2
-                )
-            
-            # Add labels
-            ax.set_xlabel('Position (meters)')
-            ax.set_title('1D Movement Diagram \n path in blue \n displacement in red')
+                # Add displacement vector
+                ax.arrow(
+                    points_x[0], steps+1, 
+                    points_x[-1] - points_x[0], 0,
+                    head_width=0.1, 
+                    head_length=abs(points_x[-1] - points_x[0]) * 0.1,
+                    fc='red', ec='red', linewidth=2
+                    )
+                
+                # Add grid
+                ax.grid(True, linestyle='--', alpha=0.3)
+
+                # Add labels
+                ax.set_xlabel('Position (meters)')
+                ax.set_ylabel('Movement Number')
+                ax.set_title('1D Movement Diagram \n path in blue \n displacement in red')
+            else: # vertical Stuff
+                ax.axhline(y=0, color='gray', linestyle='-', alpha=0.3)
+                steps = self.get_step_num(difficulty)
+                ax.set_xlim(0, steps+2)
+                # Start at origin
+                current_y = 0
+                current_x = 1
+                points_y = [current_y]
+                points_x = [current_x]
+                step_count = 0
+                positive_directions = {"right","East","North","up"}
+                # Plot each movement
+                for i in range(len(movements)):
+                    if movements[i][0] in positive_directions:
+                        current_y += movements[i][1]
+                    else:
+                        current_y -= movements[i][1]
+                    
+                    points_x.append(current_x)
+                    points_y.append(current_y)
+                    current_x+=1
+                    if i < len(movements) - 1:
+                        points_x.append(current_x)
+                        points_y.append(current_y)
+                    
+                # Plot the path
+                #ax.plot(points_x, points_y, 'o-', color='yellow')
+                
+                # Add arrows to show direction
+                for i in range(len(points_x) - 1):
+                    dy = points_y[i+1] - points_y[i]
+                    
+                    ax.arrow(points_x[i], points_y[i], 0, dy * 0.8, 
+                            head_width=0.1, head_length=abs(dy) * 0.2, 
+                            fc='cyan', ec='cyan')
+                
+                # Add displacement vector
+                ax.arrow(
+                    steps+1,points_y[0], 0,
+                    points_y[-1] - points_y[0],
+                    head_width=0.1, 
+                    head_length=abs(points_y[-1] - points_y[0]) * 0.1,
+                    fc='red', ec='red', linestyle='dashed', linewidth=2
+                    )
+                
+                # Add grid
+                ax.grid(True, linestyle='--', alpha=0.3)
+
+                # Add labels
+                ax.set_ylabel('Position (meters)')
+                ax.set_xlabel('Movement Number')
+                ax.set_title('1D Movement Diagram \n path in blue \n displacement in red')
+
             
         else:  # 2D
             # Start at origin
@@ -751,7 +814,7 @@ class LinearMotionGenerator(BaseGenerator):
                     fc='red', ec='red', linestyle='dashed', linewidth=2)
             
             # Add grid
-            ax.grid(True, linestyle='--', alpha=0.6)
+            ax.grid(True, linestyle='--', alpha=0.3)
             
             # Add labels
             ax.set_xlabel('X Position (meters)')

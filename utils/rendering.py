@@ -506,7 +506,7 @@ class rendering:
         with st.expander("Diagram"):
             if f"{prefix}_movements" in st.session_state:
                 movements = st.session_state[f"{prefix}_movements"]
-                fig = generator.generate_movement_diagram(movements, problem_type)
+                fig = generator.generate_movement_diagram(movements, problem_type, difficulty)
                 st.pyplot(fig)
         # Modified form to handle multiple inputs
         with st.form(f"{prefix}_form"):
