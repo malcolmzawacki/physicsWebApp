@@ -679,7 +679,7 @@ class LinearMotionGenerator(BaseGenerator):
                 points_x = [current_x]
                 points_y = [current_y]
                 step_count = 0
-                positive_directions = {"right","East","North","up"}
+                positive_directions = {"right","East"}
                 # Plot each movement
                 for i in range(len(movements)):
                     if movements[i][0] in positive_directions:
@@ -699,6 +699,12 @@ class LinearMotionGenerator(BaseGenerator):
                 
                 # Add arrows to show direction
                 for i in range(len(points_x) - 1):
+                    if i % 2 == 1:
+                    
+                        ax.arrow(points_x[i], points_y[i],0, 0.8,
+                            head_width=0.1, head_length=0.2, 
+                            fc='yellow', ec='yellow',linestyle=':')
+
                     dx = points_x[i+1] - points_x[i]
                     
                     ax.arrow(points_x[i], points_y[i], dx * 0.8, 0, 
@@ -720,7 +726,9 @@ class LinearMotionGenerator(BaseGenerator):
                 # Add labels
                 ax.set_xlabel('Position (meters)')
                 ax.set_ylabel('Movement Number')
-                ax.set_title('1D Movement Diagram \n path in blue \n displacement in red')
+                ax.set_title(
+                    """1D Movement Diagram\npath in blue, step in yellow,\ndisplacement in red"""
+                             )
             else: # vertical Stuff
                 ax.axhline(y=0, color='gray', linestyle='-', alpha=0.3)
                 steps = self.get_step_num(difficulty)
@@ -731,7 +739,7 @@ class LinearMotionGenerator(BaseGenerator):
                 points_y = [current_y]
                 points_x = [current_x]
                 step_count = 0
-                positive_directions = {"right","East","North","up"}
+                positive_directions = {"North","up"}
                 # Plot each movement
                 for i in range(len(movements)):
                     if movements[i][0] in positive_directions:
@@ -756,6 +764,11 @@ class LinearMotionGenerator(BaseGenerator):
                     ax.arrow(points_x[i], points_y[i], 0, dy * 0.8, 
                             head_width=0.1, head_length=abs(dy) * 0.2, 
                             fc='cyan', ec='cyan')
+                    if i % 2 == 1:
+                    
+                        ax.arrow(points_x[i], points_y[i],0.8, 0,
+                            head_width=0.1, head_length=0.2, 
+                            fc='yellow', ec='yellow',linestyle=':')
                 
                 # Add displacement vector
                 ax.arrow(
@@ -763,7 +776,7 @@ class LinearMotionGenerator(BaseGenerator):
                     (points_y[-1] - points_y[0])*0.9,
                     head_width=0.1, 
                     head_length=abs(points_y[-1] - points_y[0]) * 0.1,
-                    fc='red', ec='red', linestyle='dashed', linewidth=2
+                    fc='red', ec='red', linewidth=2
                     )
                 
                 # Add grid
@@ -772,7 +785,9 @@ class LinearMotionGenerator(BaseGenerator):
                 # Add labels
                 ax.set_ylabel('Position (meters)')
                 ax.set_xlabel('Movement Number')
-                ax.set_title('1D Movement Diagram \n path in blue \n displacement in red')
+                ax.set_title(
+                    """1D Movement Diagram\npath in blue, step in yellow,\ndisplacement in red"""
+                             )
 
             
         else:  # 2D
@@ -796,22 +811,32 @@ class LinearMotionGenerator(BaseGenerator):
                 points_y.append(current_y)
             
             # Plot the path
-            ax.plot(points_x, points_y, 'o-', color='cyan')
+            #ax.plot(points_x, points_y, 'o-', color='cyan')
             
             # Add arrows to show direction
             for i in range(len(points_x) - 1):
                 dx = points_x[i+1] - points_x[i]
                 dy = points_y[i+1] - points_y[i]
-                ax.arrow(points_x[i], points_y[i], dx * 0.8, dy * 0.8, 
-                        head_width=0.3, head_length=0.5, 
+                dx = 0.8*dx if dx != 0 else dx
+                dy = 0.8*dy if dy != 0 else dy
+                x_arrow = abs(0.2*dx) if dx != 0 else 1
+                y_arrow = abs(0.2*dy) if dy != 0 else 1
+                ax.arrow(points_x[i], points_y[i], dx, dy, 
+                        head_width=0.3, head_length=x_arrow*y_arrow, 
                         fc='cyan', ec='cyan')
             
             # Add displacement vector
-            ax.arrow(points_x[0], points_y[0], 
-                    points_x[-1] - points_x[0], 
-                    points_y[-1] - points_y[0],
-                    head_width=0.3, head_length=0.5,
-                    fc='red', ec='red', linestyle='dashed', linewidth=2)
+            disp_x = (points_x[-1] - points_x[0])
+            disp_y = (points_y[-1] - points_y[0])
+            arrowhead_length =abs((disp_x**2 + disp_y**2)**(1/2))
+            disp_x *= 0.8
+            disp_y *= 0.8
+            arrowhead_length *= 0.2
+            ax.arrow(points_x[0], points_y[0],
+                    disp_x, 
+                    disp_y,
+                    head_width=0.3, head_length=arrowhead_length,
+                    fc='red', ec='red', linewidth=1)
             
             # Add grid
             ax.grid(True, linestyle='--', alpha=0.3)
@@ -822,7 +847,7 @@ class LinearMotionGenerator(BaseGenerator):
             ax.set_title('2D Movement Diagram \n path in blue \n displacement in red')
             
             # Make axes equal scale
-            ax.set_aspect('equal')
+            ax.set_aspect('auto')
         
         # Make the plot clean
         plt.tight_layout()
