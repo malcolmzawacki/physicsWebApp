@@ -410,14 +410,29 @@ class constant_motion:
 
             problem_type_dict = {
                 "One Dimensional": {
-                      "honors": r"""\textrm{currently under construction, ask your teacher to hurry up!}""",
+                      "honors": r"""
+                      \textrm{distance } =\; d_1 + d_2 + ... \newline ~ \newline
+                      \textrm{displacement } =\; d_{final} - d_{initial} \; \textrm{(with direction)}
+                      """,
 
-                      "conceptual": r"""\textrm{currently under construction, ask your teacher to hurry up!}
+                      "conceptual": r"""
+                      \textrm{distance } =\; d_1 + d_2 + ... 
+                      
+                     \newline ~ \newline \textrm{"Positive" directions are right, East, up, and North}
+                     \newline ~ \newline \textrm{"Negative" directions are left, West, down, and South}
+                     \newline ~ \newline \textrm{displacement } =\; d_{final} - d_{initial} \; \textrm{(with direction)}
                       """},
                 "Two Dimensional": {
-                      "honors": r"""\textrm{currently under construction, ask your teacher to hurry up!}""",
+                      "honors": r"""
+                      \textrm{distance } =\; d_1 + d_2 + ... \newline ~ \newline
+                    \textrm{displacement } =\; \sqrt{d_{horizontal}^2 + d_{vertical}^2} \;\; \textrm{(with direction)}
+                      """,
 
-                      "conceptual": r"""\textrm{currently under construction, ask your teacher to hurry up!}
+                      "conceptual": r"""
+                      \textrm{distance } =\; d_1 + d_2 + ... \newline ~ \newline
+                      \textrm{Horizontal Displacement } =\; D_{East} - D_{West} \newline ~ \newline
+                      \textrm{Vertical Displacement } =\; D_{North} - D_{South} \newline ~ \newline
+                    \textrm{Net Displacement } =\; \sqrt{D_{horizontal}^{\;2} + D_{vertical}^2} \;\; \textrm{(with direction)}
                       """},
                 
                 }

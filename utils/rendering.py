@@ -562,11 +562,14 @@ class rendering:
                         
                         if all_correct:
                             st.success(f"{random_correct_message()}")
-                            st.session_state[f"{prefix}_stars"] += 1
+                            st.session_state[f"{prefix}_stars"] += self.give_stars(difficulty,difficulties,problem_types,problem_type)
                         else:
                             answer_display = ", ".join([f"{ans:.2f}" for ans in correct_answers])
                             st.error(f"{random_error_message()} The correct answers are: {answer_display}.")
                 else:
                     st.error("Please enter all answers before submitting")
 
-        
+    def give_stars(self,difficulty,difficulties,problem_types,problem_type):
+        problem_type_bonus = problem_types.index(problem_type) + 1
+        difficulty_bonus = difficulties.index(difficulty) + 1
+        return problem_type_bonus*difficulty_bonus
