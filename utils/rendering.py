@@ -519,6 +519,7 @@ class rendering:
                 for i, col in enumerate(cols):
                     unit = st.session_state[f"{prefix}_units"][i]
                     with col:
+                        # check for text input
                         if type(st.session_state[f"{prefix}_correct_answers"][i]) == str:
                             input_value = st.text_input(f"{i+1}: {unit}", max_chars= 20,
                                 key=f"{prefix}_input_{i}_{st.session_state[f'{prefix}_question_id']}"
@@ -547,13 +548,16 @@ class rendering:
                 all_correct = True
                 if None not in user_answers:
                     # Check all answers
+                    answer_display = ""
                     for i, (user_input, correct_answer) in enumerate(zip(user_answers, correct_answers)):
                         if type(user_input) == str:
                             is_correct == True if user_input.lower() == correct_answer.lower() else False
+                            answer_display+= f"{correct_answer}"
                         else:
                             tolerance = correct_answer * 0.05
                             is_correct = abs(user_input - correct_answer) < abs(tolerance)
                             all_correct = all_correct and is_correct
+                            answer_display+=f"{correct_answer}, "
                     
                     # Update performance based on overall correctness
                     if not st.session_state[f"{prefix}_submitted"]:
@@ -564,7 +568,6 @@ class rendering:
                             st.success(f"{random_correct_message()}")
                             st.session_state[f"{prefix}_stars"] += self.give_stars(difficulty,difficulties,problem_types,problem_type)
                         else:
-                            answer_display = ", ".join([f"{ans:.2f}" for ans in correct_answers])
                             st.error(f"{random_error_message()} The correct answers are: {answer_display}.")
                 else:
                     st.error("Please enter all answers before submitting")
