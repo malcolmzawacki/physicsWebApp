@@ -555,7 +555,7 @@ class rendering:
                             answer_display+= f"{correct_answer}"
                         else:
                             tolerance = correct_answer * 0.05
-                            is_correct = abs(user_input - correct_answer) < abs(tolerance)
+                            is_correct = abs(user_input - correct_answer) <= abs(tolerance)
                             all_correct = all_correct and is_correct
                             answer_display+=f"{correct_answer}, "
                     
