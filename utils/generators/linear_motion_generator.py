@@ -650,6 +650,7 @@ class LinearMotionGenerator(BaseGenerator):
             question, answer, unit = self.mixed_question(difficulty)
         return question, answer, unit
 
+
     def generate_movement_diagram(self,movements: list, problem_type: str, difficulty: str):
         """
         Generate a diagram showing the movement path

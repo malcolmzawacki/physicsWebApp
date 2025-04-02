@@ -1,52 +1,58 @@
+import numpy as np
+import matplotlib.pyplot as plt
 import streamlit as st
-import sys
-from pathlib import Path
 
-sys.path.append(str(Path(__file__).parent.parent))
-from utils.generators.projectile_generator import ProjectileGenerator
-from utils.generators.linear_motion_generator import LinearMotionGenerator
-from utils.rendering import rendering
+def plot():
+    interval = (2.8, 4)  # start, end
+    accuracy = 0.001
+    reps = 600  # number of repetitions
+    numtoplot = 200
+    lims = np.zeros(reps)
 
-class constant_motion:
-    @ staticmethod
-    def question_parameters():
-            """Holds current options for questions for centralized updating"""
+    fig, biax = plt.subplots()
+    fig.set_size_inches(16, 9)
 
-            problem_type_dict = {
-                "One Dimensional": {
-                      "honors": r"""\textrm{currently under construction, ask your teacher to hurry up!}""",
+    lims[0] = np.random.rand()
+    for r in np.arange(interval[0], interval[1], accuracy):
+        for i in range(reps - 1):
+            lims[i + 1] = r * lims[i] * (1 - lims[i])
 
-                      "conceptual": r"""\textrm{currently under construction, ask your teacher to hurry up!}
-                      """},
-                "Two Dimensional": {
-                      "honors": r"""\textrm{currently under construction, ask your teacher to hurry up!}""",
+        biax.plot([r] * numtoplot, lims[reps - numtoplot :], "b.", markersize=0.02)
 
-                      "conceptual": r"""\textrm{currently under construction, ask your teacher to hurry up!}
-                      """},
-                
-                }
-            problem_types = list(problem_type_dict.keys())
-            difficulties = ["Easy","Medium","Hard"]
-            return problem_type_dict, problem_types, difficulties
+    biax.set(xlabel="r", ylabel="x", title="logistic map")
+    return fig
 
-    @staticmethod
-    def main():
-        st.title("Constant Motion")
-        prefix = "constant"
-        problem_type_dict, problem_types, difficulties = constant_motion.question_parameters()
-        render = rendering()
-        generator = LinearMotionGenerator()
-        render.initialize_session_state(prefix, problem_types, difficulties)
-        performance = st.session_state[f"{prefix}_performance"]
-        render.subheader_ui(prefix,performance)
-        render.question_ui_3_with_diagrams(prefix, problem_type_dict, problem_types ,difficulties, generator)
+def input_plot(start = 2.8,end = 4,accuracy=0.001,reps=600,numtoplot=200):
+    interval = (start, end)  # start, end
+    lims = np.zeros(reps)
+
+    fig, biax = plt.subplots()
+    fig.set_size_inches(16, 9)
+
+    lims[0] = np.random.rand()
+    for r in np.arange(interval[0], interval[1], accuracy):
+        for i in range(reps - 1):
+            lims[i + 1] = r * lims[i] * (1 - lims[i])
+
+        biax.plot([r] * numtoplot, lims[reps - numtoplot :], "b.", markersize=0.02)
+
+    biax.set(xlabel="r", ylabel="x", title="logistic map")
+    return fig
 
 def main():
-     tab1, tab2 = st.tabs(["Constant","Projectile Problems"])
-     with tab1:
-          constant_motion.main()
-     with tab2:
-          pass
+    col1,col2,col3,col4,col5 = st.columns(5)
+    with col1:
+        start = st.number_input("start value",-2.0,10.0,2.8,0.1)
+    with col2:
+        end = st.number_input("end value",start,11.0,4.0,0.1)
+    with col3:
+        accuracy = st.number_input("accuracy",0.0001,0.1,0.001,0.001)
+    with col4:
+        reps = st.number_input("reps",2,1000,600,10)
+    with col5:
+        numtoplot = st.number_input("number to plot",10,500,200,10)
+    fig = input_plot(start,end,accuracy,reps,numtoplot)
+    st.pyplot(fig)
 
 
 if __name__ == "__main__":
