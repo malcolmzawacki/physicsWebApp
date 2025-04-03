@@ -57,7 +57,8 @@ class ForceGenerator(BaseGenerator):
                 What is the mass of the {object1}?"""
                 answer = m
                 unit = f"{object1} mass (kg)"
-        elif difficulty == "Hard":
+            return question, [answer], [unit]
+        else:
             flip = random.randint(1,3)
             if flip == 1: # find friction, mu
                 question = f"""A {appliedForce} Newton force accelerates a {m:.2f} kg {object1} at {a:.2f} m/s2.
@@ -83,4 +84,9 @@ class ForceGenerator(BaseGenerator):
                 answer2 = appliedForce
                 unit2 = f"Applied Force (N)"
     
-        return question, answer, answer2, unit, unit2
+            return question, [answer, answer2], [unit, unit2]
+    
+    def choose_problem(self,problem_type,difficulty):
+        if problem_type == "Newton's Second Law":
+            question, answer, unit = self._generate_force_question(difficulty)
+        return question, answer, unit
