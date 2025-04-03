@@ -24,7 +24,7 @@ def input_plot(start = 2.8,end = 4,accuracy=0.001,reps=600,numtoplot=200):
         for i in range(reps - 1):
             lims[i + 1] = r * lims[i] * (1 - lims[i])
 
-        biax.plot([r] * numtoplot, lims[reps - numtoplot :], "c.", markersize=size_of_marker)
+        biax.plot([r] * numtoplot, lims[reps - numtoplot :], "y.", markersize=size_of_marker)
 
     biax.set(xlabel="r", ylabel="x", title="logistic map")
     plt.style.use("dark_background")
