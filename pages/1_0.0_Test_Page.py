@@ -19,7 +19,7 @@ def input_plot(start = 2.8,end = 4,accuracy=0.001,reps=600,numtoplot=200):
     fig.set_size_inches(16, 9)
 
     lims[0] = np.random.rand()
-    size_of_marker =0.01
+    size_of_marker =0.02
     for r in np.arange(interval[0], interval[1], accuracy):
         for i in range(reps - 1):
             lims[i + 1] = r * lims[i] * (1 - lims[i])
