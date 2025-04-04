@@ -15,10 +15,16 @@ class forces:
 
             problem_type_dict = {
                 "Newton's Second Law": {
-                      "honors": r"""currently under construction, ask your teacher to hurry up!""",
+                      "honors": r"""
+                      \Sigma F \;=\; ma""",
 
-                      "conceptual": r"""currently under construction, ask your teacher to hurry up!
-                      """},
+                      "conceptual": r"""\Large{
+                      \Sigma F \;=\; ma 
+                      \quad\quad | \quad\quad
+                      m \;=\; \frac{\Sigma F}{a}
+                      \quad\quad | \quad\quad
+                      a \;=\; \frac{\Sigma F}{m}
+                      }"""},
                 }
             problem_types = list(problem_type_dict.keys())
             difficulties = ["Easy","Medium","Hard"]

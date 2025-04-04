@@ -364,7 +364,7 @@ class linear_fns:
         render.initialize_session_state(prefix, problem_types, difficulties)
         performance = st.session_state[f"{prefix}_performance"]
         render.subheader_ui(prefix,performance)
-        render.question_ui_2(prefix, problem_type_dict, problem_types ,difficulties, generator)
+        render.question_ui_3(prefix, problem_type_dict, problem_types ,difficulties, generator)
 
 
 class Projectile_fns:
@@ -401,7 +401,7 @@ class Projectile_fns:
         render.initialize_session_state(prefix, problem_types, difficulties)
         performance = st.session_state[f"{prefix}_performance"]
         render.subheader_ui(prefix,performance)
-        render.question_ui_2(prefix, problem_type_dict, problem_types ,difficulties, generator)
+        render.question_ui_3(prefix, problem_type_dict, problem_types ,difficulties, generator)
 
 class constant_motion:
     @ staticmethod

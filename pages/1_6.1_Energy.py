@@ -55,7 +55,7 @@ class energy_basics:
         render.initialize_session_state(prefix, problem_types, difficulties)
         performance = st.session_state[f"{prefix}_performance"]
         render.subheader_ui(prefix,performance)
-        render.question_ui_2(prefix, problem_type_dict, problem_types ,difficulties, generator)
+        render.question_ui_3(prefix, problem_type_dict, problem_types ,difficulties, generator)
 
 
 
@@ -99,7 +99,7 @@ class energy_conservation:
         render.initialize_session_state(prefix, problem_types, difficulties)
         performance = st.session_state[f"{prefix}_performance"]
         render.subheader_ui(prefix,performance)
-        render.question_ui_2(prefix, problem_type_dict, problem_types ,difficulties, generator)
+        render.question_ui_3(prefix, problem_type_dict, problem_types ,difficulties, generator)
 
 
 # for updating thermal as backend is completed
@@ -167,7 +167,7 @@ class thermal:
         render.initialize_session_state(prefix, problem_types, difficulties)
         performance = st.session_state[f"{prefix}_performance"]
         render.subheader_ui(prefix,performance)
-        render.question_ui_2(prefix, problem_type_dict, problem_types ,difficulties, generator)
+        render.question_ui_3(prefix, problem_type_dict, problem_types ,difficulties, generator)
 
 
 def main():
