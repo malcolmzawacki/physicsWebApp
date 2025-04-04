@@ -47,14 +47,14 @@ class energy_basics:
         return problem_type_dict, problem_types, difficulties
     @staticmethod
     def main():
-        st.title("Types of Energy")
         prefix = "energy_basics"
         problem_type_dict, problem_types, difficulties = energy_basics.question_parameters()
         render = rendering()
         generator = EnergyGenerator()
+        render.header(prefix,"Types of Energy")
         render.initialize_session_state(prefix, problem_types, difficulties)
         performance = st.session_state[f"{prefix}_performance"]
-        render.subheader_ui(prefix,performance)
+        render.subheader_ui_2(performance)
         render.question_ui_3(prefix, problem_type_dict, problem_types ,difficulties, generator)
 
 
@@ -91,16 +91,15 @@ class energy_conservation:
     
     @staticmethod
     def main():
-        st.title("Conservation of Energy")
         prefix = "energy_conservation"
         problem_type_dict, problem_types, difficulties = energy_conservation.question_parameters()
         render = rendering()
         generator = EnergyGenerator()
         render.initialize_session_state(prefix, problem_types, difficulties)
         performance = st.session_state[f"{prefix}_performance"]
-        render.subheader_ui(prefix,performance)
+        render.header(prefix,"Conservation of Energy")
         render.question_ui_3(prefix, problem_type_dict, problem_types ,difficulties, generator)
-
+        render.footer_1(prefix,generator,performance)
 
 # for updating thermal as backend is completed
 def question_parameters():
