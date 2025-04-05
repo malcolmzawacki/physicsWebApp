@@ -4,7 +4,7 @@ from utils.word_lists import random_correct_message
 from utils.word_lists import random_error_message
 import time
 
-class ui:
+class interface:
     def __init__(self, 
                  prefix: str, 
                  title: str, 

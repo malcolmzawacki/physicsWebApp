@@ -5,9 +5,7 @@ import pandas as pd
 
 sys.path.append(str(Path(__file__).parent.parent))
 from utils.generators.energy_generator import EnergyGenerator
-from utils.rendering import rendering
-from utils.word_lists import random_error_message
-from utils.word_lists import random_correct_message
+from utils.ui import interface
 
 
 
@@ -42,22 +40,16 @@ class energy_basics:
                 \;\; d = \frac{W}{F}"""
             },
             }
-        problem_types = list(problem_type_dict.keys())
         difficulties = ["Easy","Medium","Hard"]
-        return problem_type_dict, problem_types, difficulties
+        return problem_type_dict, difficulties
     @staticmethod
     def main():
+        title = "Types of Energy"
         prefix = "energy_basics"
-        problem_type_dict, problem_types, difficulties = energy_basics.question_parameters()
-        render = rendering()
+        problem_type_dict, difficulties = energy_basics.question_parameters()
         generator = EnergyGenerator()
-        
-        render.initialize_session_state(prefix, problem_types, difficulties)
-        render.header(prefix,"Types of Energy")
-        performance = st.session_state[f"{prefix}_performance"]
-        render.question_options_1(prefix,problem_type_dict,difficulties,generator)
-        render.question_ui_4(prefix, problem_type_dict, problem_types ,difficulties, generator)
-        render.footer_1(prefix,generator,performance)
+        ui = interface(prefix,title,generator,problem_type_dict,difficulties)
+        ui.default_layout()
 
 
 
@@ -87,20 +79,19 @@ class energy_conservation:
                 \;\; \Delta x = \sqrt{\frac{2mgh}{k}}"""
                                             }
             }
-        problem_types = list(problem_type_dict.keys())
+       
         difficulties = ["Easy","Medium","Hard"]
-        return problem_type_dict, problem_types, difficulties
+        return problem_type_dict, difficulties
     
     @staticmethod
     def main():
+        title = "Conservation of Energy"
         prefix = "energy_conservation"
-        problem_type_dict, problem_types, difficulties = energy_conservation.question_parameters()
-        render = rendering()
+        problem_type_dict, difficulties = energy_conservation.question_parameters()
         generator = EnergyGenerator()
-        render.initialize_session_state(prefix, problem_types, difficulties)
-        performance = st.session_state[f"{prefix}_performance"]
-        render.subheader_ui(prefix,performance)
-        render.question_ui_3(prefix, problem_type_dict, problem_types ,difficulties, generator)
+        
+        ui = interface(prefix,title,generator,problem_type_dict,difficulties)
+        ui.default_layout()
 
 # for updating thermal as backend is completed
 def question_parameters():
@@ -127,9 +118,8 @@ def question_parameters():
                 """
                                             }
             }
-        problem_types = list(problem_type_dict.keys())
         difficulties = ["Easy","Medium","Hard"]
-        return problem_type_dict, problem_types, difficulties
+        return problem_type_dict, difficulties
 
 
 class thermal:
@@ -153,22 +143,17 @@ class thermal:
                  \;\; F_f = \frac{W_f}{x}"""
                 },
             }
-        problem_types = list(problem_type_dict.keys())
         difficulties = ["Easy","Medium","Hard"]
-        return problem_type_dict, problem_types, difficulties
+        return problem_type_dict, difficulties
 
     @staticmethod
     def main():
-        st.title("Thermal Energy")
+        title = "Thermal Energy"
         prefix = "thermal"
-        problem_type_dict, problem_types, difficulties = thermal.question_parameters()
-        render = rendering()
+        problem_type_dict, difficulties = thermal.question_parameters()
         generator = EnergyGenerator()
-        render.initialize_session_state(prefix, problem_types, difficulties)
-        performance = st.session_state[f"{prefix}_performance"]
-        render.subheader_ui(prefix,performance)
-        render.question_ui_3(prefix, problem_type_dict, problem_types ,difficulties, generator)
-
+        ui = interface(prefix,title,generator,problem_type_dict,difficulties)
+        ui.default_layout()
 
 def main():
     # Add tabs for quiz and explorer modes

@@ -5,7 +5,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).parent.parent))
 from utils.generators.collision_generator import CollisionGenerator
-from utils.rendering import rendering
+from utils.ui import interface
 
 class collisions:
     @staticmethod
@@ -22,21 +22,17 @@ class collisions:
                 "conceptual": r"""m_1v_1+m_2v_2 = m_1v_1' + m_2v_2'"""
                 },
             }
-        problem_types = list(problem_type_dict.keys())
         difficulties = ["Easy"]
-        return problem_type_dict, problem_types, difficulties
+        return problem_type_dict, difficulties
 
     @staticmethod
     def main():
-        st.title("Collisions")
+        title = "Collisions"
         prefix = "collisions"
-        problem_type_dict, problem_types, difficulties = collisions.question_parameters()
-        render = rendering()
+        problem_type_dict, difficulties = collisions.question_parameters()
         generator = CollisionGenerator()
-        render.initialize_session_state(prefix, problem_types, difficulties)
-        performance = st.session_state[f"{prefix}_performance"]
-        render.subheader_ui(prefix,performance)
-        render.question_ui_3(prefix, problem_type_dict, problem_types ,difficulties, generator)
+        ui = interface(prefix,title,generator,problem_type_dict,difficulties)
+        ui.default_layout()
 
 
 if __name__ == "__main__":

@@ -12,7 +12,7 @@ plt.style.use("dark_background")
 sys.path.append(str(Path(__file__).parent.parent))
 from utils.generators.linear_motion_generator import LinearMotionGenerator
 from utils.generators.projectile_generator import ProjectileGenerator
-from utils.rendering import rendering
+from utils.ui import interface
 
 class graphing:
     def generate_position_time_graph():
@@ -350,21 +350,19 @@ class linear_fns:
                         }
 
 
-        problem_types = list(problem_type_dict.keys())
+        
         difficulties = ["Easy","Medium","Hard"]
-        return problem_type_dict, problem_types, difficulties
+        return problem_type_dict, difficulties
 
     @staticmethod
     def main():
-        st.title("Accelerated Motion")
+        title = "Accelerated Motion"
         prefix = "accelerated_motion"
-        problem_type_dict, problem_types, difficulties = linear_fns.question_parameters()
-        render = rendering()
+        problem_type_dict, difficulties = linear_fns.question_parameters()
         generator = LinearMotionGenerator()
-        render.initialize_session_state(prefix, problem_types, difficulties)
-        performance = st.session_state[f"{prefix}_performance"]
-        render.subheader_ui(prefix,performance)
-        render.question_ui_3(prefix, problem_type_dict, problem_types ,difficulties, generator)
+        ui = interface(prefix,title,generator,problem_type_dict,difficulties)
+        ui.default_layout()
+    
 
 
 class Projectile_fns:
@@ -387,21 +385,19 @@ class Projectile_fns:
                     "conceptual": r"""currently under construction, ask your teacher to hurry up!"""
                 }
                 }
-            problem_types = list(problem_type_dict.keys())
+            
             difficulties = ["Easy","Medium","Hard"]
-            return problem_type_dict, problem_types, difficulties
+            return problem_type_dict, difficulties
 
      @staticmethod
      def main():
-        st.title("Projectiles")
+        title = "Projectiles"
         prefix = "projectiles"
-        problem_type_dict, problem_types, difficulties = Projectile_fns.question_parameters()
-        render = rendering()
+        problem_type_dict, difficulties = Projectile_fns.question_parameters()
         generator = ProjectileGenerator()
-        render.initialize_session_state(prefix, problem_types, difficulties)
-        performance = st.session_state[f"{prefix}_performance"]
-        render.subheader_ui(prefix,performance)
-        render.question_ui_3(prefix, problem_type_dict, problem_types ,difficulties, generator)
+        
+        ui = interface(prefix,title,generator,problem_type_dict,difficulties,True)
+        ui.default_layout()
 
 class constant_motion:
     @ staticmethod
@@ -436,21 +432,19 @@ class constant_motion:
                       """},
                 
                 }
-            problem_types = list(problem_type_dict.keys())
+    
             difficulties = ["Easy","Medium","Hard"]
-            return problem_type_dict, problem_types, difficulties
+            return problem_type_dict, difficulties
 
     @staticmethod
     def main():
-        st.title("Constant Motion")
+        title = "Constant Motion"
         prefix = "constant"
-        problem_type_dict, problem_types, difficulties = constant_motion.question_parameters()
-        render = rendering()
+        problem_type_dict, difficulties = constant_motion.question_parameters()
         generator = LinearMotionGenerator()
-        render.initialize_session_state(prefix, problem_types, difficulties)
-        performance = st.session_state[f"{prefix}_performance"]
-        render.subheader_ui(prefix,performance)
-        render.question_ui_3_with_diagrams(prefix, problem_type_dict, problem_types ,difficulties, generator)
+        
+        ui = interface(prefix,title,generator,problem_type_dict,difficulties,True)
+        ui.diagram_layout()
 
 def main():
     # Add tabs for quiz and explorer modes
