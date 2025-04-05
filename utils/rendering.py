@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from utils.word_lists import random_correct_message
 from utils.word_lists import random_error_message
+import time
 
 class rendering:
     def __init__(self):
@@ -413,33 +414,47 @@ class rendering:
         difficulty_bonus = difficulties.index(difficulty) + 1
         return problem_type_bonus*difficulty_bonus
     
-### not currently implemented ##
+
     def new_question(self,prefix,generator,problem_type,difficulty):
         """module for new question button"""
-        if st.button("New Question",key=f"{prefix}_new_question_2"):
-                question, answers, units = generator.choose_problem(problem_type, difficulty)
-                st.session_state[f"{prefix}_question_id"] += 1
-                st.session_state[f"{prefix}_current_question"] = question
-                st.session_state[f"{prefix}_correct_answers"] = answers
-                st.session_state[f"{prefix}_units"] = units
-                st.session_state[f"{prefix}_submitted"] = False
-                generator.clear_answers()
-                st.rerun() 
+        if st.button("New Question",key=f"{prefix}_new_question"):
+                self.generate_new_question(prefix,generator,problem_type,difficulty)
+ 
     
+
+#self.generate_new_question(prefix,generator,problem_type,difficulty)
+    def generate_new_question(self,prefix:str,generator,problem_type:str,difficulty:str) -> None:
+        """reruns question generation routine"""
+        question, answers, units = generator.choose_problem(problem_type, difficulty)
+        st.session_state[f"{prefix}_question_id"] += 1
+        st.session_state[f"{prefix}_problem_type"] = problem_type
+        st.session_state[f"{prefix}_difficulty"] = difficulty
+        st.session_state[f"{prefix}_current_question"] = question
+        st.session_state[f"{prefix}_correct_answers"] = answers
+        st.session_state[f"{prefix}_units"] = units
+        st.session_state[f"{prefix}_submitted"] = False
+        generator.clear_answers()
+        st.rerun() 
+
+
     def footer_1(self,prefix,generator,performance):
         problem_type = st.session_state[f"{prefix}_problem_type"]
         difficulty = st.session_state[f"{prefix}_difficulty"]
-        col1,col2 = st.columns([1,4])
+        col1,col2 = st.columns([1,4],vertical_alignment='center')
         with col1:
-            self.new_question(prefix,generator,problem_type,difficulty)
+            self.new_question(prefix,generator,
+                              st.session_state[f"{prefix}_problem_type"],
+                              st.session_state[f"{prefix}_difficulty"])
         with col2:
             self.subheader_ui_2(performance)
     
-    def question_options_1(self,prefix:str,problem_types:list,difficulties:list,generator) -> None:
+    ### not currently implemented ##
+    #render.question_options_1(prefix,problem_types,difficulties,generator)
+    def question_options_1(self, prefix:str, problem_type_dict:dict, difficulties:list, generator) -> None:
         # UI Controls
-        col1, col2, col3 = st.columns(3,vertical_alignment='bottom',gap='medium')
+        problem_types = problem_type_dict.keys()
+        col1, col2, col3 = st.columns([3,2,2],vertical_alignment='bottom',gap='medium')
         with col1:
-
             selected_problem_type = st.selectbox(
                 "Problem Type",
                 options=list(problem_types),
@@ -458,34 +473,27 @@ class rendering:
                 "More Equations", 
                 value=False,
                 key=f"{prefix}_levels_check")
+            
         if (problem_type != st.session_state[f"{prefix}_problem_type"] or 
-            st.session_state[f"{prefix}_current_question"] is None):
-            question, answers, units = generator.choose_problem(problem_type, difficulty)
-            num_inputs = len(answers)
-            st.session_state[f"{prefix}_current_question"] = question
-            st.session_state[f"{prefix}_correct_answers"] = answers  # Now a list
-            st.session_state[f"{prefix}_units"] = units  # Now a list
-            st.session_state[f"{prefix}_problem_type"] = problem_type
-            st.session_state[f"{prefix}_submitted"] = False
-            generator.clear_answers()
-
-    def question_ui_4(self, prefix: str, problem_type_dict: dict, problem_types: list, 
-                difficulties: list, generator):
-        """Produces questions with logic passed in from the generator class, and evaluates answers.
-            **Requires the imported generator class to have a choose_problem(problem_type, difficulty) function"""
-       
-            # ... rest of your code ...
-        
+            st.session_state[f"{prefix}_current_question"] is None or 
+            difficulty != st.session_state[f"{prefix}_difficulty"]):
+                
+                self.generate_new_question(prefix,generator,problem_type,difficulty)
+           
         with st.expander("equation(s)",expanded=True):
             if st.session_state[f"{prefix}_level"] == False:
                 st.latex(problem_type_dict[st.session_state[f"{prefix}_problem_type"]]["honors"])
             else:
                 st.latex(problem_type_dict[st.session_state[f"{prefix}_problem_type"]]["conceptual"])
 
+
+    def question_ui_4(self, prefix: str, problem_type_dict: dict, problem_types: list, 
+                difficulties: list, generator):
+        """Produces questions with logic passed in from the generator class, and evaluates answers.
+            **Requires the imported generator class to have a choose_problem(problem_type, difficulty) function"""
         # Display current question
         st.subheader("Question:")
         st.write(st.session_state[f"{prefix}_current_question"])
-        
         # Modified form to handle multiple inputs
         with st.form(f"{prefix}_form"):
             num_inputs = st.session_state[f"{prefix}_correct_answers"]
@@ -520,35 +528,52 @@ class rendering:
                 )]
                 
             submitted = st.form_submit_button("Submit")
-            if submitted:
-                correct_answers = st.session_state[f"{prefix}_correct_answers"]
-                all_correct = True
-                if None not in user_answers:
-                    # Check all answers
-                    for i, (user_input, correct_answer) in enumerate(zip(user_answers, correct_answers)):
-                        if type(user_input) == str:
-                            is_correct == True if user_input.lower() == correct_answer.lower() else False
-                        else:
-                            tolerance = correct_answer * 0.05
-                            is_correct = abs(user_input - correct_answer) < abs(tolerance)
-                            all_correct = all_correct and is_correct
+        if submitted:
+            correct_answers = st.session_state[f"{prefix}_correct_answers"]
+            all_correct = True
+            if None not in user_answers:
+                # Check all answers
+                for i, (user_input, correct_answer) in enumerate(zip(user_answers, correct_answers)):
+                    if type(user_input) == str:
+                        is_correct == True if user_input.lower() == correct_answer.lower() else False
+                    else:
+                        tolerance = correct_answer * 0.05
+                        is_correct = abs(user_input - correct_answer) <= abs(tolerance)
+                        all_correct = all_correct and is_correct
+                
+                # Update performance based on overall correctness
+                if not st.session_state[f"{prefix}_submitted"]:
+                    problem_type = st.session_state[f"{prefix}_problem_type"]
+                    difficulty = st.session_state[f"{prefix}_difficulty"]
+                    self.update_performance(prefix, problem_type, difficulty, all_correct)
+                    st.session_state[f"{prefix}_submitted"] = True 
                     
-                    # Update performance based on overall correctness
-                    if not st.session_state[f"{prefix}_submitted"]:
-                        problem_type = st.session_state[f"{prefix}_problem_type"]
-                        difficulty = st.session_state[f"{prefix}_difficulty"]
-                        self.update_performance(prefix, problem_type
-                                                , difficulty, all_correct)
-                        st.session_state[f"{prefix}_submitted"] = True 
-                        
-                        if all_correct:
-                            st.success(f"{random_correct_message()}")
-                            st.session_state[f"{prefix}_stars"] += 1
-                        else:
-                            answer_display = ", ".join([f"{ans:.2f}" for ans in correct_answers])
-                            st.error(f"{random_error_message()} The correct answers are: {answer_display}.")
-                else:
-                    st.error("Please enter all answers before submitting")
+                    if all_correct:
+                        st.success(f"{random_correct_message()}")
+                        st.session_state[f"{prefix}_stars"] += 1
+                        i = 0
+                        timer = 3 # in seconds
+                        loading_text = "Next Question"
+                        timer*=100 # for smoother loading
+                        col1,col2=st.columns([5,2])
+                        with col1:
+                            loading_question = st.progress(0,loading_text)
+                                
+                        with col2:
+                            pause =st.checkbox("Cancel Next Question")
+
+                        while (i < timer and not pause):   
+                                time.sleep(0.01)
+                                loading_question.progress((i+1)/timer,loading_text)
+                                i+=1 
+                                
+                        if (i == timer and not pause):
+                            self.generate_new_question(prefix,generator,problem_type,difficulty)
+                    else:
+                        answer_display = ", ".join([f"{ans:.2f}" for ans in correct_answers])
+                        st.error(f"{random_error_message()} The correct answers are: {answer_display}.")
+            else:
+                st.error("Please enter all answers before submitting")
 
 
     def placeholder():

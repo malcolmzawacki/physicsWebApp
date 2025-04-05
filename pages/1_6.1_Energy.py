@@ -26,8 +26,8 @@ class energy_basics:
             "Kinetic Energy": {
                 "honors": r"KE = \frac{1}{2} m v^2",
                 "conceptual": r"""KE = \frac{1}{2} m v^2\;\; ,
-                \;\; m = \frac{2 \cdot K}{v^2} \;\; ,
-                \;\; v = \sqrt{\frac{2 \cdot K}{m}}"""
+                \;\; m = \frac{2KE}{v^2} \;\; ,
+                \;\; v = \sqrt{\frac{2KE}{m}}"""
             },               
             "Gravitational Potential Energy" : {
                 "honors": r"GPE = mgh",
@@ -51,11 +51,13 @@ class energy_basics:
         problem_type_dict, problem_types, difficulties = energy_basics.question_parameters()
         render = rendering()
         generator = EnergyGenerator()
-        render.header(prefix,"Types of Energy")
+        
         render.initialize_session_state(prefix, problem_types, difficulties)
+        render.header(prefix,"Types of Energy")
         performance = st.session_state[f"{prefix}_performance"]
-        render.subheader_ui_2(performance)
-        render.question_ui_3(prefix, problem_type_dict, problem_types ,difficulties, generator)
+        render.question_options_1(prefix,problem_type_dict,difficulties,generator)
+        render.question_ui_4(prefix, problem_type_dict, problem_types ,difficulties, generator)
+        render.footer_1(prefix,generator,performance)
 
 
 
@@ -97,9 +99,8 @@ class energy_conservation:
         generator = EnergyGenerator()
         render.initialize_session_state(prefix, problem_types, difficulties)
         performance = st.session_state[f"{prefix}_performance"]
-        render.header(prefix,"Conservation of Energy")
+        render.subheader_ui(prefix,performance)
         render.question_ui_3(prefix, problem_type_dict, problem_types ,difficulties, generator)
-        render.footer_1(prefix,generator,performance)
 
 # for updating thermal as backend is completed
 def question_parameters():
