@@ -18,7 +18,7 @@ class CollisionGenerator(BaseGenerator):
     def __init__(self):
         super().__init__(state_prefix="collision_")
     
-    def choose_problem(self, collision_type, difficulty):
+    def choose_problem(self, collision_type: str, difficulty: str):
         if collision_type == "Elastic Collision":
             return self._generate_elastic_collision(difficulty)
         else:

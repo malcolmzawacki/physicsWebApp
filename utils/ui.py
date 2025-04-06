@@ -333,6 +333,7 @@ class interface:
         self.question_ui_4()
         self.footer_1()
 
+
     def diagram_layout(self) -> None:
         self.initialize_session_state()
         self.header()
