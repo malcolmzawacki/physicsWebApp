@@ -15,33 +15,37 @@ from utils.generators.projectile_generator import ProjectileGenerator
 from utils.ui import interface
 
 class graphing:
-    def generate_position_time_graph():
+    def generate_position_time_graph(graph_type: str):
         """
         Returns (fig, direction, motion_state, graph_label) for a randomly generated position-time graph
         """
         fig, ax = plt.subplots(figsize=(3, 2))  # Smaller figure size
         t = np.linspace(0, 5, 100)
 
-        # Randomly pick one of four "types"
-        graph_type = random.choice(["linear_positive", "linear_negative", 
-                                    "acceleration_positive", "acceleration_negative"])
-
         if graph_type == "linear_positive":
             position = 2 * t + 1    # slope > 0, constant velocity
-            correct_direction = "Forward"
+            correct_direction = "Positive"
             correct_motion_state = "Constant Velocity"
         elif graph_type == "linear_negative":
             position = -1.5 * t + 5 # slope < 0, constant velocity
-            correct_direction = "Backward"
+            correct_direction = "Negative"
             correct_motion_state = "Constant Velocity"
-        elif graph_type == "acceleration_positive":
+        elif graph_type == "accelerating_positive":
             position = t**2         # slope increasing over time
-            correct_direction = "Forward"
-            correct_motion_state = "Accelerating (positive)"
+            correct_direction = "Positive"
+            correct_motion_state = "Speeding Up"
+        elif graph_type == "decelerating_positive":
+            position = -t*(t-10) + 5
+            correct_direction = "Positive"
+            correct_motion_state = "Slowing Down"
+        elif graph_type == "decelerating_negative":
+            position = t*(t-10) - 5
+            correct_direction = "Negative"
+            correct_motion_state = "Slowing Down"
         else:  # "acceleration_negative"
-            position = -0.5 * t**2 + 5
-            correct_direction = "Backward"
-            correct_motion_state = "Accelerating (negative)"
+            position = -t**2 + 5
+            correct_direction = "Negative"
+            correct_motion_state = "Speeding Up"
 
         ax.plot(t, position, color="cyan")
         ax.set_xlabel("Time (s)", color="white")
@@ -54,33 +58,39 @@ class graphing:
 
         return (fig, correct_direction, correct_motion_state)
 
-    def generate_velocity_time_graph():
+    def generate_velocity_time_graph(graph_type: str):
         """
         Returns (fig, direction, motion_state) for a randomly generated velocity-time graph
         """
         fig, ax = plt.subplots(figsize=(3, 2))  # Smaller figure size
         t = np.linspace(0, 5, 100)
 
-        # Randomly pick one of four "types"
-        graph_type = random.choice(["constant_positive", "constant_negative", 
-                                    "increasing_positive", "decreasing_negative"])
+        # Randomly pick one of "types"
 
-        if graph_type == "constant_positive":
+        if graph_type == "linear_positive":
             velocity = np.ones_like(t) * 2  # constant velocity > 0
-            correct_direction = "Forward"
+            correct_direction = "Positive"
             correct_motion_state = "Constant Velocity"
-        elif graph_type == "constant_negative":
-            velocity = np.ones_like(t) * -1.5  # constant velocity < 0
-            correct_direction = "Backward"
+        elif graph_type == "linear_negative":
+            velocity = np.ones_like(t) * -2  # constant velocity < 0
+            correct_direction = "Negative"
             correct_motion_state = "Constant Velocity"
-        elif graph_type == "increasing_positive":
+        elif graph_type == "accelerating_positive":
             velocity = t  # starts at 0, increasing
-            correct_direction = "Forward"
-            correct_motion_state = "Accelerating (positive)"
-        else:  # "decreasing_negative"
-            velocity = -0.5 * t - 1  # negative velocity, becomes more negative
-            correct_direction = "Backward"
-            correct_motion_state = "Accelerating (negative)"
+            correct_direction = "Positive"
+            correct_motion_state = "Speeding Up"
+        elif graph_type == "decelerating_positive":
+            velocity = -t + 5
+            correct_direction = "Positive"
+            correct_motion_state = "Slowing Down"
+        elif graph_type == "decelerating_negative":
+            velocity = t - 5
+            correct_direction = "Negative"
+            correct_motion_state = "Slowing Down"
+        else:  # "increasing_negative"
+            velocity = -t  # negative velocity, becomes more negative
+            correct_direction = "Negative"
+            correct_motion_state = "Speeding Up"
 
         ax.plot(t, velocity, color="orange")
         ax.set_xlabel("Time (s)", color="white")
@@ -94,9 +104,7 @@ class graphing:
         return (fig, correct_direction, correct_motion_state)
 
     def graphing_practice():
-        st.title("Position-Time and Velocity-Time Graph Recognition")
-        st.write("Use this page to practice identifying direction and state of motion from different graphs.")
-
+        st.title("Position & Velocity vs Time Graphs")
         # Use session state to store the current graph (so it doesn't regenerate on button press)
         if "pt_graph" not in st.session_state:
             st.session_state.pt_graph = None
@@ -120,7 +128,10 @@ class graphing:
         if mode == "Position-Time Graph":
             # If there's no stored graph yet or user wants a new one, generate it
             if st.button("Generate New Graph"):
-                st.session_state.pt_graph = graphing.generate_position_time_graph()
+                graph_type = random.choice(["linear_positive", "linear_negative", 
+                                    "accelerating_positive", "accelerating_negative",
+                                    "decelerating_positive", "decelerating_negative"])
+                st.session_state.pt_graph = graphing.generate_position_time_graph(graph_type)
 
             # If we have a stored graph, display it
             if st.session_state.pt_graph is not None:
@@ -132,11 +143,11 @@ class graphing:
                     # Let user pick answers
                     user_dir = st.selectbox(
                         "Select the direction of motion:", 
-                        ["Forward", "Backward"]
+                        ["Positive", "Negative"]
                     )
                     user_state = st.selectbox(
                         "Select the state of motion:", 
-                        ["Constant Velocity", "Accelerating (positive)", "Accelerating (negative)"]
+                        ["Constant Velocity", "Speeding Up", "Slowing Down"]
                     )
 
                 if st.button("Check Answers"):
@@ -157,7 +168,10 @@ class graphing:
         elif mode == "Velocity-Time Graph":
             # If there's no stored graph yet or user wants a new one, generate it
             if st.button("Generate New Graph"):
-                st.session_state.vt_graph = graphing.generate_velocity_time_graph()
+                graph_type = random.choice(["linear_positive", "linear_negative", 
+                                    "accelerating_positive", "accelerating_negative",
+                                    "decelerating_positive", "decelerating_negative"])
+                st.session_state.vt_graph = graphing.generate_velocity_time_graph(graph_type)
 
             # If we have a stored graph, display it
             if st.session_state.vt_graph is not None:
@@ -169,11 +183,11 @@ class graphing:
                     # Let user pick answers
                     user_dir = st.selectbox(
                         "Select the direction of motion:", 
-                        ["Forward", "Backward"]
+                        ["Positive", "Negative"]
                     )
                     user_state = st.selectbox(
                         "Select the state of motion:", 
-                        ["Constant Velocity", "Accelerating (positive)", "Accelerating (negative)"]
+                        ["Constant Velocity", "Speeding Up", "Slowing Down"]
                     )
 
                 if st.button("Check Answers"):
@@ -193,17 +207,29 @@ class graphing:
         else:
             st.write("You'll see either a position-time or velocity-time graph and try to match it among multiple options of the other type.")
 
-            # We randomly decide which main graph to show (P-T or V-T)
+            # decide which main graph to show (P-T or V-T)
             show_pt_first = st.selectbox("Which primary graph type?", 
                                     ["Position-Time First", "Velocity-Time First"])
 
             if show_pt_first == "Position-Time First":
                 # If we don't have a stored graph or user wants a new scenario
                 if st.button("Generate New Matching Set"):
-                    st.session_state.match_pt_graph = graphing.generate_position_time_graph()
+                    graph_type = random.choice(["linear_positive", "linear_negative", 
+                                    "accelerating_positive", "accelerating_negative",
+                                    "decelerating_positive", "decelerating_negative"])
+                    st.session_state.match_pt_graph = graphing.generate_position_time_graph(graph_type)
+                    wrong_answers = ["linear_positive", "linear_negative", 
+                                    "accelerating_positive", "accelerating_negative",
+                                    "decelerating_positive", "decelerating_negative"]
+                    wrong_answers.remove(graph_type)
+                    wrong_1 = random.choice(wrong_answers)
+                    wrong_answers.remove(wrong_1)
+                    wrong_2 = random.choice(wrong_answers)
+                    choice_list = [graph_type,wrong_1,wrong_2]
+                    random.shuffle(choice_list)
                     # Generate 3 velocity-time option graphs
                     st.session_state.option_graphs = [
-                        graphing.generate_velocity_time_graph() for _ in range(3)
+                        graphing.generate_velocity_time_graph(entry) for entry in choice_list
                     ]
 
                 if st.session_state.match_pt_graph is not None:
@@ -245,10 +271,22 @@ class graphing:
 
             else:  # Velocity-Time First
                 if st.button("Generate New Matching Set"):
-                    st.session_state.match_vt_graph = graphing.generate_velocity_time_graph()
+                    graph_type = random.choice(["linear_positive", "linear_negative", 
+                                    "accelerating_positive", "accelerating_negative",
+                                    "decelerating_positive", "decelerating_negative"])
+                    st.session_state.match_vt_graph = graphing.generate_velocity_time_graph(graph_type)
+                    wrong_answers = ["linear_positive", "linear_negative", 
+                                    "accelerating_positive", "accelerating_negative",
+                                    "decelerating_positive", "decelerating_negative"]
+                    wrong_answers.remove(graph_type)
+                    wrong_1 = random.choice(wrong_answers)
+                    wrong_answers.remove(wrong_1)
+                    wrong_2 = random.choice(wrong_answers)
+                    choice_list = [graph_type,wrong_1,wrong_2]
+                    random.shuffle(choice_list)
                     # Generate 3 position-time option graphs
                     st.session_state.option_graphs = [
-                        graphing.generate_position_time_graph() for _ in range(3)
+                        graphing.generate_position_time_graph(entry) for entry in choice_list
                     ]
 
                 if st.session_state.match_vt_graph is not None:

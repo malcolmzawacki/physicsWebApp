@@ -3,7 +3,47 @@ import random
 import math
 import sympy as sp
 import re
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent))
+from utils.ui import interface
+from utils.generators.arithmetic_generator import ArithmeticGenerator
 
+        
+class arithmetic: 
+    
+    @staticmethod
+    def question_parameters():
+        """Holds current options for questions for centralized updating"""
+        problem_type_dict = {
+            "Addition": {
+                "honors" : r"", 
+                "conceptual": r""""""
+                },
+            "Subtraction": {
+                "honors": r"",
+                "conceptual": r""""""
+            },               
+            "Multiplication" : {
+                "honors": r"",
+                "conceptual": r""""""
+            },
+            "Division": {
+                "honors": r"",
+                "conceptual": r""""""
+            },
+            }
+        difficulties = ["Easy","Medium","Hard"]
+        return problem_type_dict, difficulties
+    
+    @staticmethod
+    def main():
+        title = "Fast Practice"
+        prefix = "arithmetic"
+        problem_type_dict, difficulties = arithmetic.question_parameters()
+        generator = ArithmeticGenerator()
+        ui = interface(prefix,title,generator,problem_type_dict,difficulties)
+        ui.rapid_layout()
 
 class algebra:
 
@@ -507,50 +547,49 @@ class algebra:
 
             with col3:
                 # Only show value input for operations that need it
-                st.write("")
-                st.write("")
-                if st.session_state.selected_operation in ["add", "subtract", "multiply", "divide"]:
-                    value = st.number_input(
-                        "Value:",
-                        min_value=1, value=2,
-                        key=f"value_{st.session_state.question_id}"
-                    )
-                else:
-                    value = None
-                    st.write("No value needed for this operation")
-            
-            # Apply Operation button
-            if st.button("Apply Operation", key=f"apply_{st.session_state.question_id}"):
-                success, new_eq, feedback = algebra.process_step(
-                    st.session_state.problem['current_state'],
-                    st.session_state.selected_operation,
-                    value,
-                    st.session_state.problem['target_var']
-                )
-                
-                if success:
-                    # Update the equation
-                    st.session_state.problem['current_state'] = new_eq
-                    st.session_state.feedback = feedback
-                    
-                    # Add to steps taken
-                    step_display = f"{st.session_state.selected_operation.capitalize()}"
-                    if value is not None:
-                        step_display += f" {value}"
-                    
-                    st.session_state.problem['steps_taken'].append({
-                        'operation': st.session_state.selected_operation.capitalize(),
-                        'value': value,
-                        'display': step_display
-                    })
-                    
-                    # Check if solved
-                    if algebra.is_truly_solved(new_eq, st.session_state.problem['target_var']):
-                        st.session_state.solved = True
-                    
-                    st.rerun()
-                else:
-                    st.session_state.feedback = feedback
+                with st.form(f"Answer"):
+                    if st.session_state.selected_operation in ["add", "subtract", "multiply", "divide"]:
+                        value = st.number_input(
+                            "Value:",
+                            min_value=1, value=2,
+                            key=f"value_{st.session_state.question_id}"
+                        )
+                    else:
+                        value = None
+                        st.write("No value needed for this operation")
+                    submitted = st.form_submit_button("Apply Operation")
+                    # Apply Operation button
+                    if submitted:
+                        success, new_eq, feedback = algebra.process_step(
+                            st.session_state.problem['current_state'],
+                            st.session_state.selected_operation,
+                            value,
+                            st.session_state.problem['target_var']
+                        )
+                        
+                        if success:
+                            # Update the equation
+                            st.session_state.problem['current_state'] = new_eq
+                            st.session_state.feedback = feedback
+                            
+                            # Add to steps taken
+                            step_display = f"{st.session_state.selected_operation.capitalize()}"
+                            if value is not None:
+                                step_display += f" {value}"
+                            
+                            st.session_state.problem['steps_taken'].append({
+                                'operation': st.session_state.selected_operation.capitalize(),
+                                'value': value,
+                                'display': step_display
+                            })
+                            
+                            # Check if solved
+                            if algebra.is_truly_solved(new_eq, st.session_state.problem['target_var']):
+                                st.session_state.solved = True
+                            
+                            st.rerun()
+                        else:
+                            st.session_state.feedback = feedback
 
             # Display feedback
             if st.session_state.feedback:
@@ -789,10 +828,12 @@ class sci_notate:
 
 
 def main():
-    tab1,tab2 = st.tabs(["Algebra","Scientific Notation"])
+    tab1,tab2, tab3 = st.tabs(["Algebra","Scientific Notation","Arithmetic"])
     with tab1:
         algebra.main()
     with tab2:
         sci_notate.main()
+    with tab3:
+        arithmetic.main()
 if __name__ == "__main__":
     main()

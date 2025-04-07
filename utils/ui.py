@@ -181,7 +181,7 @@ class interface:
             self.performance_dropdown()    
 
 
-    def question_options_1(self) -> None:
+    def question_options_1(self, equations = True) -> None:
         # UI Controls
         col1, col2, col3 = st.columns([3,2,2],vertical_alignment='bottom',gap='medium')
         with col1:
@@ -199,31 +199,34 @@ class interface:
                 key=f"{self.prefix}_difficulty_select"
             )
         with col3:
-            st.session_state[f"{self.prefix}_level"] = st.checkbox(
-                "More Equations", 
-                value=False,
-                key=f"{self.prefix}_levels_check")
+            if equations:
+                st.session_state[f"{self.prefix}_level"] = st.checkbox(
+                    "More Equations", 
+                    value=False,
+                    key=f"{self.prefix}_levels_check")
             
         if (problem_type != st.session_state[f"{self.prefix}_problem_type"] or 
             st.session_state[f"{self.prefix}_current_question"] is None or 
             difficulty != st.session_state[f"{self.prefix}_difficulty"]):
                 
                 self.generate_new_question(problem_type, difficulty)
-           
-        with st.expander("equation(s)",expanded=True):
-            if st.session_state[f"{self.prefix}_level"] == False:
-                st.latex(self.problem_type_dict[st.session_state[f"{self.prefix}_problem_type"]]["honors"])
-            else:
-                st.latex(self.problem_type_dict[st.session_state[f"{self.prefix}_problem_type"]]["conceptual"])
+        if equations:
+            with st.expander("equation(s)",expanded=True):
+                if st.session_state[f"{self.prefix}_level"] == False:
+                    st.latex(self.problem_type_dict[st.session_state[f"{self.prefix}_problem_type"]]["honors"])
+                else:
+                    st.latex(self.problem_type_dict[st.session_state[f"{self.prefix}_problem_type"]]["conceptual"])
 
 
-    def question_ui_4(self) -> None:
+    def question_ui_4(self,timer=3.0, big_font = False) -> None:
         """Displays questions passed in from the generator class, and evaluates answers."""
         # Display current question
-        st.subheader("Question:")
-        st.write(st.session_state[f"{self.prefix}_current_question"])
+        if big_font:
+            st.title(st.session_state[f"{self.prefix}_current_question"])
+        else:
+            st.write(st.session_state[f"{self.prefix}_current_question"])
         # Modified form to handle multiple inputs
-        with st.form(f"{self.prefix}_form"):
+        with st.form(f"{self.prefix}_form",clear_on_submit=True):
             num_inputs = st.session_state[f"{self.prefix}_correct_answers"]
             num_inputs = len(num_inputs)
             if num_inputs > 1:
@@ -279,27 +282,13 @@ class interface:
                     if all_correct:
                         st.success(f"{random_correct_message()}")
                         st.session_state[f"{self.prefix}_stars"] += self.give_stars(difficulty,problem_type)
-                        i = 0
-                        timer = 3 # in seconds
-                        loading_text = "Next Question"
-                        timer*=100 # for smoother loading
-                        col1,col2=st.columns([5,2])
-                        with col1:
-                            loading_question = st.progress(0,loading_text)
-                                
-                        with col2:
-                            pause =st.checkbox("Cancel Next Question")
-
-                        while (i < timer and not pause):   
-                                time.sleep(0.01)
-                                loading_question.progress((i+1)/timer,loading_text)
-                                i+=1 
-                                
-                        if (i == timer and not pause):
-                            self.generate_new_question(problem_type,difficulty)
+                        self.loading_question(timer)
+                        
                     else:
                         answer_display = ", ".join([f"{ans:.2f}" for ans in correct_answers])
                         st.error(f"{random_error_message()} The correct answers are: {answer_display}.")
+                        self.loading_question(timer)
+                    
             else:
                 st.error("Please enter all answers before submitting")
 
@@ -313,6 +302,34 @@ class interface:
         difficulty_bonus = self.difficulties.index(difficulty) + 1
         return problem_type_bonus*difficulty_bonus
     
+
+    def loading_question(self,timer: float) -> None:
+        """
+        Displays a loading bar to show the next question is coming up
+
+        :param timer: the time (in seconds) that the next question takes to load
+        :type timer: float
+        """
+        problem_type = st.session_state[f"{self.prefix}_problem_type"]
+        difficulty = st.session_state[f"{self.prefix}_difficulty"]
+        i = 0
+        loading_text = "Next Question"
+        timer*=100 # for smoother loading
+        col1,col2=st.columns([5,2])
+        with col1:
+            loading_question = st.progress(0,loading_text)
+                
+        with col2:
+            pause =st.checkbox("Cancel Next Question")
+
+        while (i < timer and not pause):   
+                time.sleep(0.01)
+                loading_question.progress((i+1)/timer,loading_text)
+                i+=1 
+                
+        if (i == timer and not pause):
+            self.generate_new_question(problem_type,difficulty)
+
 
     def add_diagram(self) -> None:
         """currently over-specified for distance/displacement in linear fns class. 
@@ -343,3 +360,10 @@ class interface:
         self.footer_1()
 
 
+
+    def rapid_layout(self) -> None:
+        self.initialize_session_state()
+        self.header()
+        self.question_options_1(equations=False)
+        self.question_ui_4(timer=0.1,big_font=True)
+        self.footer_1()
