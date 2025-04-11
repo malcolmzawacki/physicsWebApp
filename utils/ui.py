@@ -244,7 +244,7 @@ class interface:
                         else:
                             input_value = st.number_input(
                                 f"{i+1}: {unit}", 
-                                min_value=0.00, value=None, step=0.01,
+                                 value=None, step=0.01,
                                 key=f"{self.prefix}_input_{i}_{st.session_state[f'{self.prefix}_question_id']}"
                             )
                             user_answers.append(input_value)
@@ -254,43 +254,48 @@ class interface:
                 unit = st.session_state[f"{self.prefix}_units"][0]
                 user_answers = [st.number_input(
                     f"{unit}:", 
-                    min_value=0.00, value=None, step=0.01,
+                    value=None, step=0.01,
                     key=f"{self.prefix}_input_0_{st.session_state[f'{self.prefix}_question_id']}"
                 )]
                 
             submitted = st.form_submit_button("Submit")
         if submitted:
-            correct_answers = st.session_state[f"{self.prefix}_correct_answers"]
-            all_correct = True
-            if None not in user_answers:
-                # Check all answers
-                for i, (user_input, correct_answer) in enumerate(zip(user_answers, correct_answers)):
-                    if type(user_input) == str:
-                        is_correct == True if user_input.lower() == correct_answer.lower() else False
-                    else:
-                        tolerance = correct_answer * 0.05
-                        is_correct = abs(user_input - correct_answer) <= abs(tolerance)
-                        all_correct = all_correct and is_correct
+            self.check_answers(user_answers,timer)
+            
+
+    def check_answers(self,user_answers: list, timer: float):
+        correct_answers = st.session_state[f"{self.prefix}_correct_answers"]
+        all_correct = True
+        if None not in user_answers:
+            # Check all answers
+            for i, (user_input, correct_answer) in enumerate(zip(user_answers, correct_answers)):
+                if type(user_input) == str:
+                    is_correct == True if user_input.lower() == correct_answer.lower() else False
+                else:
+                    tolerance = correct_answer * 0.05
+                    is_correct = abs(user_input - correct_answer) <= abs(tolerance)
+                    all_correct = all_correct and is_correct
+            
+            # Update performance based on overall correctness
+            if not st.session_state[f"{self.prefix}_submitted"]:
+                problem_type = st.session_state[f"{self.prefix}_problem_type"]
+                difficulty = st.session_state[f"{self.prefix}_difficulty"]
+                self.update_performance(problem_type, difficulty, all_correct)
+                st.session_state[f"{self.prefix}_submitted"] = True 
                 
-                # Update performance based on overall correctness
-                if not st.session_state[f"{self.prefix}_submitted"]:
-                    problem_type = st.session_state[f"{self.prefix}_problem_type"]
-                    difficulty = st.session_state[f"{self.prefix}_difficulty"]
-                    self.update_performance(problem_type, difficulty, all_correct)
-                    st.session_state[f"{self.prefix}_submitted"] = True 
+                if all_correct:
+                    st.success(f"{random_correct_message()}")
+                    st.session_state[f"{self.prefix}_stars"] += self.give_stars(difficulty,problem_type)
+                    self.loading_question(timer)
                     
-                    if all_correct:
-                        st.success(f"{random_correct_message()}")
-                        st.session_state[f"{self.prefix}_stars"] += self.give_stars(difficulty,problem_type)
-                        self.loading_question(timer)
-                        
-                    else:
-                        answer_display = ", ".join([f"{ans:.2f}" for ans in correct_answers])
-                        st.error(f"{random_error_message()} The correct answers are: {answer_display}.")
-                        self.loading_question(timer)
-                    
-            else:
-                st.error("Please enter all answers before submitting")
+                else:
+                    answer_display = ", ".join([f"{ans:.2f}" for ans in correct_answers])
+                    st.error(f"{random_error_message()} The correct answers are: {answer_display}.")
+                    self.loading_question(timer)
+                
+        else:
+            st.error("Please enter all answers before submitting")
+
 
 
     def give_stars(self, difficulty: str, problem_type: str) -> None:
