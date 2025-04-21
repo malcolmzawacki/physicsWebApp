@@ -336,26 +336,29 @@ class linear_fns:
 
                             "conceptual": r"""
                             \quad x = \frac{v_f + v_i}{2} t  \quad
-                            \quad x = \frac{1}{2} at^2  \quad
+                            \quad x = v_i t + \frac{1}{2} at^2  \quad
                             \quad x = \frac{v_f^2 - v_i^2}{2a}  \quad
 
                             \newline ~ \newline ~ \newline
-                            \quad v_f = \frac{2x}{t} - v_i  \quad
-                            \quad v_f = \sqrt{v_i^2 + 2ax}  \quad
-                            \quad v_f = v_i + at  \quad
+                            \quad t = \frac{2x}{v_f + v_i}  \quad 
+                            \quad t = \frac{v_f - v_i}{a}  \quad
+                            \quad t = \frac{\sqrt{v_i^2 + 2ax} - v_i}{a}  \quad
                             
                             \newline ~ \newline ~ \newline
                             \quad v_i = \sqrt{2ax - v_f^2}  \quad
                             \quad v_i = v_f - at  \quad
                             \quad v_i = \frac{2x}{t} - v_f  \quad
+                            \quad v_i = \frac{x}{t} - \frac{1}{2} at \quad
+
                             \newline ~ \newline ~ \newline
-                            \quad t = \frac{2x}{v_f + v_i}  \quad 
-                            \quad t = \sqrt{ \frac{2x}{a} }  \quad
-                            \quad t = \frac{v_f - v_i}{a}  \quad
+                            \quad v_f = \frac{2x}{t} - v_i  \quad
+                            \quad v_f = \sqrt{v_i^2 + 2ax}  \quad
+                            \quad v_f = v_i + at  \quad
+
                             \newline ~ \newline ~ \newline
-                                \quad a = \frac{2x}{t^2}  \quad 
-                                \quad a = \frac{v_f - v_i}{t}  \quad
-                                \quad a = \frac{v_f^2 - v_i^2}{2x}  \quad
+                            \quad a = 2 \left( \frac{x - v_i t}{t^2} \right)\quad 
+                            \quad a = \frac{v_f - v_i}{t}  \quad
+                            \quad a = \frac{v_f^2 - v_i^2}{2x}  \quad
                             
                             """},
                         "No Time": {
@@ -375,15 +378,16 @@ class linear_fns:
                         "No Acceleration" : {
                             "honors": r"x = \frac{v_f + v_i}{2} t",
                             "conceptual": r"""x = \frac{v_f + v_i}{2} t  \quad ,
-                            \quad t = \frac{2d}{v_f + v_i}  \quad ,
-                            \quad v_f = \frac{2d}{t} - v_i  \quad , 
-                            \quad v_i = \frac{2d}{t} - v_f  \quad """
+                            \quad t = \frac{2x}{v_f + v_i}  \quad ,
+                            \quad v_f = \frac{2x}{t} - v_i  \quad , 
+                            \quad v_i = \frac{2x}{t} - v_f  \quad """
                         },
                         "No Final Velocity": {
                             "honors": r"x = v_i t + \frac{1}{2} at^2",
-                            "conceptual": r"""x = \frac{1}{2} at^2  \quad ,
-                            \quad a = \frac{2x}{t^2}  \quad ,
-                            \quad t = \sqrt{ \frac{2d}{a} }"""
+                            "conceptual": r"""
+                            x = v_i t + \frac{1}{2} at^2  \quad ,
+                            \quad a = 2 \left( \frac{x - v_i t}{t^2} \right)\quad ,
+                            \quad t = \frac{\sqrt{v_i^2 + 2ax} - v_i}{a}"""
                         },
                         }
 

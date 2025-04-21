@@ -570,42 +570,35 @@ class LinearMotionGenerator(BaseGenerator):
                 question = f"""A {noun}, initially moving to the right, accelerates at a rate of {a} m/s² for {t} seconds.
                 The {noun} covers {x} meters. How fast was it initially moving?"""
                 answer = v_i
-                unit = "m/s"
+                unit = "Initial Velocity (m/s)"
             else: # a
                 answer = a
                 unit = "Acceleration (m/s²)"
                 question = f"""A {noun}, initially moving at {v_i} m/s, accelerates at a constant rate for {t} seconds over {x} meters.
                 How big was the acceleration?"""
         else: # hard
-            "mis-matched velocity and acceleration, sometimes?? somehow re-loop in medium?"
-            "one in three chance, maybe"
-            medium_chance = random.randint(0,2)
-            if medium_chance == 0:
-                question, answer, unit = self.no_vf_question("Medium")
-            else:
-                "find all four"
-                var_dice = random.randint(0,3)
-                if var_dice == 0: # x
-                    question = f"""A {noun} is initially moving at {v_i} m/s to the right, 
-                    but is slowed by an acceleration of {-1*a} m/s² for {t} seconds.
-                    How far does it go during this time?"""
-                    answer = x
-                    unit = "Distance (meters)"
-                elif var_dice == 1: #v_i
-                    question = f"""A {noun}, initially moving to the right, is slowed at a rate of {-1*a} m/s² for {t} seconds.
-                    Despite this, {noun} covers {x} meters. How fast was it initially moving?"""
-                    answer = v_i
-                    unit = "Initial Velovity (m/s)"
-                elif var_dice == 2: # a
-                    answer = a
-                    unit = "Acceleration (m/s²)"
-                    question = f"""A {noun}, initially moving at {v_i} m/s to the right, is slowed at a constant rate for {t} seconds over {x} meters.
-                    What was the acceleration?"""
-                else: # time
-                    answer = t
-                    unit = "Time (seconds)"
-                    question = f"""A {noun}, initially moving at {v_i} m/s to the right, is slowed at a constant rate {-1*a} m/s².
-                    How much time does this take for the {noun} to cover {x} meters?"""
+            var_dice = random.randint(0,3)
+            if var_dice == 0: # x
+                question = f"""A {noun} is initially moving at {v_i} m/s to the right, 
+                but is slowed by {-1*a} m/s² for {t} seconds.
+                How far does it go during this time?"""
+                answer = x
+                unit = "Distance (meters)"
+            elif var_dice == 1: #v_i
+                question = f"""A {noun}, initially moving to the right, is slowed at a rate of {-1*a} m/s² for {t} seconds.
+                Despite this, {noun} covers {x} meters. How fast was it initially moving?"""
+                answer = v_i
+                unit = "Initial Velocity (m/s)"
+            elif var_dice == 2: # a
+                answer = a
+                unit = "Acceleration (m/s²)"
+                question = f"""A {noun}, initially moving at {v_i} m/s to the right, is slowed at a constant rate for {t} seconds over {x} meters.
+                What was the acceleration?"""
+            else: # time
+                answer = t
+                unit = "Time (seconds)"
+                question = f"""A {noun}, initially moving at {v_i} m/s to the right, is slowed at a constant rate {-1*a} m/s².
+                How much time does this take for the {noun} to cover {x} meters?"""
 
 
 
@@ -633,22 +626,23 @@ class LinearMotionGenerator(BaseGenerator):
     
     def choose_problem(self,problem_type, difficulty):
         if problem_type == "No Time":
-            question, answer, unit = self.no_time_question(difficulty)
+            return self.no_time_question(difficulty)
         elif problem_type == "No Distance":
-            question, answer, unit = self.no_dist_question(difficulty)
+            return self.no_dist_question(difficulty)
         elif problem_type == "No Acceleration":
-            question, answer, unit = self.no_acc_question(difficulty)
+            return self.no_acc_question(difficulty)
         elif problem_type == "No Final Velocity":
-            question, answer, unit = self.no_vf_question(difficulty)
+            return self.no_vf_question(difficulty)
+        elif problem_type == "Mixed":
+            return self.mixed_question(difficulty)
         elif problem_type == "One Dimensional":
             question, answer, unit, movements = self.distance_and_displacement_1D(difficulty)
             return question, answer, unit, movements
         elif problem_type == "Two Dimensional":
             question, answer, unit, movements = self.distance_and_displacement_2D(difficulty)
             return question, answer, unit, movements
-        else:  # Mixed
-            question, answer, unit = self.mixed_question(difficulty)
-        return question, answer, unit
+        else:
+            pass
 
 
     def generate_movement_diagram(self,movements: list, problem_type: str, difficulty: str):
