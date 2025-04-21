@@ -581,7 +581,7 @@ class LinearMotionGenerator(BaseGenerator):
             "one in three chance, maybe"
             medium_chance = random.randint(0,2)
             if medium_chance == 0:
-                question, answer, unit = self.no_vf_question(difficulty)
+                question, answer, unit = self.no_vf_question("Medium")
             else:
                 "find all four"
                 var_dice = random.randint(0,3)
@@ -595,7 +595,7 @@ class LinearMotionGenerator(BaseGenerator):
                     question = f"""A {noun}, initially moving to the right, is slowed at a rate of {-1*a} m/s² for {t} seconds.
                     Despite this, {noun} covers {x} meters. How fast was it initially moving?"""
                     answer = v_i
-                    unit = "m/s"
+                    unit = "Initial Velovity (m/s)"
                 elif var_dice == 2: # a
                     answer = a
                     unit = "Acceleration (m/s²)"
