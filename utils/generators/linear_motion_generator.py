@@ -376,6 +376,7 @@ class LinearMotionGenerator(BaseGenerator):
                     question = f"""Determine the deceleration required for a {noun} moving at {v_f} m/s \
                     to slow to {v_i} m/s in {t} seconds."""
             elif var_dice in [1,2]:  # Solve for final velocity, they are reversible
+                answer = v_f
                 if coin == 0:
                     question = f"""A {noun} starts at {v_i} m/s and accelerates at {a} m/s² for {t} seconds. \
                     What is its final velocity?"""
