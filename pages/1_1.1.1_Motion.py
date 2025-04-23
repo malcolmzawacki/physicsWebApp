@@ -10,9 +10,17 @@ import pandas as pd
 plt.style.use("dark_background")
 
 sys.path.append(str(Path(__file__).parent.parent))
-from utils.generators.linear_motion_generator import LinearMotionGenerator
-from utils.generators.projectile_generator import ProjectileGenerator
 from utils.ui import interface
+
+class motion_graphs:
+    def graphing_practice():
+        from utils.generators.motion_graph_generator import MotionGraphGenerator
+        graph_types = ["linear_positive", "linear_negative", 
+                                        "accelerating_positive", "accelerating_negative",
+                                        "decelerating_positive", "decelerating_negative"]
+        generator = MotionGraphGenerator(graph_types,prefix="_motion_graphs")
+        generator.graphing_practice()
+
 
 class graphing:
     def generate_position_time_graph(graph_type: str):
@@ -328,6 +336,35 @@ class linear_fns:
         """Holds current options for questions for centralized updating"""
 
         problem_type_dict = {
+                       
+                        "No Time": {
+                            "honors" : r"v_f^2 = v_i^2 + 2ax", 
+                            "conceptual": r"""v_f = \sqrt{v_i^2 + 2ax}  \quad , 
+                            \quad v_i = \sqrt{2ax - v_f^2}  \quad , 
+                            \quad  x = \frac{v_f^2 - v_i^2}{2a}  \quad,
+                            \quad  a = \frac{v_f^2 - v_i^2}{2x}"""
+                            },
+                        "No Distance": {
+                            "honors": r"v_f = v_i + at",
+                            "conceptual": r"""v_f = v_i +at  \quad ,
+                            \quad v_i =  v_f - at  \quad ,
+                            \quad a = \frac{v_f - v_i}{t}  \quad,
+                            \quad t = \frac{v_f - v_i}{a}"""
+                        },               
+                        "No Acceleration" : {
+                            "honors": r"x = \frac{v_f + v_i}{2} t",
+                            "conceptual": r"""x = \frac{v_f + v_i}{2} t  \quad ,
+                            \quad t = \frac{2x}{v_f + v_i}  \quad ,
+                            \quad v_f = \frac{2x}{t} - v_i  \quad , 
+                            \quad v_i = \frac{2x}{t} - v_f  \quad """
+                        },
+                        "No Final Velocity": {
+                            "honors": r"x = v_i t + \frac{1}{2} at^2",
+                            "conceptual": r"""
+                            x = v_i t + \frac{1}{2} at^2  \quad ,
+                            \quad a = 2 \left( \frac{x - v_i t}{t^2} \right)\quad ,
+                            \quad t = \frac{\sqrt{v_i^2 + 2ax} - v_i}{a}"""
+                        },
                         "Mixed": {
                             "honors": r"""v_f^2 = v_i^2 + 2ax \quad ,
                             \quad v_f = v_i +at  \quad ,
@@ -361,34 +398,6 @@ class linear_fns:
                             \quad a = \frac{v_f^2 - v_i^2}{2x}  \quad
                             
                             """},
-                        "No Time": {
-                            "honors" : r"v_f^2 = v_i^2 + 2ax", 
-                            "conceptual": r"""v_f = \sqrt{v_i^2 + 2ax}  \quad , 
-                            \quad v_i = \sqrt{2ax - v_f^2}  \quad , 
-                            \quad  x = \frac{v_f^2 - v_i^2}{2a}  \quad,
-                            \quad  a = \frac{v_f^2 - v_i^2}{2x}"""
-                            },
-                        "No Distance": {
-                            "honors": r"v_f = v_i + at",
-                            "conceptual": r"""v_f = v_i +at  \quad ,
-                            \quad v_i =  v_f - at  \quad ,
-                            \quad a = \frac{v_f - v_i}{t}  \quad,
-                            \quad t = \frac{v_f - v_i}{a}"""
-                        },               
-                        "No Acceleration" : {
-                            "honors": r"x = \frac{v_f + v_i}{2} t",
-                            "conceptual": r"""x = \frac{v_f + v_i}{2} t  \quad ,
-                            \quad t = \frac{2x}{v_f + v_i}  \quad ,
-                            \quad v_f = \frac{2x}{t} - v_i  \quad , 
-                            \quad v_i = \frac{2x}{t} - v_f  \quad """
-                        },
-                        "No Final Velocity": {
-                            "honors": r"x = v_i t + \frac{1}{2} at^2",
-                            "conceptual": r"""
-                            x = v_i t + \frac{1}{2} at^2  \quad ,
-                            \quad a = 2 \left( \frac{x - v_i t}{t^2} \right)\quad ,
-                            \quad t = \frac{\sqrt{v_i^2 + 2ax} - v_i}{a}"""
-                        },
                         }
 
 
@@ -398,14 +407,14 @@ class linear_fns:
 
     @staticmethod
     def main():
+        from utils.generators.linear_motion_generator import LinearMotionGenerator
         title = "Accelerated Motion"
         prefix = "accelerated_motion"
         problem_type_dict, difficulties = linear_fns.question_parameters()
-        generator = LinearMotionGenerator()
-        ui = interface(prefix,title,generator,problem_type_dict,difficulties)
+        ui = interface(prefix,title,
+                       LinearMotionGenerator(),problem_type_dict,difficulties)
         ui.default_layout()
     
-
 
 class Projectile_fns:
      @ staticmethod
@@ -433,15 +442,17 @@ class Projectile_fns:
 
      @staticmethod
      def main():
+        from utils.generators.projectile_generator import ProjectileGenerator
         title = "Projectiles"
         prefix = "projectiles"
         problem_type_dict, difficulties = Projectile_fns.question_parameters()
-        generator = ProjectileGenerator()
-        
-        ui = interface(prefix,title,generator,problem_type_dict,difficulties,True)
+        ui = interface(prefix,title,ProjectileGenerator(),
+                       problem_type_dict,difficulties,True)
         ui.default_layout()
 
+
 class constant_motion:
+    
     @ staticmethod
     def question_parameters():
             """Holds current options for questions for centralized updating"""
@@ -480,12 +491,13 @@ class constant_motion:
 
     @staticmethod
     def main():
+        from utils.generators.dist_disp_generator import DistDispGenerator
         title = "Constant Motion"
         prefix = "constant"
         problem_type_dict, difficulties = constant_motion.question_parameters()
-        generator = LinearMotionGenerator()
         
-        ui = interface(prefix,title,generator,problem_type_dict,difficulties,True)
+        ui = interface(prefix,title,DistDispGenerator(),
+                       problem_type_dict,difficulties,True)
         ui.diagram_layout()
 
 def main():

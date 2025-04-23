@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import streamlit as st
-
+from utils.generators.motion_graph_generator import MotionGraphGenerator
 
 
 def input_plot(start = 2.8,end = 4,accuracy=0.001,reps=600,numtoplot=200):
@@ -26,9 +26,9 @@ def input_plot(start = 2.8,end = 4,accuracy=0.001,reps=600,numtoplot=200):
 def main():
     col1,col2,col3,col4,col5 = st.columns(5)
     with col1:
-        start = st.number_input("start value",-2.0,3.9,-1.0,0.1)
+        start = st.number_input("start value",-2.0,3.9,2.0,0.1)
     with col2:
-        end = st.number_input("end value",-2.0,4.0,1.0,0.1)
+        end = st.number_input("end value",-2.0,4.0,4.0,0.1)
     with col3:
         accuracy = st.number_input("accuracy",0.001,0.1,0.001,0.001)
     with col4:
@@ -38,7 +38,16 @@ def main():
     fig = input_plot(start,end,accuracy,reps,numtoplot)
     st.pyplot(fig)
 
+def test_main():
+    
+    graph_types = ["linear_positive", "linear_negative", 
+                                    "accelerating_positive", "accelerating_negative",
+                                    "decelerating_positive", "decelerating_negative"]
+    generator = MotionGraphGenerator(graph_types,prefix="_motion_graphs")
+    generator.graphing_practice()
+    pass
+
 
 
 if __name__ == "__main__":
-    main()
+    test_main()
