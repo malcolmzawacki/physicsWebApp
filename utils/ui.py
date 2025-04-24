@@ -123,7 +123,7 @@ class interface:
 
     def header(self) -> None:
         """Creates the page Title and displays stars"""
-        col1,col2 = st.columns([10,4],vertical_alignment='center')
+        col1,col2 = st.columns([10,4],vertical_alignment='top')
         with col1:
             st.title(f"{self.title}")
         with col2:
@@ -181,7 +181,7 @@ class interface:
             self.performance_dropdown()    
 
 
-    def question_options_1(self, equations = True) -> None:
+    def question_options_1(self, equations = True, ifDifficulty = True) -> None:
         # UI Controls
         col1, col2, col3 = st.columns([3,2,2],vertical_alignment='bottom',gap='medium')
         with col1:
@@ -193,11 +193,14 @@ class interface:
             problem_type = selected_problem_type
 
         with col2:
-            difficulty = st.selectbox(
-                "Difficulty",
-                self.difficulties,
-                key=f"{self.prefix}_difficulty_select"
-            )
+            if ifDifficulty:
+                difficulty = st.selectbox(
+                    "Difficulty",
+                    self.difficulties,
+                    key=f"{self.prefix}_difficulty_select"
+                )
+            else:
+                difficulty = "Easy"
         with col3:
             if equations:
                 st.session_state[f"{self.prefix}_level"] = st.checkbox(
@@ -346,6 +349,160 @@ class interface:
                 movements = st.session_state[f"{self.prefix}_movements"]
                 fig = self.generator.generate_movement_diagram(movements, problem_type, difficulty)
                 st.pyplot(fig)
+
+
+    def question_ui_buttons(self) -> None:
+        """
+        Displays questions with multiple-choice buttons instead of text input.
+        
+        Parameters:
+        - timer: Time in seconds before loading the next question after submission
+        """
+        # Display current question
+        st.write(st.session_state[f"{self.prefix}_current_question"])
+        
+        # Get the correct answers and their units
+        correct_answers = st.session_state[f"{self.prefix}_correct_answers"]
+        units = st.session_state[f"{self.prefix}_units"]
+        
+        # Define answer options based on units if not already in session state
+        if f"{self.prefix}_answer_options" not in st.session_state:
+            answer_options = {}
+            for i, unit in enumerate(units):
+                if unit == "Direction":
+                    answer_options[i] = ["Positive", "Negative"]
+                elif unit == "Motion State":
+                    answer_options[i] = ["Constant Velocity", "Speeding Up", "Slowing Down"]
+                else:
+                    # Default option list if not recognized
+                    answer_options[i] = []
+            st.session_state[f"{self.prefix}_answer_options"] = answer_options
+        
+        # Initialize user answers in session state if not present
+        if f"{self.prefix}_user_answers_selected" not in st.session_state:
+            st.session_state[f"{self.prefix}_user_answers_selected"] = [None] * len(correct_answers)
+        
+        # Display each question with button options
+        for i, unit in enumerate(units):
+            st.write(f"**{unit}:**")
+            
+            # Get options for this question
+            options = st.session_state[f"{self.prefix}_answer_options"].get(i, [])
+            if not options:
+                st.warning(f"No predefined options for {unit}. Please configure options.")
+                continue
+            
+            # Create buttons in a row
+            cols = st.columns(len(options))
+            for j, (col, option) in enumerate(zip(cols, options)):
+                with col:
+                    # Determine if this button is selected
+                    is_selected = st.session_state[f"{self.prefix}_user_answers_selected"][i] == option
+                    button_type = "primary" if is_selected else "secondary"
+                    
+                    # Create the button
+                    if st.button(option, key=f"{self.prefix}_option_{i}_{j}_{st.session_state[f'{self.prefix}_question_id']}", 
+                                type=button_type, use_container_width=True):
+                        # Update the selected answer
+                        user_answers = st.session_state[f"{self.prefix}_user_answers_selected"]
+                        user_answers[i] = option
+                        st.session_state[f"{self.prefix}_user_answers_selected"] = user_answers
+                        st.rerun()  # Rerun to update button states
+        
+        # Add a submit button
+        if st.button("Submit Answers", key=f"{self.prefix}_submit_button_{st.session_state[f'{self.prefix}_question_id']}"):
+            user_answers = st.session_state[f"{self.prefix}_user_answers_selected"]
+            
+            # Check if all questions have been answered
+            if None in user_answers:
+                st.error("Please answer all questions before submitting.")
+            else:
+                self.check_button_answers(user_answers)
+
+    def check_button_answers(self, user_answers):
+        """Check answers submitted via buttons."""
+        correct_answers = st.session_state[f"{self.prefix}_correct_answers"]
+        all_correct = True
+        
+        # Check each answer
+        for user_input, correct_answer in zip(user_answers, correct_answers):
+            is_correct = (user_input == correct_answer)
+            all_correct = all_correct and is_correct
+        
+        # Update performance based on overall correctness
+        if not st.session_state[f"{self.prefix}_submitted"]:
+            problem_type = st.session_state[f"{self.prefix}_problem_type"]
+            difficulty = st.session_state[f"{self.prefix}_difficulty"]
+            self.update_performance(problem_type, difficulty, all_correct)
+            st.session_state[f"{self.prefix}_submitted"] = True
+            
+            if all_correct:
+                st.success(f"{random_correct_message()}")
+                st.session_state[f"{self.prefix}_stars"] += self.give_stars(difficulty, problem_type)
+                # Set a flag to show loading bar instead of directly calling loading_question
+                st.session_state[f"{self.prefix}_show_loading"] = True
+            else:
+                answer_display = ", ".join([f"{ans}" for ans in correct_answers])
+                st.error(f"{random_error_message()} The correct answers are: {answer_display}.")
+                # Set a flag to show loading bar instead of directly calling loading_question
+                st.session_state[f"{self.prefix}_show_loading"] = True
+        
+        # Reset selections for next question
+        st.session_state[f"{self.prefix}_user_answers_selected"] = [None] * len(correct_answers)
+
+
+    def button_layout(self, display_function=None, timer=3.0):
+        """
+        A custom layout that displays content in one column and buttons in another
+        with a full-width loading bar when needed
+        
+        Parameters:
+        - display_function: A function that displays content in the left column
+        - timer: Time in seconds before loading the next question
+        """
+        self.initialize_session_state()
+        
+        # Initialize the loading flag if not present
+        if f"{self.prefix}_show_loading" not in st.session_state:
+            st.session_state[f"{self.prefix}_show_loading"] = False
+        
+        self.header()
+        self.question_options_1(equations=False,ifDifficulty=False)
+        
+        # Display content and answer form in columns
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            if display_function:
+                display_function()
+        
+        with col2:
+            self.question_ui_buttons()  
+        
+        # Check if we should show the loading bar (full width, outside columns)
+        if st.session_state[f"{self.prefix}_show_loading"]:
+            problem_type = st.session_state[f"{self.prefix}_problem_type"]
+            difficulty = st.session_state[f"{self.prefix}_difficulty"]
+            
+            i = 0
+            loading_text = "Next Question"
+            timer_steps = timer * 100  # for smoother loading
+            loading_question = st.progress(0, loading_text)
+                
+            # Add a cancel button below the progress bar
+            pause = st.checkbox("Cancel Next Question")
+
+            while (i < timer_steps and not pause):   
+                import time
+                time.sleep(0.01)
+                loading_question.progress((i+1)/timer_steps, loading_text)
+                i += 1 
+                
+            if (i == timer_steps and not pause):
+                # Reset the loading flag
+                st.session_state[f"{self.prefix}_show_loading"] = False
+                self.generate_new_question(problem_type, difficulty)
+        
+        self.footer_1()
 
 
     def default_layout(self) -> None:
