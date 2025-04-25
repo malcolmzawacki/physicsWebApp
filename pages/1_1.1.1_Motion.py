@@ -185,7 +185,6 @@ def position_and_velocity_graph_analysis():
 
 def PvT_and_VvT_graph_matching():
     from utils.generators.motion_graph_generator import MotionGraphGenerator
-    """Custom implementation for graph matching activity"""
     # Initialize state for the matching activity
     if "matching_initialized" not in st.session_state:
         st.session_state.matching_initialized = True
@@ -193,9 +192,13 @@ def PvT_and_VvT_graph_matching():
         st.session_state.option_graphs = None
         st.session_state.match_stars = 0
     
+    col1,col2 = st.columns([3,1])
+    with col1:
+        st.title("Matching Motion Graphs")
+    with col2:
     # Display star count
-    if st.session_state.match_stars > 0:
-        st.write(f"⭐ x {st.session_state.match_stars}")
+        if st.session_state.match_stars > 0:
+            st.title(f"⭐ x {st.session_state.match_stars}")
     
     # Setup graph types
     graph_types = ["linear_positive", "linear_negative", 
