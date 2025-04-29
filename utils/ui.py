@@ -275,7 +275,7 @@ class interface:
                 if type(user_input) == str:
                     is_correct == True if user_input.lower() == correct_answer.lower() else False
                 else:
-                    tolerance = correct_answer * 0.05
+                    tolerance = correct_answer * 0.1
                     is_correct = abs(user_input - correct_answer) <= abs(tolerance)
                     all_correct = all_correct and is_correct
             
