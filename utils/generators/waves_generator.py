@@ -52,7 +52,7 @@ class WaveGenerator(BaseGenerator):
         return question, [answer], [unit]
     
     def string_harmonics(self,difficulty):
-        fundamental_frequency = ri(20,20.000)
+        fundamental_frequency = ri(20,20000)
         velocity = 343
         wavelength = velocity / fundamental_frequency
         string_length = wavelength / 2
