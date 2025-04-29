@@ -29,12 +29,46 @@ def wave_properties():
                     problem_type_dict,difficulties,True)
     ui.default_layout()
 
+
+def Harmonics():
+        
+    problem_type_dict = {
+        "String Harmonics": {
+                "honors": r"""v \;=\; \lambda f
+                \quad , \quad \lambda \;=\; \frac{2L}{m}
+                \quad , \quad m = 1, 2, 3 ...
+                \newline ~ \newline
+                \textrm{speed of sound } \approx 343 \frac{m}{s}""",
+
+                "conceptual": r"""v \;=\; \lambda f \quad , \quad
+                \lambda \;=\; \frac{v}{f} \quad , \quad
+                f \;=\; \frac{v}{\lambda}
+                \newline ~ \newline
+                \lambda \;=\; \frac{2L}{m}
+                \quad , \quad f = \frac{vm}{2L}
+                \quad , \quad L = \frac{vm}{2f}
+                \quad , \quad L = \frac{m \lambda}{2}
+                \quad , \quad m = 1, 2, 3 ...
+                \newline ~ \newline
+                \textrm{speed of sound }\approx 343 \frac{m}{s}
+                """},
+        }
+    
+    difficulties = ["Easy","Medium","Hard"]
+
+    from utils.generators.waves_generator import WaveGenerator
+    title = "Harmonics"
+    prefix = "harmonics"
+    ui = interface(prefix,title,WaveGenerator(),
+                    problem_type_dict,difficulties,True)
+    ui.default_layout()
+
 def main():
-    tab1,tab2 = st.tabs(["Wave Properties","TBD"])
+    tab1,tab2 = st.tabs(["Wave Properties","Harmonics"])
     with tab1:
         wave_properties()
     with tab2:
-        pass
+        Harmonics()
 
 if __name__ == "__main__":
     main()
