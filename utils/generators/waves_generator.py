@@ -138,7 +138,7 @@ class WaveGenerator(BaseGenerator):
 
             elif q_type == 2:
                 question = f"""An open-ended column resonates with a fundamental frequency of {fundamental_frequency} Hz.
-                How long is the string?"""
+                How long is the column?"""
                 answer = open_column_length
                 unit = "Column Length (meters)"
 
@@ -204,7 +204,7 @@ class WaveGenerator(BaseGenerator):
             elif q_type == 2:
                 question = f"""An closed-end column resonates with 
                 a fundamental frequency of {fundamental_frequency} Hz.
-                How long is the string?"""
+                How long is the column?"""
                 answer = closed_column_length
                 unit = "Column Length (meters)"
 
@@ -221,14 +221,14 @@ class WaveGenerator(BaseGenerator):
                 question = f"""What are the wavelengths of the first three harmonics of a 
                 {closed_column_length:.3f} meter long closed-end column?"""
                 answer = [wavelength, wavelength/3, wavelength/5]
-                unit = ["First Harmonic Wavelength (meters)","Second Harmonic Wavelength (meters)","Third Harmonic Wavelength (meters)"]
+                unit = ["First Harmonic Wavelength (meters)","Third Harmonic Wavelength (meters)","Fifth Harmonic Wavelength (meters)"]
 
             elif q_type == 1:
                 question = f"""What are the frequencies of the first three harmonics of a 
                 {closed_column_length:.3f} meter long closed-end column?"""
                 answer = [fundamental_frequency, 3*fundamental_frequency, 5*fundamental_frequency]
                 unit = ["Fundamental Frequency (Hz)",
-                        "Second Harmonic Frequency (Hz)","Third Harmonic Frequency (Hz)"]
+                        "Third Harmonic Frequency (Hz)","Fifth Harmonic Frequency (Hz)"]
 
             return question, answer, unit
         
@@ -236,12 +236,12 @@ class WaveGenerator(BaseGenerator):
             # lots of working backwards
             q_type = ri(0,1)
             if q_type == 0:
-                question = f"""The third harmonic of an closed-end column is {5*fundamental_frequency:.3f} Hertz. 
+                question = f"""The fifth harmonic of an closed-end column is {5*fundamental_frequency:.3f} Hertz. 
                 What is the wavelength of the first harmonic? What is the length of the closed-end column?"""
                 answer = [wavelength, closed_column_length]
                 unit = ["Wavelength (meters)","Column Length (meters)"]
             elif q_type == 1:
-                question = f"""The third harmonic of an closed-end column has a wavelength of {wavelength/5:.3f} meters. 
+                question = f"""The fifth harmonic of an closed-end column has a wavelength of {wavelength/5:.3f} meters. 
                 What is the fundamental frequency? What is the length of the closed-end column?"""
                 answer = [fundamental_frequency, closed_column_length]
                 unit = ["Fundamental Frequency (Hz)","Column Length (meters)"]
