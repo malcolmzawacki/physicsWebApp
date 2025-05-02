@@ -23,6 +23,10 @@ class WaveGenerator(BaseGenerator):
             return self.properties_of_waves(difficulty)
         elif problem_type == "String Harmonics":
             return self.string_harmonics(difficulty)
+        elif problem_type == "Open Ended Column Harmonics":
+            return self.open_column_harmonics(difficulty)
+        elif problem_type == "Closed End Column Harmonics":
+            return self.closed_column_harmonics(difficulty)
         else:
             pass
     
@@ -111,3 +115,134 @@ class WaveGenerator(BaseGenerator):
                 unit = ["Fundamental Frequency (Hz)","String Length (meters)"]
             return question, answer, unit
 
+
+    
+    def open_column_harmonics(self,difficulty):
+        fundamental_frequency = ri(20,5000)
+        velocity = 343
+        wavelength = velocity / fundamental_frequency
+        open_column_length = wavelength / 2
+        
+        if difficulty == "Easy":
+            # only working forwards
+            q_type = ri(0,3)
+            if q_type == 0:
+                question = f"""What is the wavelength of the first harmonic of a {open_column_length:.3f} meter long open-ended column?"""
+                answer = wavelength
+                unit = "Wavelength (meters)"
+
+            elif q_type == 1:
+                question = f"What is the fundamental frequency of a {open_column_length:.3f} meter long open-ended column?"
+                answer = fundamental_frequency
+                unit = "Fundamental Frequency (Hz)"
+
+            elif q_type == 2:
+                question = f"""An open-ended column resonates with a fundamental frequency of {fundamental_frequency} Hz.
+                How long is the string?"""
+                answer = open_column_length
+                unit = "Column Length (meters)"
+
+            elif q_type == 3:
+                question = f"""How long would an open-ended column have to be to produce a wavelength of {wavelength:.3f} meters for its first harmonic?"""
+                answer = open_column_length
+                unit = "Column Length (meters)"
+            return question, [answer],[unit]
+        elif difficulty == "Medium":
+            # still forwards, multiple answers
+            q_type = ri(0,1)
+            if q_type == 0:
+                question = f"""What are the wavelengths of the first three harmonics of a {open_column_length:.3f} meter long open-ended column?"""
+                answer = [wavelength, wavelength/2, wavelength/3]
+                unit = ["First Harmonic Wavelength (meters)","Second Harmonic Wavelength (meters)","Third Harmonic Wavelength (meters)"]
+
+            elif q_type == 1:
+                question = f"""What are the frequencies of the first three harmonics of a {open_column_length:.3f} meter long open-ended column?"""
+                answer = [fundamental_frequency, 2*fundamental_frequency, 3*fundamental_frequency]
+                unit = ["Fundamental Frequency (Hz)","Second Harmonic Frequency (Hz)","Third Harmonic Frequency (Hz)"]
+
+            return question, answer, unit
+        
+        elif difficulty == "Hard":
+            # lots of working backwards
+            q_type = ri(0,1)
+            if q_type == 0:
+                question = f"""The third harmonic of an open-ended column is {3*fundamental_frequency:.3f} Hertz. 
+                What is the wavelength of the first harmonic? What is the length of the open-ended column?"""
+                answer = [wavelength, open_column_length]
+                unit = ["Wavelength (meters)","Column Length (meters)"]
+            elif q_type == 1:
+                question = f"""The third harmonic of an open-ended column has a wavelength of {wavelength/3:.3f} meters. 
+                What is the fundamental frequency? What is the length of the open-ended column?"""
+                answer = [fundamental_frequency, open_column_length]
+                unit = ["Fundamental Frequency (Hz)","Column Length (meters)"]
+            return question, answer, unit
+
+
+
+    
+    def closed_column_harmonics(self,difficulty):
+        fundamental_frequency = ri(20,5000)
+        velocity = 343
+        wavelength = velocity / fundamental_frequency
+        closed_column_length = wavelength / 4
+        
+        if difficulty == "Easy":
+            # only working forwards
+            q_type = ri(0,3)
+            if q_type == 0:
+                question = f"""What is the wavelength of the first harmonic of a 
+                {closed_column_length:.3f} meter long closed-end column?"""
+                answer = wavelength
+                unit = "Wavelength (meters)"
+
+            elif q_type == 1:
+                question = f"""What is the fundamental frequency of a 
+                {closed_column_length:.3f} meter long closed-end column?"""
+                answer = fundamental_frequency
+                unit = "Fundamental Frequency (Hz)"
+
+            elif q_type == 2:
+                question = f"""An closed-end column resonates with 
+                a fundamental frequency of {fundamental_frequency} Hz.
+                How long is the string?"""
+                answer = closed_column_length
+                unit = "Column Length (meters)"
+
+            elif q_type == 3:
+                question = f"""How long would an closed-end column have to be to produce 
+                a wavelength of {wavelength:.3f} meters for its first harmonic?"""
+                answer = closed_column_length
+                unit = "Column Length (meters)"
+            return question, [answer],[unit]
+        elif difficulty == "Medium":
+            # still forwards, multiple answers
+            q_type = ri(0,1)
+            if q_type == 0:
+                question = f"""What are the wavelengths of the first three harmonics of a 
+                {closed_column_length:.3f} meter long closed-end column?"""
+                answer = [wavelength, wavelength/3, wavelength/5]
+                unit = ["First Harmonic Wavelength (meters)","Second Harmonic Wavelength (meters)","Third Harmonic Wavelength (meters)"]
+
+            elif q_type == 1:
+                question = f"""What are the frequencies of the first three harmonics of a 
+                {closed_column_length:.3f} meter long closed-end column?"""
+                answer = [fundamental_frequency, 3*fundamental_frequency, 5*fundamental_frequency]
+                unit = ["Fundamental Frequency (Hz)",
+                        "Second Harmonic Frequency (Hz)","Third Harmonic Frequency (Hz)"]
+
+            return question, answer, unit
+        
+        elif difficulty == "Hard":
+            # lots of working backwards
+            q_type = ri(0,1)
+            if q_type == 0:
+                question = f"""The third harmonic of an closed-end column is {5*fundamental_frequency:.3f} Hertz. 
+                What is the wavelength of the first harmonic? What is the length of the closed-end column?"""
+                answer = [wavelength, closed_column_length]
+                unit = ["Wavelength (meters)","Column Length (meters)"]
+            elif q_type == 1:
+                question = f"""The third harmonic of an closed-end column has a wavelength of {wavelength/5:.3f} meters. 
+                What is the fundamental frequency? What is the length of the closed-end column?"""
+                answer = [fundamental_frequency, closed_column_length]
+                unit = ["Fundamental Frequency (Hz)","Column Length (meters)"]
+            return question, answer, unit

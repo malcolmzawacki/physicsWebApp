@@ -52,6 +52,44 @@ def Harmonics():
                 \newline ~ \newline
                 \textrm{speed of sound }\approx 343 \frac{m}{s}
                 """},
+        "Open Ended Column Harmonics": {
+                "honors": r"""v \;=\; \lambda f
+                \quad , \quad \lambda \;=\; \frac{2L}{m}
+                \quad , \quad m = 1, 2, 3 ...
+                \newline ~ \newline
+                \textrm{speed of sound } \approx 343 \frac{m}{s}""",
+
+                "conceptual": r"""v \;=\; \lambda f \quad , \quad
+                \lambda \;=\; \frac{v}{f} \quad , \quad
+                f \;=\; \frac{v}{\lambda}
+                \newline ~ \newline
+                \lambda \;=\; \frac{2L}{m}
+                \quad , \quad f = \frac{vm}{2L}
+                \quad , \quad L = \frac{vm}{2f}
+                \quad , \quad L = \frac{m \lambda}{2}
+                \quad , \quad m = 1, 2, 3 ...
+                \newline ~ \newline
+                \textrm{speed of sound }\approx 343 \frac{m}{s}
+                """},
+        "Closed End Column Harmonics": {
+                "honors": r"""v \;=\; \lambda f
+                \quad , \quad \lambda \;=\; \frac{4L}{m}
+                \quad , \quad m = 1, 3, 5 ...
+                \newline ~ \newline
+                \textrm{speed of sound } \approx 343 \frac{m}{s}""",
+
+                "conceptual": r"""v \;=\; \lambda f \quad , \quad
+                \lambda \;=\; \frac{v}{f} \quad , \quad
+                f \;=\; \frac{v}{\lambda}
+                \newline ~ \newline
+                \lambda \;=\; \frac{4L}{m}
+                \quad , \quad f = \frac{vm}{2L}
+                \quad , \quad L = \frac{vm}{2f}
+                \quad , \quad L = \frac{m \lambda}{2}
+                \quad , \quad m = 1, 3, 5 ...
+                \newline ~ \newline
+                \textrm{speed of sound }\approx 343 \frac{m}{s}
+                """},
         }
     
     difficulties = ["Easy","Medium","Hard"]
