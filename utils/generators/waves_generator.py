@@ -270,5 +270,30 @@ class WaveGenerator(BaseGenerator):
                 times less intense than a {final_intensity*10} deciBel sound?"""
                 answer = initial_intensity*10
                 unit = "Volume (deciBels)"
+        elif difficulty == "Medium":
+            # distance -> squaring distance = twice the change
+            more_or_less = ri(0,1)
+            # 0 = more, 1 = less, 2 = distance
+            intensity_change = ri(1,3)
+            initial_intensity = ri(0,7)
+            final_intensity = initial_intensity + 2*intensity_change
+            if more_or_less == 0:
+                question = f"""How loud does a {initial_intensity*10} deciBel noise sound 
+                 to someone {10**intensity_change} times closer to the source of the sound?"""
+                answer = final_intensity*10
+                unit = "Volume (deciBels)"
+            elif more_or_less == 1:
+                # less intense
+                question = f"""How loud does a {final_intensity*10} deciBel noise sound 
+                 to someone {10**intensity_change} times further away from the source of the sound?"""
+                answer = initial_intensity*10
+                unit = "Volume (deciBels)"
+            else:
+                question = f"""Person A and Person B both hear a sound. Person A hears a 
+                {10*initial_intensity} sound, but person B hears a {10*final_intensity} sound. 
+                \n\n How much closer to the source of the sound is Person B?"""
+                answer = intensity_change
+                unit = "Distance Multiple"
+             
         return question, [answer],[unit]
 

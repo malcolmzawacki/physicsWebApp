@@ -105,12 +105,16 @@ def deciBel_practice():
         
     problem_type_dict = {
         "deciBel Scale": {
-            "honors": r"""\textrm{Multplying the intensity by 10 adds 10 on the deciBel scale}""",
-            "conceptual": r"""\textrm{Multplying the intensity by 10 adds 10 on the deciBel scale}"""
+            "honors": r"""\textrm{Multplying the intensity by 10 adds 10 on the deciBel scale}
+            \newline ~ \newline
+            \textrm{Intensity changes with the distance SQUARED, not just distance}""",
+            "conceptual": r"""\textrm{Multplying the intensity by 10 adds 10 on the deciBel scale}
+            \newline ~ \newline
+            \textrm{Intensity changes with the distance SQUARED, not just distance}"""
         }
         }
     
-    difficulties = ["Easy"]
+    difficulties = ["Easy","Medium"]
 
     from utils.generators.waves_generator import WaveGenerator
     title = "deciBel Scale"
