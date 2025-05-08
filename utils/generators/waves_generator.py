@@ -1,4 +1,5 @@
 from random import randint as ri
+from random import choice as rc
 import sys
 from pathlib import Path
 
@@ -27,6 +28,8 @@ class WaveGenerator(BaseGenerator):
             return self.open_column_harmonics(difficulty)
         elif problem_type == "Closed End Column Harmonics":
             return self.closed_column_harmonics(difficulty)
+        elif problem_type == "deciBel Scale":
+            return self.decibel_scale(difficulty)
         else:
             pass
     
@@ -246,3 +249,26 @@ class WaveGenerator(BaseGenerator):
                 answer = [fundamental_frequency, closed_column_length]
                 unit = ["Fundamental Frequency (Hz)","Column Length (meters)"]
             return question, answer, unit
+        
+    
+    def decibel_scale(self,difficulty):
+        if difficulty == "Easy":
+            #purely intensity, no distance. options are more or less intense
+            more_or_less = ri(0,1)
+            # 0 = more, 1 = less
+            intensity_change = ri(1,5)
+            initial_intensity = ri(0,7)
+            final_intensity = initial_intensity + intensity_change
+            if more_or_less == 0:
+                question = f"""What sound is {10**intensity_change} 
+                times more intense than a {initial_intensity*10} deciBel sound?"""
+                answer = final_intensity*10
+                unit = "Volume (deciBels)"
+            else:
+                # less intense
+                question = f"""What sound is {10**intensity_change} 
+                times less intense than a {final_intensity*10} deciBel sound?"""
+                answer = initial_intensity*10
+                unit = "Volume (deciBels)"
+        return question, [answer],[unit]
+

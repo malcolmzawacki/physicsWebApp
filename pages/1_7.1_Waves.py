@@ -18,6 +18,10 @@ def wave_properties():
                 T \;=\; \frac{1}{f}
                 \quad , \quad f \;=\; \frac{1}{T}
                 """},
+        "deciBel Scale": {
+            "honors": r"""\textrm{Multplying the intensity by 10 adds 10 on the deciBel scale}""",
+            "conceptual": r"""\textrm{Multplying the intensity by 10 adds 10 on the deciBel scale}"""
+        }
         }
     
     difficulties = ["Easy"]
