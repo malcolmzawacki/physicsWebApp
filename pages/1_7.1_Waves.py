@@ -18,10 +18,6 @@ def wave_properties():
                 T \;=\; \frac{1}{f}
                 \quad , \quad f \;=\; \frac{1}{T}
                 """},
-        "deciBel Scale": {
-            "honors": r"""\textrm{Multplying the intensity by 10 adds 10 on the deciBel scale}""",
-            "conceptual": r"""\textrm{Multplying the intensity by 10 adds 10 on the deciBel scale}"""
-        }
         }
     
     difficulties = ["Easy"]
@@ -105,12 +101,33 @@ def Harmonics():
                     problem_type_dict,difficulties,True)
     ui.default_layout()
 
+def deciBel_practice():
+        
+    problem_type_dict = {
+        "deciBel Scale": {
+            "honors": r"""\textrm{Multplying the intensity by 10 adds 10 on the deciBel scale}""",
+            "conceptual": r"""\textrm{Multplying the intensity by 10 adds 10 on the deciBel scale}"""
+        }
+        }
+    
+    difficulties = ["Easy"]
+
+    from utils.generators.waves_generator import WaveGenerator
+    title = "deciBel Scale"
+    prefix = "deciBels_"
+    ui = interface(prefix,title,WaveGenerator(),
+                    problem_type_dict,difficulties,True)
+    ui.default_layout()
+
+
 def main():
-    tab1,tab2 = st.tabs(["Wave Properties","Harmonics"])
+    tab1,tab2,tab3 = st.tabs(["Wave Properties","Harmonics","deciBel Scale"])
     with tab1:
         wave_properties()
     with tab2:
         Harmonics()
+    with tab3:
+        deciBel_practice()
 
 if __name__ == "__main__":
     main()
