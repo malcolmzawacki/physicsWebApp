@@ -83,9 +83,9 @@ def Harmonics():
                 f \;=\; \frac{v}{\lambda}
                 \newline ~ \newline
                 \lambda \;=\; \frac{4L}{m}
-                \quad , \quad f = \frac{vm}{2L}
-                \quad , \quad L = \frac{vm}{2f}
-                \quad , \quad L = \frac{m \lambda}{2}
+                \quad , \quad f = \frac{vm}{4L}
+                \quad , \quad L = \frac{vm}{4f}
+                \quad , \quad L = \frac{m \lambda}{4}
                 \quad , \quad m = 1, 3, 5 ...
                 \newline ~ \newline
                 \textrm{speed of sound }\approx 343 \frac{m}{s}
