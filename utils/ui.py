@@ -257,7 +257,7 @@ class interface:
                 unit = st.session_state[f"{self.prefix}_units"][0]
                 user_answers = [st.number_input(
                     f"{unit}:", 
-                    value=None, step=0.01,
+                    value=None,
                     key=f"{self.prefix}_input_0_{st.session_state[f'{self.prefix}_question_id']}"
                 )]
                 
