@@ -247,7 +247,7 @@ class interface:
                         else:
                             input_value = st.number_input(
                                 f"{i+1}: {unit}", 
-                                 value=None,
+                                 value=None, step = None,
                                 key=f"{self.prefix}_input_{i}_{st.session_state[f'{self.prefix}_question_id']}"
                             )
                             user_answers.append(input_value)
@@ -257,7 +257,7 @@ class interface:
                 unit = st.session_state[f"{self.prefix}_units"][0]
                 user_answers = [st.number_input(
                     f"{unit}:", 
-                    value=None,
+                    value=None, step = None,
                     key=f"{self.prefix}_input_0_{st.session_state[f'{self.prefix}_question_id']}"
                 )]
                 
