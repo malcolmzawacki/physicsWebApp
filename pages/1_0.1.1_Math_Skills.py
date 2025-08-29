@@ -852,7 +852,7 @@ class vectors:
         problem_type_dict, difficulties = vectors.question_parameters()
         generator = VectorGenerator()
         ui = interface(prefix, title, generator, problem_type_dict, difficulties)
-        ui.default_layout(equations=False)
+        ui.default_layout(False)
 
 
 
