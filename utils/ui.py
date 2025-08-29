@@ -139,7 +139,7 @@ class interface:
         """renders performance dataframe in dropdown menu"""
         with st.expander("Your Performance", expanded=False):
             performance_df = self.create_performance_dataframe()
-            st.dataframe(performance_df, width='stretch')
+            st.dataframe(performance_df)
 
 
     def generate_new_question(self, problem_type: str, difficulty: str) -> None:
@@ -545,10 +545,10 @@ class interface:
         self.footer_1()
 
 
-    def default_layout(self) -> None:
+    def default_layout(self, equations = True) -> None:
         self.initialize_session_state()
         self.header()
-        self.question_options_1()
+        self.question_options_1(equations)
         self.question_ui_4()
         self.footer_1()
 

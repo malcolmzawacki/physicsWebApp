@@ -8,8 +8,8 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 from utils.ui import interface
 from utils.generators.arithmetic_generator import ArithmeticGenerator
+from utils.generators.vector_generator import VectorGenerator
 
-        
 class arithmetic: 
     
     @staticmethod
@@ -38,6 +38,7 @@ class arithmetic:
     
     @staticmethod
     def main():
+        
         title = "Fast Practice"
         prefix = "arithmetic"
         problem_type_dict, difficulties = arithmetic.question_parameters()
@@ -827,13 +828,43 @@ class sci_notate:
                 st.rerun()
 
 
+class vectors:
+    @staticmethod
+    def question_parameters():
+        problem_type_dict = {
+            "Find Components": {
+                "honors" : r"", 
+                "conceptual": r""""""
+                },
+            "Find Resultant": {
+                "honors": r"",
+                "conceptual": r""""""
+            },
+        }
+        difficulties = ["Easy", "Medium", "Hard"]
+        return problem_type_dict, difficulties
+
+    @staticmethod
+    def main():
+        
+        title = "Vectors"
+        prefix = "vect"
+        problem_type_dict, difficulties = vectors.question_parameters()
+        generator = VectorGenerator()
+        ui = interface(prefix, title, generator, problem_type_dict, difficulties)
+        ui.default_layout(equations=False)
+
+
+
 def main():
-    tab1,tab2, tab3 = st.tabs(["Algebra","Scientific Notation","Arithmetic"])
+    tab1,tab2, tab3, tab4 = st.tabs(["Algebra","Scientific Notation","Arithmetic", "Vectors"])
     with tab1:
         algebra.main()
     with tab2:
         sci_notate.main()
     with tab3:
         arithmetic.main()
+    with tab4:
+        vectors.main()
 if __name__ == "__main__":
     main()
