@@ -4,6 +4,7 @@ from utils.word_lists import random_correct_message
 from utils.word_lists import random_error_message
 import time
 
+
 class interface:
     def __init__(self, 
                  prefix: str, 
@@ -138,7 +139,7 @@ class interface:
         """renders performance dataframe in dropdown menu"""
         with st.expander("Your Performance", expanded=False):
             performance_df = self.create_performance_dataframe()
-            st.dataframe(performance_df, use_container_width=True)
+            st.dataframe(performance_df, width='stretch')
 
 
     def generate_new_question(self, problem_type: str, difficulty: str) -> None:
@@ -221,6 +222,7 @@ class interface:
                     st.latex(self.problem_type_dict[st.session_state[f"{self.prefix}_problem_type"]]["conceptual"])
 
 
+
     def question_ui_4(self,timer=3.0, big_font = False) -> None:
         """Displays questions passed in from the generator class, and evaluates answers."""
         # Display current question
@@ -230,42 +232,74 @@ class interface:
             st.write(st.session_state[f"{self.prefix}_current_question"])
         # Modified form to handle multiple inputs
         with st.form(f"{self.prefix}_form",clear_on_submit=True):
+            user_answers = []
             num_inputs = st.session_state[f"{self.prefix}_correct_answers"]
             num_inputs = len(num_inputs)
+            
             if num_inputs > 1:
                 cols = st.columns(num_inputs)
-                user_answers = []
-                
                 for i, col in enumerate(cols):
                     unit = st.session_state[f"{self.prefix}_units"][i]
                     with col:
                         if type(st.session_state[f"{self.prefix}_correct_answers"][i]) == str:
-                            input_value = st.text_input(f"{i+1}: {unit}", max_chars= 20,
+                            input_value = st.text_input(f"{i+1}: {unit}", max_chars=20,
                                 key=f"{self.prefix}_input_{i}_{st.session_state[f'{self.prefix}_question_id']}"
                             )
                             user_answers.append(input_value)
                         else:
-                            input_value = st.number_input(
-                                f"{i+1}: {unit}", 
-                                 value=None, step = None,
+                            input_str = st.text_input(
+                                f"{i+1}: {unit}",
+                                placeholder="Enter a number...",
                                 key=f"{self.prefix}_input_{i}_{st.session_state[f'{self.prefix}_question_id']}"
                             )
-                            user_answers.append(input_value)
-                            
+                            user_answers.append(input_str)  # Store the string, validate later
+    
             else:
                 # Single input case
                 unit = st.session_state[f"{self.prefix}_units"][0]
-                user_answers = [st.number_input(
-                    f"{unit}:", 
-                    value=None, step = None,
+                input_str = st.text_input(
+                    f"{unit}:", placeholder= "Type a number ...", 
                     key=f"{self.prefix}_input_0_{st.session_state[f'{self.prefix}_question_id']}"
-                )]
+                    )
+                user_answers.append(input_str)  # Store the string, validate later
                 
+                
+            # Always enable the submit button
             submitted = st.form_submit_button("Submit")
         if submitted:
-            self.check_answers(user_answers,timer)
+            # Convert and validate the answers
+            validated_answers = []
+            validation_passed = True
             
+            for i, (raw_answer, correct_answer) in enumerate(zip(user_answers, st.session_state[f"{self.prefix}_correct_answers"])):
+                if type(correct_answer) == str:
+                    # String answer - no validation needed
+                    validated_answers.append(raw_answer)
+                else:
+                    # Numeric answer - validate
+                    if not raw_answer or not raw_answer.strip():
+                        st.error(f"Please enter a value for {st.session_state[f'{self.prefix}_units'][i]}")
+                        validation_passed = False
+                        validated_answers.append(None)
+                    else:
+                        try:
+                            validated_answers.append(float(raw_answer.strip()))
+                        except ValueError:
+                            st.error(f"'{raw_answer}' is not a valid number for {st.session_state[f'{self.prefix}_units'][i]}")
+                            validation_passed = False
+                            validated_answers.append(None)
+            
+            # Only proceed if all validation passed
+            if validation_passed:
+                self.check_answers(validated_answers, timer)
+            else:
+                st.warning("Please fix the errors above and try again.")
+    
 
+    
+
+
+    
     def check_answers(self,user_answers: list, timer: float):
         correct_answers = st.session_state[f"{self.prefix}_correct_answers"]
         all_correct = True
@@ -273,12 +307,15 @@ class interface:
             # Check all answers
             for i, (user_input, correct_answer) in enumerate(zip(user_answers, correct_answers)):
                 if type(user_input) == str:
-                    is_correct == True if user_input.lower() == correct_answer.lower() else False
+                    if user_input.lower() == correct_answer.lower():
+                        is_correct = True
+                    else:
+                        is_correct = False
+                    all_correct = all_correct and is_correct
                 else:
                     tolerance = correct_answer * 0.1
                     is_correct = abs(user_input - correct_answer) <= abs(tolerance)
                     all_correct = all_correct and is_correct
-            
             # Update performance based on overall correctness
             if not st.session_state[f"{self.prefix}_submitted"]:
                 problem_type = st.session_state[f"{self.prefix}_problem_type"]
@@ -289,16 +326,19 @@ class interface:
                 if all_correct:
                     st.success(f"{random_correct_message()}")
                     st.session_state[f"{self.prefix}_stars"] += self.give_stars(difficulty,problem_type)
-                    self.loading_question(timer)
+                    self.loading_question(1)
                     
                 else:
-                    answer_display = ", ".join([f"{ans:.2f}" for ans in correct_answers])
-                    st.error(f"{random_error_message()} The correct answers are: {answer_display}.")
-                    self.loading_question(timer)
+                    for ans in correct_answers:
+                        if type(ans) != str:
+                            ans = f"{ans:.2f}"
+                    answer_display = ", ".join([f"{ans} " for ans in correct_answers])
+                    article = "is" if len(correct_answers) < 2 else "are"
+                    st.error(f"{random_error_message()} The correct answers {article}: {answer_display}.")
+                    self.loading_question(4)
                 
         else:
             st.error("Please enter all answers before submitting")
-
 
 
     def give_stars(self, difficulty: str, problem_type: str) -> None:
@@ -402,7 +442,7 @@ class interface:
                     
                     # Create the button
                     if st.button(option, key=f"{self.prefix}_option_{i}_{j}_{st.session_state[f'{self.prefix}_question_id']}", 
-                                type=button_type, use_container_width=True):
+                                type=button_type, width='stretch'):
                         # Update the selected answer
                         user_answers = st.session_state[f"{self.prefix}_user_answers_selected"]
                         user_answers[i] = option

@@ -498,7 +498,7 @@ class algebra:
                 add_button = st.button("Add", 
                                     key="add_button", 
                                     type="primary" if st.session_state.selected_operation == "add" else "secondary",
-                                    use_container_width=True)
+                                    width='stretch')
                 if add_button:
                     algebra.select_operation("add")
                     st.rerun()
@@ -506,7 +506,7 @@ class algebra:
                 multiply_button = st.button("Multiply", 
                                         key="multiply_button", 
                                         type="primary" if st.session_state.selected_operation == "multiply" else "secondary",
-                                        use_container_width=True)
+                                        width='stretch')
                 if multiply_button:
                     algebra.select_operation("multiply")
                     st.rerun()
@@ -514,7 +514,7 @@ class algebra:
                 square_button = st.button("Square", 
                                         key="square_button", 
                                         type="primary" if st.session_state.selected_operation == "square" else "secondary",
-                                        use_container_width=True)
+                                        width='stretch')
                 if square_button:
                     algebra.select_operation("square")
                     st.rerun()
@@ -524,7 +524,7 @@ class algebra:
                 subtract_button = st.button("Subtract", 
                                         key="subtract_button", 
                                         type="primary" if st.session_state.selected_operation == "subtract" else "secondary",
-                                        use_container_width=True)
+                                        width='stretch')
                 if subtract_button:
                     algebra.select_operation("subtract")
                     st.rerun()
@@ -532,7 +532,7 @@ class algebra:
                 divide_button = st.button("Divide", 
                                         key="divide_button", 
                                         type="primary" if st.session_state.selected_operation == "divide" else "secondary",
-                                        use_container_width=True)
+                                        width='stretch')
                 if divide_button:
                     algebra.select_operation("divide")
                     st.rerun()
@@ -540,7 +540,7 @@ class algebra:
                 sqrt_button = st.button("Square Root", 
                                     key="sqrt_button", 
                                     type="primary" if st.session_state.selected_operation == "sqrt" else "secondary",
-                                    use_container_width=True)
+                                    width='stretch')
                 if sqrt_button:
                     algebra.select_operation("sqrt")
                     st.rerun()
