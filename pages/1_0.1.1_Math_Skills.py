@@ -7,8 +7,8 @@ import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 from utils.ui import interface
-from utils.generators.arithmetic_generator import ArithmeticGenerator
-from utils.generators.vector_generator import VectorGenerator
+
+
 
 class arithmetic: 
     
@@ -38,7 +38,7 @@ class arithmetic:
     
     @staticmethod
     def main():
-        
+        from utils.generators.arithmetic_generator import ArithmeticGenerator
         title = "Fast Practice"
         prefix = "arithmetic"
         problem_type_dict, difficulties = arithmetic.question_parameters()
@@ -846,7 +846,7 @@ class vectors:
 
     @staticmethod
     def main():
-        
+        from utils.generators.vector_generator import VectorGenerator
         title = "Vectors"
         prefix = "vect"
         problem_type_dict, difficulties = vectors.question_parameters()
