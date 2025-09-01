@@ -100,7 +100,8 @@ class interface:
         'user_answer',
         'submitted',
         'difficulty',
-        'problem_type'
+        'problem_type',
+        'movements',
         ]
 
         zero_vars = ["question_id","stars"]
@@ -553,10 +554,10 @@ class interface:
         self.footer_1()
 
 
-    def diagram_layout(self) -> None:
+    def diagram_layout(self, equations = True) -> None:
         self.initialize_session_state()
         self.header()
-        self.question_options_1()
+        self.question_options_1(equations)
         self.question_ui_4()
         self.add_diagram()
         self.footer_1()

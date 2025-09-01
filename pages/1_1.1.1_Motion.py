@@ -117,42 +117,6 @@ def projectile_fns():
     ui.default_layout()
 
 
-def distance_displacement():
-    problem_type_dict = {
-        "One Dimensional": {
-                "honors": r"""
-                \textrm{distance } =\; d_1 + d_2 + ... \newline ~ \newline
-                \textrm{displacement } =\; d_{final} - d_{initial} \; \textrm{(with direction)}
-                """,
-
-                "conceptual": r"""
-                \textrm{distance } =\; d_1 + d_2 + ... 
-                
-                \newline ~ \newline \textrm{"Positive" directions are right, East, up, and North}
-                \newline ~ \newline \textrm{"Negative" directions are left, West, down, and South}
-                \newline ~ \newline \textrm{displacement } =\; d_{final} - d_{initial} \; \textrm{(with direction)}
-                """},
-        "Two Dimensional": {
-                "honors": r"""
-                \textrm{distance } =\; d_1 + d_2 + ... \newline ~ \newline
-            \textrm{displacement } =\; \sqrt{d_{horizontal}^2 + d_{vertical}^2} \;\; \textrm{(with direction)}
-                """,
-
-                "conceptual": r"""
-                \textrm{distance } =\; d_1 + d_2 + ... \newline ~ \newline
-                \textrm{Horizontal Displacement } =\; D_{East} - D_{West} \newline ~ \newline
-                \textrm{Vertical Displacement } =\; D_{North} - D_{South} \newline ~ \newline
-            \textrm{Net Displacement } =\; \sqrt{D_{horizontal}^{\;2} + D_{vertical}^2} \;\; \textrm{(with direction)}
-                """},
-        }
-    difficulties = ["Easy","Medium","Hard"]
-    from utils.generators.dist_disp_generator import DistDispGenerator
-    title = "Distance & Displacement"
-    prefix = "constant"
-    ui = interface(prefix,title,DistDispGenerator(),
-                problem_type_dict,difficulties,True)
-    ui.diagram_layout()
-
 def position_and_velocity_graph_analysis():
     # Setup for standard interface
     problem_type_dict = {
@@ -182,6 +146,7 @@ def position_and_velocity_graph_analysis():
     generator = MotionGraphGenerator()
     ui = interface("motion_graph", "Graph Analysis", generator, problem_type_dict, difficulties)
     ui.button_layout(generator.display_current_graph)
+
 
 def PvT_and_VvT_graph_matching():
     from utils.generators.motion_graph_generator import MotionGraphGenerator
@@ -316,14 +281,13 @@ def PvT_and_VvT_graph_matching():
 
 def main():
     # Add tabs for quiz and explorer modes
-    tab1, tab2,tab3,tab4,tab5 = st.tabs(["Distance & Displacement",
+    tab2,tab3,tab4,tab5 = st.tabs([
                                     "Accelerated Motion", 
                                     "Types of Motion Graphs",
                                     "Matching Motion Graphs",
-                                    "Projectiles"])
+                                    "Projectiles"
+                                    ])
     
-    with tab1:
-        distance_displacement()
     with tab2:
         linear_fns()
     with tab3:
