@@ -82,7 +82,7 @@ class EnergyGenerator(BaseGenerator):
             answer = spring_constant
             unit = "Spring Strength (N/m)"
 
-        return question, [answer], [unit]
+        return question, [answer], [unit], None
     
     def kinetic_problem(self,difficulty):
         mass, velocity, kinetic_e = self.kinetic_energy(difficulty)
@@ -101,7 +101,7 @@ class EnergyGenerator(BaseGenerator):
             answer = mass
             unit = "Mass (kilograms)"
 
-        return question, [answer], [unit]
+        return question, [answer], [unit], None
     
     def gravitational_problem(self,difficulty):
         mass, height, gravit_e = self.gravitational_potential_energy(difficulty)
@@ -123,7 +123,7 @@ class EnergyGenerator(BaseGenerator):
             answer = mass
             unit = "Mass (kilograms)"
 
-        return question, [answer], [unit]
+        return question, [answer], [unit], None
     
     def work_problem(self,difficulty):
         force, distance, work = self.work(difficulty)
@@ -145,7 +145,7 @@ class EnergyGenerator(BaseGenerator):
             answer = force
             unit = "Force (Newtons)"
 
-        return question, [answer], [unit]
+        return question, [answer], [unit], None
 
     
     # # # E N E R G Y   C 0 N S E R V A T I 0 N   P R 0 B L E M S # # # 
@@ -176,7 +176,7 @@ class EnergyGenerator(BaseGenerator):
             answer = velocity
             unit = "Velocity (m/s)"
 
-        return question, [answer], [unit]
+        return question, [answer], [unit], None
     
     def elastic_gravitational_problem(self, difficulty):
         spring_constant, compression, elastic_e = self.elastic_potential_energy(difficulty)
@@ -240,7 +240,7 @@ class EnergyGenerator(BaseGenerator):
             answer = mass
             unit = "Mass (kilograms)"
 
-        return question, [answer], [unit]
+        return question, [answer], [unit], None
 
     def elastic_kinetic_problem(self, difficulty):
             spring_constant, compression, _ = self.elastic_potential_energy(difficulty)
@@ -310,7 +310,7 @@ class EnergyGenerator(BaseGenerator):
                 answer = mass
                 unit =  "Mass (kilograms)"
 
-            return question, [answer], [unit]
+            return question, [answer], [unit], None
 
 
     # # # T H E R M A L    E N E R G Y   L 0 S S   N U M B E R S # # # 
@@ -395,7 +395,7 @@ class EnergyGenerator(BaseGenerator):
             {velocity:.2f} m/s, what was the original height of the ramp?"""
             answer = height
             unit = "Height (meters)"
-        return question, [answer], [unit]
+        return question, [answer], [unit], None
     
     def kin_to_grav_thermal_q(self,difficulty):
         flip = ri(0,2)
@@ -424,16 +424,15 @@ class EnergyGenerator(BaseGenerator):
                 how high up the ramp does it reach?"""
             answer = height
             unit = "Height (meters)"
-        return question, [answer], [unit]
+        return question, [answer], [unit], None
+   
     
     def grav_kin_thermal(self, difficulty):
         dirn = ri(0,1)
         if dirn == 0:
-           question, answer, unit = self.grav_to_kin_thermal_q(difficulty)
+           return self.grav_to_kin_thermal_q(difficulty)
         else:
-            question, answer, unit = self.kin_to_grav_thermal_q(difficulty)
-
-        return question, answer, unit
+            return self.kin_to_grav_thermal_q(difficulty)
 
 
 
@@ -479,8 +478,9 @@ class EnergyGenerator(BaseGenerator):
             \n How tall is the ramp?"""
             answer = height
             unit = "Ramp Height (meters)"
-        return question, [answer], [unit]
-    
+        return question, [answer], [unit], None
+
+
     def elastic_to_grav_thermal_q(self,difficulty):
         noun = random_noun()
         flip = ri(0,4)
@@ -527,15 +527,15 @@ class EnergyGenerator(BaseGenerator):
             \n What height up the ramp does the {noun} reach?"""
             answer = height
             unit = "Ramp Height (meters)"
-        return question, [answer], [unit]
+        return question, [answer], [unit], None
+
 
     def grav_elastic_thermal(self, difficulty):
         dirn = ri(0,1)
         if dirn == 0:
-           question, answer, unit = self.grav_to_elastic_thermal_q(difficulty)
+           return self.grav_to_elastic_thermal_q(difficulty)
         else: 
-            question, answer, unit = self.elastic_to_grav_thermal_q(difficulty)
-        return question, answer, unit
+            return self.elastic_to_grav_thermal_q(difficulty)
 
 
     def kinetic_to_elastic_thermal_q(self,difficulty):
@@ -579,7 +579,7 @@ class EnergyGenerator(BaseGenerator):
             \n How fast was it moving?"""
             answer = velocity
             unit = "Velocity (m/s)"
-        return  question, [answer], [unit]
+        return  question, [answer], [unit], None
     
     def elastic_to_kinetic_thermal_q(self,difficulty):
         noun = random_noun()
@@ -626,16 +626,15 @@ class EnergyGenerator(BaseGenerator):
             how fast is it currently moving?"""
             answer = velocity
             unit = "Velocity (m/s)"
-        return question, [answer], [unit]
+        return question, [answer], [unit], None
 
     def kinetic_elastic_thermal(self,difficulty):
         dirn = ri(0,1)
         if dirn == 0:
-            question, answer, unit = self.kinetic_to_elastic_thermal_q(difficulty)
+            return self.kinetic_to_elastic_thermal_q(difficulty)
         else:
-           question, answer, unit = self.elastic_to_kinetic_thermal_q(difficulty) 
+           return self.elastic_to_kinetic_thermal_q(difficulty) 
 
-        return question, answer,unit
 
 
     # chooser for thermal energy problems
@@ -643,15 +642,14 @@ class EnergyGenerator(BaseGenerator):
         flip = ri(0,2)
         if flip == 0:
             #grav -> Kin
-            question, answer, unit = self.grav_kin_thermal(difficulty)
+            return self.grav_kin_thermal(difficulty)
         elif flip == 1:
             #grav -> elastic
-            question, answer, unit = self.grav_elastic_thermal(difficulty)
+            return self.grav_elastic_thermal(difficulty)
         elif flip == 2:
             #kinetic -> elastic
-            question, answer, unit = self.kinetic_elastic_thermal(difficulty)
+            return self.kinetic_elastic_thermal(difficulty)
 
-        return question, answer, unit
 
 
 
@@ -692,7 +690,7 @@ class EnergyGenerator(BaseGenerator):
                 unit1 = "Thermal Energy (Joules)"
                 answer2 = mass
                 unit2 = "Mass (kilograms)"
-            return question, [answer1, answer2], [unit1, unit2]
+            return question, [answer1, answer2], [unit1, unit2], None
         else:
             flip = ri(0,4)
             if flip == 0: 
@@ -729,7 +727,7 @@ class EnergyGenerator(BaseGenerator):
                 \n If the ramp is {distance:.2f} meters long, how strong was the force of friction?"""
                 answer = friction
                 unit = "Force of Friction (Newtons)"
-            return question, [answer], [unit]
+            return question, [answer], [unit], None
         
     def kinetic_to_grav_friction_distance_q(self, difficulty):
         
@@ -766,7 +764,7 @@ class EnergyGenerator(BaseGenerator):
                 unit1 = "Thermal Energy (Joules)"
                 answer2 = mass
                 unit2 = "Mass (kilograms)"
-            return question, [answer1, answer2], [unit1, unit2]
+            return question, [answer1, answer2], [unit1, unit2], None
         else:
             flip = ri(0,4)
             if flip == 0: 
@@ -804,7 +802,7 @@ class EnergyGenerator(BaseGenerator):
                 \n If the ramp is {distance:.2f} meters long, how strong was the force of friction?"""
                 answer = friction
                 unit = "Force of Friction (Newtons)"
-            return question, [answer], [unit]
+            return question, [answer], [unit], None
 
     def grav_to_elastic_friction_distance_q(self, difficulty):
         mass, height, spring_constant, compression, thermal = self.grav_to_elastic_thermal_nums()        
@@ -853,7 +851,7 @@ class EnergyGenerator(BaseGenerator):
                 unit1 = "Thermal Energy (Joules)"
                 answer2 = mass
                 unit2 = "Mass (kilograms)"
-            return question, [answer1, answer2], [unit1, unit2]
+            return question, [answer1, answer2], [unit1, unit2], None
         else:
             flip = ri(0,5)
             if flip == 0: 
@@ -902,7 +900,7 @@ class EnergyGenerator(BaseGenerator):
                 \n If the ramp is {distance:.2f} meters long, how strong was the force of friction?"""
                 answer = friction
                 unit = "Force of Friction (Newtons)"
-            return question, [answer], [unit]
+            return question, [answer], [unit], None
 
     def elastic_to_grav_friction_distance_q(self, difficulty):
         mass, height, spring_constant, compression, thermal = self.elastic_to_grav_thermal_nums()        
@@ -948,7 +946,7 @@ class EnergyGenerator(BaseGenerator):
                 unit1 = "Thermal Energy (Joules)"
                 answer2 = mass
                 unit2 = "Mass (kilograms)"
-            return question, [answer1, answer2], [unit1, unit2]
+            return question, [answer1, answer2], [unit1, unit2], None
         else:
             flip = ri(0,5)
             if flip == 0: 
@@ -992,7 +990,7 @@ class EnergyGenerator(BaseGenerator):
                 \n If the ramp is {distance:.2f} meters long, how strong was the force of friction?"""
                 answer = friction
                 unit = "Force of Friction (Newtons)"
-            return question, [answer], [unit]
+            return question, [answer], [unit], None
 
     def kinetic_to_elastic_friction_distance_q(self, difficulty):
         mass, velocity, spring_constant, compression, thermal = self.kinetic_to_elastic_thermal_nums()
@@ -1039,7 +1037,7 @@ class EnergyGenerator(BaseGenerator):
                 unit1 = "Thermal Energy (Joules)"
                 answer2 = mass
                 unit2 = "Mass (kilograms)"
-            return question, [answer1, answer2], [unit1, unit2]
+            return question, [answer1, answer2], [unit1, unit2], None
         else:
             flip = ri(0,5)
             if flip == 0: 
@@ -1089,7 +1087,7 @@ class EnergyGenerator(BaseGenerator):
                 \n What was the force of friction?"""
                 answer = friction
                 unit = "Force of Friction (Newtons)"
-            return question, [answer], [unit]
+            return question, [answer], [unit], None
 
     def elastic_to_kinetic_friction_distance_q(self, difficulty):
         mass, velocity, spring_constant, compression, thermal = self.elastic_to_kinetic_thermal_nums()
@@ -1137,7 +1135,7 @@ class EnergyGenerator(BaseGenerator):
                 unit1 = "Thermal Energy (Joules)"
                 answer2 = mass
                 unit2 = "Mass (kilograms)"
-            return question, [answer1, answer2], [unit1, unit2]
+            return question, [answer1, answer2], [unit1, unit2], None
         else:
             flip = ri(0,5)
             if flip == 0: 
@@ -1188,49 +1186,47 @@ class EnergyGenerator(BaseGenerator):
                 \n What was the force of friction experienced by the {noun}?"""
                 answer = friction
                 unit = "Force of Friction (Newtons)"
-            return question, [answer], [unit]
+            return question, [answer], [unit], None
 
     # chooser for friction and distance problems
     def friction_and_distance_problems(self,difficulty):
         flip = ri(0,5)
         if flip == 0:
-            question, answer, unit = self.grav_to_kinetic_friction_distance_q(difficulty)
+            return self.grav_to_kinetic_friction_distance_q(difficulty)
         elif flip == 1:
-            question, answer, unit = self.kinetic_to_grav_friction_distance_q(difficulty)
+            return self.kinetic_to_grav_friction_distance_q(difficulty)
         elif flip == 2:
-            question, answer, unit = self.elastic_to_kinetic_friction_distance_q(difficulty)
+            return self.elastic_to_kinetic_friction_distance_q(difficulty)
         elif flip == 3:
-            question, answer, unit = self.kinetic_to_elastic_friction_distance_q(difficulty)
+            return self.kinetic_to_elastic_friction_distance_q(difficulty)
         elif flip == 4:
-            question, answer, unit = self.grav_to_elastic_friction_distance_q(difficulty)
+            return self.grav_to_elastic_friction_distance_q(difficulty)
         else:
-            question, answer, unit = self.elastic_to_grav_friction_distance_q(difficulty)
+            return self.elastic_to_grav_friction_distance_q(difficulty)
 
-        return question, answer, unit
 
 
     # # # I N T E R F A C E  W I T H   R E N D E R E R # # # 
     def choose_problem(self,problem_type, difficulty):
         if problem_type == "Elastic Potential Energy":
-            question, answer, unit = self.elastic_problem(difficulty)
+            return self.elastic_problem(difficulty)
         elif problem_type == "Kinetic Energy":
-            question, answer, unit = self.kinetic_problem(difficulty)
+            return self.kinetic_problem(difficulty)
         elif problem_type == "Gravitational Potential Energy":
-            question, answer, unit = self.gravitational_problem(difficulty)
+            return self.gravitational_problem(difficulty)
         elif problem_type == "Work":
-            question, answer, unit = self.work_problem(difficulty)
+            return self.work_problem(difficulty)
 
         elif problem_type == "Elastic <--> Kinetic":
-            question, answer, unit = self.elastic_kinetic_problem(difficulty)
+            return self.elastic_kinetic_problem(difficulty)
         elif problem_type == "Gravitational <--> Kinetic":
-            question, answer, unit = self.kinetic_gravitational_problem(difficulty)
+            return self.kinetic_gravitational_problem(difficulty)
         elif problem_type == "Gravitational <--> Elastic":
-              question, answer, unit = self.elastic_gravitational_problem(difficulty)
+              return self.elastic_gravitational_problem(difficulty)
 
         elif problem_type == "Quantifying Thermal Energy":
-            question, answer, unit = self.thermal_quant_problems(difficulty)
+            return self.thermal_quant_problems(difficulty)
         elif problem_type == "Friction and Distance":
-            question, answer, unit = self.friction_and_distance_problems(difficulty)
+            return self.friction_and_distance_problems(difficulty)
         else:
             pass
-        return question, answer, unit

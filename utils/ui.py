@@ -336,7 +336,7 @@ class interface:
                     answer_display = ", ".join([f"{ans} " for ans in correct_answers])
                     article = "is" if len(correct_answers) < 2 else "are"
                     st.error(f"{random_error_message()} The correct answers {article}: {answer_display}.")
-                    self.loading_question(4)
+                    #self.loading_question(4)
                 
         else:
             st.error("Please enter all answers before submitting")

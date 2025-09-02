@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import streamlit as st
-
+from typing import Optional, Any
+import matplotlib
 class BaseGenerator(ABC):
     def __init__(self, state_prefix):
         self.state_prefix = state_prefix
@@ -14,6 +15,18 @@ class BaseGenerator(ABC):
         else:
             return 20
     
+    @abstractmethod
+    def choose_problem(self, problem_type: str, difficulty: str) -> tuple[str, list[float], list[str], Optional[Any]]:
+        """
+        Always return 4 values to avoid try/except (for diagrams, for now)
+        """
+        pass
+
+    def generate_diagram(self, diagram_data: Any, problem_type: str, difficulty: str) -> Optional['matplotlib.figure.Figure']:
+        """
+        Opt out for diagrams
+        """
+        return None
 
     @abstractmethod
     def choose_problem(self, problem_type: str, 
