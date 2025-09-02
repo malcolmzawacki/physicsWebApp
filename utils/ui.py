@@ -395,6 +395,8 @@ class interface:
                 if key in st.session_state:
                     diagram_key = key
                     break
+                else:
+                    return # if no diagram data can be found, assume there isn't one, and skip adding one
         with st.expander(expander_title):
             if diagram_key and diagram_key in st.session_state:
                 diagram_data = st.session_state[diagram_key]
