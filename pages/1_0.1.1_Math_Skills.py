@@ -828,43 +828,17 @@ class sci_notate:
                 st.rerun()
 
 
-class vectors:
-    @staticmethod
-    def question_parameters():
-        problem_type_dict = {
-            "Find Components": {
-                "honors" : r"", 
-                "conceptual": r""""""
-                },
-            "Find Resultant": {
-                "honors": r"",
-                "conceptual": r""""""
-            },
-        }
-        difficulties = ["Easy", "Medium", "Hard"]
-        return problem_type_dict, difficulties
-
-    @staticmethod
-    def main():
-        from utils.generators.vector_generator import VectorGenerator
-        title = "Vectors"
-        prefix = "vect"
-        problem_type_dict, difficulties = vectors.question_parameters()
-        generator = VectorGenerator()
-        ui = interface(prefix, title, generator, problem_type_dict, difficulties)
-        ui.default_layout(False)
 
 
 
 def main():
-    tab1,tab2, tab3, tab4 = st.tabs(["Algebra","Scientific Notation","Arithmetic", "Vectors"])
+    tab1,tab2, tab3 = st.tabs(["Algebra","Scientific Notation","Arithmetic"])
     with tab1:
         algebra.main()
     with tab2:
         sci_notate.main()
     with tab3:
         arithmetic.main()
-    with tab4:
-        vectors.main()
+
 if __name__ == "__main__":
     main()

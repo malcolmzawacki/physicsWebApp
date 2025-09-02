@@ -127,16 +127,6 @@ class ProjectileGenerator(BaseGenerator):
 
 
 
-
-    def generate_question(self, problem_type, difficulty):
-        if problem_type == "Type 1":
-            return self._generate_type1_question(difficulty)
-        elif problem_type == "Type 2":
-            return self._generate_type2_question(difficulty)
-        else:  # Type 3
-            return self._generate_type3_question(difficulty)
-
-
     def _generate_type1_question(self, difficulty):
         v_x, v_r, theta, d_x, d_y = self.calculate_type1_values(difficulty)
         object_name = random_noun()
@@ -179,7 +169,7 @@ class ProjectileGenerator(BaseGenerator):
                 answer2 = d_x
                 unit2 = "Horizontal Distance (m)"
         
-        return question, answer, answer2, unit, unit2
+        return question, [answer, answer2], [unit, unit2], None
 
     def _generate_type2_question(self, difficulty):
         v_r, theta, d_x, d_y = self.calculate_type2_values(difficulty)
@@ -213,7 +203,7 @@ class ProjectileGenerator(BaseGenerator):
                 answer2 = d_x
                 unit2 = "Horizontal Distance (m)"
         
-        return question, answer, answer2, unit, unit2
+        return question, [answer, answer2], [unit, unit2], None
 
     def _generate_type3_question(self, difficulty):
 
@@ -280,16 +270,14 @@ class ProjectileGenerator(BaseGenerator):
                     answer2 = d_x
                     unit2 = "Horizontal distance from launch site to cliff face (m)"
         
-        return question, answer, answer2, unit, unit2
+        return question, [answer, answer2], [unit, unit2], None
     
 
     def choose_problem(self, problem_type, difficulty):
         if problem_type == "Type 1":
-            question, answer, answer2, unit, unit2 = self._generate_type1_question(difficulty)
-            if difficulty == "Easy":
-                return question, [answer], [unit]
+            return self._generate_type1_question(difficulty)
+
         elif problem_type == "Type 2":
-            question, answer, answer2, unit, unit2 = self._generate_type2_question(difficulty)
+            return self._generate_type2_question(difficulty)
         else:  # Type 3
-            question, answer, answer2, unit, unit2 = self._generate_type3_question(difficulty)
-        return question, [answer,answer2],[unit,unit2]
+            return self._generate_type3_question(difficulty)

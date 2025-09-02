@@ -56,7 +56,7 @@ class CollisionGenerator(BaseGenerator):
             question = f"A {m1:.2f} kg {object1} moving at {v1:.2f} m/s {verb} a {m2:.2f} kg {object2} moving at {v2:.2f} m/s . The {object1} is moving at {v1_p:.2f} after the collision. How fast is the {object2} moving?"
             answer = v2_p
             unit = f"{object2} final velocity (m/s)"
-        return question, [answer], [unit]
+        return question, [answer], [unit], None
     
     
     def _generate_inelastic_collision(self, difficulty):
@@ -72,6 +72,6 @@ class CollisionGenerator(BaseGenerator):
             question = f"A {m1:.2f} kg {object1} moving at {v1:.2f} m/s {verb} a {m2:.2f} kg {object2} moving at {v2:.2f} m/s . They smush together. How fast are they moving together?"
             answer = v3
             unit = f"{object1} and {object2} combined final velocity (m/s)"
-        return question, [answer], [unit]
+        return question, [answer], [unit], None
     
     

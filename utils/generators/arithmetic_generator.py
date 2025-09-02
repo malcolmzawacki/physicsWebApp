@@ -50,7 +50,7 @@ class ArithmeticGenerator(BaseGenerator):
         question = f"{first} X {second}"
         answer = first*second
         unit = "Product"
-        return question, [answer], [unit]
+        return question, [answer], [unit], None
     
 
     def division_problem(self, difficulty: str):
@@ -59,7 +59,7 @@ class ArithmeticGenerator(BaseGenerator):
         question = f"{third} ÷ {second}"
         answer = first
         unit = "Quotient"
-        return question, [answer], [unit]
+        return question, [answer], [unit], None
     
     
     def subtraction_problem(self,difficulty: str):
@@ -68,7 +68,7 @@ class ArithmeticGenerator(BaseGenerator):
         question = f"{third} - {second}"
         answer = first
         unit = "Difference"
-        return question, [answer], [unit]
+        return question, [answer], [unit], None
     
 
     def addition_problem(self, difficulty: str):
@@ -76,4 +76,4 @@ class ArithmeticGenerator(BaseGenerator):
         question = f"{first} + {second}"
         answer = first+second
         unit = "Sum"
-        return question, [answer], [unit]
+        return question, [answer], [unit], None

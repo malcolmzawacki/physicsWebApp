@@ -56,7 +56,7 @@ class WaveGenerator(BaseGenerator):
             answer = frequency
             unit = "Frequency (Hz)"
             pass
-        return question, [answer], [unit]
+        return question, [answer], [unit], None
     
     def string_harmonics(self,difficulty):
         fundamental_frequency = ri(20,5000)
@@ -87,7 +87,7 @@ class WaveGenerator(BaseGenerator):
                 question = f"""How long would a string have to be to produce a wavelength of {wavelength:.3f} meters for its first harmonic?"""
                 answer = string_length
                 unit = "String Length (meters)"
-            return question, [answer],[unit]
+            return question, [answer],[unit], None
         elif difficulty == "Medium":
             # still forwards, multiple answers
             q_type = ri(0,1)
@@ -101,7 +101,7 @@ class WaveGenerator(BaseGenerator):
                 answer = [fundamental_frequency, 2*fundamental_frequency, 3*fundamental_frequency]
                 unit = ["Fundamental Frequency (Hz)","Second Harmonic Frequency (Hz)","Third Harmonic Frequency (Hz)"]
 
-            return question, answer, unit
+            return question, answer, unit, None
         
         elif difficulty == "Hard":
             # lots of working backwards
@@ -116,7 +116,7 @@ class WaveGenerator(BaseGenerator):
                 What is the fundamental frequency? What is the length of the string?"""
                 answer = [fundamental_frequency, string_length]
                 unit = ["Fundamental Frequency (Hz)","String Length (meters)"]
-            return question, answer, unit
+            return question, answer, unit, None
 
 
     
@@ -149,7 +149,7 @@ class WaveGenerator(BaseGenerator):
                 question = f"""How long would an open-ended column have to be to produce a wavelength of {wavelength:.3f} meters for its first harmonic?"""
                 answer = open_column_length
                 unit = "Column Length (meters)"
-            return question, [answer],[unit]
+            return question, [answer],[unit], None
         elif difficulty == "Medium":
             # still forwards, multiple answers
             q_type = ri(0,1)
@@ -163,7 +163,7 @@ class WaveGenerator(BaseGenerator):
                 answer = [fundamental_frequency, 2*fundamental_frequency, 3*fundamental_frequency]
                 unit = ["Fundamental Frequency (Hz)","Second Harmonic Frequency (Hz)","Third Harmonic Frequency (Hz)"]
 
-            return question, answer, unit
+            return question, answer, unit, None
         
         elif difficulty == "Hard":
             # lots of working backwards
@@ -178,7 +178,7 @@ class WaveGenerator(BaseGenerator):
                 What is the fundamental frequency? What is the length of the open-ended column?"""
                 answer = [fundamental_frequency, open_column_length]
                 unit = ["Fundamental Frequency (Hz)","Column Length (meters)"]
-            return question, answer, unit
+            return question, answer, unit, None
 
 
 
@@ -216,7 +216,7 @@ class WaveGenerator(BaseGenerator):
                 a wavelength of {wavelength:.3f} meters for its first harmonic?"""
                 answer = closed_column_length
                 unit = "Column Length (meters)"
-            return question, [answer],[unit]
+            return question, [answer],[unit], None
         elif difficulty == "Medium":
             # still forwards, multiple answers
             q_type = ri(0,1)
@@ -233,7 +233,7 @@ class WaveGenerator(BaseGenerator):
                 unit = ["Fundamental Frequency (Hz)",
                         "Third Harmonic Frequency (Hz)","Fifth Harmonic Frequency (Hz)"]
 
-            return question, answer, unit
+            return question, answer, unit, None
         
         elif difficulty == "Hard":
             # lots of working backwards
@@ -248,7 +248,7 @@ class WaveGenerator(BaseGenerator):
                 What is the fundamental frequency? What is the length of the closed-end column?"""
                 answer = [fundamental_frequency, closed_column_length]
                 unit = ["Fundamental Frequency (Hz)","Column Length (meters)"]
-            return question, answer, unit
+            return question, answer, unit, None
         
     
     def decibel_scale(self,difficulty):
@@ -295,5 +295,5 @@ class WaveGenerator(BaseGenerator):
                 answer = intensity_change
                 unit = "Distance Multiple"
              
-        return question, [answer],[unit]
+        return question, [answer],[unit], None
 
