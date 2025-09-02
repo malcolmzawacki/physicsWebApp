@@ -98,7 +98,7 @@ class VectorGenerator(BaseGenerator):
         return question, answer, unit, data
 
 
-    def generate_movement_diagram(
+    def generate_diagram(
             self, data: list, 
             problem_type: str, 
             difficulty: str

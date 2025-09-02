@@ -147,13 +147,11 @@ class interface:
         """reruns question generation routine
         **Requires the imported generator class to have a 
             choose_problem(problem_type, difficulty) function"""
-        try:
-            question, answers, units = self.generator.choose_problem(problem_type, 
-                                                                     difficulty)
-        except:
-            question, answers, units, movements = self.generator.choose_problem(problem_type, 
-                                                                     difficulty)
-            st.session_state[f"{self.prefix}_movements"] = movements
+        question, answers, units, diagram_data = self.generator.choose_problem(problem_type, difficulty)
+
+        if diagram_data is not None:
+            st.session_state[f"{self.prefix}_diagram_data"] = diagram_data
+
         st.session_state[f"{self.prefix}_question_id"] += 1
         st.session_state[f"{self.prefix}_problem_type"] = problem_type
         st.session_state[f"{self.prefix}_difficulty"] = difficulty
@@ -380,17 +378,40 @@ class interface:
             self.generate_new_question(problem_type,difficulty)
 
 
-    def add_diagram(self) -> None:
-        """currently over-specified for distance/displacement in linear fns class. 
-        adds an expander with a diagram"""
-        problem_type = st.session_state[f"{self.prefix}_problem_type"]
-        difficulty = st.session_state[f"{self.prefix}_difficulty"]
-        with st.expander("Diagram"):
-            if f"{self.prefix}_movements" in st.session_state:
-                movements = st.session_state[f"{self.prefix}_movements"]
-                fig = self.generator.generate_movement_diagram(movements, problem_type, difficulty)
-                st.pyplot(fig)
+    def add_diagram(self, diagram_key: str = None, expander_title: str = "Diagram") -> None:
+        if not hasattr(self.generator, 'generate_diagram'):
+            return
+        
+        if diagram_key is None:
+            possible_keys = [
+                f"{self.prefix}_diagram_data",   # Generic key (preferred)
+                f"{self.prefix}_movements",      # Legacy movement data
+                f"{self.prefix}_vector_data",    # Specific vector data  
+                f"{self.prefix}_graph_data"      # Graph data
+            ]
 
+            diagram_key = None
+            for key in possible_keys:
+                if key in st.session_state:
+                    diagram_key = key
+                    break
+        with st.expander(expander_title):
+            if diagram_key and diagram_key in st.session_state:
+                diagram_data = st.session_state[diagram_key]
+                problem_type = st.session_state[f"{self.prefix}_problem_type"]
+                difficulty = st.session_state[f"{self.prefix}_difficulty"]
+
+                try:
+                    fig = self.generator.generate_diagram(diagram_data, problem_type, difficulty)
+                    if fig:
+                        st.pyplot(fig)
+                    else:
+                        st.info("No diagram data available for this problem type")
+
+                except Exception as e:
+                    st.error("Error generating diagram: {str(e)}")
+            else:
+                st.info("No diagram data Available")
 
     def question_ui_buttons(self) -> None:
         """
@@ -554,7 +575,7 @@ class interface:
         self.footer_1()
 
 
-    def diagram_layout(self, equations = True) -> None:
+    def diagram_layout(self, equations: bool = True, diagram_title: str = "Diagram") -> None:
         self.initialize_session_state()
         self.header()
         self.question_options_1(equations)

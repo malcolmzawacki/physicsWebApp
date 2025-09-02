@@ -135,7 +135,7 @@ class DistDispGenerator(BaseGenerator):
         return question, [distance, displacement, dirn_final], label_set, movements
     
 
-    def generate_movement_diagram(self,movements: list, problem_type: str, difficulty: str):
+    def generate_diagram(self,movements: list, problem_type: str, difficulty: str):
         """
         Generate a diagram showing the movement path
         
@@ -146,6 +146,10 @@ class DistDispGenerator(BaseGenerator):
         Returns:
         matplotlib figure
         """
+
+        if movements is None:
+            return None
+        
         import matplotlib.pyplot as plt
         
         fig, ax = plt.subplots(figsize=(4, 4))

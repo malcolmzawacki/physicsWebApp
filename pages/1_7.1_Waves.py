@@ -27,7 +27,7 @@ def wave_properties():
     prefix = "wave_properties"
     ui = interface(prefix,title,WaveGenerator(),
                     problem_type_dict,difficulties,True)
-    ui.default_layout()
+    ui.diagram_layout()
 
 
 def Harmonics():
