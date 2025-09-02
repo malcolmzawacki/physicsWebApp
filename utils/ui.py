@@ -326,7 +326,7 @@ class interface:
                 if all_correct:
                     st.success(f"{random_correct_message()}")
                     st.session_state[f"{self.prefix}_stars"] += self.give_stars(difficulty,problem_type)
-                    self.loading_question(1)
+                    self.loading_question(3)
                     
                 else:
                     for ans in correct_answers:
@@ -335,7 +335,7 @@ class interface:
                     answer_display = ", ".join([f"{ans} " for ans in correct_answers])
                     article = "is" if len(correct_answers) < 2 else "are"
                     st.error(f"{random_error_message()} The correct answers {article}: {answer_display}.")
-                    self.loading_question(4)
+                    #self.loading_question(4)
                 
         else:
             st.error("Please enter all answers before submitting")
