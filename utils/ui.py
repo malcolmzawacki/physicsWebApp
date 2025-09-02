@@ -325,7 +325,7 @@ class interface:
                 if all_correct:
                     st.success(f"{random_correct_message()}")
                     st.session_state[f"{self.prefix}_stars"] += self.give_stars(difficulty,problem_type)
-                    self.loading_question(1)
+                    self.loading_question(3)
                     
                 else:
                     for ans in correct_answers:
