@@ -4,6 +4,8 @@ import random
 import matplotlib.pyplot as plt
 import numpy as np
 from utils.generators.base_generator import BaseGenerator
+from typing import Optional, Any
+import matplotlib
 
 class MotionGraphGenerator(BaseGenerator):
     def __init__(self):
@@ -114,25 +116,39 @@ class MotionGraphGenerator(BaseGenerator):
         
         if problem_type == "Position-Time Graph":
             fig, direction, motion_state = self.generate_position_time_graph(graph_type)
-            # Store the graph in session state for display
-            st.session_state[f"{self.state_prefix}current_graph"] = fig
             question = "Analyze the position-time graph shown above. What is the direction and state of motion?"
-            return question, [direction, motion_state], ["Direction", "Motion State"]
+            return question, [direction, motion_state], ["Direction", "Motion State"], fig
         
         elif problem_type == "Velocity-Time Graph":
             fig, direction, motion_state = self.generate_velocity_time_graph(graph_type)
-            # Store the graph in session state for display
-            st.session_state[f"{self.state_prefix}current_graph"] = fig
             question = "Analyze the velocity-time graph shown above. What is the direction and state of motion?"
-            return question, [direction, motion_state], ["Direction", "Motion State"]
+            return question, [direction, motion_state], ["Direction", "Motion State"], fig
         
         # For the matching activities, we'll handle differently
         else:
             # Return a placeholder - matching will be handled separately
-            return "Matching activity requires a different interface", ["None"], ["None"]
+            return "Matching activity requires a different interface", ["None"], ["None"], fig
+
+    def generate_diagram(
+            self, 
+            diagram_data: Any, 
+            problem_type: str, 
+            difficulty: str
+            ) -> Optional['matplotlib.figure.Figure']:
+        
+        return diagram_data  # Just return the figure that was passed in
     
-    # Custom functions for displaying graphs
-    def display_current_graph(self):
-        """Display the current graph stored in session state"""
-        if f"{self.state_prefix}current_graph" in st.session_state:
-            st.pyplot(st.session_state[f"{self.state_prefix}current_graph"])
+    def get_answer_options(
+            self, 
+            units: list[str]
+            ) -> dict[int, list[str]]:
+        
+        options = {}
+
+        for i, unit in enumerate(units):
+            if unit == "Direction":
+                options[i] = ["Positive", "Negative"]
+            elif unit == "Motion State":
+                options[i] = ["Constant Velocity", "Speeding Up", "Slowing Down"]
+
+        return options

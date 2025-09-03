@@ -28,19 +28,18 @@ class BaseGenerator(ABC):
         """
         return None
 
-    @abstractmethod
-    def choose_problem(self, problem_type: str, 
-                       difficulty: str) -> tuple[ str, list[float], list[str] ]:
-        """
-        Generate a problem based on type and difficulty.
-        
-        Must return:
-            - question (str): The problem text
-            - answers (list): List of correct answers 
-            - units (list): List of units for each answer
-        """
-        pass
 
+    def get_answer_options(self, units: list[str]) -> dict[int, list[str]]:
+        """
+        Optional method for generators that want to provide button-based answers
+        
+        :param units: List of unit strings from choose_problem
+        :returns: Dict mapping answer index to list of button options
+                 Empty dict means use text input for all answers
+        """
+        return {}  # Default: no button options, use text input
+    
+    
     def initialize_session_state(self) -> None:
         """Initialize basic session state variables with proper prefixing"""
         vars_to_init = [

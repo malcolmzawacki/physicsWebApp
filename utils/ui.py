@@ -395,8 +395,8 @@ class interface:
                 if key in st.session_state:
                     diagram_key = key
                     break
-                else:
-                    return # if no diagram data can be found, assume there isn't one, and skip adding one
+            if diagram_key is None:
+                return # if no diagram data can be found, assume there isn't one, and skip adding one
         with st.expander(expander_title):
             if diagram_key and diagram_key in st.session_state:
                 diagram_data = st.session_state[diagram_key]
@@ -418,9 +418,6 @@ class interface:
     def question_ui_buttons(self) -> None:
         """
         Displays questions with multiple-choice buttons instead of text input.
-        
-        Parameters:
-        - timer: Time in seconds before loading the next question after submission
         """
         # Display current question
         st.write(st.session_state[f"{self.prefix}_current_question"])
@@ -429,31 +426,37 @@ class interface:
         correct_answers = st.session_state[f"{self.prefix}_correct_answers"]
         units = st.session_state[f"{self.prefix}_units"]
         
-        # Define answer options based on units if not already in session state
+        # FIXED: Use generator's get_answer_options method instead of hardcoding
         if f"{self.prefix}_answer_options" not in st.session_state:
-            answer_options = {}
-            for i, unit in enumerate(units):
-                if unit == "Direction":
-                    answer_options[i] = ["Positive", "Negative"]
-                elif unit == "Motion State":
-                    answer_options[i] = ["Constant Velocity", "Speeding Up", "Slowing Down"]
-                else:
-                    # Default option list if not recognized
-                    answer_options[i] = []
+            # Ask the generator for button options
+            answer_options = self.generator.get_answer_options(units)
+            
+            # Fallback to hardcoded options only for motion graphs (backwards compatibility)
+            if not answer_options:  # Empty dict from generator
+                for i, unit in enumerate(units):
+                    if unit == "Direction":
+                        answer_options[i] = ["Positive", "Negative"]
+                    elif unit == "Motion State":
+                        answer_options[i] = ["Constant Velocity", "Speeding Up", "Slowing Down"]
+                    else:
+                        # Default: no button options for this unit
+                        answer_options[i] = []
+            
             st.session_state[f"{self.prefix}_answer_options"] = answer_options
         
         # Initialize user answers in session state if not present
         if f"{self.prefix}_user_answers_selected" not in st.session_state:
             st.session_state[f"{self.prefix}_user_answers_selected"] = [None] * len(correct_answers)
         
-        # Display each question with button options
+        # Display each question with button options or text input
         for i, unit in enumerate(units):
             st.write(f"**{unit}:**")
             
             # Get options for this question
             options = st.session_state[f"{self.prefix}_answer_options"].get(i, [])
             if not options:
-                st.warning(f"No predefined options for {unit}. Please configure options.")
+                # No button options - fall back to text input
+                st.text_input(f"Enter {unit}:", key=f"{self.prefix}_text_input_{i}")
                 continue
             
             # Create buttons in a row
@@ -466,7 +469,7 @@ class interface:
                     
                     # Create the button
                     if st.button(option, key=f"{self.prefix}_option_{i}_{j}_{st.session_state[f'{self.prefix}_question_id']}", 
-                                type=button_type, width='stretch'):
+                                type=button_type, use_container_width=True):
                         # Update the selected answer
                         user_answers = st.session_state[f"{self.prefix}_user_answers_selected"]
                         user_answers[i] = option
@@ -482,6 +485,8 @@ class interface:
                 st.error("Please answer all questions before submitting.")
             else:
                 self.check_button_answers(user_answers)
+
+
 
     def check_button_answers(self, user_answers):
         """Check answers submitted via buttons."""
