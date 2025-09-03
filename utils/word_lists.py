@@ -31,7 +31,7 @@ error_messages = [
     "Lo siento, esto no es correcto.","Soooo actually...you're wrong.","Yikes. Just, yikes.",
     "Oof, this is not it pal.","Swing and a miss, champ.", "Aw shucks :/","Aw drats!","Gosh dang it!",
     "Not quite...","Raise your hand if you're RIGHT! Put your hand down.",
-    "You'll get 'em next time bud. But not this time."
+    "You'll get 'em next time bud. But not this time.", "Uh ohhhhh!"
     ]
 
 def random_error_message():
@@ -41,7 +41,7 @@ def random_error_message():
 correct_messages = [
     "Correct!","¡Excelente! Es correcto.", "C'est correct, bon travail!",
     "Hey hey hey, we got a smart one over here!","Not too shabby kid, not too shabby.",
-    "Thine brains art formidable indeed", "Incroyable!","¡Increible!","Dataway!"
+    "Thine brains art formidable indeed", "Incroyable!","¡Increible!","Dataway!", "Good job, yay!",
     ]
 
 def random_correct_message():

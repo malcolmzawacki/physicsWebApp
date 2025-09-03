@@ -279,15 +279,42 @@ def PvT_and_VvT_graph_matching():
         st.info("Click 'Generate New Matching Set' to start.")
 
 
+def constant_motion():
+    from utils.generators.const_motion_generator import ConstantMotionGenerator
+    problem_type_dict = {
+        "Constant Speed": {
+            "honors" : r"d \;=\; v \cdot t", 
+            "conceptual": r"""d \;=\; v \cdot t \quad , \quad 
+            v \;=\; \frac{d}{t} \quad , \quad
+            t \;=\; \frac{d}{v}"""
+            },
+        "Average Speed": {
+            "honors" : r"v_{avg} \;=\; \frac{d_1 + d_2 + ...}{t_1 + t_2 + ...}", 
+            "conceptual": r"""v_{avg} \;=\; \frac{d_1 + d_2 + ...}{t_1 + t_2 + ...} \quad , \quad
+            d \;=\; v \cdot t \quad , \quad 
+            v \;=\; \frac{d}{t} \quad , \quad
+            t \;=\; \frac{d}{v}
+            """
+            }
+        }
+    difficulties = ["Easy","Medium","Hard"]
+    title = "Constant Motion"
+    prefix = "const_motion_"
+    ui = interface(prefix,title,ConstantMotionGenerator(),
+                    problem_type_dict,difficulties,True)
+    ui.default_layout()
+
 def main():
     # Add tabs for quiz and explorer modes
-    tab2,tab3,tab4,tab5 = st.tabs([
+    tab1,tab2,tab3,tab4,tab5 = st.tabs([
+                                    "Constant Motion",
                                     "Accelerated Motion", 
                                     "Types of Motion Graphs",
                                     "Matching Motion Graphs",
                                     "Projectiles"
                                     ])
-    
+    with tab1:
+        constant_motion()
     with tab2:
         linear_fns()
     with tab3:

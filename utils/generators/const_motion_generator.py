@@ -1,0 +1,85 @@
+from random import randint as ri
+import random
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).parent.parent.parent))
+try:
+    from .base_generator import BaseGenerator
+except ImportError:
+    import sys
+    from pathlib import Path
+    sys.path.append(str(Path(__file__).parent.parent.parent))
+    from utils.generators.base_generator import BaseGenerator
+
+from utils.word_lists import random_noun
+
+class ConstantMotionGenerator(BaseGenerator):
+    def __init__(self):
+        super().__init__(state_prefix="const_motion_")
+    
+    def choose_problem(self, problem_type: str, difficulty: str
+                       ) -> tuple[
+        str,list[float],list[str],list[tuple[str,float]]]:
+        if problem_type == "Constant Speed":
+            return self.inst_speed_question()
+        if problem_type == "Average Speed":
+            return self.average_speed_question(difficulty)
+
+    def inst_speed(self):
+        time = ri(10, 50)
+        speed = ri(10, 50)
+        dist = speed*time
+        return dist, time, speed
+    
+    def inst_speed_question(self):
+        dist, time, speed = self.inst_speed()
+        noun = random_noun()
+        p = ri(0,2)
+        if p == 0:
+            answer = dist
+            unit = "Distance (m)"
+            question = f"""A {noun} spends {time} seconds moving at {speed} m/s. 
+            \n\nHow much distance was travelled?"""
+        if p == 1:
+            answer = time
+            unit = "Time (sec)"
+            question = f"""A {noun} moves at {speed} m/s, covering {dist} meters of distance. 
+            \n\nHow long did it take to do this?"""
+        if p == 2:
+            answer = speed
+            unit = "Speed (m/s)"
+            question = f"""A {noun} moves {dist} meters over {time} seconds. 
+            \n\nHow fast was the {noun} moving?"""
+        return question, [answer], [unit], None
+    
+    def average_speed_question(self, difficulty):
+        d1,t1,s1 = self.inst_speed()
+        d2,t2,s2 = self.inst_speed()
+        
+        noun = random_noun()
+        if difficulty == "Easy":
+            # gives the distances and time, just average them
+            answer = round((d1+d2)/(t1+t2),3)
+            unit = "Average Speed (m/s)"
+            question = f"""A {noun} travels {d1} meters in {t1} seconds,
+             \n\n then {d2} meters in {t2} seconds.
+              \n\n What is the average speed of the {noun}? """
+        if difficulty == "Medium":
+            # gives speed and d, t, have to calculate
+            answer = round((d1+d2)/(t1+t2),3)
+            unit = "Average Speed (m/s)"
+            question = f"""A {noun} travels at {s1} m/s for {t1} seconds,
+             \n\n then {s2} m/s over {d2} meters.
+              \n\n What is the average speed of the {noun}? """
+        if difficulty == "Hard":
+            # three segments ****can vary order/combination later
+            d3,t3,s3 = self.inst_speed()
+            answer = round((d1+d2+d3)/(t1+t2+t3),3)
+            unit = "Average Speed (m/s)"
+            question = f"""A {noun} travels at {s1} m/s for {t1} seconds,
+             \n\n then {s2} m/s over {d2} meters,
+             \n\n and finally {d3} meters in {t3} seconds.
+              \n\n What is the average speed of the {noun}? """
+        
+        return question, [answer], [unit], None
