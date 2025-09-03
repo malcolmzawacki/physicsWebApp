@@ -379,41 +379,52 @@ class interface:
 
 
     def add_diagram(self, diagram_key: str = None, expander_title: str = "Diagram") -> None:
+        """
+        Add diagram expander ONLY if there's actually a diagram to show
+        No empty expanders for better UX
+        """
+        # Skip if generator doesn't support diagrams
         if not hasattr(self.generator, 'generate_diagram'):
-            return
+            return  # No expander shown
         
+        # Auto-detect diagram data key
         if diagram_key is None:
             possible_keys = [
-                f"{self.prefix}_diagram_data",   # Generic key (preferred)
-                f"{self.prefix}_movements",      # Legacy movement data
-                f"{self.prefix}_vector_data",    # Specific vector data  
-                f"{self.prefix}_graph_data"      # Graph data
+                f"{self.prefix}_diagram_data",
+                f"{self.prefix}_movements",      
+                f"{self.prefix}_vector_data",
+                f"{self.prefix}_graph_data"
             ]
-
-            diagram_key = None
             for key in possible_keys:
                 if key in st.session_state:
                     diagram_key = key
                     break
+            
             if diagram_key is None:
-                return # if no diagram data can be found, assume there isn't one, and skip adding one
+                return  # No diagram data, no expander shown
+        
+        # Check if we actually have diagram data
+        if diagram_key not in st.session_state:
+            return  # No expander shown
+        
+        diagram_data = st.session_state[diagram_key]
+        if diagram_data is None:
+            return  # No expander shown
+        
+        # Try to generate the diagram BEFORE showing expander
+        problem_type = st.session_state[f"{self.prefix}_problem_type"]
+        difficulty = st.session_state[f"{self.prefix}_difficulty"]
+        
+        try:
+            fig = self.generator.generate_diagram(diagram_data, problem_type, difficulty)
+            if fig is None:
+                return  # No diagram generated, no expander shown
+        except Exception:
+            return  # Error generating, no expander shown
+        
+        # ONLY show expander if we have a actual diagram
         with st.expander(expander_title):
-            if diagram_key and diagram_key in st.session_state:
-                diagram_data = st.session_state[diagram_key]
-                problem_type = st.session_state[f"{self.prefix}_problem_type"]
-                difficulty = st.session_state[f"{self.prefix}_difficulty"]
-
-                try:
-                    fig = self.generator.generate_diagram(diagram_data, problem_type, difficulty)
-                    if fig:
-                        st.pyplot(fig)
-                    else:
-                        st.info("No diagram data available for this problem type")
-
-                except Exception as e:
-                    st.error("Error generating diagram: {str(e)}")
-            else:
-                st.info("No diagram data Available")
+            st.pyplot(fig)
 
     def question_ui_buttons(self) -> None:
         """
