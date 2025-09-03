@@ -306,7 +306,7 @@ class interface:
             # Check all answers
             for i, (user_input, correct_answer) in enumerate(zip(user_answers, correct_answers)):
                 if type(user_input) == str:
-                    if user_input.lower() == correct_answer.lower():
+                    if user_input.lower().strip() == correct_answer.lower():
                         is_correct = True
                     else:
                         is_correct = False
