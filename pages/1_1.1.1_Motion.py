@@ -295,6 +295,22 @@ def constant_motion():
             v \;=\; \frac{d}{t} \quad , \quad
             t \;=\; \frac{d}{v}
             """
+            },
+        "Average Velocity": {
+            "honors" : r"v_{avg} \;=\; \frac{d_1 + d_2 + ...}{t_1 + t_2 + ...}", 
+            "conceptual": r"""v_{avg} \;=\; \frac{d_1 + d_2 + ...}{t_1 + t_2 + ...} \quad , \quad
+            d \;=\; v \cdot t \quad , \quad 
+            v \;=\; \frac{d}{t} \quad , \quad
+            t \;=\; \frac{d}{v}
+            """
+            },
+        "Combined Constant Motion": {
+            "honors" : r"v_{avg} \;=\; \frac{d_1 + d_2 + ...}{t_1 + t_2 + ...}", 
+            "conceptual": r"""v_{avg} \;=\; \frac{d_1 + d_2 + ...}{t_1 + t_2 + ...} \quad , \quad
+            d \;=\; v \cdot t \quad , \quad 
+            v \;=\; \frac{d}{t} \quad , \quad
+            t \;=\; \frac{d}{v}
+            """
             }
         }
     difficulties = ["Easy","Medium","Hard"]
