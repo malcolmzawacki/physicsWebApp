@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import streamlit as st
 from utils.generators.motion_graph_generator import MotionGraphGenerator
-
+plt.style.use("dark_background")
 
 def input_plot(start = 2.8,end = 4,accuracy=0.001,reps=600,numtoplot=200):
     interval = (start, end)  # start, end
@@ -38,16 +38,5 @@ def main():
     fig = input_plot(start,end,accuracy,reps,numtoplot)
     st.pyplot(fig)
 
-def test_main():
-    
-    graph_types = ["linear_positive", "linear_negative", 
-                                    "accelerating_positive", "accelerating_negative",
-                                    "decelerating_positive", "decelerating_negative"]
-    generator = MotionGraphGenerator(graph_types,prefix="_motion_graphs")
-    generator.graphing_practice()
-    pass
-
-
-
 if __name__ == "__main__":
-    test_main()
+    main()
