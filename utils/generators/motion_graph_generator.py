@@ -116,11 +116,13 @@ class MotionGraphGenerator(BaseGenerator):
         
         if problem_type == "Position-Time Graph":
             fig, direction, motion_state = self.generate_position_time_graph(graph_type)
+            st.session_state[f"{self.state_prefix}current_graph"] = fig
             question = "Analyze the position-time graph shown above. What is the direction and state of motion?"
             return question, [direction, motion_state], ["Direction", "Motion State"], fig
         
         elif problem_type == "Velocity-Time Graph":
             fig, direction, motion_state = self.generate_velocity_time_graph(graph_type)
+            st.session_state[f"{self.state_prefix}current_graph"] = fig
             question = "Analyze the velocity-time graph shown above. What is the direction and state of motion?"
             return question, [direction, motion_state], ["Direction", "Motion State"], fig
         
@@ -138,6 +140,12 @@ class MotionGraphGenerator(BaseGenerator):
         
         return diagram_data  # Just return the figure that was passed in
     
+    
+    def display_current_graph(self):
+        if f"{self.state_prefix}current_graph" in st.session_state:
+            st.pyplot(st.session_state[f"{self.state_prefix}current_graph"])
+
+
     def get_answer_options(
             self, 
             units: list[str]

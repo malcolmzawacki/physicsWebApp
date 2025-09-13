@@ -145,7 +145,7 @@ def position_and_velocity_graph_analysis():
     difficulties = ["Easy", "Medium", "Hard"]
     generator = MotionGraphGenerator()
     ui = interface("motion_graph", "Graph Analysis", generator, problem_type_dict, difficulties)
-    ui.button_layout()
+    ui.button_layout(display_function=generator.display_current_graph)
 
 
 def PvT_and_VvT_graph_matching():
