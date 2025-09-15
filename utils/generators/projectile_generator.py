@@ -134,42 +134,41 @@ class ProjectileGenerator(BaseGenerator):
         
         if difficulty == "Easy":
             choice = random.randint(1,3)
-            answer2 = 0
-            unit2 = ""
+
             if choice == 1:
                 question = f"If a {object_name} is {verb} horizontally off of a {d_y:.2f} m cliff with an initial velocity of {v_x:.2f} m/s, how far away does it land?"
-                answer = d_x
-                unit = "Horizontal Distance (m)"
+                answers = [d_x]
+                units = ["Horizontal Distance (m)"]
             elif choice == 2:
                 question = f"If a {object_name} is {verb} horizontally off of a cliff at {v_x:.2f} m/s, and lands {d_x:.2f} m away, what was the height of the cliff?"
-                answer = d_y
-                unit = "Cliff Height (m)"
+                answers = [d_y]
+                units = ["Cliff Height (m)"]
             else:
                 question = f"If a {object_name} is {verb} horizontally off of a {d_y:.2f} m cliff, and lands {d_x:.2f} m away, how fast was it {verb}?"
-                answer = v_x
-                unit = "Initial Velocity (m/s)"
+                answers = [v_x]
+                units = ["Initial Velocity (m/s)"]
         else:  # Hard
             choice = random.randint(1,3)
             if choice == 1:
                 question = f"If a {object_name} was {verb} horizontally off of a cliff and lands at {v_r:.2f} m/s at a {theta:.2f} degree angle, how fast was it {verb}, and from how high?"
-                answer = v_x
-                unit = "Initial Velocity (m/s)"
+                answers = [v_x, d_y]
+                units = ["Initial Velocity (m/s)","Cliff Height (m)"]
                 answer2 = d_y
                 unit2 = "Cliff Height (m)"
             elif choice == 2:
                 question = f"If a {object_name} is {verb} horizontally off of a cliff at {v_x:.2f} m/s, and lands {d_x:.2f} m away, what speed and angle does it land with?"
-                answer = v_r
-                unit = "Final Velocity (m/s)"
+                answers = [v_r, theta]
+                units = ["Final Velocity (m/s)","Angle (degrees)"]
                 answer2 = theta
                 unit2 = "Angle (degrees)"
             else:
                 question = f"A {object_name} is {verb} horizontally off of a {d_y:.2f} m cliff, and lands at a {theta:.2f} degree angle, with what speed did it land, and how far from the base of the cliff?"
-                answer = v_r
-                unit = "Overall Final Velocity (m/s)"
+                answers = [v_r, d_x]
+                units = ["Overall Final Velocity (m/s)","Horizontal Distance (m)"]
                 answer2 = d_x
                 unit2 = "Horizontal Distance (m)"
         
-        return question, [answer, answer2], [unit, unit2], None
+        return {"question": question, "answers": answers, "units": units}
 
     def _generate_type2_question(self, difficulty):
         v_r, theta, d_x, d_y = self.calculate_type2_values(difficulty)
@@ -203,7 +202,9 @@ class ProjectileGenerator(BaseGenerator):
                 answer2 = d_x
                 unit2 = "Horizontal Distance (m)"
         
-        return question, [answer, answer2], [unit, unit2], None
+        return {"question": question, 
+                "answers": [answer, answer2], 
+                "units": [unit, unit2]}
 
     def _generate_type3_question(self, difficulty):
 
@@ -270,10 +271,22 @@ class ProjectileGenerator(BaseGenerator):
                     answer2 = d_x
                     unit2 = "Horizontal distance from launch site to cliff face (m)"
         
-        return question, [answer, answer2], [unit, unit2], None
+        return {"question": question, 
+                "answers": [answer, answer2], 
+                "units": [unit, unit2]}
     
 
     def choose_problem(self, problem_type, difficulty):
+        if problem_type == "Type 1":
+            return self._generate_type1_question(difficulty)
+
+        elif problem_type == "Type 2":
+            return self._generate_type2_question(difficulty)
+        else:  # Type 3
+            return self._generate_type3_question(difficulty)
+    
+
+    def choose_problem_dict(self, problem_type, difficulty):
         if problem_type == "Type 1":
             return self._generate_type1_question(difficulty)
 

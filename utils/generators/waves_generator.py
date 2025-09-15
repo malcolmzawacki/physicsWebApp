@@ -32,6 +32,21 @@ class WaveGenerator(BaseGenerator):
             return self.decibel_scale(difficulty)
         else:
             pass
+
+
+    def choose_problem_dict(self, problem_type: str, difficulty: str):
+        if problem_type == "Wave Properties":
+            return self.properties_of_waves(difficulty)
+        elif problem_type == "String Harmonics":
+            return self.string_harmonics(difficulty)
+        elif problem_type == "Open Ended Column Harmonics":
+            return self.open_column_harmonics(difficulty)
+        elif problem_type == "Closed End Column Harmonics":
+            return self.closed_column_harmonics(difficulty)
+        elif problem_type == "deciBel Scale":
+            return self.decibel_scale(difficulty)
+        else:
+            pass
     
     def properties_of_waves(self, difficulty):
         frequency = ri(2,100)
@@ -56,7 +71,7 @@ class WaveGenerator(BaseGenerator):
             answer = frequency
             unit = "Frequency (Hz)"
             pass
-        return question, [answer], [unit], None
+        return {"question": question, "answers": [answer], "units": [unit]}
     
     def string_harmonics(self,difficulty):
         fundamental_frequency = ri(20,5000)

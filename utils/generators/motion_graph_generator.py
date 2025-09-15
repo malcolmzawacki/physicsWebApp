@@ -160,3 +160,29 @@ class MotionGraphGenerator(BaseGenerator):
                 options[i] = ["Constant Velocity", "Speeding Up", "Slowing Down"]
 
         return options
+    
+    def choose_problem_dict(self, problem_type, difficulty):
+        """Required method for BaseGenerator pattern"""
+        # Store the graph_type chosen for this problem
+        graph_type = random.choice(self.graph_types)
+        units = ["Direction", "Motion State"]
+        options = self.get_answer_options(units)
+
+        if problem_type == "Position-Time Graph":
+            fig, direction, motion_state = self.generate_position_time_graph(graph_type)
+            st.session_state[f"{self.state_prefix}current_graph"] = fig
+            question = "Analyze the position-time graph shown to the left. What is the direction and state of motion?"
+            answers =  [direction, motion_state] 
+        
+        elif problem_type == "Velocity-Time Graph":
+            fig, direction, motion_state = self.generate_velocity_time_graph(graph_type)
+            st.session_state[f"{self.state_prefix}current_graph"] = fig
+            question = "Analyze the velocity-time graph shown to the left. What is the direction and state of motion?"
+            answers =  [direction, motion_state]
+
+        return {"question": question, 
+                    "answers": answers, 
+                    "units": units, 
+                    "diagram_data": fig,
+                    "button_options": options,
+                    "side_by_side": True}

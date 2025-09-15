@@ -22,7 +22,7 @@ class interface:
         self.difficulties = difficulties
         self.type_weight = type_weight
 
-      
+   # region performance dataframe  
     def clear_performance_dataframe(self) -> dict:
         """Initialize/Reset the performance tracking dictionary"""
         performance_dict = {}
@@ -90,6 +90,15 @@ class interface:
             st.session_state[f"{self.prefix}_performance"] = performance
 
 
+    def performance_dropdown(self) -> None:
+        """renders performance dataframe in dropdown menu"""
+        with st.expander("Your Performance", expanded=False):
+            performance_df = self.create_performance_dataframe()
+            st.dataframe(performance_df)
+
+    #endregion
+
+
     def initialize_session_state(self) -> None:
         """takes commonly used streamlit state variables and initializes them for the page to use"""
 
@@ -136,13 +145,8 @@ class interface:
                 st.write("")
 
 
-    def performance_dropdown(self) -> None:
-        """renders performance dataframe in dropdown menu"""
-        with st.expander("Your Performance", expanded=False):
-            performance_df = self.create_performance_dataframe()
-            st.dataframe(performance_df)
 
-
+    # region legacy 
     def generate_new_question(self, problem_type: str, difficulty: str) -> None:
         """reruns question generation routine
         **Requires the imported generator class to have a 
@@ -609,3 +613,386 @@ class interface:
         self.question_options_1(equations=False)
         self.question_ui_4(timer=0.1,big_font=True)
         self.footer_1()
+
+
+    # endregion
+
+
+    ##### unified / single point of dict handling
+    # region unified version
+    def add_diagram_smart(self, expander_title: str = "Diagram",**kwargs) -> None:
+        """NEW: Smarter diagram addition that works with dictionary data"""
+        diagram_data = st.session_state.get(f"{self.prefix}_diagram_data")
+        if diagram_data is None:
+            return
+        
+        problem_type = st.session_state[f"{self.prefix}_problem_type"]
+        difficulty = st.session_state[f"{self.prefix}_difficulty"]
+        
+        # Try new interface first
+        if hasattr(self.generator, 'generate_diagram'):
+            try:
+                fig = self.generator.generate_diagram(diagram_data, problem_type, difficulty)
+                if fig is not None:
+                    with st.expander(expander_title, expanded= kwargs.get('expanded', False)):
+                        st.pyplot(fig)
+            except Exception as e:
+                print(f"Diagram generation failed: {e}")
+
+    def get_current_problem_features(self) -> dict:
+        """NEW: Get available features for current problem"""
+        features = {}
+        possible_features = ['diagram_data', 'hints', 'button_options', 'time_limit', 'explanation', 'tags', 'show_equations']
+        
+        for feature in possible_features:
+            key = f"{self.prefix}_{feature}"
+            if key in st.session_state:
+                features[feature] = st.session_state[key]
+        
+        return features
+
+    def show_hints(self) -> None:
+        """NEW: Display hints if available"""
+        hints = st.session_state.get(f"{self.prefix}_hints", [])
+        if hints:
+            with st.expander("💡 Hints"):
+                for i, hint in enumerate(hints, 1):
+                    st.write(f"{i}. {hint}")
+
+    def show_problem_tags(self, tags: list) -> None:
+        """NEW: Display problem tags"""
+        if tags:
+            st.caption(" • ".join(tags))
+
+
+    def generate_question_once(self, problem_type: str, difficulty: str):
+        """
+        Generate question ONCE and persist all data
+        """
+        
+        # Generate based on format
+        try: # new dictionary method
+            result = self.generator.choose_problem_dict(problem_type, difficulty)
+            self._store_dict_result(result, problem_type, difficulty)
+        except: # legacy system
+            result = self.generator.choose_problem(problem_type, difficulty)
+            self._store_legacy_result(result, problem_type, difficulty)
+        
+        st.rerun()
+
+    def _store_dict_result(self, result: dict, problem_type: str, difficulty: str):
+        """Store dictionary result in session state"""
+        # Core data
+        st.session_state[f"{self.prefix}_question_id"] = st.session_state.get(f"{self.prefix}_question_id", 0) + 1
+        st.session_state[f"{self.prefix}_problem_type"] = problem_type
+        st.session_state[f"{self.prefix}_difficulty"] = difficulty
+        st.session_state[f"{self.prefix}_current_question"] = result['question']
+        st.session_state[f"{self.prefix}_correct_answers"] = result['answers']
+        st.session_state[f"{self.prefix}_units"] = result['units']
+        st.session_state[f"{self.prefix}_submitted"] = False
+        st.session_state[f"{self.prefix}_generation_format"] = 'dict'
+        
+        # Optional features
+        optional_features = ['diagram_data', 'hints', 'button_options', 'time_limit', 'explanation', 'tags', 'show_equations']
+        for feature in optional_features:
+            key = f"{self.prefix}_{feature}"
+            if feature in result:
+                st.session_state[key] = result[feature]
+            elif key in st.session_state:
+                del st.session_state[key]
+
+    def _store_legacy_result(self, result: tuple, problem_type: str, difficulty: str):
+        """Store legacy tuple result in session state"""
+        question, answers, units, diagram_data = result
+        
+        st.session_state[f"{self.prefix}_question_id"] = st.session_state.get(f"{self.prefix}_question_id", 0) + 1
+        st.session_state[f"{self.prefix}_problem_type"] = problem_type
+        st.session_state[f"{self.prefix}_difficulty"] = difficulty
+        st.session_state[f"{self.prefix}_current_question"] = question
+        st.session_state[f"{self.prefix}_correct_answers"] = answers
+        st.session_state[f"{self.prefix}_units"] = units
+        st.session_state[f"{self.prefix}_submitted"] = False
+        st.session_state[f"{self.prefix}_generation_format"] = 'legacy'
+        
+        if diagram_data is not None:
+            st.session_state[f"{self.prefix}_diagram_data"] = diagram_data
+
+
+    def unified_question_options(self, equations=True, ifDifficulty=True):
+        """Unified question options that work with both formats"""
+        # UI Controls
+        col1, col2, col3 = st.columns([3,2,2], vertical_alignment='bottom', gap='medium')
+        
+        with col1:
+            selected_problem_type = st.selectbox(
+                "Problem Type",
+                options=list(self.problem_types),
+                key=f"{self.prefix}_problem_type_select_unified")
+        
+        with col2:
+            if ifDifficulty:
+                difficulty = st.selectbox(
+                    "Difficulty",
+                    self.difficulties,
+                    key=f"{self.prefix}_difficulty_select_unified"
+                )
+            else:
+                difficulty = "Easy"
+        
+        with col3:
+            if equations:
+                st.session_state[f"{self.prefix}_level"] = st.checkbox(
+                    "More Equations", 
+                    value=False,
+                    key=f"{self.prefix}_levels_check_unified")
+        
+        # Check if we need to generate new question
+        if (selected_problem_type != st.session_state.get(f"{self.prefix}_problem_type") or 
+            st.session_state.get(f"{self.prefix}_current_question") is None or 
+            difficulty != st.session_state.get(f"{self.prefix}_difficulty")):
+                
+            # UNIFIED: Single generation call
+            self.generate_question_once(selected_problem_type, difficulty)
+        
+        # Show equations
+        if equations:
+            self._show_equations_unified(selected_problem_type)
+
+    def _show_equations_unified(self, problem_type: str):
+        """Show equations from whatever source is available"""
+        with st.expander("equation(s)", expanded=True):
+            # Try generator metadata first (new way)
+            if hasattr(self.generator, 'get_problem_metadata'):
+                metadata = self.generator.get_problem_metadata(problem_type)
+                if st.session_state[f"{self.prefix}_level"]:
+                    equation = metadata.get('conceptual_equation', '')
+                else:
+                    equation = metadata.get('honors_equation', '')
+                
+                if equation:
+                    st.latex(equation)
+                    return
+            
+            # Fallback to manual dict (legacy way)
+            if hasattr(self, 'problem_type_dict'):
+                equation_dict = self.problem_type_dict.get(problem_type, {})
+                if st.session_state[f"{self.prefix}_level"]:
+                    equation = equation_dict.get('conceptual', '')
+                else:
+                    equation = equation_dict.get('honors', '')
+                
+                if equation:
+                    st.latex(equation)
+
+    def unified_smart_layout(self, **kwargs):
+        """Smart layout that works with both legacy and dictionary generators"""
+        self.initialize_session_state()
+        self.header()
+        
+        # Unified question options (handles both formats)
+        equations = kwargs.get('equations', True)
+        self.unified_question_options(equations)
+        
+        # Get current format and features
+        generation_format = st.session_state.get(f"{self.prefix}_generation_format", 'legacy')
+        
+        if generation_format == 'dict':
+            # Use smart features for dictionary format
+            available_features = self.get_current_problem_features()
+
+            if kwargs.get('side_by_side'):
+                col1, col2 = st.columns(2)
+                with col1:
+                    if available_features.get('diagram_data') is not None:
+                        self.add_diagram_smart(kwargs.get('diagram_title', 'Diagram'), expanded = kwargs.get('expanded'))
+                with col2:    
+                    if available_features.get('button_options'):
+                        self.question_ui_buttons()
+                    else:
+                        time_limit = available_features.get('time_limit', kwargs.get('timer', 180))
+                        self.question_ui_dict(timer=time_limit/60)
+            else:   
+                if available_features.get('button_options'):
+                    self.question_ui_buttons()
+                else:
+                    time_limit = available_features.get('time_limit', kwargs.get('timer', 180))
+                    self.question_ui_dict(timer=time_limit/60)
+                
+                if available_features.get('diagram_data') is not None:
+                    self.add_diagram_smart(kwargs.get('diagram_title', 'Diagram'))
+            
+            if available_features.get('hints'):
+                self.show_hints()
+        
+        else:
+            # Use legacy behavior for legacy format
+            self.question_ui_4()
+            
+            if f"{self.prefix}_diagram_data" in st.session_state:
+                self.add_diagram()
+        
+        self.footer_dict()
+
+    def new_question_dict(self, problem_type: str, difficulty: str) -> None:
+        """module for new question button"""
+        if st.button("New Question",key=f"{self.prefix}_new_question"):
+                self.generate_question_once(problem_type, difficulty)
+
+
+    def footer_dict(self)-> None:
+        """Organizes the new question button and the performance dataframe into 
+        columns at the bottom of the page"""
+        col1,col2 = st.columns([1,4],vertical_alignment='center')
+        with col1:
+            self.new_question_dict(
+                              st.session_state[f"{self.prefix}_problem_type"],
+                              st.session_state[f"{self.prefix}_difficulty"])
+        with col2:
+            self.performance_dropdown()
+
+
+    
+
+    def question_ui_dict(self,timer=3.0, big_font = False) -> None:
+        """Displays questions passed in from the generator class, and evaluates answers."""
+        # Display current question
+        if big_font:
+            st.title(st.session_state[f"{self.prefix}_current_question"])
+        else:
+            st.write(st.session_state[f"{self.prefix}_current_question"])
+        # Modified form to handle multiple inputs
+        with st.form(f"{self.prefix}_form",clear_on_submit=True):
+            user_answers = []
+            num_inputs = st.session_state[f"{self.prefix}_correct_answers"]
+            num_inputs = len(num_inputs)
+            
+            if num_inputs > 1:
+                cols = st.columns(num_inputs)
+                for i, col in enumerate(cols):
+                    unit = st.session_state[f"{self.prefix}_units"][i]
+                    with col:
+                        if type(st.session_state[f"{self.prefix}_correct_answers"][i]) == str:
+                            input_value = st.text_input(f"{i+1}: {unit}", max_chars=20,
+                                key=f"{self.prefix}_input_{i}_{st.session_state[f'{self.prefix}_question_id']}"
+                            )
+                            user_answers.append(input_value)
+                        else:
+                            input_str = st.text_input(
+                                f"{i+1}: {unit}",
+                                placeholder="Enter a number...",
+                                key=f"{self.prefix}_input_{i}_{st.session_state[f'{self.prefix}_question_id']}"
+                            )
+                            user_answers.append(input_str)  # Store the string, validate later
+    
+            else:
+                # Single input case
+                unit = st.session_state[f"{self.prefix}_units"][0]
+                input_str = st.text_input(
+                    f"{unit}:", placeholder= "Type a number ...", 
+                    key=f"{self.prefix}_input_0_{st.session_state[f'{self.prefix}_question_id']}"
+                    )
+                user_answers.append(input_str)  # Store the string, validate later
+                
+                
+            # Always enable the submit button
+            submitted = st.form_submit_button("Submit")
+        if submitted:
+            # Convert and validate the answers
+            validated_answers = []
+            validation_passed = True
+            
+            for i, (raw_answer, correct_answer) in enumerate(zip(user_answers, st.session_state[f"{self.prefix}_correct_answers"])):
+                if type(correct_answer) == str:
+                    # String answer - no validation needed
+                    validated_answers.append(raw_answer)
+                else:
+                    # Numeric answer - validate
+                    if not raw_answer or not raw_answer.strip():
+                        st.error(f"Please enter a value for {st.session_state[f'{self.prefix}_units'][i]}")
+                        validation_passed = False
+                        validated_answers.append(None)
+                    else:
+                        try:
+                            validated_answers.append(float(raw_answer.strip()))
+                        except ValueError:
+                            st.error(f"'{raw_answer}' is not a valid number for {st.session_state[f'{self.prefix}_units'][i]}")
+                            validation_passed = False
+                            validated_answers.append(None)
+            
+            # Only proceed if all validation passed
+            if validation_passed:
+                self.check_answers_dict(validated_answers, timer)
+            else:
+                st.warning("Please fix the errors above and try again.")
+    
+
+    
+    
+    def check_answers_dict(self,user_answers: list, timer: float):
+        correct_answers = st.session_state[f"{self.prefix}_correct_answers"]
+        all_correct = True
+        if None not in user_answers:
+            # Check all answers
+            for i, (user_input, correct_answer) in enumerate(zip(user_answers, correct_answers)):
+                if type(user_input) == str:
+                    if user_input.lower().strip() == correct_answer.lower():
+                        is_correct = True
+                    else:
+                        is_correct = False
+                    all_correct = all_correct and is_correct
+                else:
+                    tolerance = correct_answer * 0.1
+                    is_correct = abs(user_input - correct_answer) <= abs(tolerance)
+                    all_correct = all_correct and is_correct
+            # Update performance based on overall correctness
+            if not st.session_state[f"{self.prefix}_submitted"]:
+                problem_type = st.session_state[f"{self.prefix}_problem_type"]
+                difficulty = st.session_state[f"{self.prefix}_difficulty"]
+                self.update_performance(problem_type, difficulty, all_correct)
+                st.session_state[f"{self.prefix}_submitted"] = True 
+                
+                if all_correct:
+                    st.success(f"{random_correct_message()}")
+                    st.session_state[f"{self.prefix}_stars"] += self.give_stars(difficulty,problem_type)
+                    self.loading_q_dict(3)
+                    
+                else:
+                    for ans in correct_answers:
+                        if type(ans) != str:
+                            ans = f"{ans:.2f}"
+                    answer_display = ", ".join([f"{ans} " for ans in correct_answers])
+                    article = "is" if len(correct_answers) < 2 else "are"
+                    st.error(f"{random_error_message()} The correct answers {article}: {answer_display}.")
+                    #self.loading_question(4)
+                
+        else:
+            st.error("Please enter all answers before submitting")
+
+    
+    def loading_q_dict(self,timer: float) -> None:
+        """
+        Displays a loading bar to show the next question is coming up
+
+        :param timer: the time (in seconds) that the next question takes to load
+        :type timer: float
+        """
+        problem_type = st.session_state[f"{self.prefix}_problem_type"]
+        difficulty = st.session_state[f"{self.prefix}_difficulty"]
+        i = 0
+        loading_text = "Next Question"
+        timer*=100 # for smoother loading
+        col1,col2=st.columns([5,2])
+        with col1:
+            loading_question = st.progress(0,loading_text)
+                
+        with col2:
+            pause =st.checkbox("Cancel Next Question")
+
+        while (i < timer and not pause):   
+                time.sleep(0.01)
+                loading_question.progress((i+1)/timer,loading_text)
+                i+=1 
+                
+        if (i == timer and not pause):
+            self.generate_question_once(problem_type,difficulty)
+

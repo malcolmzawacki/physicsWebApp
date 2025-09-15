@@ -48,7 +48,7 @@ class dist_disp:
       prefix = "constant"
       ui = interface(prefix,title,DistDispGenerator(),
                   problem_type_dict,difficulties,True)
-      ui.diagram_layout()
+      ui.unified_smart_layout()
 
 
 class vectors:
@@ -73,7 +73,7 @@ class vectors:
         prefix = "vect"
         generator = VectorGenerator()
         ui = interface(prefix, title, generator, problem_type_dict, difficulties)
-        ui.diagram_layout(equations=False)
+        ui.unified_smart_layout(equations=False)
 
 def main():
     tab1, tab2 = st.tabs([

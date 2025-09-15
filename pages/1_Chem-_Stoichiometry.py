@@ -228,7 +228,7 @@ def format_reaction(reactants, products, reactant_coefficients, product_coeffici
         if coefficient == 1:
             product_terms.append(compound)
         else:
-            product_terms.append(f"{coefficient} {product}")
+            product_terms.append(f"{coefficient} {products[i]}")
     
     reaction_str = " + ".join(reactant_terms) + " → " + " + ".join(product_terms)
     return reaction_str

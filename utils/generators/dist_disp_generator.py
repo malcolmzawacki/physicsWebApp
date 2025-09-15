@@ -25,7 +25,11 @@ class DistDispGenerator(BaseGenerator):
         elif problem_type == "Two Dimensional":
             return self.distance_and_displacement_2D(difficulty)
 
-    
+    def choose_problem_dict(self, problem_type: str, difficulty: str):
+        if problem_type == "One Dimensional":
+            return self.distance_and_displacement_1D(difficulty)
+        elif problem_type == "Two Dimensional":
+            return self.distance_and_displacement_2D(difficulty)
     
     def get_step_num(self,difficulty):
         if difficulty == "Easy":
@@ -78,7 +82,8 @@ class DistDispGenerator(BaseGenerator):
         else:
             direction = "None"
         displacement = abs(displacement)
-        return question, [distance, displacement, direction], label_set, movements
+        answers = [distance, displacement, direction]
+        return {"question": question, "answers": answers, "units": label_set, "diagram_data": movements}
     
 
     def distance_and_displacement_2D(self,difficulty):

@@ -86,7 +86,7 @@ def linear_fns():
 
     ui = interface(prefix,title,
                     LinearMotionGenerator(),problem_type_dict,difficulties)
-    ui.default_layout()
+    ui.unified_smart_layout()
 
 
 def projectile_fns():
@@ -114,7 +114,7 @@ def projectile_fns():
     prefix = "projectiles"
     ui = interface(prefix,title,ProjectileGenerator(),
                     problem_type_dict,difficulties,True)
-    ui.default_layout()
+    ui.unified_smart_layout()
 
 
 def position_and_velocity_graph_analysis():
@@ -145,7 +145,7 @@ def position_and_velocity_graph_analysis():
     difficulties = ["Easy", "Medium", "Hard"]
     generator = MotionGraphGenerator()
     ui = interface("motion_graph", "Graph Analysis", generator, problem_type_dict, difficulties)
-    ui.button_layout(display_function=generator.display_current_graph)
+    ui.unified_smart_layout(side_by_side=True, equations=False, expanded=True)
 
 
 def PvT_and_VvT_graph_matching():
