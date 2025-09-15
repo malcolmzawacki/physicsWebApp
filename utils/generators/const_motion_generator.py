@@ -184,16 +184,16 @@ class ConstantMotionGenerator(BaseGenerator):
             # asks for distance, displacement, speed, and velocity
             d3,t3,s3 = self.inst_speed()
             sign_change2 = ri(0,1)
-            if sign_change == 0:
+            if sign_change2 == 0:
                 d3*=-1
                 direct3 = "to the left"
             else:
                 direct3 = "to the right"
             disp = d1 + d2 + d3
-            velocity = round(disp/(t1+t2),3)
+            velocity = round(disp/(t1+t2+t3),3)
             d1, d2, d3 = abs(d1), abs(d2), abs(d3)
             dist = d1 + d2 + d3
-            speed  = round((dist)/(t1+t2),3)
+            speed  = round((dist)/(t1+t2+t3),3)
             answer = [dist, disp, speed, velocity]
             unit = ["Total Distance (m)","Net Displacement (m)","Average Speed (m/s)", "Average Velocity (m/s)"]
             question = f"""A {noun} travels at {s1} m/s {direct1} for {t1} seconds,
