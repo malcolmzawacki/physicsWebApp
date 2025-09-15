@@ -70,7 +70,7 @@ class WaveGenerator(BaseGenerator):
             {wavelength} meters. \n\n What is the frequency of the wave?"""
             answer = frequency
             unit = "Frequency (Hz)"
-            pass
+    
         return {"question": question, "answers": [answer], "units": [unit]}
     
     def string_harmonics(self,difficulty):

@@ -215,7 +215,7 @@ class LinearMotionGenerator(BaseGenerator):
                     question = f"""A {noun} decelerates from {v_f} m/s to {v_i} m/s at {-1*a} m/s². \
                     How far did it travel?"""
 
-        return question, [answer], [unit], None
+        return {"question": question, "answers": [answer], "units": [unit]}
             
     "Formatting on HARD here could be improved to state direction textually. still includes negative signs. gotta ship something tho"
     def no_dist_question(self, difficulty):
@@ -309,7 +309,7 @@ class LinearMotionGenerator(BaseGenerator):
                 question = f"""A {noun} {verb} at {a} m/s² from {v_i} m/s to {v_f} m/s. \
                 How long does it take?"""
 
-        return question, [answer], [unit], None
+        return {"question": question, "answers": [answer], "units": [unit]}
 
     
     def no_acc_question(self,difficulty):
@@ -428,7 +428,7 @@ class LinearMotionGenerator(BaseGenerator):
                     traveling {abs(x)} meters {direction_phrase}.
                     What is the final velocity of the {noun}?"""
 
-        return question, [answer], [unit], None
+        return {"question": question, "answers": [answer], "units": [unit]}
     
     def no_vf_question(self,difficulty):
         "has x, needs a, vi, t -> (for easy, hard only)"
@@ -496,7 +496,7 @@ class LinearMotionGenerator(BaseGenerator):
 
 
 
-        return question, [answer], [unit], None
+        return {"question": question, "answers": [answer], "units": [unit]}
     
     def mixed_question(self,difficulty):
         dice = random.randint(0,3)
@@ -518,6 +518,20 @@ class LinearMotionGenerator(BaseGenerator):
 
     
     def choose_problem(self,problem_type, difficulty):
+        if problem_type == "No Time":
+            return self.no_time_question(difficulty)
+        elif problem_type == "No Distance":
+            return self.no_dist_question(difficulty)
+        elif problem_type == "No Acceleration":
+            return self.no_acc_question(difficulty)
+        elif problem_type == "No Final Velocity":
+            return self.no_vf_question(difficulty)
+        elif problem_type == "Mixed":
+            return self.mixed_question(difficulty)
+        else:
+            pass
+    
+    def choose_problem_dict(self,problem_type, difficulty):
         if problem_type == "No Time":
             return self.no_time_question(difficulty)
         elif problem_type == "No Distance":
