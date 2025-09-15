@@ -49,7 +49,7 @@ class energy_basics:
         problem_type_dict, difficulties = energy_basics.question_parameters()
         generator = EnergyGenerator()
         ui = interface(prefix,title,generator,problem_type_dict,difficulties)
-        ui.default_layout()
+        ui.unified_smart_layout()
 
 
 
@@ -91,7 +91,7 @@ class energy_conservation:
         generator = EnergyGenerator()
         
         ui = interface(prefix,title,generator,problem_type_dict,difficulties)
-        ui.default_layout()
+        ui.unified_smart_layout()
 
 # for updating thermal as backend is completed
 def question_parameters():
@@ -153,7 +153,7 @@ class thermal:
         problem_type_dict, difficulties = thermal.question_parameters()
         generator = EnergyGenerator()
         ui = interface(prefix,title,generator,problem_type_dict,difficulties)
-        ui.default_layout()
+        ui.unified_smart_layout()
 
 def main():
     # Add tabs for quiz and explorer modes

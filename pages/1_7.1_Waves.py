@@ -121,7 +121,7 @@ def deciBel_practice():
     prefix = "deciBels_"
     ui = interface(prefix,title,WaveGenerator(),
                     problem_type_dict,difficulties,True)
-    ui.default_layout()
+    ui.unified_smart_layout()
 
 
 def main():

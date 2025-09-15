@@ -31,7 +31,7 @@ class collisions:
         problem_type_dict, difficulties = collisions.question_parameters()
         generator = CollisionGenerator()
         ui = interface(prefix,title,generator,problem_type_dict,difficulties)
-        ui.default_layout()
+        ui.unified_smart_layout()
 
 
 if __name__ == "__main__":

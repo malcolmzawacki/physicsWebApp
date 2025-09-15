@@ -36,7 +36,7 @@ class forces:
         problem_type_dict, difficulties = forces.question_parameters()
         generator = ForceGenerator()
         ui = interface(prefix,title,generator,problem_type_dict,difficulties)
-        ui.default_layout()
+        ui.unified_smart_layout()
 
 def main():
      tab1,tab2 = st.tabs(["Newton's Second Law","TBD"])

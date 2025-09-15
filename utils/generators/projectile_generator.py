@@ -153,20 +153,17 @@ class ProjectileGenerator(BaseGenerator):
                 question = f"If a {object_name} was {verb} horizontally off of a cliff and lands at {v_r:.2f} m/s at a {theta:.2f} degree angle, how fast was it {verb}, and from how high?"
                 answers = [v_x, d_y]
                 units = ["Initial Velocity (m/s)","Cliff Height (m)"]
-                answer2 = d_y
-                unit2 = "Cliff Height (m)"
+
             elif choice == 2:
                 question = f"If a {object_name} is {verb} horizontally off of a cliff at {v_x:.2f} m/s, and lands {d_x:.2f} m away, what speed and angle does it land with?"
                 answers = [v_r, theta]
                 units = ["Final Velocity (m/s)","Angle (degrees)"]
-                answer2 = theta
-                unit2 = "Angle (degrees)"
+
             else:
                 question = f"A {object_name} is {verb} horizontally off of a {d_y:.2f} m cliff, and lands at a {theta:.2f} degree angle, with what speed did it land, and how far from the base of the cliff?"
                 answers = [v_r, d_x]
                 units = ["Overall Final Velocity (m/s)","Horizontal Distance (m)"]
-                answer2 = d_x
-                unit2 = "Horizontal Distance (m)"
+
         
         return {"question": question, "answers": answers, "units": units}
 

@@ -318,8 +318,9 @@ def constant_motion():
     prefix = "const_motion_"
     ui = interface(prefix,title,ConstantMotionGenerator(),
                     problem_type_dict,difficulties,True)
-    ui.default_layout()
+    ui.unified_smart_layout()
 
+    
 def main():
     # Add tabs for quiz and explorer modes
     tab1,tab2,tab3,tab4,tab5 = st.tabs([
