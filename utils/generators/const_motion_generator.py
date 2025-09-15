@@ -30,6 +30,16 @@ class ConstantMotionGenerator(BaseGenerator):
         if problem_type == "Combined Constant Motion":
             return self.combined_constant_question(difficulty)
 
+    def choose_problem_dict(self, problem_type: str, difficulty: str):
+        if problem_type == "Constant Speed":
+            return self.inst_speed_question()
+        if problem_type == "Average Speed":
+            return self.average_speed_question(difficulty)
+        if problem_type == "Average Velocity":
+            return self.average_velocity_question(difficulty)
+        if problem_type == "Combined Constant Motion":
+            return self.combined_constant_question(difficulty)
+
     def inst_speed(self):
         time = ri(10, 50)
         speed = ri(10, 50)
@@ -55,7 +65,7 @@ class ConstantMotionGenerator(BaseGenerator):
             unit = "Speed (m/s)"
             question = f"""A {noun} moves {dist} meters over {time} seconds. 
             \n\nHow fast was the {noun} moving?"""
-        return question, [answer], [unit], None
+        return {"question": question, "answers": [answer], "units": [unit]}
     
     def average_speed_question(self, difficulty):
         d1,t1,s1 = self.inst_speed()
@@ -86,7 +96,7 @@ class ConstantMotionGenerator(BaseGenerator):
              \n\n and finally {d3} meters in {t3} seconds.
               \n\n What is the average speed of the {noun}? """
         
-        return question, [answer], [unit], None
+        return {"question": question, "answers": [answer], "units": [unit]}
     
 
     def average_velocity_question(self, difficulty):
@@ -137,7 +147,7 @@ class ConstantMotionGenerator(BaseGenerator):
              \n\n and finally {d3} meters {direct3} in {t3} seconds.
               \n\n What is the average velocity of the {noun}? """
         
-        return question, [answer], [unit], None
+        return {"question": question, "answers": [answer], "units": [unit]}
     
 
 
@@ -202,4 +212,4 @@ class ConstantMotionGenerator(BaseGenerator):
               \n\n What is the total distance travelled by the {noun}? What is the net displacement?
               \n\n What is the average speed of the {noun}? The average velocity?"""
         
-        return question, answer, unit, None
+        return {"question": question, "answers": answer, "units": unit}
