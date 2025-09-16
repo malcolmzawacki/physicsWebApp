@@ -34,7 +34,6 @@ class Org:
         return sections
 
 
-
     def unit1_practice_doc(self):
 
         sections = [
@@ -70,14 +69,15 @@ class Org:
     def constant_motion_quiz(self):
 
         sections = [
-            {
-            "heading": "Distance and Displacement",
-            "problems": [self.DDG.distance_and_displacement_1D(difficulty="Medium") for _ in range(3)],
-            "gap": 2
-            },
+            
             {
             "heading": "Constant Speed",
             "problems": [self.CM.inst_speed_question() for _ in range(5)],
+            "gap": 2
+            },
+            {
+            "heading": "Distance and Displacement",
+            "problems": [self.DDG.distance_and_displacement_1D(difficulty="Easy") for _ in range(1)] +  [self.DDG.distance_and_displacement_1D(difficulty="Medium") for _ in range(1)] + [self.DDG.distance_and_displacement_1D(difficulty="Hard") for _ in range(1)],
             "gap": 2
             },
             {
@@ -87,12 +87,12 @@ class Org:
             },
             {
             "heading": "Average Velocity",
-            "problems": [self.CM.average_velocity_question("Medium") for _ in range(5)],
+            "problems": [self.CM.average_velocity_question("Easy") for _ in range(2)]+[self.CM.average_velocity_question("Medium") for _ in range(2)],
             "gap": 2
             },
              {
             "heading": "Combined Constant",
-            "problems": [self.CM.combined_constant_question("Medium") for _ in range(5)],
+            "problems": [self.CM.combined_constant_question("Medium") for _ in range(2)]+[self.CM.combined_constant_question("Hard") for _ in range(1)],
             "gap": 2
             },
         ]

@@ -53,18 +53,18 @@ class ConstantMotionGenerator(BaseGenerator):
         if p == 0:
             answer = dist
             unit = "Distance (m)"
-            question = f"""A {noun} spends {time} seconds moving at {speed} m/s. 
-            \n\nHow much distance was travelled?"""
+            question = (f"A {noun} spends {time} seconds moving at {speed} m/s. \n" 
+            " \n How much distance was travelled?")
         if p == 1:
             answer = time
             unit = "Time (sec)"
             question = f"""A {noun} moves at {speed} m/s, covering {dist} meters of distance. 
-            \n\nHow long did it take to do this?"""
+            \nHow long did it take to do this?"""
         if p == 2:
             answer = speed
             unit = "Speed (m/s)"
             question = f"""A {noun} moves {dist} meters over {time} seconds. 
-            \n\nHow fast was the {noun} moving?"""
+            \nHow fast was the {noun} moving?"""
         return {"question": question, "answers": [answer], "units": [unit]}
     
     def average_speed_question(self, difficulty):
@@ -77,24 +77,24 @@ class ConstantMotionGenerator(BaseGenerator):
             answer = round((d1+d2)/(t1+t2),3)
             unit = "Average Speed (m/s)"
             question = f"""A {noun} travels {d1} meters in {t1} seconds,
-             \n\n then {d2} meters in {t2} seconds.
-              \n\n What is the average speed of the {noun}? """
+             \n then {d2} meters in {t2} seconds.
+              \n What is the average speed of the {noun}? """
         if difficulty == "Medium":
             # gives speed and d, t, have to calculate
             answer = round((d1+d2)/(t1+t2),3)
             unit = "Average Speed (m/s)"
             question = f"""A {noun} travels at {s1} m/s for {t1} seconds,
-             \n\n then {s2} m/s over {d2} meters.
-              \n\n What is the average speed of the {noun}? """
+             \n then {s2} m/s over {d2} meters.
+              \n What is the average speed of the {noun}? """
         if difficulty == "Hard":
             # three segments ****can vary order/combination later
             d3,t3,s3 = self.inst_speed()
             answer = round((d1+d2+d3)/(t1+t2+t3),3)
             unit = "Average Speed (m/s)"
             question = f"""A {noun} travels at {s1} m/s for {t1} seconds,
-             \n\n then {s2} m/s over {d2} meters,
-             \n\n and finally {d3} meters in {t3} seconds.
-              \n\n What is the average speed of the {noun}? """
+             \n then {s2} m/s over {d2} meters,
+             \n and finally {d3} meters in {t3} seconds.
+              \n What is the average speed of the {noun}? """
         
         return {"question": question, "answers": [answer], "units": [unit]}
     
@@ -120,16 +120,16 @@ class ConstantMotionGenerator(BaseGenerator):
             d1, d2 = abs(d1), abs(d2)
             unit = "Average Velocity (m/s)"
             question = f"""A {noun} travels {d1} meters {direct1} in {t1} seconds,
-             \n\n then {d2} meters {direct2} in {t2} seconds.
-              \n\n What is the average velocity of the {noun}? """
+             \n then {d2} meters {direct2} in {t2} seconds.
+              \n What is the average velocity of the {noun}? """
         if difficulty == "Medium":
             # gives speed and d, t, have to calculate
             answer = round((d1+d2)/(t1+t2),3)
             d1, d2 = abs(d1), abs(d2)
             unit = "Average Velocity (m/s)"
             question = f"""A {noun} travels at {s1} m/s {direct1} for {t1} seconds,
-             \n\n then {s2} m/s {direct2} over {d2} meters.
-              \n\n What is the average velocity of the {noun}? """
+             \n then {s2} m/s {direct2} over {d2} meters.
+              \n What is the average velocity of the {noun}? """
         if difficulty == "Hard":
             # three segments ****can vary order/combination later
             d3,t3,s3 = self.inst_speed()
@@ -143,9 +143,9 @@ class ConstantMotionGenerator(BaseGenerator):
             d1, d2, d3 = abs(d1), abs(d2), abs(d3)
             unit = "Average Velocity (m/s)"
             question = f"""A {noun} travels at {s1} m/s {direct1} for {t1} seconds,
-             \n\n then {s2} m/s {direct2} for {d2} meters,
-             \n\n and finally {d3} meters {direct3} in {t3} seconds.
-              \n\n What is the average velocity of the {noun}? """
+             \n then {s2} m/s {direct2} for {d2} meters,
+             \n and finally {d3} meters {direct3} in {t3} seconds.
+              \n What is the average velocity of the {noun}? """
         
         return {"question": question, "answers": [answer], "units": [unit]}
     
@@ -175,8 +175,8 @@ class ConstantMotionGenerator(BaseGenerator):
             answer = [speed, velocity]
             unit = ["Average Speed (m/s)", "Average Velocity (m/s)"]
             question = f"""A {noun} travels {d1} meters {direct1} in {t1} seconds,
-             \n\n then {d2} meters {direct2} in {t2} seconds.
-              \n\n What is the average speed of the {noun}? The average velocity?"""
+             \n then {d2} meters {direct2} in {t2} seconds.
+              \n What is the average speed of the {noun}? The average velocity?"""
         if difficulty == "Medium":
             # asks for distance, displacement, speed, and velocity
             disp = d1 + d2
@@ -187,9 +187,9 @@ class ConstantMotionGenerator(BaseGenerator):
             answer = [dist, disp, speed, velocity]
             unit = ["Total Distance (m)","Net Displacement (m)","Average Speed (m/s)", "Average Velocity (m/s)"]
             question = f"""A {noun} travels at {s1} m/s {direct1} for {t1} seconds,
-             \n\n then {s2} m/s {direct2} over {d2} meters.
-             \n\n What is the total distance travelled by the {noun}? What is the net displacement?
-              \n\n What is the average speed of the {noun}? The average velocity?"""
+             \n then {s2} m/s {direct2} over {d2} meters.
+             \n What is the total distance travelled by the {noun}? What is the net displacement?
+              \n What is the average speed of the {noun}? The average velocity?"""
         if difficulty == "Hard":
             # asks for distance, displacement, speed, and velocity
             d3,t3,s3 = self.inst_speed()
@@ -207,9 +207,9 @@ class ConstantMotionGenerator(BaseGenerator):
             answer = [dist, disp, speed, velocity]
             unit = ["Total Distance (m)","Net Displacement (m)","Average Speed (m/s)", "Average Velocity (m/s)"]
             question = f"""A {noun} travels at {s1} m/s {direct1} for {t1} seconds,
-             \n\n then {s2} m/s {direct2} for {d2} meters,
-             \n\n and finally {d3} meters {direct3} in {t3} seconds.
-              \n\n What is the total distance travelled by the {noun}? What is the net displacement?
-              \n\n What is the average speed of the {noun}? The average velocity?"""
+             \n then {s2} m/s {direct2} for {d2} meters,
+             \n and finally {d3} meters {direct3} in {t3} seconds.
+              \n What is the total distance travelled by the {noun}? What is the net displacement?
+              \n What is the average speed of the {noun}? The average velocity?"""
         
         return {"question": question, "answers": answer, "units": unit}

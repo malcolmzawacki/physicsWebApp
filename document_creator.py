@@ -11,7 +11,7 @@ def create_documents(title: str, questions: list[dict], number_of_docs: int):
   for doc_num in range(1, number_of_docs + 1):
       # Add test header
       doc.add_heading(f'{title} {doc_num}', 0)
-      doc.add_paragraph(f'Name: ________________________________ Date: __________________')
+      doc.add_paragraph(f'Name: _____________________________________________ Date: __________________')
       
       # Generate problems here
       problem_number = 1
@@ -25,7 +25,11 @@ def create_documents(title: str, questions: list[dict], number_of_docs: int):
          spaces = section["gap"]
          section_answers = []
          for problem in section["problems"]:
-            clean_question = problem["question"].replace('\n', ' ').replace('  ', ' ').strip()
+            clean_question = problem["question"].split(" ")
+            clean_tuple = ()
+            for word in clean_question:
+                clean_tuple += tuple((word, " "))
+            clean_question = "".join(tuple(clean_tuple))
             doc.add_paragraph(f'{problem_number}. {clean_question}')
 
             if "graph" in problem:
@@ -34,7 +38,15 @@ def create_documents(title: str, questions: list[dict], number_of_docs: int):
             for i in range(spaces):
                 doc.add_paragraph()
             answers = problem["answers"]
-            section_answers.append(f"{problem_number}. {answers}")
+            units = problem["units"]
+            answer_tuple = ()
+            for answer, unit in zip(answers, units):
+                unit_split = unit.split('(')
+                unit = unit_split[1].replace(')','')
+                answer = tuple(f"{answer} {unit},   ")
+                answer_tuple += answer
+            answer_str = "".join(answer_tuple)
+            section_answers.append(f"{problem_number}. {answer_str}")
             problem_number += 1
           
          version_answers[f"Section {section_num}: {heading}"] = section_answers
