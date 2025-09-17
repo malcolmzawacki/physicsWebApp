@@ -2,7 +2,7 @@ from document_creator import create_doc
 
 from question_organizer import Org
 title = "Constant Motion Quiz"
-number_of_docs = 3
+number_of_docs = 4
 org = Org()
 
 question_generator = org.constant_motion_quiz()

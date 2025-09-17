@@ -93,13 +93,49 @@ def projectile_fns():
         
     problem_type_dict = {
         "Type 1": {
-                "honors": r"""currently under construction, ask your teacher to hurry up!""",
+                "honors": r"""
+                v_{yi} \; = \; 0
+                \newline ~ \newline ~ \newline
+                x \; = \; v_x \cdot t   
+                \newline ~ \newline ~ \newline
+                v_{yf}^2 = v_{yi}^2 + 2gy \quad ,
+                \quad v_{yf} = v_{yi} +gt  \quad ,
+                \quad y = \frac{v_{yf} + v_{yi}}{2} t  \quad ,
+                \quad y = v_{yi} t + \frac{1}{2} gt^2
+                """,
 
-                "conceptual": r"""currently under construction, ask your teacher to hurry up!
+                "conceptual": r"""
+                x \;=\; v_x \cdot t \quad , \quad v_x \;=\; \frac{x}{t} \quad , \quad t\;=\; \frac{x}{v_x}
+                \newline ~ \newline ~ \newline
+                y\;=\; \frac{1}{2} gt^2 \quad , \quad v_{y0} \;=\; 0 \quad , \quad  
+                v_{yf} \;=\; gt \quad , \quad t \;=\; \sqrt{\frac{2y}{g}}
+                \newline ~ \newline ~ \newline
+                v_f \;=\; \sqrt{v_x^2 \;+\; v_{yf}^2} \quad , \quad \theta \;=\; \tan^{-1} \Bigl( \frac{v_{yf}}{v_x} \Bigr)
                 """},
         "Type 2": {
-            "honors" : r"currently under construction, ask your teacher to hurry up!", 
-            "conceptual": r"""currently under construction, ask your teacher to hurry up!"""
+            "honors" : r"""
+                v_{yf} \; = \; - v_{yi}
+                \newline ~ \newline ~ \newline
+                x \; = \; v_x \cdot t   
+                \newline ~ \newline ~ \newline
+                v_{yf}^2 = v_{yi}^2 + 2gy \quad ,
+                \quad v_{yf} = v_{yi} +gt  \quad ,
+                \quad y = \frac{v_{yf} + v_{yi}}{2} t  \quad ,
+                \quad y = v_{yi} t + \frac{1}{2} gt^2
+                """, 
+            "conceptual": r"""
+                x \;=\; v_x \cdot t \quad , \quad 
+                v_x \;=\; \frac{x}{t} \;\; \textrm{or} \;\; v \cdot \cos(\theta)
+                \quad , \quad t\;=\; \frac{x}{v_x}
+                \newline ~ \newline ~ \newline
+                y_{max} \;=\; \frac{v_{yi}^2}{2g} 
+                \quad , \quad v_{yi} \;=\;  v \cdot \sin(\theta) \;\; \textrm{or} \;\; \frac{1}{2} gt
+                \quad , \quad v_{yf} \;=\; - v_{yi}
+                \quad , \quad t \;=\; 2 \sqrt{\frac{2y}{g}}
+                \newline ~ \newline ~ \newline
+                v_f \;=\; \sqrt{v_x^2 \;+\; v_{yf}^2} \quad , \quad \theta \;=\; \tan^{-1} \Bigl( \frac{v_{yf}}{v_x} \Bigr)
+
+            """
             },
         "Type 3": {
             "honors": r"currently under construction, ask your teacher to hurry up!",

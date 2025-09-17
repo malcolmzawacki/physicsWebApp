@@ -164,48 +164,39 @@ def create_doc(title: str, question_generator, number_of_docs: int):
 
             question_para = doc.add_paragraph(f'{problem_number}. {clean_question}')
             question_para.paragraph_format.keep_with_next = True
+            question_para.paragraph_format.keep_together = True
 
             # Check if this is a multipart question
             if is_multipart_question(problem):
                 # Create answer table for multipart questions
-                create_answer_table(doc, problem["units"], problem_number)
+                #q_table = create_answer_table(doc, problem["units"], problem_number)
                 
                 # Store formatted answer for answer key
                 answers = problem["answers"]
                 units = problem["units"]
-                answer_parts = []
+                answer_parts = ["Multiple Answers:"]
                 for answer, unit in zip(answers, units):
 
                     answer_parts.append(f"{unit}: {answer}")
-                answer_str = " | ".join(answer_parts)
+                answer_str = " \n ".join(answer_parts)
                 section_answers.append(f"{problem_number}. {answer_str}")
             else:
                 # Single-part question: use original spacing method
-                for i in range(spaces):
-                    doc.add_paragraph()
+                #for i in range(spaces):
+                    #doc.add_paragraph()
                 
                 # Store single answer for answer key
                 answer = problem["answers"][0]
-                unit = problem["units"][0].replace('(', '').replace(')', '').strip()
-                section_answers.append(f"{problem_number}. {answer} {unit}")
-            
-            problem_number += 1
+                unit = problem["units"][0]
+                section_answers.append(f"{problem_number}. {unit}: {answer}")
 
             if "graph" in problem:
                 from utils.graph_utils import embed_graph_in_doc
                 embed_graph_in_doc(doc, problem["graph"])
-            for i in range(spaces):
-                doc.add_paragraph()
-            answers = problem["answers"]
-            units = problem["units"]
-            answer_tuple = ()
-            for answer, unit in zip(answers, units):
-                unit_split = unit.split('(')
-                unit = unit_split[1].replace(')','')
-                answer = tuple(f"{answer} {unit},   ")
-                answer_tuple += answer
-            answer_str = "".join(answer_tuple)
-            section_answers.append(f"{problem_number}. {answer_str}")
+            for _ in range(spaces):
+                blank_para = doc.add_paragraph()
+                blank_para.paragraph_format.keep_together = True
+            
             problem_number += 1
           
          version_answers[f"Section {section_num}: {heading}"] = section_answers
@@ -220,15 +211,15 @@ def create_doc(title: str, question_generator, number_of_docs: int):
       doc.add_page_break()
 
 
-  doc.add_heading('Answer Key - All Versions', 0)
+  doc.add_heading('Answer Key - All Versions', 1)
   for version_dict in answer_key:
-          for version_name, sections in version_dict.items():
-              doc.add_heading(version_name, level=2)
-              for section_name, answers in sections.items():
-                  doc.add_heading(section_name, level=3)
-                  for answer in answers:
-                      doc.add_paragraph(answer)
-              doc.add_paragraph('')  # Space between versions
+    for version_name, sections in version_dict.items():
+        doc.add_heading(version_name, level=2)
+        for section_name, answers in sections.items():
+            doc.add_heading(section_name, level=3)
+            for answer in answers:
+                doc.add_paragraph(answer)
+    doc.add_page_break()            # Space between versions
 
   # Save main document
   file_name = f'{title}_x{number_of_docs}.docx'
