@@ -15,7 +15,8 @@ class ArithmeticGenerator(BaseGenerator):
     def __init__(self):
         super().__init__(state_prefix="arithmetic_")
 
-    def choose_problem(self, problem_type: str, difficulty: str):
+
+    def choose_problem_dict(self, problem_type: str, difficulty: str):
         if problem_type == "Multiplication":
             return self.multiplication_problem(difficulty)
         elif problem_type == "Division":
@@ -50,7 +51,7 @@ class ArithmeticGenerator(BaseGenerator):
         question = f"{first} X {second}"
         answer = first*second
         unit = "Product"
-        return question, [answer], [unit], None
+        return {"question": question, "answers": [answer], "units": [unit]}
     
 
     def division_problem(self, difficulty: str):
@@ -59,7 +60,7 @@ class ArithmeticGenerator(BaseGenerator):
         question = f"{third} ÷ {second}"
         answer = first
         unit = "Quotient"
-        return question, [answer], [unit], None
+        return {"question": question, "answers": [answer], "units": [unit]}
     
     
     def subtraction_problem(self,difficulty: str):
@@ -68,7 +69,7 @@ class ArithmeticGenerator(BaseGenerator):
         question = f"{third} - {second}"
         answer = first
         unit = "Difference"
-        return question, [answer], [unit], None
+        return {"question": question, "answers": [answer], "units": [unit]}
     
 
     def addition_problem(self, difficulty: str):
@@ -76,4 +77,4 @@ class ArithmeticGenerator(BaseGenerator):
         question = f"{first} + {second}"
         answer = first+second
         unit = "Sum"
-        return question, [answer], [unit], None
+        return {"question": question, "answers": [answer], "units": [unit]}

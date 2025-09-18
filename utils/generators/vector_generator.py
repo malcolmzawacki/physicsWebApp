@@ -64,7 +64,7 @@ class VectorGenerator(BaseGenerator):
         """
         answer = [x, y]
         unit = ["Horizontal (x) component", "Vertical (y) component"]
-        return question, answer, unit, [x,y]
+        return {"question": question, "answers": answer, "units": unit, "diagram_data": [x,y]}
 
 
 
@@ -77,7 +77,7 @@ class VectorGenerator(BaseGenerator):
         """
         answer = [r, theta]
         unit = ["Magnitude", f"Angle ({theta_str}) "]
-        return question, answer, unit, [x,y]
+        return {"question": question, "answers": answer, "units": unit, "diagram_data": [x,y]}
 
 
     def vector_sum(self) -> tuple:
@@ -95,7 +95,7 @@ class VectorGenerator(BaseGenerator):
         answer = [r, theta]
         unit = ["Magnitude", f"Angle ({theta_str})"]
         data = [[x1, y1, r1], [x2, y2, r2], [x_r, y_r, r]]
-        return question, answer, unit, data
+        return {"question": question, "answers": answer, "units": unit, "diagram_data": data}
 
 
     def generate_diagram(
@@ -211,9 +211,7 @@ class VectorGenerator(BaseGenerator):
         return fig
 
 
-
-
-    def choose_problem(self, problem_type, difficulty):
+    def choose_problem_dict(self, problem_type, difficulty):
         if problem_type == "Find Components":
             return self.component_problem()
         if problem_type == "Find Resultant":

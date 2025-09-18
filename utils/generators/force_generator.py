@@ -18,9 +18,6 @@ class ForceGenerator(BaseGenerator):
     def __init__(self):
         super().__init__(state_prefix="force_")
     
-    def generate_question(self, difficulty):
-
-        return self._generate_force_question(difficulty)
 
 
         
@@ -34,59 +31,58 @@ class ForceGenerator(BaseGenerator):
         return m, a, netForce, mu, appliedForce
        
     
-    def _generate_force_question(self, difficulty):
+    def generate_force_question(self, difficulty):
         range = self.get_difficulty_range(difficulty)
         m, a, netForce, mu, appliedForce = self.numbers(range)
         object1 = random_noun()
         if difficulty == "Easy":
-            answer2 = 0
-            unit2 = ""
+
             flip = random.randint(1,3)
             if flip == 1: # find acceleration
                  question = f"""A net force of {netForce:.2f} Newtons accelerates a {m:.2f} kg {object1}.
                  What is the resulting acceleration?"""
-                 answer = a
-                 unit = f"{object1} acceleration (m/s2)"
+                 answer = [a]
+                 unit = [f"{object1} acceleration (m/s2)"]
             elif flip == 2: # find net force
                 question = f"""A {m:.2f} kg {object1} accelerates at {a:.2f} m/s2.
                 What net Force caused this?"""
-                answer = netForce
-                unit = f"Net Force on {object1} (N)"
+                answer = [netForce]
+                unit = [f"Net Force on {object1} (N)"]
             else: #flip = 3, find mass
                 question = f"""A net force of {netForce:.2f} Newtons accelerates a {object1} at {a:.2f} m/s2.
                 What is the mass of the {object1}?"""
-                answer = m
-                unit = f"{object1} mass (kg)"
-            return question, [answer], [unit], None
+                answer = [m]
+                unit = [f"{object1} mass (kg)"]
+
         else:
             flip = random.randint(1,3)
             if flip == 1: # find friction, mu
                 question = f"""A {appliedForce} Newton force accelerates a {m:.2f} kg {object1} at {a:.2f} m/s2.
                 What is the net force on {object1}? What is the coefficient of friction?"""
-                answer = netForce
-                unit = f"Net Force (N)"
-                answer2 = mu
-                unit2 = f"coefficient of friction"
+                answer = [netForce, mu]
+                unit = [f"Net Force (N)",f"coefficient of friction"]
+
             elif flip == 2: # find acceleration
                 question = f"""A {appliedForce} Newton force accelerates a {m:.2f} kg {object1} over a surface with a
                  coefficient of friction of {mu:.2f} .
                 What is the net force on {object1}? What is the resulting acceleration?"""
-                answer = netForce
-                unit = f"Net Force (N)"
-                answer2 = a
-                unit2 = f"acceleration (m/s2)"
+                answer = [netForce, a]
+                unit = [f"Net Force (N)",f"acceleration (m/s2)"]
+
             else: # flip == 3, find applied force
                 question = f"""A {m:.2f} kg {object1} accelerates at {a:.2f} m/s2 
                 over a surface with a coefficient of friction of {mu:.2f} .
                 What is the net force on {object1}? What applied force produced this acceleration?"""
-                answer = netForce
-                unit = f"Net Force (N)"
-                answer2 = appliedForce
-                unit2 = f"Applied Force (N)"
+                answer = [netForce, appliedForce]
+                unit = [f"Net Force (N)",f"Applied Force (N)"]
+
     
-            return question, [answer, answer2], [unit, unit2], None
-    
-    def choose_problem(self,problem_type,difficulty):
+        return {"question": question, "answers": answer, "units": unit}
+        
+
+        
+    def choose_problem_dict(self,problem_type,difficulty):
         if problem_type == "Newton's Second Law":
-            return self._generate_force_question(difficulty)
+            return self.generate_force_question(difficulty)
+
 

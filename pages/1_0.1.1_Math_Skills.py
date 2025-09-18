@@ -44,7 +44,7 @@ class arithmetic:
         problem_type_dict, difficulties = arithmetic.question_parameters()
         generator = ArithmeticGenerator()
         ui = interface(prefix,title,generator,problem_type_dict,difficulties)
-        ui.rapid_layout()
+        ui.unified_smart_layout(timer=0.1)
 
 class algebra:
 

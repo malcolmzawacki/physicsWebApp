@@ -1,3 +1,8 @@
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent))
+
+
 from utils.generators.linear_motion_generator import LinearMotionGenerator
 from utils.generators.const_motion_generator import ConstantMotionGenerator
 from utils.generators.dist_disp_generator import DistDispGenerator

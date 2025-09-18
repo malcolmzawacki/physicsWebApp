@@ -109,28 +109,7 @@ class MotionGraphGenerator(BaseGenerator):
 
         return (fig, correct_direction, correct_motion_state)
 
-    def choose_problem(self, problem_type, difficulty):
-        """Required method for BaseGenerator pattern"""
-        # Store the graph_type chosen for this problem
-        graph_type = random.choice(self.graph_types)
-        
-        if problem_type == "Position-Time Graph":
-            fig, direction, motion_state = self.generate_position_time_graph(graph_type)
-            st.session_state[f"{self.state_prefix}current_graph"] = fig
-            question = "Analyze the position-time graph shown above. What is the direction and state of motion?"
-            return question, [direction, motion_state], ["Direction", "Motion State"], fig
-        
-        elif problem_type == "Velocity-Time Graph":
-            fig, direction, motion_state = self.generate_velocity_time_graph(graph_type)
-            st.session_state[f"{self.state_prefix}current_graph"] = fig
-            question = "Analyze the velocity-time graph shown above. What is the direction and state of motion?"
-            return question, [direction, motion_state], ["Direction", "Motion State"], fig
-        
-        # For the matching activities, we'll handle differently
-        else:
-            # Return a placeholder - matching will be handled separately
-            return "Matching activity requires a different interface", ["None"], ["None"], fig
-
+   
     def generate_diagram(
             self, 
             diagram_data: Any, 
@@ -162,7 +141,6 @@ class MotionGraphGenerator(BaseGenerator):
         return options
     
     def choose_problem_dict(self, problem_type, difficulty):
-        """Required method for BaseGenerator pattern"""
         # Store the graph_type chosen for this problem
         graph_type = random.choice(self.graph_types)
         units = ["Direction", "Motion State"]

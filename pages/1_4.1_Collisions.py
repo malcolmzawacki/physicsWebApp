@@ -7,9 +7,9 @@ from utils.generators.collision_generator import CollisionGenerator
 from utils.ui import interface
 
 class collisions:
+    
     @staticmethod
-    def question_parameters():
-        """Holds current options for questions for centralized updating"""
+    def main():
         problem_type_dict = {
             "Inelastic Collision": {
                 "honors": r"p_1 + p_2 = p'",
@@ -22,13 +22,9 @@ class collisions:
                 },
             }
         difficulties = ["Easy"]
-        return problem_type_dict, difficulties
-
-    @staticmethod
-    def main():
         title = "Collisions"
         prefix = "collisions"
-        problem_type_dict, difficulties = collisions.question_parameters()
+    
         generator = CollisionGenerator()
         ui = interface(prefix,title,generator,problem_type_dict,difficulties)
         ui.unified_smart_layout()

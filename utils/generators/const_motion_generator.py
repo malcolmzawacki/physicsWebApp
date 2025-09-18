@@ -18,17 +18,6 @@ class ConstantMotionGenerator(BaseGenerator):
     def __init__(self):
         super().__init__(state_prefix="const_motion_")
     
-    def choose_problem(self, problem_type: str, difficulty: str
-                       ) -> tuple[
-        str,list[float],list[str],list[tuple[str,float]]]:
-        if problem_type == "Constant Speed":
-            return self.inst_speed_question()
-        if problem_type == "Average Speed":
-            return self.average_speed_question(difficulty)
-        if problem_type == "Average Velocity":
-            return self.average_velocity_question(difficulty)
-        if problem_type == "Combined Constant Motion":
-            return self.combined_constant_question(difficulty)
 
     def choose_problem_dict(self, problem_type: str, difficulty: str):
         if problem_type == "Constant Speed":
@@ -46,21 +35,31 @@ class ConstantMotionGenerator(BaseGenerator):
         dist = speed*time
         return dist, time, speed
     
-    def inst_speed_question(self):
+    def inst_speed_question(self, solve_for = None) -> dict:
+        """
+        :param solve_for: Distance, Speed, or Time. If None, random
+        :type solve_for: str
+
+        :returns dict: question, answer, label (referred to as unit)
+        """
+
         dist, time, speed = self.inst_speed()
         noun = random_noun()
-        p = ri(0,2)
-        if p == 0:
+
+        if solve_for == None:
+            solve_for = random.choice(["Distance", "Speed", "Time"])
+
+        if solve_for == "Distance":
             answer = dist
             unit = "Distance (m)"
             question = (f"A {noun} spends {time} seconds moving at {speed} m/s. \n" 
             " \n How much distance was travelled?")
-        if p == 1:
+        if solve_for == "Time":
             answer = time
             unit = "Time (sec)"
             question = f"""A {noun} moves at {speed} m/s, covering {dist} meters of distance. 
             \nHow long did it take to do this?"""
-        if p == 2:
+        if solve_for == "Speed":
             answer = speed
             unit = "Speed (m/s)"
             question = f"""A {noun} moves {dist} meters over {time} seconds. 
@@ -68,6 +67,15 @@ class ConstantMotionGenerator(BaseGenerator):
         return {"question": question, "answers": [answer], "units": [unit]}
     
     def average_speed_question(self, difficulty):
+        """
+        :param difficulty: Easy, Medium, or Hard
+        :type difficulty: str
+
+        Easy gives the two distances and times needed to solve \n
+        Medium gives speed and time, then speed and distance (requires calculation to find other needed)\n
+        Hard is like medium, but gives 3 instead of 2 steps
+        """
+
         d1,t1,s1 = self.inst_speed()
         d2,t2,s2 = self.inst_speed()
         
@@ -100,6 +108,14 @@ class ConstantMotionGenerator(BaseGenerator):
     
 
     def average_velocity_question(self, difficulty):
+        """
+        :param difficulty: Easy, Medium, or Hard
+        :type difficulty: str
+
+        Easy gives the two displacements and times needed to solve \n
+        Medium gives speed and time, then speed and displacement(requires calculation to find other needed)\n
+        Hard is like medium, but gives 3 instead of 2 steps
+        """
         d1,t1,s1 = self.inst_speed()
         d2,t2,s2 = self.inst_speed()
         noun = random_noun()
@@ -153,6 +169,14 @@ class ConstantMotionGenerator(BaseGenerator):
 
     
     def combined_constant_question(self, difficulty):
+        """
+        :param difficulty: Easy, Medium, or Hard
+        :type difficulty: str
+
+        Easy gives the two displacements and times needed to solve, asks for speed and velocity \n
+        Medium gives speed and time, then speed and displacement (requires calculation to find other needed). Asks for distance, displacement, speed, and velocity\n
+        Hard is like medium, but gives 3 instead of 2 steps
+        """
         d1,t1,s1 = self.inst_speed()
         d2,t2,s2 = self.inst_speed()
         noun = random_noun()

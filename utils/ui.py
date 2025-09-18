@@ -785,7 +785,23 @@ class interface:
                     st.latex(equation)
 
     def unified_smart_layout(self, **kwargs):
-        """Smart layout that works with both legacy and dictionary generators"""
+        r"""
+        Smart layout that works with both legacy and dictionary generators
+
+        ## **kwargs
+
+            *equations* ``dict``
+                * will render an (open) dropdown of equations
+                * requires an honors and conceptual entry (different amounts of detail)
+
+            *timer* ``float``
+                * the amount of time the next question loads for, in seconds
+                * defaults to 3 seconds
+            
+            *side_by_side* ``bool``
+                * for graph formatting. If True, graph is next to, not under question
+
+        """
         self.initialize_session_state()
         self.header()
         
@@ -809,14 +825,14 @@ class interface:
                     if available_features.get('button_options'):
                         self.question_ui_buttons()
                     else:
-                        time_limit = available_features.get('time_limit', kwargs.get('timer', 180))
-                        self.question_ui_dict(timer=time_limit/60)
+                        timer =  kwargs.get('timer', 3)
+                        self.question_ui_dict(timer)
             else:   
                 if available_features.get('button_options'):
                     self.question_ui_buttons()
                 else:
-                    time_limit = available_features.get('time_limit', kwargs.get('timer', 180))
-                    self.question_ui_dict(timer=time_limit/60)
+                    timer =  kwargs.get('timer', 3)
+                    self.question_ui_dict(timer)
                 
                 if available_features.get('diagram_data') is not None:
                     self.add_diagram_smart(kwargs.get('diagram_title', 'Diagram'))
@@ -954,7 +970,7 @@ class interface:
                 if all_correct:
                     st.success(f"{random_correct_message()}")
                     st.session_state[f"{self.prefix}_stars"] += self.give_stars(difficulty,problem_type)
-                    self.loading_q_dict(3)
+                    self.loading_q_dict(timer)
                     
                 else:
                     for ans in correct_answers:
@@ -969,7 +985,7 @@ class interface:
             st.error("Please enter all answers before submitting")
 
     
-    def loading_q_dict(self,timer: float) -> None:
+    def loading_q_dict(self,timer: float = 3) -> None:
         """
         Displays a loading bar to show the next question is coming up
 

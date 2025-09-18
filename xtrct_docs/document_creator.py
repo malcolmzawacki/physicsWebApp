@@ -63,6 +63,9 @@ def create_answer_table(doc, problem_units, problem_number):
     final_answers_run = final_answers_para.add_run("Final Answers:")
     final_answers_run.bold = True
     
+    # Keep the "Final Answers:" label with the table
+    final_answers_para.paragraph_format.keep_with_next = True
+    
     # Create table with 2 rows and columns equal to number of answer parts
     num_parts = len(problem_units)
     table = doc.add_table(rows=2, cols=num_parts)
@@ -71,14 +74,35 @@ def create_answer_table(doc, problem_units, problem_number):
     # Set table style and format
     table.style = 'Table Grid'
     
+    # Keep table together and prevent it from breaking across pages
+    try:
+        from docx.oxml.shared import qn
+        from docx.oxml import OxmlElement
+        
+        # Access table properties and set keep together
+        tbl = table._element
+        tbl_pr = tbl.find(qn('w:tblPr'))
+        if tbl_pr is None:
+            tbl_pr = OxmlElement('w:tblPr')
+            tbl.insert(0, tbl_pr)
+        
+        # Add keep together property for the table
+        keep_together = OxmlElement('w:cantSplit')
+        keep_together.set(qn('w:val'), 'true')
+        tbl_pr.append(keep_together)
+        
+    except ImportError:
+        # If XML manipulation fails, continue without it
+        pass
+    
     # First row: unit labels
     for i, unit in enumerate(problem_units):
         # Clean up the unit string (remove parentheses if present)
-        clean_unit = unit.replace('(', '').replace(')', '').strip()
+        
         
         # Top row: unit label
         header_cell = table.cell(0, i)
-        header_cell.text = clean_unit
+        header_cell.text = unit
         header_cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         # Make header row bold
         for paragraph in header_cell.paragraphs:
@@ -96,7 +120,9 @@ def create_answer_table(doc, problem_units, problem_number):
     for row in table.rows:
         for i, cell in enumerate(row.cells):
             cell.width = column_width
-    table.rows[1].height = Inches(0.5)
+    
+    # Set the height of the answer row (second row, index 1)
+    table.rows[1].height = Inches(0.5)  # Good amount of writing room
 
 
 def keep_question_together(doc, question_paragraphs):
@@ -169,7 +195,8 @@ def create_doc(title: str, question_generator, number_of_docs: int):
             # Check if this is a multipart question
             if is_multipart_question(problem):
                 # Create answer table for multipart questions
-                #q_table = create_answer_table(doc, problem["units"], problem_number)
+                create_answer_table(doc, problem["units"], problem_number)
+ 
                 
                 # Store formatted answer for answer key
                 answers = problem["answers"]

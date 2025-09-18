@@ -18,6 +18,24 @@ class LinearMotionGenerator(BaseGenerator):
     def __init__(self):
         super().__init__(state_prefix="linear_")
 
+
+    def choose_problem_dict(self,problem_type, difficulty):
+        if problem_type == "No Time":
+            return self.no_time_question(difficulty)
+        elif problem_type == "No Distance":
+            return self.no_dist_question(difficulty)
+        elif problem_type == "No Acceleration":
+            return self.no_acc_question(difficulty)
+        elif problem_type == "No Final Velocity":
+            return self.no_vf_question(difficulty)
+        elif problem_type == "Mixed":
+            return self.mixed_question(difficulty)
+        else:
+            pass
+
+    
+
+
     def get_difficulty_range(self, difficulty):
         if difficulty == "Easy":
             return 5
@@ -517,30 +535,3 @@ class LinearMotionGenerator(BaseGenerator):
                 return self.no_vf_question(difficulty)
 
     
-    def choose_problem(self,problem_type, difficulty):
-        if problem_type == "No Time":
-            return self.no_time_question(difficulty)
-        elif problem_type == "No Distance":
-            return self.no_dist_question(difficulty)
-        elif problem_type == "No Acceleration":
-            return self.no_acc_question(difficulty)
-        elif problem_type == "No Final Velocity":
-            return self.no_vf_question(difficulty)
-        elif problem_type == "Mixed":
-            return self.mixed_question(difficulty)
-        else:
-            pass
-    
-    def choose_problem_dict(self,problem_type, difficulty):
-        if problem_type == "No Time":
-            return self.no_time_question(difficulty)
-        elif problem_type == "No Distance":
-            return self.no_dist_question(difficulty)
-        elif problem_type == "No Acceleration":
-            return self.no_acc_question(difficulty)
-        elif problem_type == "No Final Velocity":
-            return self.no_vf_question(difficulty)
-        elif problem_type == "Mixed":
-            return self.mixed_question(difficulty)
-        else:
-            pass

@@ -18,11 +18,10 @@ class BaseGenerator(ABC):
             return 20
     
 
+
+
     @abstractmethod
-    def choose_problem(self, problem_type: str, difficulty: str) -> tuple[str, list[float], list[str], Optional[Any]]:
-        """
-        Always return 4 values to avoid try/except (for diagrams, for now)
-        """
+    def choose_problem_dict(self, problem_type: str, difficulty: str):
         pass
 
 

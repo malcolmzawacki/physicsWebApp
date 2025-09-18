@@ -19,7 +19,19 @@ from utils.word_lists import random_noun, random_proj_verb # does not need
 class ProjectileGenerator(BaseGenerator):
     def __init__(self):
         super().__init__(state_prefix="proj_")
-        
+
+
+
+    def choose_problem_dict(self, problem_type, difficulty):
+        if problem_type == "Type 1":
+            return self._generate_type1_question(difficulty)
+
+        elif problem_type == "Type 2":
+            return self._generate_type2_question(difficulty)
+        else:  # Type 3
+            return self._generate_type3_question(difficulty)
+    
+     
     def m_n_array(self, max_val):
         m = 5
         n = 1
@@ -273,21 +285,3 @@ class ProjectileGenerator(BaseGenerator):
                 "units": [unit, unit2]}
     
 
-    def choose_problem(self, problem_type, difficulty):
-        if problem_type == "Type 1":
-            return self._generate_type1_question(difficulty)
-
-        elif problem_type == "Type 2":
-            return self._generate_type2_question(difficulty)
-        else:  # Type 3
-            return self._generate_type3_question(difficulty)
-    
-
-    def choose_problem_dict(self, problem_type, difficulty):
-        if problem_type == "Type 1":
-            return self._generate_type1_question(difficulty)
-
-        elif problem_type == "Type 2":
-            return self._generate_type2_question(difficulty)
-        else:  # Type 3
-            return self._generate_type3_question(difficulty)

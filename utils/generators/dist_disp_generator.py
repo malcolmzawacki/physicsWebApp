@@ -18,18 +18,14 @@ class DistDispGenerator(BaseGenerator):
     def __init__(self):
         super().__init__(state_prefix="disp_")
     
-    def choose_problem(self, problem_type: str, difficulty: str) ->tuple[
-        str,list[float],list[str],list[tuple[str,float]]]:
-        if problem_type == "One Dimensional":
-            return self.distance_and_displacement_1D(difficulty)
-        elif problem_type == "Two Dimensional":
-            return self.distance_and_displacement_2D(difficulty)
+
 
     def choose_problem_dict(self, problem_type: str, difficulty: str):
         if problem_type == "One Dimensional":
             return self.distance_and_displacement_1D(difficulty)
         elif problem_type == "Two Dimensional":
             return self.distance_and_displacement_2D(difficulty)
+        
     
     def get_step_num(self,difficulty):
         if difficulty == "Easy":
