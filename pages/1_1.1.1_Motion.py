@@ -124,22 +124,50 @@ def projectile_fns():
                 \quad y = v_{yi} t + \frac{1}{2} gt^2
                 """, 
             "conceptual": r"""
-                x \;=\; v_x \cdot t \quad , \quad 
-                v_x \;=\; \frac{x}{t} \;\; \textrm{or} \;\; v \cdot \cos(\theta)
-                \quad , \quad t\;=\; \frac{x}{v_x}
+                x \;=\; v_x \cdot t \quad , \quad  
+                y_{max} \;=\; \frac{v_{yi}^2}{2g} \quad \textrm{or} \quad \frac{1}{8}g t^2
                 \newline ~ \newline ~ \newline
-                y_{max} \;=\; \frac{v_{yi}^2}{2g} 
-                \quad , \quad v_{yi} \;=\;  v \cdot \sin(\theta) \;\; \textrm{or} \;\; \frac{1}{2} gt
+
+                v_x \;=\; \frac{x}{t} \quad \textrm{or} \quad v \cdot \cos(\theta)
+                \quad , \quad v_{yi} \;=\;  
+                v \cdot \sin(\theta) \quad \textrm{or} \quad \frac{1}{2} gt
                 \quad , \quad v_{yf} \;=\; - v_{yi}
-                \quad , \quad t \;=\; 2 \sqrt{\frac{2y}{g}}
                 \newline ~ \newline ~ \newline
-                v_f \;=\; \sqrt{v_x^2 \;+\; v_{yf}^2} \quad , \quad \theta \;=\; \tan^{-1} \Bigl( \frac{v_{yf}}{v_x} \Bigr)
+
+                t\;=\; \frac{x}{v_x} \;\; \textrm{or} 
+                \;\; 2 \sqrt{\frac{2y}{g}} \quad \textrm{or} \quad 
+                \frac{2v_{yi}}{g}
+                \newline ~ \newline ~ \newline
+
+                v_f \;=\; \sqrt{v_x^2 \;+\; v_{yf}^2} \quad \textrm{or} \quad
+                \frac{v_{yf}}{\sin(\theta)} \quad \textrm{or} \quad
+                \frac{v_x}{\cos(\theta)}
+                \newline ~ \newline ~ \newline
+                \theta \;=\; \tan^{-1} \Bigl( \frac{v_{yf}}{v_x} \Bigr) \quad \textrm{or} \quad
+                \sin^{-1} \Bigl( \frac{v_{yf}}{v_f} \Bigr) \quad \textrm{or} \quad
+                \cos^{-1} \Bigl( \frac{v_x}{v_f} \Bigr)
 
             """
             },
         "Type 3": {
-            "honors": r"currently under construction, ask your teacher to hurry up!",
-            "conceptual": r"""currently under construction, ask your teacher to hurry up!"""
+            "honors": r"""
+            x \; = \; v_x \cdot t   
+            \newline ~ \newline ~ \newline
+            v_{yf}^2 = v_{yi}^2 + 2gy \quad ,
+            \quad v_{yf} = v_{yi} +gt  \quad ,
+            \quad y = \frac{v_{yf} + v_{yi}}{2} t  \quad ,
+            \quad y = v_{yi} t + \frac{1}{2} gt^2
+                """,
+            "conceptual": r"""
+            \textrm{There are no simplifying tricks here, sorry!}
+            \newline ~ \newline ~ \newline
+            x \; = \; v_x \cdot t   
+            \newline ~ \newline ~ \newline
+            v_{yf}^2 = v_{yi}^2 + 2gy \quad ,
+            \quad v_{yf} = v_{yi} +gt  \quad ,
+            \quad y = \frac{v_{yf} + v_{yi}}{2} t  \quad ,
+            \quad y = v_{yi} t + \frac{1}{2} gt^2
+                """
         }
         }
     
