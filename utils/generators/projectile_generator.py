@@ -1,16 +1,8 @@
 # utils/generators/projectile_generator.py
 import math
 import random
-import sys
-from pathlib import Path
 
-try:
-    from .base_generator import BaseGenerator
-except ImportError:
-    import sys
-    from pathlib import Path
-    sys.path.append(str(Path(__file__).parent.parent.parent))
-    from utils.generators.base_generator import BaseGenerator
+from utils.generators.base_generator import BaseGenerator
 
 #from base_generator import BaseGenerator
 from utils.word_lists import random_noun, random_proj_verb # does not need 

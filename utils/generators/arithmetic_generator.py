@@ -1,15 +1,6 @@
 import random
-import sys
-from pathlib import Path
 
-sys.path.append(str(Path(__file__).parent.parent.parent))
-try:
-    from .base_generator import BaseGenerator
-except ImportError:
-    import sys
-    from pathlib import Path
-    sys.path.append(str(Path(__file__).parent.parent.parent))
-    from utils.generators.base_generator import BaseGenerator
+from utils.generators.base_generator import BaseGenerator
 
 class ArithmeticGenerator(BaseGenerator):
     def __init__(self):
