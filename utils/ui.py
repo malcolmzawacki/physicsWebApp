@@ -693,7 +693,7 @@ class interface:
         st.session_state[f"{self.prefix}_generation_format"] = 'dict'
         
         # Optional features
-        optional_features = ['diagram_data', 'hints', 'button_options', 'time_limit', 'explanation', 'tags', 'show_equations']
+        optional_features = ['diagram_data', 'hints', 'button_options', 'timer', 'explanation', 'tags', 'show_equations']
         for feature in optional_features:
             key = f"{self.prefix}_{feature}"
             if feature in result:
