@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import streamlit as st
-from utils.generators.motion_graph_generator import MotionGraphGenerator
 plt.style.use("dark_background")
 
 def input_plot(start = 2.8,end = 4,accuracy=0.001,reps=600,numtoplot=200):

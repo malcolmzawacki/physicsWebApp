@@ -1,8 +1,4 @@
-# pages/collisions.py
-import sys
-from pathlib import Path
-
-sys.path.append(str(Path(__file__).parent.parent))
+import streamlit as st
 from utils.generators.collision_generator import CollisionGenerator
 from utils.ui import interface
 

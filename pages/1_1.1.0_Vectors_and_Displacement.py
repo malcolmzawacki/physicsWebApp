@@ -1,15 +1,11 @@
 import streamlit as st
-import sys
-from pathlib import Path
-import numpy as np
 import matplotlib.pyplot as plt
-import random
-import pandas as pd
+
 
 # Use a dark background for matplotlib so it fits a "dark mode" style
 plt.style.use("dark_background")
 
-sys.path.append(str(Path(__file__).parent.parent))
+
 from utils.ui import interface
 
 
