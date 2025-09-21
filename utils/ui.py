@@ -5,14 +5,7 @@ import streamlit as st
 from utils.config import AUTHOR_MODE
 from utils.word_lists import random_correct_message, random_error_message
 from utils.ui_state import State
-from utils.ui_components import (
-    render_header,
-    build_performance_table,
-    performance_expander,
-    draw_answer_inputs,
-    render_button_options,
-    render_hints,
-)
+from utils.ui_components import (render_header, build_performance_table, performance_expander, draw_answer_inputs, render_button_options, render_hints, init_performance, record_performance, show_equations_expander, render_debug_panel)
 from utils.problem_payload import payload_from_dict, ProblemPayload, ProblemPayloadError
 
 
@@ -37,25 +30,18 @@ class Interface:
 
     # region performance
     def clear_performance_dataframe(self) -> dict:
-        performance_dict = {}
-        for p_type in self.problem_types:
-            performance_dict[p_type] = {}
-            for diff in self.difficulties:
-                performance_dict[p_type][diff] = {"attempts": 0, "correct": 0}
-        st.session_state[self.state.key("performance")] = performance_dict
-        return performance_dict
+        """Create a fresh performance dict (pure) using ui_components helper."""
+        return init_performance(self.problem_types, self.difficulties)
 
     def create_performance_dataframe(self) -> pd.DataFrame:
-        performance = st.session_state[self.state.key("performance")]
+        performance = self.state.get("performance")
         ordered = list(self.difficulties)
         return build_performance_table(performance, ordered)
 
     def update_performance(self, problem_type: str, difficulty: str, is_correct: bool) -> None:
-        performance = st.session_state[self.state.key("performance")]
-        performance[problem_type][difficulty]["attempts"] += 1
-        if is_correct:
-            performance[problem_type][difficulty]["correct"] += 1
-        st.session_state[self.state.key("performance")] = performance
+        performance = self.state.get("performance")
+        new_perf = record_performance(performance, problem_type, difficulty, is_correct)
+        self.state.set("performance", new_perf)
 
     def performance_dropdown(self) -> None:
         performance_df = self.create_performance_dataframe()
@@ -80,10 +66,11 @@ class Interface:
         for var in zero_vars:
             self.state.ensure(var, 0)
         # Performance tracking
-        self.state.ensure("performance", self.clear_performance_dataframe())
+        # Lazily initialize performance dict to avoid resetting on reruns
+        self.state.ensure_lazy("performance", lambda: init_performance(self.problem_types, self.difficulties))
         # Equation level toggle default
-        if self.state.key("level") not in st.session_state:
-            st.session_state[self.state.key("level")] = False
+        if self.state.get("level") is None:
+            self.state.set("level", False)
 
     def header_component(self) -> None:
         stars = self.state.get("stars", 0)
@@ -108,26 +95,18 @@ class Interface:
 
     def get_current_problem_features(self) -> dict:
         features = {}
-        for feature in [
-            "diagram_data",
-            "hints",
-            "button_options",
-            "time_limit",
-            "explanation",
-            "tags",
-            "show_equations",
-        ]:
-            key = self.state.key(feature)
-            if key in st.session_state:
-                features[feature] = st.session_state[key]
+        for feature in ["diagram_data", "hints", "button_options", "time_limit", "explanation", "tags", "show_equations"]:
+            val = self.state.get(feature)
+            if val is not None:
+                features[feature] = val
         return features
 
     def show_hints(self) -> None:
-        render_hints(st.session_state.get(self.state.key("hints"), []))
+        render_hints(self.state.get("hints", []))
 
     def show_problem_tags(self, tags: list) -> None:
         if tags:
-            st.caption(" • ".join(tags))
+            st.caption(" ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ ".join(tags))
 
     def generate_question_once(self, problem_type: str, difficulty: str) -> None:
         try:
@@ -161,11 +140,10 @@ class Interface:
         self.state.set("generation_format", "dict")
 
         for feature in ["diagram_data", "hints", "button_options", "timer", "explanation", "tags", "show_equations"]:
-            key = self.state.key(feature)
             if feature in result:
-                st.session_state[key] = result[feature]
-            elif key in st.session_state:
-                del st.session_state[key]
+                self.state.set(feature, result[feature])
+            else:
+                self.state.pop(feature)
 
     def _store_legacy_result(self, result: tuple, problem_type: str, difficulty: str) -> None:
         question, answers, units, diagram_data = result
@@ -178,7 +156,7 @@ class Interface:
         self.state.set("submitted", False)
         self.state.set("generation_format", "legacy")
         if diagram_data is not None:
-            st.session_state[self.state.key("diagram_data")] = diagram_data
+            self.state.set("diagram_data", diagram_data)
 
     def unified_question_options(self, equations: bool = True, ifDifficulty: bool = True) -> None:
         col1, col2, col3 = st.columns([3, 2, 2], vertical_alignment="bottom", gap="medium")
@@ -195,8 +173,8 @@ class Interface:
                 difficulty = "Easy"
         with col3:
             if equations:
-                st.session_state[f"{self.prefix}_level"] = st.checkbox(
-                    "More Equations", value=False, key=f"{self.prefix}_levels_check_unified"
+                lvl = st.checkbox(
+                    "More Equations", value=self.state.get('level',False), key=f"{self.prefix}_levels_check_unified"
                 )
 
         if (
@@ -207,13 +185,17 @@ class Interface:
             self.generate_question_once(selected_problem_type, difficulty)
 
         if equations:
-            self._show_equations_unified(selected_problem_type)
+            show_equations_expander(
+                generator=self.generator, 
+                problem_type= selected_problem_type, 
+                level= lvl, 
+                fallback_dict= self.problem_type_dict if hasattr(self, "problem_type_dict") else None, expanded=True)
 
     def _show_equations_unified(self, problem_type: str) -> None:
         with st.expander("equation(s)", expanded=True):
             if hasattr(self.generator, "get_problem_metadata"):
                 metadata = self.generator.get_problem_metadata(problem_type)
-                if st.session_state[f"{self.prefix}_level"]:
+                if self.state.get("level"):
                     equation = metadata.get("conceptual_equation", "")
                 else:
                     equation = metadata.get("honors_equation", "")
@@ -222,7 +204,7 @@ class Interface:
                     return
             if hasattr(self, "problem_type_dict"):
                 equation_dict = self.problem_type_dict.get(problem_type, {})
-                if st.session_state[f"{self.prefix}_level"]:
+                if self.state.get("level"):
                     equation = equation_dict.get("conceptual", "")
                 else:
                     equation = equation_dict.get("honors", "")
@@ -321,8 +303,9 @@ class Interface:
         st.write(self.state.get("current_question"))
         correct_answers = self.state.get("correct_answers", [])
         units = self.state.get("units", [])
-        if f"{self.prefix}_answer_options" not in st.session_state:
-            answer_options = self.generator.get_answer_options(units)
+        options = self.state.get("answer_options")
+        if options is None:
+            answer_options = self.generator.get_answer_options(units) or {}
             if not answer_options:
                 for i, unit in enumerate(units):
                     if unit == "Direction":
@@ -331,17 +314,18 @@ class Interface:
                         answer_options[i] = ["Constant Velocity", "Speeding Up", "Slowing Down"]
                     else:
                         answer_options[i] = []
-            st.session_state[f"{self.prefix}_answer_options"] = answer_options
+            self.state.set("answer_options", answer_options)
+            options = answer_options
         render_button_options(
             self.prefix,
             units,
-            st.session_state[f"{self.prefix}_answer_options"],
+            options,
             self.state.get("question_id", 0),
         )
         if st.button(
             "Submit Answers", key=f"{self.prefix}_submit_button_{self.state.get('question_id', 0)}"
         ):
-            user_answers = st.session_state[f"{self.prefix}_user_answers_selected"]
+            user_answers = self.state.get("user_answers_selected", [])
             if None in user_answers:
                 st.error("Please answer all questions before submitting.")
             else:
@@ -360,13 +344,13 @@ class Interface:
             self.state.set("submitted", True)
             if all_correct:
                 st.success(f"{random_correct_message()}")
-                st.session_state[f"{self.prefix}_stars"] += self.give_stars(difficulty, problem_type)
-                st.session_state[f"{self.prefix}_show_loading"] = True
+                self.state.set("stars", self.state.get("stars", 0) + self.give_stars(difficulty, problem_type))
+                self.state.set("show_loading", True)
             else:
                 answer_display = ", ".join([f"{ans}" for ans in correct_answers])
                 st.error(f"{random_error_message()} The correct answers are: {answer_display}.")
-                st.session_state[f"{self.prefix}_show_loading"] = True
-        st.session_state[f"{self.prefix}_user_answers_selected"] = [None] * len(correct_answers)
+                self.state.set("show_loading", True)
+        self.state.set("user_answers_selected", [None] * len(correct_answers))
 
     def check_answers_dict(self, user_answers: list, timer: float):
         correct_answers = self.state.get("correct_answers", [])
@@ -386,7 +370,7 @@ class Interface:
                 self.state.set("submitted", True)
                 if all_correct:
                     st.success(f"{random_correct_message()}")
-                    st.session_state[f"{self.prefix}_stars"] += self.give_stars(difficulty, problem_type)
+                    self.state.set("stars", self.state.get("stars", 0) + self.give_stars(difficulty, problem_type))
                     self.loading_q_dict(timer)
                 else:
                     answers_disp = []

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 import streamlit as st
-from typing import Dict
+from typing import Dict, Optional
 
 
 def render_header(title: str, stars: int | None = None) -> None:
@@ -44,6 +44,83 @@ def build_performance_table(performance: Dict[str, Dict[str, Dict[str, int]]], o
 def performance_expander(df: pd.DataFrame) -> None:
     with st.expander("Your Performance", expanded=False):
         st.dataframe(df)
+
+
+def init_performance(problem_types: list[str], difficulties: list[str]) -> Dict[str, Dict[str, Dict[str, int]]]:
+    """Create a fresh performance tracking dict structure.
+
+    Returns: { problem_type: { difficulty: { 'attempts': int, 'correct': int } } }
+    """
+    perf: Dict[str, Dict[str, Dict[str, int]]] = {}
+    for p in problem_types:
+        perf[p] = {}
+        for d in difficulties:
+            perf[p][d] = {"attempts": 0, "correct": 0}
+    return perf
+
+
+def record_performance(perf: Dict[str, Dict[str, Dict[str, int]]], problem_type: str, difficulty: str, is_correct: bool) -> Dict[str, Dict[str, Dict[str, int]]]:
+    """Update an existing performance dict for a submission.
+
+    Mutates the provided dict and returns it for convenience.
+    """
+    if problem_type not in perf:
+        perf[problem_type] = {}
+    if difficulty not in perf[problem_type]:
+        perf[problem_type][difficulty] = {"attempts": 0, "correct": 0}
+    perf[problem_type][difficulty]["attempts"] += 1
+    if is_correct:
+        perf[problem_type][difficulty]["correct"] += 1
+    return perf
+
+
+def show_equations_expander(
+    generator: object,
+    problem_type: str,
+    level: bool,
+    fallback_dict: Optional[dict] = None,
+    expanded: bool = True,
+) -> None:
+    """Render the equations expander using generator metadata with optional fallback.
+
+    - generator: expects optional get_problem_metadata(problem_type) -> dict
+    - level: False = honors_equation, True = conceptual_equation
+    - fallback_dict: optional { problem_type: { 'honors': str, 'conceptual': str } }
+    """
+    with st.expander("equation(s)", expanded=expanded):
+        # Try generator metadata first
+        if hasattr(generator, "get_problem_metadata"):
+            try:
+                metadata = generator.get_problem_metadata(problem_type)
+                equation = metadata.get("conceptual_equation" if level else "honors_equation", "")
+                if equation:
+                    st.latex(equation)
+                    return
+            except Exception:
+                pass
+        # Fallback to provided dict
+        if fallback_dict is not None:
+            entry = fallback_dict.get(problem_type, {})
+            equation = entry.get("conceptual" if level else "honors", "")
+            if equation:
+                st.latex(equation)
+
+
+def render_debug_panel(
+    problem_type: Optional[str],
+    difficulty: Optional[str],
+    answers: list,
+    units: list,
+    features: dict,
+) -> None:
+    try:
+        with st.expander("Debug", expanded=False):
+            st.write(f"Type: {problem_type} | Difficulty: {difficulty}")
+            st.write(f"Answers: {answers}")
+            st.write(f"Units: {units}")
+            st.json(features)
+    except Exception as e:
+        st.write(f"Debug panel error: {e}")
 
 
 def draw_answer_inputs(prefix: str, units: list[str], correct_answers: list, question_id: int) -> list[str]:

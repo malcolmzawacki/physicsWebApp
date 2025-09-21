@@ -34,3 +34,18 @@ class State:
         self.set(name, value)
         return value
 
+    def pop(self, name: str) -> None:
+        """Remove a namespaced key from session_state if present."""
+        key = self.key(name)
+        if key in st.session_state:
+            del st.session_state[key]
+
+    def ensure_lazy(self, name: str, factory: callable) -> None:
+        """
+        Ensure a namespaced key exists, computing its default lazily via factory().
+
+        Unlike ensure(name, default), this only calls factory if the key is absent,
+        avoiding unintended side effects from eager evaluation.
+        """
+        if not self.has(name):
+            self.set(name, factory())
