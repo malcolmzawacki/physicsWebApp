@@ -76,4 +76,13 @@ class ForceGenerator(BaseGenerator):
         if problem_type == "Newton's Second Law":
             return self.generate_force_question(difficulty)
 
+    def get_problem_metadata(self, problem_type: str) -> dict:
+        meta = {
+            "Newton's Second Law": {
+                "honors_equation": r"F = m a",
+                "conceptual_equation": r"\textrm{Under Construction}",
+            },
+        }
+        return meta.get(problem_type, {})
+
 

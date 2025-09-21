@@ -69,7 +69,7 @@ class vectors:
         prefix = "vect"
         generator = VectorGenerator()
         ui = interface(prefix, title, generator, problem_type_dict, difficulties)
-        ui.unified_smart_layout(equations=False)
+        ui.unified_smart_layout(equations=True)
 
 def main():
     tab1, tab2 = st.tabs([

@@ -69,3 +69,24 @@ class ArithmeticGenerator(BaseGenerator):
         answer = first+second
         unit = "Sum"
         return {"question": question, "answers": [answer], "units": [unit]}
+
+    def get_problem_metadata(self, problem_type: str) -> dict:
+        meta = {
+            "Addition": {
+                "honors_equation": r"a + b = c",
+                "conceptual_equation": r"\textrm{Under Construction}",
+            },
+            "Subtraction": {
+                "honors_equation": r"a - b = c",
+                "conceptual_equation": r"\textrm{Under Construction}",
+            },
+            "Multiplication": {
+                "honors_equation": r"a \times b = c",
+                "conceptual_equation": r"\textrm{Under Construction}",
+            },
+            "Division": {
+                "honors_equation": r"\frac{a}{b} = c",
+                "conceptual_equation": r"\textrm{Under Construction}",
+            },
+        }
+        return meta.get(problem_type, {})

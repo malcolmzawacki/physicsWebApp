@@ -22,6 +22,23 @@ class ProjectileGenerator(BaseGenerator):
             return self._generate_type2_question(difficulty)
         else:  # Type 3
             return self._generate_type3_question(difficulty)
+
+    def get_problem_metadata(self, problem_type: str) -> dict:
+        meta = {
+            "Type 1": {
+                "honors_equation": r"\text{Horizontal: } x = v_x t \quad \text{Vertical: } y = \tfrac{1}{2} g t^2",
+                "conceptual_equation": r"\textrm{Under Construction}",
+            },
+            "Type 2": {
+                "honors_equation": r"v_{yf} = v_{yi} + g t \quad , \quad y = v_{yi} t + \tfrac{1}{2} g t^2",
+                "conceptual_equation": r"\textrm{Under Construction}",
+            },
+            "Type 3": {
+                "honors_equation": r"x = v_x t \quad , \quad y = v_{yi} t + \tfrac{1}{2} g t^2",
+                "conceptual_equation": r"\textrm{Under Construction}",
+            },
+        }
+        return meta.get(problem_type, {})
     
      
     def m_n_array(self, max_val):

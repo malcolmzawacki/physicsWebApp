@@ -16,6 +16,19 @@ class DistDispGenerator(BaseGenerator):
             return self.distance_and_displacement_1D(difficulty)
         elif problem_type == "Two Dimensional":
             return self.distance_and_displacement_2D(difficulty)
+    
+    def get_problem_metadata(self, problem_type: str) -> dict:
+        meta = {
+            "One Dimensional": {
+                "honors_equation": r"d = \sum |\Delta x_i| \quad , \quad |\Delta x| = |x_f - x_i|",
+                "conceptual_equation": r"\\textrm{Under Construction}",
+            },
+            "Two Dimensional": {
+                "honors_equation": r"d = \sum (|\Delta x_i| + |\Delta y_i|) \quad , \quad |\vec{\Delta r}| = \sqrt{(\Delta x)^2 + (\Delta y)^2}",
+                "conceptual_equation": r"\\textrm{Under Construction}",
+            },
+        }
+        return meta.get(problem_type, {})
         
     
     def get_step_num(self,difficulty):

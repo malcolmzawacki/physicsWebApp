@@ -1,7 +1,9 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 import streamlit as st
-from typing import Optional, Any
+from typing import Optional, Any, Dict
 import matplotlib
+
+
 class BaseGenerator(ABC):
     def __init__(self, state_prefix):
         self.state_prefix = state_prefix
@@ -19,10 +21,29 @@ class BaseGenerator(ABC):
     
 
 
+    def choose_problem_dict(self, problem_type: str, difficulty: str) -> Dict[str, Any]:
+        """
+        Default dictionary-based chooser.
 
-    @abstractmethod
-    def choose_problem_dict(self, problem_type: str, difficulty: str):
-        pass
+        Subclasses may override this directly. If they only implement the
+        legacy tuple-based `choose_problem`, this fallback converts it to
+        the standard dict format.
+        """
+        if hasattr(self, 'choose_problem'):
+            # accept tuple data from current choose problem
+            question, answers, units, diagram_data = self.choose_problem(problem_type, difficulty)  # type: ignore[attr-defined]
+            result: Dict[str, Any] = {
+                'question': question,
+                'answers': answers,
+                'units': units
+            }
+            if diagram_data is not None:
+                result['diagram_data'] = diagram_data
+            button_options = self.get_answer_options(units)
+            if button_options:
+                result['button_options'] = button_options
+            return result
+        raise NotImplementedError("Generator must implement choose_problem_dict or choose_problem")
 
 
     def generate_diagram(self, diagram_data: Any, problem_type: str, difficulty: str) -> Optional['matplotlib.figure.Figure']:
@@ -73,29 +94,7 @@ class BaseGenerator(ABC):
 
 
     ######### DICTIONARY-BASED FUNCTIONS FOR THE UPDATED SYSTEM ######
-    def choose_problem_dict(
-            self, 
-            problem_type: str, 
-            difficulty: str
-            ) -> dict:
-        """Helper method to transition convert old tuple format to new dictionary format"""
-        # accept tuple data from current choose problem
-        question, answers, units, diagram_data = self.choose_problem(problem_type, difficulty)
-        # convert to dictionary
-        result = {
-            'question': question,
-            'answers': answers,
-            'units': units
-        }
-        
-        if diagram_data is not None:
-            result['diagram_data'] = diagram_data
-            
-        button_options = self.get_answer_options(units)
-        if button_options:
-            result['button_options'] = button_options
-            
-        return result
+    # choose_problem_dict is defined above with a sensible default fallback
 
     # Utility methods for new interface
     def validate_result_dict(self, result: dict) -> bool:
@@ -103,6 +102,14 @@ class BaseGenerator(ABC):
         required_fields = ['question', 'answers', 'units']
         for field in required_fields:
             if field not in result:
-                print(f"ERROR: Generator missing required field '{field}'")
-                return False
+                raise ValueError(f"Generator missing required field '{field}'")
         return True
+
+    # Optional metadata hook used by the UI to display equations or notes
+    def get_problem_metadata(self, problem_type: str) -> dict:
+        """
+        Return metadata for a given problem type.
+        Suggested keys: 'honors_equation', 'conceptual_equation', 'tags'
+        Default: empty dict (feature optional per generator)
+        """
+        return {}

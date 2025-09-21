@@ -1221,3 +1221,24 @@ class EnergyGenerator(BaseGenerator):
             return self.friction_and_distance_problems(difficulty)
         else:
             pass
+
+    def get_problem_metadata(self, problem_type: str) -> dict:
+        meta = {
+            "Elastic Potential Energy": {
+                "honors_equation": r"U_e = \tfrac{1}{2} k x^2",
+                "conceptual_equation": r"\textrm{Under Construction}",
+            },
+            "Kinetic Energy": {
+                "honors_equation": r"K = \tfrac{1}{2} m v^2",
+                "conceptual_equation": r"\textrm{Under Construction}",
+            },
+            "Gravitational Potential Energy": {
+                "honors_equation": r"U_g = m g h",
+                "conceptual_equation": r"\textrm{Under Construction}",
+            },
+            "Work": {
+                "honors_equation": r"W = F d",
+                "conceptual_equation": r"\textrm{Under Construction}",
+            },
+        }
+        return meta.get(problem_type, {})
