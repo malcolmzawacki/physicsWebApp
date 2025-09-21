@@ -42,33 +42,22 @@ class dist_disp:
       from utils.generators.dist_disp_generator import DistDispGenerator
       title = "Distance & Displacement"
       prefix = "constant"
-      ui = interface(prefix,title,DistDispGenerator(),
-                  problem_type_dict,difficulties,True)
+      generator = DistDispGenerator()
+      metadata = generator.stored_metadata()
+      ui = interface(prefix, title, generator, metadata, difficulties)
       ui.unified_smart_layout()
 
 
 class vectors:
     def vector_practice():
-        problem_type_dict = {
-            "Find Components": {
-                "honors" : r"", 
-                "conceptual": r""""""
-                },
-            "Find Resultant": {
-                "honors": r"",
-                "conceptual": r""""""
-            },
-            "Summing Vectors": {
-                "honors": r"",
-                "conceptual": r""""""
-            },
-        }
+
         difficulties = ["Easy", "Medium", "Hard"]
         from utils.generators.vector_generator import VectorGenerator
         title = "Vectors"
         prefix = "vect"
         generator = VectorGenerator()
-        ui = interface(prefix, title, generator, problem_type_dict, difficulties)
+        metadata = generator.stored_metadata()
+        ui = interface(prefix, title, generator, metadata, difficulties)
         ui.unified_smart_layout(equations=True)
 
 def main():

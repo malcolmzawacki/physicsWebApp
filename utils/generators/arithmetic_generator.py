@@ -70,8 +70,9 @@ class ArithmeticGenerator(BaseGenerator):
         unit = "Sum"
         return {"question": question, "answers": [answer], "units": [unit]}
 
-    def get_problem_metadata(self, problem_type: str) -> dict:
-        meta = {
+    def stored_metadata(self) -> dict[str, dict]:
+        """Return metadata mapping for this generator."""
+        return {
             "Addition": {
                 "honors_equation": r"a + b = c",
                 "conceptual_equation": r"\textrm{Under Construction}",
@@ -89,4 +90,4 @@ class ArithmeticGenerator(BaseGenerator):
                 "conceptual_equation": r"\textrm{Under Construction}",
             },
         }
-        return meta.get(problem_type, {})
+

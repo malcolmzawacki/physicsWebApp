@@ -6,23 +6,13 @@ class collisions:
     
     @staticmethod
     def main():
-        problem_type_dict = {
-            "Inelastic Collision": {
-                "honors": r"p_1 + p_2 = p'",
-                "conceptual": r""" \frac{m_1v_1 + m_2v_2}{m_1+m_2}=v'
-                """
-                },
-            "Elastic Collision": {
-                "honors": r"p_1 + p_2 = p_1' + p_2'",
-                "conceptual": r"""m_1v_1+m_2v_2 = m_1v_1' + m_2v_2'"""
-                },
-            }
+        generator = CollisionGenerator()
+        metadata = generator.stored_metadata()
         difficulties = ["Easy"]
         title = "Collisions"
         prefix = "collisions"
-    
-        generator = CollisionGenerator()
-        ui = interface(prefix,title,generator,problem_type_dict,difficulties)
+
+        ui = interface(prefix, title, generator, metadata, difficulties)
         ui.unified_smart_layout()
 
 

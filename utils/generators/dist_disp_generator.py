@@ -17,18 +17,37 @@ class DistDispGenerator(BaseGenerator):
         elif problem_type == "Two Dimensional":
             return self.distance_and_displacement_2D(difficulty)
     
-    def get_problem_metadata(self, problem_type: str) -> dict:
-        meta = {
+    def stored_metadata(self) -> dict[str, dict]:
+        """Return metadata mapping for this generator."""
+        return {
             "One Dimensional": {
-                "honors_equation": r"d = \sum |\Delta x_i| \quad , \quad |\Delta x| = |x_f - x_i|",
-                "conceptual_equation": r"\\textrm{Under Construction}",
-            },
-            "Two Dimensional": {
-                "honors_equation": r"d = \sum (|\Delta x_i| + |\Delta y_i|) \quad , \quad |\vec{\Delta r}| = \sqrt{(\Delta x)^2 + (\Delta y)^2}",
-                "conceptual_equation": r"\\textrm{Under Construction}",
+                  "honors": r"""
+                  \textrm{distance } =\; d_1 + d_2 + ... \newline ~ \newline
+                  \textrm{displacement } =\; d_{final} - d_{initial} \; \textrm{(with direction)}
+                  """,
+
+                  "conceptual": r"""
+                  \textrm{distance } =\; d_1 + d_2 + ... 
+                  
+                  \newline ~ \newline \textrm{"Positive" directions are right, East, up, and North}
+                  \newline ~ \newline \textrm{"Negative" directions are left, West, down, and South}
+                  \newline ~ \newline \textrm{displacement } =\; d_{final} - d_{initial} \; \textrm{(with direction)}
+                  """},
+          "Two Dimensional": {
+                  "honors": r"""
+                  \textrm{distance } =\; d_1 + d_2 + ... \newline ~ \newline
+              \textrm{displacement } =\; \sqrt{d_{horizontal}^2 + d_{vertical}^2} \;\; \textrm{(with direction)}
+                  """,
+
+                  "conceptual": r"""
+                  \textrm{distance } =\; d_1 + d_2 + ... \newline ~ \newline
+                  \textrm{Horizontal Displacement } =\; D_{East} - D_{West} \newline ~ \newline
+                  \textrm{Vertical Displacement } =\; D_{North} - D_{South} \newline ~ \newline
+              \textrm{Net Displacement } =\; \sqrt{D_{horizontal}^{\;2} + D_{vertical}^2} \;\; \textrm{(with direction)}
+                  """
             },
         }
-        return meta.get(problem_type, {})
+
         
     
     def get_step_num(self,difficulty):

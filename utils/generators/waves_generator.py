@@ -24,30 +24,87 @@ class WaveGenerator(BaseGenerator):
         else:
             pass
 
-    def get_problem_metadata(self, problem_type: str) -> dict:
-        meta = {
+    def stored_metadata(self) -> dict[str, dict]:
+        """Return metadata mapping for this generator."""
+        return {
             "Wave Properties": {
-                "honors_equation": r"v = f \lambda",
-                "conceptual_equation": r"\textrm{Under Construction}",
-            },
+                "honors": r"""v \;=\; \lambda f
+                \quad , \quad T \;=\; \frac{1}{f}""",
+
+                "conceptual": r"""v \;=\; \lambda f \quad , \quad
+                \lambda \;=\; \frac{v}{f} \quad , \quad
+                f \;=\; \frac{v}{\lambda}
+                \newline ~ \newline
+                T \;=\; \frac{1}{f}
+                \quad , \quad f \;=\; \frac{1}{T}
+                """},
             "String Harmonics": {
-                "honors_equation": r"f_n = n \frac{v}{2L} \quad , \quad \lambda_n = \frac{2L}{n}",
-                "conceptual_equation": r"\textrm{Under Construction}",
-            },
+                "honors": r"""v \;=\; \lambda f
+                \quad , \quad \lambda \;=\; \frac{2L}{m}
+                \quad , \quad m = 1, 2, 3 ...
+                \newline ~ \newline
+                \textrm{speed of sound } \approx 343 \frac{m}{s}""",
+
+                "conceptual": r"""v \;=\; \lambda f \quad , \quad
+                \lambda \;=\; \frac{v}{f} \quad , \quad
+                f \;=\; \frac{v}{\lambda}
+                \newline ~ \newline
+                \lambda \;=\; \frac{2L}{m}
+                \quad , \quad f = \frac{vm}{2L}
+                \quad , \quad L = \frac{vm}{2f}
+                \quad , \quad L = \frac{m \lambda}{2}
+                \quad , \quad m = 1, 2, 3 ...
+                \newline ~ \newline
+                \textrm{speed of sound }\approx 343 \frac{m}{s}
+                """},
             "Open Ended Column Harmonics": {
-                "honors_equation": r"f_n = n \frac{v}{2L} \quad , \quad \lambda_n = \frac{2L}{n}",
-                "conceptual_equation": r"\textrm{Under Construction}",
-            },
+                "honors": r"""v \;=\; \lambda f
+                \quad , \quad \lambda \;=\; \frac{2L}{m}
+                \quad , \quad m = 1, 2, 3 ...
+                \newline ~ \newline
+                \textrm{speed of sound } \approx 343 \frac{m}{s}""",
+
+                "conceptual": r"""v \;=\; \lambda f \quad , \quad
+                \lambda \;=\; \frac{v}{f} \quad , \quad
+                f \;=\; \frac{v}{\lambda}
+                \newline ~ \newline
+                \lambda \;=\; \frac{2L}{m}
+                \quad , \quad f = \frac{vm}{2L}
+                \quad , \quad L = \frac{vm}{2f}
+                \quad , \quad L = \frac{m \lambda}{2}
+                \quad , \quad m = 1, 2, 3 ...
+                \newline ~ \newline
+                \textrm{speed of sound }\approx 343 \frac{m}{s}
+                """},
             "Closed End Column Harmonics": {
-                "honors_equation": r"f_n = n \frac{v}{4L} \quad (n=1,3,5,\dots) \quad , \quad \lambda_n = \frac{4L}{n}",
-                "conceptual_equation": r"\textrm{Under Construction}",
-            },
+                "honors": r"""v \;=\; \lambda f
+                \quad , \quad \lambda \;=\; \frac{4L}{m}
+                \quad , \quad m = 1, 3, 5 ...
+                \newline ~ \newline
+                \textrm{speed of sound } \approx 343 \frac{m}{s}""",
+
+                "conceptual": r"""v \;=\; \lambda f \quad , \quad
+                \lambda \;=\; \frac{v}{f} \quad , \quad
+                f \;=\; \frac{v}{\lambda}
+                \newline ~ \newline
+                \lambda \;=\; \frac{4L}{m}
+                \quad , \quad f = \frac{vm}{4L}
+                \quad , \quad L = \frac{vm}{4f}
+                \quad , \quad L = \frac{m \lambda}{4}
+                \quad , \quad m = 1, 3, 5 ...
+                \newline ~ \newline
+                \textrm{speed of sound }\approx 343 \frac{m}{s}
+                """},
             "deciBel Scale": {
-                "honors_equation": r"\Delta \text{dB} = 10 \log_{10}\!\left(\frac{I_2}{I_1}\right)",
-                "conceptual_equation": r"\textrm{Under Construction}",
+            "honors": r"""\textrm{Multplying the intensity by 10 adds 10 on the deciBel scale}
+            \newline ~ \newline
+            \textrm{Intensity changes with the distance SQUARED, not just distance}""",
+            "conceptual": r"""\textrm{Multplying the intensity by 10 adds 10 on the deciBel scale}
+            \newline ~ \newline
+            \textrm{Intensity changes with the distance SQUARED, not just distance}""",
             },
         }
-        return meta.get(problem_type, {})
+
 
     
     def properties_of_waves(self, difficulty):
@@ -285,7 +342,7 @@ class WaveGenerator(BaseGenerator):
                 times less intense than a {final_intensity*10} deciBel sound?"""
                 answer = [initial_intensity*10]
                 unit = ["Volume (deciBels)"]
-        elif difficulty == "Medium":
+        else:
             # distance -> squaring distance = twice the change
             more_or_less = ri(0,1)
             # 0 = more, 1 = less, 2 = distance

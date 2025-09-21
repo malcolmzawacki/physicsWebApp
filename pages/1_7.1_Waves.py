@@ -130,5 +130,17 @@ def main():
     with tab3:
         deciBel_practice()
 
+def main2():
+    from utils.generators.waves_generator import WaveGenerator
+    prefix ="waves_"
+    title = "Waves"
+    generator = WaveGenerator()
+    metadata = generator.stored_metadata()
+    difficulties = ["Easy","Medium","Hard"]
+
+    ui = interface(prefix, title, generator, metadata, difficulties)
+    ui.unified_smart_layout()
+    
+
 if __name__ == "__main__":
-    main()
+    main2()

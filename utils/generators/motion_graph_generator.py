@@ -165,17 +165,28 @@ class MotionGraphGenerator(BaseGenerator):
                     "button_options": options,
                     "side_by_side": True}
 
-    def get_problem_metadata(self, problem_type: str) -> dict:
-        meta = {
+    def stored_metadata(self) -> dict[str, dict]:
+        """Return metadata mapping for this generator."""
+        return {
             "Position-Time Graph": {
-                "honors_equation": r"\\text{Direction and motion from position-time graphs}",
-                "conceptual_equation": r"\\text{Positive slope: moving in positive direction} \\\\ \\text{Negative slope: moving in negative direction} \\\\ \\text{Straight line: constant velocity} \\\\ \\text{Curved (increasing): speeding up} \\\\ \\text{Curved (decreasing): slowing down}",
-                "tags": ["graphs", "position-time"],
-            },
-            "Velocity-Time Graph": {
-                "honors_equation": r"\\text{Direction and motion from velocity-time graphs}",
-                "conceptual_equation": r"\\text{Above x-axis: moving in positive direction} \\\\ \\text{Below x-axis: moving in negative direction} \\\\ \\text{Horizontal line: constant velocity} \\\\ \\text{Sloped line (increasing): speeding up} \\\\ \\text{Sloped line (decreasing): slowing down}",
-                "tags": ["graphs", "velocity-time"],
-            },
-        }
-        return meta.get(problem_type, {})
+            "honors": r"\text{Direction and motion from position-time graphs}",
+            "conceptual": r"""
+            \text{Positive slope: moving in positive direction} \\
+            \text{Negative slope: moving in negative direction} \\
+            \text{Straight line: constant velocity} \\
+            \text{Curved (increasing): speeding up} \\
+            \text{Curved (decreasing): slowing down}
+            """
+        },
+        "Velocity-Time Graph": {
+            "honors": r"\text{Direction and motion from velocity-time graphs}",
+            "conceptual": r"""
+            \text{Above x-axis: moving in positive direction} \\
+            \text{Below x-axis: moving in negative direction} \\
+            \text{Horizontal line: constant velocity} \\
+            \text{Sloped line (increasing): speeding up} \\
+            \text{Sloped line (decreasing): slowing down}
+            """
+        },
+    }
+

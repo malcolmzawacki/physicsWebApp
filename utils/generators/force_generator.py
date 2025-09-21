@@ -76,13 +76,22 @@ class ForceGenerator(BaseGenerator):
         if problem_type == "Newton's Second Law":
             return self.generate_force_question(difficulty)
 
-    def get_problem_metadata(self, problem_type: str) -> dict:
-        meta = {
+    def stored_metadata(self) -> dict[str, dict]:
+        """Return metadata mapping for this generator."""
+        return {
             "Newton's Second Law": {
-                "honors_equation": r"F = m a",
-                "conceptual_equation": r"\textrm{Under Construction}",
+                      "honors": r"""
+                      \Sigma F \;=\; ma""",
+
+                      "conceptual": r"""\Large{
+                      \Sigma F \;=\; ma 
+                      \quad\quad | \quad\quad
+                      m \;=\; \frac{\Sigma F}{a}
+                      \quad\quad | \quad\quad
+                      a \;=\; \frac{\Sigma F}{m}
+                      }"""
             },
         }
-        return meta.get(problem_type, {})
+
 
 

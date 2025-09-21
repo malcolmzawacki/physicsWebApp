@@ -106,10 +106,20 @@ class BaseGenerator(ABC):
         return True
 
     # Optional metadata hook used by the UI to display equations or notes
-    def get_problem_metadata(self, problem_type: str) -> dict:
-        """
-        Return metadata for a given problem type.
-        Suggested keys: 'honors_equation', 'conceptual_equation', 'tags'
-        Default: empty dict (feature optional per generator)
-        """
+    def stored_metadata(self) -> Dict[str, Dict[str, Any]]:
+        """Return the full metadata map for this generator."""
         return {}
+
+    def get_problem_metadata(self, problem_type: str) -> dict:
+        """Return metadata for a given problem type."""
+        metadata = self.stored_metadata()
+        if not isinstance(metadata, dict):
+            return {}
+        return metadata.get(problem_type, {})
+
+    def get_problem_types(self) -> list[str]:
+        """Return the list of supported problem types for UI consumers."""
+        metadata = self.stored_metadata()
+        if isinstance(metadata, dict) and metadata:
+            return list(metadata.keys())
+        return []

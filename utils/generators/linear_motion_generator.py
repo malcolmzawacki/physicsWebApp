@@ -528,9 +528,9 @@ class LinearMotionGenerator(BaseGenerator):
 
     
 
-    def get_problem_metadata(self, problem_type: str) -> dict:
-        """Provide LaTeX equations per problem type for display in UI."""
-        meta = {
+    def stored_metadata(self) -> dict[str, dict]:
+        """Return metadata mapping for this generator."""
+        return {
             "No Time": {
                 "honors_equation": r"v_f^2 = v_i^2 + 2ax",
                 "conceptual_equation": r"v_f = \sqrt{v_i^2 + 2ax}  \quad , \quad v_i = \sqrt{2ax - v_f^2}  \quad , \quad  x = \frac{v_f^2 - v_i^2}{2a}  \quad, \quad  a = \frac{v_f^2 - v_i^2}{2x}",
@@ -557,4 +557,4 @@ class LinearMotionGenerator(BaseGenerator):
                 "tags": ["kinematics", "mixed"],
             },
         }
-        return meta.get(problem_type, {})
+

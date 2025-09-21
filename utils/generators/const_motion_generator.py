@@ -229,28 +229,28 @@ class ConstantMotionGenerator(BaseGenerator):
         
         return {"question": question, "answers": answer, "units": unit}
 
-    def get_problem_metadata(self, problem_type: str) -> dict:
-        """Provide LaTeX equations and notes per problem type."""
-        meta = {
+    def stored_metadata(self) -> dict[str, dict]:
+        """Return metadata mapping for this generator."""
+        return {
             "Constant Speed": {
-                "honors_equation": r"d \;=\; v \cdot t",
-                "conceptual_equation": r"d \;=\; v \cdot t \quad , \quad v \;=\; \frac{d}{t} \quad , \quad t \;=\; \frac{d}{v}",
+                "honors": r"d \;=\; v \cdot t",
+                "conceptual": r"d \;=\; v \cdot t \quad , \quad v \;=\; \frac{d}{t} \quad , \quad t \;=\; \frac{d}{v}",
                 "tags": ["constant", "speed", "distance", "time"],
             },
             "Average Speed": {
-                "honors_equation": r"v_{avg} \;=\; \frac{d_1 + d_2 + \dots}{t_1 + t_2 + \dots}",
-                "conceptual_equation": r"v_{avg} \;=\; \frac{d_1 + d_2 + \dots}{t_1 + t_2 + \dots} \quad , \quad d \;=\; v \cdot t \quad , \quad v \;=\; \frac{d}{t} \quad , \quad t \;=\; \frac{d}{v}",
+                "honors": r"v_{avg} \;=\; \frac{d_1 + d_2 + \dots}{t_1 + t_2 + \dots}",
+                "conceptual": r"v_{avg} \;=\; \frac{d_1 + d_2 + \dots}{t_1 + t_2 + \dots} \quad , \quad d \;=\; v \cdot t \quad , \quad v \;=\; \frac{d}{t} \quad , \quad t \;=\; \frac{d}{v}",
                 "tags": ["average", "speed"],
             },
             "Average Velocity": {
-                "honors_equation": r"v_{avg} \;=\; \frac{d_1 + d_2 + \dots}{t_1 + t_2 + \dots}",
-                "conceptual_equation": r"v_{avg} \;=\; \frac{d_1 + d_2 + \dots}{t_1 + t_2 + \dots} \quad , \quad d \;=\; v \cdot t \quad , \quad v \;=\; \frac{d}{t} \quad , \quad t \;=\; \frac{d}{v}",
+                "honors": r"v_{avg} \;=\; \frac{d_1 + d_2 + \dots}{t_1 + t_2 + \dots}",
+                "conceptual": r"v_{avg} \;=\; \frac{d_1 + d_2 + \dots}{t_1 + t_2 + \dots} \quad , \quad d \;=\; v \cdot t \quad , \quad v \;=\; \frac{d}{t} \quad , \quad t \;=\; \frac{d}{v}",
                 "tags": ["average", "velocity"],
             },
             "Combined Constant Motion": {
-                "honors_equation": r"v_{avg} \;=\; \frac{d_1 + d_2 + \dots}{t_1 + t_2 + \dots}",
-                "conceptual_equation": r"v_{avg} \;=\; \frac{d_1 + d_2 + \dots}{t_1 + t_2 + \dots} \quad , \quad d \;=\; v \cdot t \quad , \quad v \;=\; \frac{d}{t} \quad , \quad t \;=\; \frac{d}{v}",
+                "honors": r"v_{avg} \;=\; \frac{d_1 + d_2 + \dots}{t_1 + t_2 + \dots}",
+                "conceptual": r"v_{avg} \;=\; \frac{d_1 + d_2 + \dots}{t_1 + t_2 + \dots} \quad , \quad d \;=\; v \cdot t \quad , \quad v \;=\; \frac{d}{t} \quad , \quad t \;=\; \frac{d}{v}",
                 "tags": ["distance", "displacement", "speed", "velocity"],
             },
         }
-        return meta.get(problem_type, {})
+

@@ -14,19 +14,48 @@ class Interface:
         self,
         prefix: str,
         title: str,
-        generator: None,
-        problem_type_dict: dict,
+        generator: object,
+        problem_type_dict: dict | list[str] | tuple[str, ...] | None,
         difficulties: list,
         type_weight: bool = False,
     ) -> None:
         self.prefix = prefix
         self.title = title
         self.generator = generator
-        self.problem_type_dict = problem_type_dict
-        self.problem_types = list(problem_type_dict.keys())
+        if isinstance(problem_type_dict, dict):
+            self.problem_type_dict = problem_type_dict
+            self.problem_types = list(problem_type_dict.keys())
+        elif isinstance(problem_type_dict, (list, tuple)):
+            self.problem_type_dict = None
+            self.problem_types = list(problem_type_dict)
+        else:
+            self.problem_type_dict = None
+            inferred_types = self._infer_problem_types()
+            if not inferred_types:
+                raise ValueError(
+                    "Interface requires a problem type list or a generator that implements get_problem_types()."
+                )
+            self.problem_types = inferred_types
         self.difficulties = difficulties
         self.type_weight = type_weight
         self.state = State(prefix)
+
+    def _infer_problem_types(self) -> list[str]:
+        getter = getattr(self.generator, "get_problem_types", None)
+        if callable(getter):
+            try:
+                types = getter()
+            except Exception:
+                return []
+            if isinstance(types, (list, tuple)):
+                return list(types)
+            if types is None:
+                return []
+            try:
+                return list(types)
+            except TypeError:
+                return []
+        return []
 
     # region performance
     def clear_performance_dataframe(self) -> dict:
@@ -186,23 +215,25 @@ class Interface:
 
         if equations:
             show_equations_expander(
-                generator=self.generator, 
-                problem_type= selected_problem_type, 
-                level= lvl, 
-                fallback_dict= self.problem_type_dict if hasattr(self, "problem_type_dict") else None, expanded=True)
+                generator=self.generator,
+                problem_type=selected_problem_type,
+                level=lvl,
+                fallback_dict=self.problem_type_dict,
+                expanded=True,
+            )
 
     def _show_equations_unified(self, problem_type: str) -> None:
         with st.expander("equation(s)", expanded=True):
             if hasattr(self.generator, "get_problem_metadata"):
                 metadata = self.generator.get_problem_metadata(problem_type)
                 if self.state.get("level"):
-                    equation = metadata.get("conceptual_equation", "")
+                    equation = metadata.get("conceptual", "")
                 else:
-                    equation = metadata.get("honors_equation", "")
+                    equation = metadata.get("honors", "")
                 if equation:
                     st.latex(equation)
                     return
-            if hasattr(self, "problem_type_dict"):
+            if self.problem_type_dict is not None:
                 equation_dict = self.problem_type_dict.get(problem_type, {})
                 if self.state.get("level"):
                     equation = equation_dict.get("conceptual", "")

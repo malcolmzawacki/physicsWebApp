@@ -66,15 +66,17 @@ class CollisionGenerator(BaseGenerator):
         return {"question": question, "answers": [answer], "units": [unit]}
     
     
-    def get_problem_metadata(self, problem_type: str) -> dict:
-        meta = {
-            "Elastic Collision": {
-                "honors_equation": r"m_1 v_{1i} + m_2 v_{2i} = m_1 v_{1f} + m_2 v_{2f} \quad , \quad \tfrac{1}{2} m_1 v_{1i}^2 + \tfrac{1}{2} m_2 v_{2i}^2 = \tfrac{1}{2} m_1 v_{1f}^2 + \tfrac{1}{2} m_2 v_{2f}^2",
-                "conceptual_equation": r"\textrm{Under Construction}",
-            },
+    def stored_metadata(self) -> dict[str, dict]:
+        """Return metadata mapping for this generator."""
+        return {
             "Inelastic Collision": {
-                "honors_equation": r"m_1 v_{1i} + m_2 v_{2i} = (m_1+m_2) v_f",
-                "conceptual_equation": r"\textrm{Under Construction}",
-            },
+                "honors": r"p_1 + p_2 = p'",
+                "conceptual": r""" \frac{m_1v_1 + m_2v_2}{m_1+m_2}=v'
+                """
+                },
+            "Elastic Collision": {
+                "honors": r"p_1 + p_2 = p_1' + p_2'",
+                "conceptual": r"""m_1v_1+m_2v_2 = m_1v_1' + m_2v_2'"""
+                },
         }
-        return meta.get(problem_type, {})
+

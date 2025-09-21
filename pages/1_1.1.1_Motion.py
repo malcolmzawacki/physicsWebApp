@@ -8,207 +8,54 @@ plt.style.use("dark_background")
 from utils.ui import interface
 
 def linear_fns():
-    problem_type_dict = {
-                    
-                    "No Time": {
-                        "honors" : r"v_f^2 = v_i^2 + 2ax", 
-                        "conceptual": r"""v_f = \sqrt{v_i^2 + 2ax}  \quad , 
-                        \quad v_i = \sqrt{2ax - v_f^2}  \quad , 
-                        \quad  x = \frac{v_f^2 - v_i^2}{2a}  \quad,
-                        \quad  a = \frac{v_f^2 - v_i^2}{2x}"""
-                        },
-                    "No Distance": {
-                        "honors": r"v_f = v_i + at",
-                        "conceptual": r"""v_f = v_i +at  \quad ,
-                        \quad v_i =  v_f - at  \quad ,
-                        \quad a = \frac{v_f - v_i}{t}  \quad,
-                        \quad t = \frac{v_f - v_i}{a}"""
-                    },               
-                    "No Acceleration" : {
-                        "honors": r"x = \frac{v_f + v_i}{2} t",
-                        "conceptual": r"""x = \frac{v_f + v_i}{2} t  \quad ,
-                        \quad t = \frac{2x}{v_f + v_i}  \quad ,
-                        \quad v_f = \frac{2x}{t} - v_i  \quad , 
-                        \quad v_i = \frac{2x}{t} - v_f  \quad """
-                    },
-                    "No Final Velocity": {
-                        "honors": r"x = v_i t + \frac{1}{2} at^2",
-                        "conceptual": r"""
-                        x = v_i t + \frac{1}{2} at^2  \quad ,
-                        \quad a = 2 \left( \frac{x - v_i t}{t^2} \right)\quad ,
-                        \quad t = \frac{\sqrt{v_i^2 + 2ax} - v_i}{a}"""
-                    },
-                    "Mixed": {
-                        "honors": r"""v_f^2 = v_i^2 + 2ax \quad ,
-                        \quad v_f = v_i +at  \quad ,
-                        \quad x = \frac{v_f + v_i}{2} t  \quad ,
-                        \quad x = v_i t + \frac{1}{2} at^2""",
+    # Lazy import - only load when this tab is actually accessed
+    from utils.generators.linear_motion_generator import LinearMotionGenerator
+    generator = LinearMotionGenerator()
+    metadata = generator.stored_metadata()
 
-                        "conceptual": r"""
-                        \quad x = \frac{v_f + v_i}{2} t  \quad
-                        \quad x = v_i t + \frac{1}{2} at^2  \quad
-                        \quad x = \frac{v_f^2 - v_i^2}{2a}  \quad
-
-                        \newline ~ \newline ~ \newline
-                        \quad t = \frac{2x}{v_f + v_i}  \quad 
-                        \quad t = \frac{v_f - v_i}{a}  \quad
-                        \quad t = \frac{\sqrt{v_i^2 + 2ax} - v_i}{a}  \quad
-                        
-                        \newline ~ \newline ~ \newline
-                        \quad v_i = \sqrt{2ax - v_f^2}  \quad
-                        \quad v_i = v_f - at  \quad
-                        \quad v_i = \frac{2x}{t} - v_f  \quad
-                        \quad v_i = \frac{x}{t} - \frac{1}{2} at \quad
-
-                        \newline ~ \newline ~ \newline
-                        \quad v_f = \frac{2x}{t} - v_i  \quad
-                        \quad v_f = \sqrt{v_i^2 + 2ax}  \quad
-                        \quad v_f = v_i + at  \quad
-
-                        \newline ~ \newline ~ \newline
-                        \quad a = 2 \left( \frac{x - v_i t}{t^2} \right)\quad 
-                        \quad a = \frac{v_f - v_i}{t}  \quad
-                        \quad a = \frac{v_f^2 - v_i^2}{2x}  \quad
-                        
-                        """},
-                    }
 
     difficulties = ["Easy","Medium","Hard"]
 
-    from utils.generators.linear_motion_generator import LinearMotionGenerator
     title = "Accelerated Motion"
     prefix = "accelerated_motion"
 
     ui = interface(prefix,title,
-                    LinearMotionGenerator(),problem_type_dict,difficulties)
+                    generator,metadata,difficulties)
     ui.unified_smart_layout()
 
 
 def projectile_fns():
-        
-    problem_type_dict = {
-        "Type 1": {
-                "honors": r"""
-                v_{yi} \; = \; 0
-                \newline ~ \newline ~ \newline
-                x \; = \; v_x \cdot t   
-                \newline ~ \newline ~ \newline
-                v_{yf}^2 = v_{yi}^2 + 2gy \quad ,
-                \quad v_{yf} = v_{yi} +gt  \quad ,
-                \quad y = \frac{v_{yf} + v_{yi}}{2} t  \quad ,
-                \quad y = v_{yi} t + \frac{1}{2} gt^2
-                """,
+    # Lazy import - only load when this tab is actually accessed
+    from utils.generators.projectile_generator import ProjectileGenerator
 
-                "conceptual": r"""
-                x \;=\; v_x \cdot t \quad , \quad v_x \;=\; \frac{x}{t} \quad , \quad t\;=\; \frac{x}{v_x}
-                \newline ~ \newline ~ \newline
-                y\;=\; \frac{1}{2} gt^2 \quad , \quad v_{y0} \;=\; 0 \quad , \quad  
-                v_{yf} \;=\; gt \quad , \quad t \;=\; \sqrt{\frac{2y}{g}}
-                \newline ~ \newline ~ \newline
-                v_f \;=\; \sqrt{v_x^2 \;+\; v_{yf}^2} \quad , \quad \theta \;=\; \tan^{-1} \Bigl( \frac{v_{yf}}{v_x} \Bigr)
-                """},
-        "Type 2": {
-            "honors" : r"""
-                v_{yf} \; = \; - v_{yi}
-                \newline ~ \newline ~ \newline
-                x \; = \; v_x \cdot t   
-                \newline ~ \newline ~ \newline
-                v_{yf}^2 = v_{yi}^2 + 2gy \quad ,
-                \quad v_{yf} = v_{yi} +gt  \quad ,
-                \quad y = \frac{v_{yf} + v_{yi}}{2} t  \quad ,
-                \quad y = v_{yi} t + \frac{1}{2} gt^2
-                """, 
-            "conceptual": r"""
-                x \;=\; v_x \cdot t \quad , \quad  
-                y_{max} \;=\; \frac{v_{yi}^2}{2g} \quad \textrm{or} \quad \frac{1}{8}g t^2
-                \newline ~ \newline ~ \newline
-
-                v_x \;=\; \frac{x}{t} \quad \textrm{or} \quad v \cdot \cos(\theta)
-                \quad , \quad v_{yi} \;=\;  
-                v \cdot \sin(\theta) \quad \textrm{or} \quad \frac{1}{2} gt
-                \quad , \quad v_{yf} \;=\; - v_{yi}
-                \newline ~ \newline ~ \newline
-
-                t\;=\; \frac{x}{v_x} \;\; \textrm{or} 
-                \;\; 2 \sqrt{\frac{2y}{g}} \quad \textrm{or} \quad 
-                \frac{2v_{yi}}{g}
-                \newline ~ \newline ~ \newline
-
-                v_f \;=\; \sqrt{v_x^2 \;+\; v_{yf}^2} \quad \textrm{or} \quad
-                \frac{v_{yf}}{\sin(\theta)} \quad \textrm{or} \quad
-                \frac{v_x}{\cos(\theta)}
-                \newline ~ \newline ~ \newline
-                \theta \;=\; \tan^{-1} \Bigl( \frac{v_{yf}}{v_x} \Bigr) \quad \textrm{or} \quad
-                \sin^{-1} \Bigl( \frac{v_{yf}}{v_f} \Bigr) \quad \textrm{or} \quad
-                \cos^{-1} \Bigl( \frac{v_x}{v_f} \Bigr)
-
-            """
-            },
-        "Type 3": {
-            "honors": r"""
-            x \; = \; v_x \cdot t   
-            \newline ~ \newline ~ \newline
-            v_{yf}^2 = v_{yi}^2 + 2gy \quad ,
-            \quad v_{yf} = v_{yi} +gt  \quad ,
-            \quad y = \frac{v_{yf} + v_{yi}}{2} t  \quad ,
-            \quad y = v_{yi} t + \frac{1}{2} gt^2
-                """,
-            "conceptual": r"""
-            \textrm{There are no simplifying tricks here, sorry!}
-            \newline ~ \newline ~ \newline
-            x \; = \; v_x \cdot t   
-            \newline ~ \newline ~ \newline
-            v_{yf}^2 = v_{yi}^2 + 2gy \quad ,
-            \quad v_{yf} = v_{yi} +gt  \quad ,
-            \quad y = \frac{v_{yf} + v_{yi}}{2} t  \quad ,
-            \quad y = v_{yi} t + \frac{1}{2} gt^2
-                """
-        }
-        }
+    generator = ProjectileGenerator()
+    metadata = generator.stored_metadata()
     
     difficulties = ["Easy","Medium","Hard"]
 
-    from utils.generators.projectile_generator import ProjectileGenerator
     title = "Projectiles"
     prefix = "projectiles"
-    ui = interface(prefix,title,ProjectileGenerator(),
-                    problem_type_dict,difficulties,True)
+    ui = interface(prefix, title, generator, metadata, difficulties)
     ui.unified_smart_layout()
 
 
 def position_and_velocity_graph_analysis():
-    # Setup for standard interface
-    problem_type_dict = {
-        "Position-Time Graph": {
-            "honors": r"\text{Direction and motion from position-time graphs}",
-            "conceptual": r"""
-            \text{Positive slope: moving in positive direction} \\
-            \text{Negative slope: moving in negative direction} \\
-            \text{Straight line: constant velocity} \\
-            \text{Curved (increasing): speeding up} \\
-            \text{Curved (decreasing): slowing down}
-            """
-        },
-        "Velocity-Time Graph": {
-            "honors": r"\text{Direction and motion from velocity-time graphs}",
-            "conceptual": r"""
-            \text{Above x-axis: moving in positive direction} \\
-            \text{Below x-axis: moving in negative direction} \\
-            \text{Horizontal line: constant velocity} \\
-            \text{Sloped line (increasing): speeding up} \\
-            \text{Sloped line (decreasing): slowing down}
-            """
-        },
-    }
+    # Lazy import - only load when this tab is actually accessed
     from utils.generators.motion_graph_generator import MotionGraphGenerator
+
     difficulties = ["Easy", "Medium", "Hard"]
     generator = MotionGraphGenerator()
-    ui = interface("motion_graph", "Graph Analysis", generator, problem_type_dict, difficulties)
+    metadata = generator.stored_metadata()
+    prefix = "motion_graph"
+    title = "Analyzing Motion Graphs"
+    ui = interface(prefix, title, generator, metadata, difficulties)
     ui.unified_smart_layout(side_by_side=True, equations=False, expanded=True)
 
 
 def PvT_and_VvT_graph_matching():
+    # Lazy import - only load when this tab is actually accessed
     from utils.generators.motion_graph_generator import MotionGraphGenerator
+
     # Initialize state for the matching activity
     if "matching_initialized" not in st.session_state:
         st.session_state.matching_initialized = True
@@ -339,66 +186,82 @@ def PvT_and_VvT_graph_matching():
 
 
 def constant_motion():
+    # Lazy import - only load when this tab is actually accessed
     from utils.generators.const_motion_generator import ConstantMotionGenerator
-    problem_type_dict = {
-        "Constant Speed": {
-            "honors" : r"d \;=\; v \cdot t", 
-            "conceptual": r"""d \;=\; v \cdot t \quad , \quad 
-            v \;=\; \frac{d}{t} \quad , \quad
-            t \;=\; \frac{d}{v}"""
-            },
-        "Average Speed": {
-            "honors" : r"v_{avg} \;=\; \frac{d_1 + d_2 + ...}{t_1 + t_2 + ...}", 
-            "conceptual": r"""v_{avg} \;=\; \frac{d_1 + d_2 + ...}{t_1 + t_2 + ...} \quad , \quad
-            d \;=\; v \cdot t \quad , \quad 
-            v \;=\; \frac{d}{t} \quad , \quad
-            t \;=\; \frac{d}{v}
-            """
-            },
-        "Average Velocity": {
-            "honors" : r"v_{avg} \;=\; \frac{d_1 + d_2 + ...}{t_1 + t_2 + ...}", 
-            "conceptual": r"""v_{avg} \;=\; \frac{d_1 + d_2 + ...}{t_1 + t_2 + ...} \quad , \quad
-            d \;=\; v \cdot t \quad , \quad 
-            v \;=\; \frac{d}{t} \quad , \quad
-            t \;=\; \frac{d}{v}
-            """
-            },
-        "Combined Constant Motion": {
-            "honors" : r"v_{avg} \;=\; \frac{d_1 + d_2 + ...}{t_1 + t_2 + ...}", 
-            "conceptual": r"""v_{avg} \;=\; \frac{d_1 + d_2 + ...}{t_1 + t_2 + ...} \quad , \quad
-            d \;=\; v \cdot t \quad , \quad 
-            v \;=\; \frac{d}{t} \quad , \quad
-            t \;=\; \frac{d}{v}
-            """
-            }
-        }
+
+    generator = ConstantMotionGenerator()
+    metadata = generator.stored_metadata()
     difficulties = ["Easy","Medium","Hard"]
     title = "Constant Motion"
     prefix = "const_motion_"
-    ui = interface(prefix,title,ConstantMotionGenerator(),
-                    problem_type_dict,difficulties,True)
+    ui = interface(prefix, title, generator, metadata, difficulties)
     ui.unified_smart_layout()
 
     
 def main():
+    # Initialize session state for lazy loading
+    if 'loaded_tabs' not in st.session_state:
+        st.session_state.loaded_tabs = set()
+
     # Add tabs for quiz and explorer modes
-    tab1,tab2,tab3,tab4,tab5 = st.tabs([
-                                    "Constant Motion",
-                                    "Accelerated Motion", 
-                                    "Types of Motion Graphs",
-                                    "Matching Motion Graphs",
-                                    "Projectiles"
-                                    ])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+        "Constant Motion",
+        "Accelerated Motion",
+        "Types of Motion Graphs",
+        "Matching Motion Graphs",
+        "Projectiles"
+    ])
+
+    # Lazy loading implementation - only load content when tab is first accessed
     with tab1:
-        constant_motion()
+        if 'tab1' not in st.session_state.loaded_tabs:
+            if st.button("🚀 Load Constant Motion", key="load_tab1", help="Click to load this tab's content"):
+                st.session_state.loaded_tabs.add('tab1')
+                st.rerun()
+            
+        else:
+            constant_motion()
+
     with tab2:
-        linear_fns()
+        if 'tab2' not in st.session_state.loaded_tabs:
+            if st.button("🚀 Load Accelerated Motion", key="load_tab2", help="Click to load this tab's content"):
+                st.session_state.loaded_tabs.add('tab2')
+                st.rerun()
+            
+        else:
+            linear_fns()
+
     with tab3:
-        position_and_velocity_graph_analysis()
+        if 'tab3' not in st.session_state.loaded_tabs:
+            if st.button("🚀 Load Types of Motion Graphs", key="load_tab3", help="Click to load this tab's content"):
+                st.session_state.loaded_tabs.add('tab3')
+                st.rerun()
+            
+        else:
+            position_and_velocity_graph_analysis()
+
     with tab4:
-        PvT_and_VvT_graph_matching()
+        if 'tab4' not in st.session_state.loaded_tabs:
+            if st.button("🚀 Load Matching Motion Graphs", key="load_tab4", help="Click to load this tab's content"):
+                st.session_state.loaded_tabs.add('tab4')
+                st.rerun()
+            
+        else:
+            PvT_and_VvT_graph_matching()
+
     with tab5:
-        projectile_fns()
+        if 'tab5' not in st.session_state.loaded_tabs:
+            if st.button("🚀 Load Projectiles", key="load_tab5", help="Click to load this tab's content"):
+                st.session_state.loaded_tabs.add('tab5')
+                st.rerun()
+            
+        else:
+            projectile_fns()
+
+    # Auto-load the first tab on initial visit for better UX
+    if len(st.session_state.loaded_tabs) == 0:
+        st.session_state.loaded_tabs.add('tab1')
+        st.rerun()
 
 if __name__ == "__main__":
     main()

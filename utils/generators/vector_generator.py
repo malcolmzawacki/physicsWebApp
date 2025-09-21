@@ -211,22 +211,23 @@ class VectorGenerator(BaseGenerator):
         if problem_type == "Summing Vectors":
             return self.vector_sum()
 
-    def get_problem_metadata(self, problem_type: str) -> dict:
-        meta = {
+    def stored_metadata(self) -> dict[str, dict]:
+        """Return metadata mapping for this generator."""
+        return {
             "Find Components": {
-                "honors_equation": r"x = r\cos(\theta) \quad , \quad y = r\sin(\theta)",
-                "conceptual_equation": r"\text{Resolve the vector into horizontal (x) and vertical (y) components}",
+                "honors": r"x = r\cos(\theta) \quad , \quad y = r\sin(\theta)",
+                "conceptual": r"\text{Resolve the vector into horizontal (x) and vertical (y) components}",
                 "tags": ["vectors", "components"],
             },
             "Find Resultant": {
-                "honors_equation": r"r = \sqrt{x^2 + y^2} \quad , \quad \theta = \tan^{-1}\!\left(\frac{y}{x}\right)",
-                "conceptual_equation": r"\text{Magnitude from Pythagorean theorem; angle from inverse tangent}",
+                "honors": r"r = \sqrt{x^2 + y^2} \quad , \quad \theta = \tan^{-1}\!\left(\frac{y}{x}\right)",
+                "conceptual": r"\text{Magnitude from Pythagorean theorem; angle from inverse tangent}",
                 "tags": ["vectors", "resultant"],
             },
             "Summing Vectors": {
-                "honors_equation": r"x_r = x_1 + x_2 \quad , \quad y_r = y_1 + y_2 \quad , \quad r = \sqrt{x_r^2 + y_r^2} \quad , \quad \theta = \tan^{-1}\!\left(\frac{y_r}{x_r}\right)",
-                "conceptual_equation": r"\text{Add components, then convert to magnitude/angle}",
+                "honors": r"x_r = x_1 + x_2 \quad , \quad y_r = y_1 + y_2 \quad , \quad r = \sqrt{x_r^2 + y_r^2} \quad , \quad \theta = \tan^{-1}\!\left(\frac{y_r}{x_r}\right)",
+                "conceptual": r"\text{Add components, then convert to magnitude/angle}",
                 "tags": ["vectors", "addition"],
             },
         }
-        return meta.get(problem_type, {})
+
