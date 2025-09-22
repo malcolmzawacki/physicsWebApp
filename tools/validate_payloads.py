@@ -6,7 +6,6 @@ from typing import Dict, List, Tuple
 from utils.generators.const_motion_generator import ConstantMotionGenerator
 from utils.generators.linear_motion_generator import LinearMotionGenerator
 from utils.generators.force_generator import ForceGenerator
-from utils.generators.energy_generator import EnergyGenerator
 from utils.generators.vector_generator import VectorGenerator
 from utils.generators.projectile_generator import ProjectileGenerator
 from utils.generators.waves_generator import WaveGenerator
@@ -58,13 +57,6 @@ def main() -> int:
         ),
         "ForceGenerator": (
             ForceGenerator(),
-            [
-                "Type 1",
-                "Type 2",
-            ],
-        ),
-        "EnergyGenerator": (
-            EnergyGenerator(),
             [
                 "Type 1",
                 "Type 2",

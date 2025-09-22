@@ -1,6 +1,8 @@
 import streamlit as st
 from utils.ui import interface
 
+# region older layout
+
 def wave_properties():
         
     problem_type_dict = {
@@ -129,6 +131,8 @@ def main():
         Harmonics()
     with tab3:
         deciBel_practice()
+# endregion
+
 
 def main2():
     from utils.generators.waves_generator import WaveGenerator
