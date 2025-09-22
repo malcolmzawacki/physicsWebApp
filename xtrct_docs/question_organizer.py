@@ -6,11 +6,13 @@ sys.path.append(str(Path(__file__).parent.parent))
 from utils.generators.linear_motion_generator import LinearMotionGenerator
 from utils.generators.const_motion_generator import ConstantMotionGenerator
 from utils.generators.dist_disp_generator import DistDispGenerator
+from utils.generators.projectile_generator import ProjectileGenerator
 class Org:
     def __init__(self):
         self.AM = LinearMotionGenerator()
         self.CM = ConstantMotionGenerator()
         self.DDG = DistDispGenerator()
+        self.PG = ProjectileGenerator()
 
     def create_first_doc(self):
         def question_generator():
@@ -106,5 +108,56 @@ class Org:
         return generate_questions
 
 
+    def projectile_practice(self):
+        def generate_question():
+            return [
+                {
+                "heading": "Type 1 Projectiles (Easy)",
+                "problems": [self.PG._generate_type1_question("Easy") for _ in range(10)],
+                "gap": 1
+                },
+                {              
+                "heading": "Type 1 Projectiles (Medium)",
+                "problems": [self.PG._generate_type1_question("Medium") for _ in range(10)],
+                "gap": 1
+                },
+                {              
+                "heading": "Type 1 Projectiles (Hard)",
+                "problems": [self.PG._generate_type1_question("Hard") for _ in range(10)],
+                "gap": 1
+                },
+                {
+                "heading": "Type 2 Projectiles (Easy)",
+                "problems": [self.PG._generate_type2_question("Easy") for _ in range(10)],
+                "gap": 1
+                },
+                {              
+                "heading": "Type 2 Projectiles (Medium)",
+                "problems": [self.PG._generate_type2_question("Medium") for _ in range(10)],
+                "gap": 1
+                },
+                {              
+                "heading": "Type 2 Projectiles (Hard)",
+                "problems": [self.PG._generate_type2_question("Hard") for _ in range(10)],
+                "gap": 1
+                },
+                {
+                "heading": "Type 3 Projectiles (Easy)",
+                "problems": [self.PG._generate_type3_question("Easy") for _ in range(10)],
+                "gap": 1
+                },
+                {              
+                "heading": "Type 3 Projectiles (Medium)",
+                "problems": [self.PG._generate_type3_question("Medium") for _ in range(10)],
+                "gap": 1
+                },
+                {              
+                "heading": "Type 3 Projectiles (Hard)",
+                "problems": [self.PG._generate_type3_question("Hard") for _ in range(10)],
+                "gap": 1
+                },
+
+            ]
+        return generate_question
 
 
