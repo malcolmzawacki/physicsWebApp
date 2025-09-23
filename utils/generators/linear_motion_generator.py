@@ -553,7 +553,27 @@ class LinearMotionGenerator(BaseGenerator):
             },
             "Mixed": {
                 "honors_equation": r"v_f^2 = v_i^2 + 2ax \quad , \quad v_f = v_i +at  \quad , \quad x = \frac{v_f + v_i}{2} t  \quad , \quad x = v_i t + \frac{1}{2} at^2",
-                "conceptual_equation": r"\quad x = \frac{v_f + v_i}{2} t  \quad \newline ~ \newline ~ \newline \quad x = v_i t + \frac{1}{2} at^2  \quad \newline ~ \newline ~ \newline \quad x = \frac{v_f^2 - v_i^2}{2a}  \quad \newline ~ \newline ~ \newline \quad t = \frac{2x}{v_f + v_i}  \quad  \quad t = \frac{v_f - v_i}{a}  \quad  \quad t = \frac{\sqrt{v_i^2 + 2ax} - v_i}{a}  \quad  \newline ~ \newline ~ \newline \quad v_i = \sqrt{2ax - v_f^2}  \quad  \quad v_i = v_f - at  \quad  \quad v_i = \frac{2x}{t} - v_f  \quad  \quad v_i = \frac{x}{t} - \frac{1}{2} at  \quad  \newline ~ \newline ~ \newline \quad v_f = \frac{2x}{t} - v_i  \quad  \quad v_f = \sqrt{v_i^2 + 2ax}  \quad  \quad v_f = v_i + at  \quad  \newline ~ \newline ~ \newline \quad a = 2 \left( \frac{x - v_i t}{t^2} \right)\quad   \quad a = \frac{v_f - v_i}{t}  \quad  \quad a = \frac{v_f^2 - v_i^2}{2x}",
+                "conceptual_equation": r"""
+                x = \frac{v_f + v_i}{2} t  \quad , \quad 
+                x = v_i t + \frac{1}{2} at^2  \quad , \quad 
+                x = \frac{v_f^2 - v_i^2}{2a}  
+                \newline ~ \newline ~ \newline 
+                t = \frac{2x}{v_f + v_i}  \quad , \quad 
+                t = \frac{v_f - v_i}{a}  \quad , \quad 
+                t = \frac{\sqrt{v_i^2 + 2ax} - v_i}{a}   
+                \newline ~ \newline ~ \newline 
+                v_i = \sqrt{2ax - v_f^2}  \quad , \quad
+                v_i = v_f - at  \quad , \quad 
+                v_i = \frac{2x}{t} - v_f  \quad , \quad 
+                v_i = \frac{x}{t} - \frac{1}{2} at 
+                \newline ~ \newline ~ \newline 
+                v_f = \frac{2x}{t} - v_i  \quad , \quad 
+                v_f = \sqrt{v_i^2 + 2ax}  \quad , \quad 
+                v_f = v_i + at  \quad  
+                \newline ~ \newline ~ \newline 
+                a = 2 \left( \frac{x - v_i t}{t^2} \right)\quad  , \quad 
+                a = \frac{v_f - v_i}{t}  \quad , \quad 
+                a = \frac{v_f^2 - v_i^2}{2x}""",
                 "tags": ["kinematics", "mixed"],
             },
         }
