@@ -1,8 +1,12 @@
 import streamlit as st
+
+from tools.loading import lazy_tabs
 from utils.ui import interface
+
 
 def energy_basics_page():
     from utils.generators.energy.energy_basics import EnergyBasicsGenerator
+
     title = "Types of Energy"
     prefix = "energy_basics"
     difficulties = ["Easy","Medium","Hard"]
@@ -11,8 +15,10 @@ def energy_basics_page():
     ui = interface(prefix, title, generator, metadata, difficulties)
     ui.unified_smart_layout()
 
+
 def energy_conserv_page():
     from utils.generators.energy.energy_conserv import EnergyConservationGenerator
+
     title = "Conservation of Energy"
     prefix = "energy_conservation"
     generator = EnergyConservationGenerator()
@@ -24,6 +30,7 @@ def energy_conserv_page():
 
 def thermal_energy_page():
     from utils.generators.energy.thermal_loss import ThermalLossGenerator
+
     title = "Thermal Energy"
     prefix = "thermal"
     generator = ThermalLossGenerator()
@@ -32,8 +39,10 @@ def thermal_energy_page():
     ui = interface(prefix, title, generator, metadata, difficulties)
     ui.unified_smart_layout()
 
+
 def friction_distance_page():
     from utils.generators.energy.frict_and_dist import ThermalWithFrictionGenerator
+
     title = "Friction and Distance"
     prefix = "frict_dist"
     generator = ThermalWithFrictionGenerator()
@@ -44,17 +53,15 @@ def friction_distance_page():
 
 
 def main():
-    # Add tabs for quiz and explorer modes
-    tab1, tab2, tab3, tab4 = st.tabs(["Types of Energy", "Conservation of Energy","Thermal Energy","Friction and Distance"])  
-    
-    with tab1:
-        energy_basics_page()
-    with tab2:
-        energy_conserv_page()
-    with tab3:
-        thermal_energy_page()
-    with tab4:
-        friction_distance_page()
+    tab_specs = [
+        ("Types of Energy", energy_basics_page),
+        ("Conservation of Energy", energy_conserv_page),
+        ("Thermal Energy", thermal_energy_page),
+        ("Friction and Distance", friction_distance_page),
+    ]
+
+    lazy_tabs(tab_specs, state_key="energy_tabs", auto_load_first=True)
+
 
 if __name__ == "__main__":
     main()

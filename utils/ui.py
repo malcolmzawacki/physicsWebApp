@@ -1,3 +1,5 @@
+"""Streamlit interface helpers that connect problem generators to the UI layer."""
+
 import time
 import pandas as pd
 import streamlit as st
@@ -10,6 +12,8 @@ from utils.problem_payload import payload_from_dict, ProblemPayload, ProblemPayl
 
 
 class Interface:
+    """High-level controller that wires generators into the Streamlit UI."""
+
     def __init__(
         self,
         prefix: str,
@@ -19,6 +23,7 @@ class Interface:
         difficulties: list,
         type_weight: bool = False,
     ) -> None:
+        """Store generator metadata and configure the namespaced session state."""
         self.prefix = prefix
         self.title = title
         self.generator = generator
@@ -41,6 +46,7 @@ class Interface:
         self.state = State(prefix)
 
     def _infer_problem_types(self) -> list[str]:
+        """Ask the generator for its supported problem types when none were provided."""
         getter = getattr(self.generator, "get_problem_types", None)
         if callable(getter):
             try:
@@ -78,6 +84,7 @@ class Interface:
     # endregion
 
     def initialize_session_state(self) -> None:
+        """Ensure all interface-managed session-state keys exist with sensible defaults."""
         none_vars = [
             "current_question",
             "correct_answer",
@@ -102,11 +109,13 @@ class Interface:
             self.state.set("level", False)
 
     def header_component(self) -> None:
+        """Render the title banner along with any earned star count."""
         stars = self.state.get("stars", 0)
         render_header(self.title, stars if stars else None)
 
     # region unified helpers
     def add_diagram_smart(self, expander_title: str = "Diagram", **kwargs) -> None:
+        """Render a generator-provided diagram in an expander when diagram data is available."""
         diagram_data = self.state.get("diagram_data")
         if diagram_data is None:
             return
@@ -123,6 +132,7 @@ class Interface:
                     st.exception(e)
 
     def get_current_problem_features(self) -> dict:
+        """Collect optional features saved in session state for the current question."""
         features = {}
         for feature in ["diagram_data", "hints", "button_options", "time_limit", "explanation", "tags", "show_equations"]:
             val = self.state.get(feature)
@@ -131,13 +141,16 @@ class Interface:
         return features
 
     def show_hints(self) -> None:
+        """Display ordered hints, if any were supplied by the generator."""
         render_hints(self.state.get("hints", []))
 
     def show_problem_tags(self, tags: list) -> None:
+        """Render topic tags for the current question when generators provide them."""
         if tags:
             st.caption(" ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ ".join(tags))
 
     def generate_question_once(self, problem_type: str, difficulty: str) -> None:
+        """Fetch a new problem from the generator, normalize it, and trigger a rerun."""
         try:
             result = self.generator.choose_problem_dict(problem_type, difficulty)
         except Exception as e:
@@ -150,6 +163,7 @@ class Interface:
         st.rerun()
 
     def _store_dict_result(self, result: dict, problem_type: str, difficulty: str) -> None:
+        """Validate the generator payload and persist the normalized data in session state."""
         try:
             payload: ProblemPayload = payload_from_dict(result)
         except ProblemPayloadError as e:
@@ -175,6 +189,7 @@ class Interface:
                 self.state.pop(feature)
 
     def _store_legacy_result(self, result: tuple, problem_type: str, difficulty: str) -> None:
+        """Support tuple-based generators until they are migrated to the dict contract."""
         question, answers, units, diagram_data = result
         self.state.inc("question_id", 1)
         self.state.set("problem_type", problem_type)
@@ -188,6 +203,7 @@ class Interface:
             self.state.set("diagram_data", diagram_data)
 
     def unified_question_options(self, equations: bool = True, ifDifficulty: bool = True) -> None:
+        """Render selectors for problem type and difficulty, auto-refreshing when the choice changes."""
         col1, col2, col3 = st.columns([3, 2, 2], vertical_alignment="bottom", gap="medium")
         with col1:
             selected_problem_type = st.selectbox(
@@ -223,6 +239,7 @@ class Interface:
             )
 
     def _show_equations_unified(self, problem_type: str) -> None:
+        """Legacy helper for equation display; retained for compatibility with older pages."""
         with st.expander("equation(s)", expanded=True):
             if hasattr(self.generator, "get_problem_metadata"):
                 metadata = self.generator.get_problem_metadata(problem_type)
@@ -243,7 +260,7 @@ class Interface:
                     st.latex(equation)
 
     def unified_smart_layout(self, **kwargs):
-        """Smart layout that works with both legacy and dictionary generators"""
+        """Co-ordinate the full question lifecycle, handling diagrams, hints, and answer UIs."""
         self.initialize_session_state()
         self.header_component()
         equations = kwargs.get("equations", True)
@@ -281,10 +298,12 @@ class Interface:
         self.footer_dict()
 
     def new_question_dict(self, problem_type: str, difficulty: str) -> None:
+        """Expose a manual new-question button that respects the current selections."""
         if st.button("New Question", key=f"{self.prefix}_new_question"):
             self.generate_question_once(problem_type, difficulty)
 
     def footer_dict(self) -> None:
+        """Render the footer controls for generating new questions and showing performance."""
         col1, col2 = st.columns([1, 4], vertical_alignment="center")
         with col1:
             self.new_question_dict(self.state.get("problem_type"), self.state.get("difficulty"))
@@ -292,6 +311,7 @@ class Interface:
             self.performance_dropdown()
 
     def question_ui_dict(self, timer: float = 3.0, big_font: bool = False) -> None:
+        """Render the free-response form and enforce numeric validation with tolerance."""
         q = self.state.get("current_question")
         st.title(q) if big_font else st.write(q)
         with st.form(f"{self.prefix}_form", clear_on_submit=True):
@@ -331,6 +351,7 @@ class Interface:
                 st.warning("Please fix the errors above and try again.")
 
     def question_ui_buttons(self) -> None:
+        """Render multiple-choice style inputs when generators provide answer options."""
         st.write(self.state.get("current_question"))
         correct_answers = self.state.get("correct_answers", [])
         units = self.state.get("units", [])
@@ -363,6 +384,7 @@ class Interface:
                 self.check_button_answers(user_answers)
 
     def check_button_answers(self, user_answers):
+        """Evaluate button-based answers, update performance, and show feedback."""
         correct_answers = self.state.get("correct_answers", [])
         all_correct = True
         for user_input, correct_answer in zip(user_answers, correct_answers):
@@ -384,6 +406,7 @@ class Interface:
         self.state.set("user_answers_selected", [None] * len(correct_answers))
 
     def check_answers_dict(self, user_answers: list, timer: float):
+        """Score free-response answers with a +/-10% tolerance for numeric entries."""
         correct_answers = self.state.get("correct_answers", [])
         all_correct = True
         if None not in user_answers:
@@ -415,11 +438,13 @@ class Interface:
             st.error("Please enter all answers before submitting")
 
     def give_stars(self, difficulty: str, problem_type: str) -> int:
+        """Calculate the star bonus using difficulty order and optional problem-type weighting."""
         problem_type_bonus = self.problem_types.index(problem_type) + 1 if self.type_weight else 1
         difficulty_bonus = self.difficulties.index(difficulty) + 1
         return problem_type_bonus * difficulty_bonus
 
     def loading_q_dict(self, timer: float = 3) -> None:
+        """Display a progress bar before auto-generating the next question unless canceled."""
         problem_type = self.state.get("problem_type")
         difficulty = self.state.get("difficulty")
         i = 0
@@ -438,6 +463,7 @@ class Interface:
             self.generate_question_once(problem_type, difficulty)
 
     def debug_panel(self) -> None:
+        """In author mode, summarize the payload and metadata for quick inspection."""
         try:
             problem_type = self.state.get("problem_type")
             difficulty = self.state.get("difficulty")
@@ -455,3 +481,5 @@ class Interface:
 
 # Backwards compatibility for existing imports
 interface = Interface
+
+

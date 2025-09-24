@@ -6,7 +6,7 @@ import random
 plt.style.use("dark_background")
 
 from utils.ui import interface
-
+from tools.loading import lazy_tabs
 def linear_fns():
     # Lazy import - only load when this tab is actually accessed
     from utils.generators.linear_motion_generator import LinearMotionGenerator
@@ -199,69 +199,16 @@ def constant_motion():
 
     
 def main():
-    # Initialize session state for lazy loading
-    if 'loaded_tabs' not in st.session_state:
-        st.session_state.loaded_tabs = set()
+    tab_specs = [
+        ("Constant Motion", constant_motion),
+        ("Accelerated Motion", linear_fns),
+        ("Types of Motion Graphs", position_and_velocity_graph_analysis),
+        ("Matching Motion Graphs", PvT_and_VvT_graph_matching),
+        ("Projectiles", projectile_fns),
+    ]
 
-    # Add tabs for quiz and explorer modes
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
-        "Constant Motion",
-        "Accelerated Motion",
-        "Types of Motion Graphs",
-        "Matching Motion Graphs",
-        "Projectiles"
-    ])
-
-    # Lazy loading implementation - only load content when tab is first accessed
-    with tab1:
-        if 'tab1' not in st.session_state.loaded_tabs:
-            if st.button("🚀 Load Constant Motion", key="load_tab1", help="Click to load this tab's content"):
-                st.session_state.loaded_tabs.add('tab1')
-                st.rerun()
-            
-        else:
-            constant_motion()
-
-    with tab2:
-        if 'tab2' not in st.session_state.loaded_tabs:
-            if st.button("🚀 Load Accelerated Motion", key="load_tab2", help="Click to load this tab's content"):
-                st.session_state.loaded_tabs.add('tab2')
-                st.rerun()
-            
-        else:
-            linear_fns()
-
-    with tab3:
-        if 'tab3' not in st.session_state.loaded_tabs:
-            if st.button("🚀 Load Types of Motion Graphs", key="load_tab3", help="Click to load this tab's content"):
-                st.session_state.loaded_tabs.add('tab3')
-                st.rerun()
-            
-        else:
-            position_and_velocity_graph_analysis()
-
-    with tab4:
-        if 'tab4' not in st.session_state.loaded_tabs:
-            if st.button("🚀 Load Matching Motion Graphs", key="load_tab4", help="Click to load this tab's content"):
-                st.session_state.loaded_tabs.add('tab4')
-                st.rerun()
-            
-        else:
-            PvT_and_VvT_graph_matching()
-
-    with tab5:
-        if 'tab5' not in st.session_state.loaded_tabs:
-            if st.button("🚀 Load Projectiles", key="load_tab5", help="Click to load this tab's content"):
-                st.session_state.loaded_tabs.add('tab5')
-                st.rerun()
-            
-        else:
-            projectile_fns()
-
-    # Auto-load the first tab on initial visit for better UX
-    if len(st.session_state.loaded_tabs) == 0:
-        st.session_state.loaded_tabs.add('tab1')
-        st.rerun()
+    lazy_tabs(tab_specs, state_key="motion_tabs", auto_load_first=True)
 
 if __name__ == "__main__":
     main()
+

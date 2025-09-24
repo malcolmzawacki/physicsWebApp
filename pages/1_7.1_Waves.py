@@ -1,5 +1,6 @@
 import streamlit as st
 from utils.ui import interface
+from tools.loading import lazy_tabs
 
 # region older layout
 
@@ -124,13 +125,13 @@ def deciBel_practice():
 
 
 def main():
-    tab1,tab2,tab3 = st.tabs(["Wave Properties","Harmonics","deciBel Scale"])
-    with tab1:
-        wave_properties()
-    with tab2:
-        Harmonics()
-    with tab3:
-        deciBel_practice()
+    tab_specs = [
+        ("Wave Properties", wave_properties),
+        ("Harmonics", Harmonics),
+        ("deciBel Scale", deciBel_practice),
+    ]
+
+    lazy_tabs(tab_specs, state_key="waves_tabs", auto_load_first=True)
 # endregion
 
 
@@ -147,4 +148,4 @@ def main2():
     
 
 if __name__ == "__main__":
-    main2()
+    main()

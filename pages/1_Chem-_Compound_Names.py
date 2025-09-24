@@ -2,6 +2,8 @@ import streamlit as st
 import math
 import random
 
+from tools.loading import lazy_tabs
+
 element_dict = {
     #"Period 1"
     'H': {'name': 'Hydrogen', 'period': 1, 'group': 1, 'charges': [1], 'anion': 'hydride'},
@@ -542,14 +544,12 @@ def practice_quiz_page():
             st.warning(st.session_state.feedback)
 
 def main():
-    # Add tabs for quiz and explorer modes
-    tab1, tab2 = st.tabs(["Practice Quiz", "Formula Explorer"])
-    
-    with tab1:
-        practice_quiz_page()
-    
-    with tab2:
-        create_exploration_page()
+    tab_specs = [
+        ("Practice Quiz", practice_quiz_page),
+        ("Formula Explorer", create_exploration_page),
+    ]
+
+    lazy_tabs(tab_specs, state_key="compound_names_tabs", auto_load_first=True)
 
 if __name__ == "__main__":
     main()
