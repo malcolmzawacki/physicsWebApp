@@ -204,7 +204,7 @@ class LinearMotionGenerator(BaseGenerator):
                     question = f"""If a {noun} starts at {v_i} m/s and accelerates at {a} m/s² 
                     over {x} meters, what velocity does it reach?"""
                 else:
-                    question = f"""If a {noun} decelerates at {-1*a} m/s² from {v_f} m/s 
+                    question = f"""If a {noun} decelerates at {-1*a} m/s² from {v_i} m/s 
                     over {x} meters, what is the final velocity?"""
             elif var_dice == 2:  # Solve for initial velocity
                 unit = "Initial Velocity (m/s)"
