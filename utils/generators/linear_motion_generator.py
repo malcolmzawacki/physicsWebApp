@@ -11,21 +11,20 @@ class LinearMotionGenerator(BaseGenerator):
         super().__init__(state_prefix="linear_")
 
 
-    def choose_problem_dict(self,problem_type, difficulty):
+    def choose_problem_dict(self, problem_type, difficulty, solve_for=None):
+        """Return a problem dictionary for the requested kinematics case."""
         if problem_type == "No Time":
-            return self.no_time_question(difficulty)
+            return self.no_time_question(difficulty, solve_for=solve_for)
         elif problem_type == "No Distance":
-            return self.no_dist_question(difficulty)
+            return self.no_dist_question(difficulty, solve_for=solve_for)
         elif problem_type == "No Acceleration":
-            return self.no_acc_question(difficulty)
+            return self.no_acc_question(difficulty, solve_for=solve_for)
         elif problem_type == "No Final Velocity":
-            return self.no_vf_question(difficulty)
+            return self.no_vf_question(difficulty, solve_for=solve_for)
         elif problem_type == "Mixed":
-            return self.mixed_question(difficulty)
+            return self.mixed_question(difficulty, solve_for=solve_for)
         else:
-            pass
-
-    
+            raise ValueError(f"Unknown problem type '{problem_type}'")
 
 
     def get_difficulty_range(self, difficulty):
@@ -34,6 +33,9 @@ class LinearMotionGenerator(BaseGenerator):
         elif difficulty == "Hard":
             return 20
         return 10
+    
+
+    # region get numbers for equations
 
     def no_time_eq_nums(self, difficulty): # v_f,v_i,a,x 
         max_val = self.get_difficulty_range(difficulty)
@@ -141,374 +143,395 @@ class LinearMotionGenerator(BaseGenerator):
         return x, v_i,t,a
 
 
+    # endregion
 
-    "E X T R A   S P A C E   F O R   Q U E S T I O N   F U N C T I O N S"
 
 
-    def no_time_question(self, difficulty):
-        """has acceleration problems, needs x, vf, vi"""
-        noun = random_noun()
-        coin = random.randint(0,1)  # determines speeding up or slowing down
-        var_dice = random.randint(0, 3)  # roll for variable to solve for
-        v_f, v_i, a, x = self.no_time_eq_nums(difficulty)
-        if coin == 0:
-            verb = "speeds up"
+
+
+
+    # region question phrasing and formatting
+
+    def _select_solve_for(self, solve_for, allowed_map, context_label):
+        """Normalize a solve_for string and validate it against supported options."""
+        options = list(allowed_map.keys())
+        if solve_for is None:
+            return random.choice(options)
+
+        normalized = str(solve_for).strip().lower()
+        for canonical, aliases in allowed_map.items():
+            alias_values = {canonical}
+            alias_values.update(aliases)
+            if normalized in alias_values:
+                return canonical
+
+        readable = "', '".join(options)
+        raise ValueError(
+            f"Unsupported solve_for '{solve_for}' for {context_label}. Choose from '{readable}'."
+        )
+
+    def _direction_label(self, value):
+        if value > 0:
+            return "to the right"
+        if value < 0:
+            return "to the left"
+        return None
+
+    def _velocity_value_str(self, value):
+        direction = self._direction_label(value)
+        base = f"{value} m/s"
+        if direction:
+            return f"{base} ({direction})"
+        return base
+
+    def _describe_velocity(self, value):
+        direction = self._direction_label(value)
+        speed = abs(value)
+        if speed == 0:
+            return "at rest"
+        if direction:
+            return f"{speed} m/s {direction}"
+        return f"{speed} m/s"
+
+    def _format_acceleration(self, value):
+        direction = self._direction_label(value)
+        base = f"{value} m/s^2"
+        if direction and value != 0:
+            return f"{base} ({direction})"
+        return base
+
+    def _motion_phrases(self, initial, final, scenario):
+        start_inf = "start from rest" if initial == 0 else f"start by moving at {self._velocity_value_str(initial)}"
+        start_ind = "it starts from rest" if initial == 0 else f"it starts by moving at {self._velocity_value_str(initial)}"
+
+        if final == 0:
+            end_inf = "come to rest"
+            end_ind = "it comes to rest"
+        elif scenario == "reversal":
+            end_inf = f"reach {self._velocity_value_str(final)} after changing direction"
+            end_ind = f"it reaches {self._velocity_value_str(final)} after changing direction"
         else:
-            a *= -1
-            verb = "slows down"
+            end_inf = f"reach {self._velocity_value_str(final)}"
+            end_ind = f"it reaches {self._velocity_value_str(final)}"
 
-        if difficulty in ["Easy", "Medium"]:
-            if var_dice == 0:  # Solve for acceleration
-                unit = "Acceleration (m/s²)"
-                answer = a
-                if verb == "speeds up":
-                    question = f"""What acceleration would a {noun} at rest need to experience 
-                    for it to reach a velocity of {v_f} m/s over a distance of {x} meters?"""
-                else:
-                    question = f"""How much deceleration would a {noun} moving at {v_f} m/s 
-                    need in order to come to rest over a distance of {x} meters?"""
-            elif var_dice in [1,2]:  # Solve for final velocity, swap for 'initial' if slowing
-                
-                answer = v_f
-                if verb == "speeds up":
-                    question = f"""If a {noun} starts from rest and accelerates at {a} m/s² 
-                    over a distance of {x} meters, what velocity does it reach?"""
-                    unit = "Final Velocity (m/s)"
-                else:
-                    question = f"""If a {noun} decelerates at {-1*a} m/s² to rest 
-                    over {x} meters, what was its initial velocity?"""
-                    unit = "Initial Velocity (m/s)"
-            elif var_dice == 3:  # Solve for distance
-                unit = "Distance (meters)"
-                answer = x
-                if verb == "speeds up":
-                    question = f"""A {noun} at rest accelerates at {a} m/s² to a velocity of {v_f} m/s. 
-                    How far did it travel during this time?"""
-                else:
-                    question = f"""A {noun} decelerates at {-1*a} m/s² from {v_f} m/s to rest. 
-                    How far did it travel during this time?"""
-        else:  # HARD difficulty
-            if var_dice == 0:  # Solve for acceleration
-                unit = "Acceleration (m/s²)"
-                answer = a
-                if verb == "speeds up":
-                    question = f"""What acceleration would a {noun} moving at {v_i} m/s need to experience 
-                    for it to speed up to {v_f} m/s over a distance of {x} meters?"""
-                else:
-                    question = f"""What deceleration would a {noun} moving at {v_f} m/s need to experience 
-                    to slow down to {v_i} m/s over a distance of {x} meters?"""
-            elif var_dice == 1:  # Solve for final velocity
-                unit = "Final Velocity (m/s)"
-                answer = v_f
-                if verb == "speeds up":
-                    question = f"""If a {noun} starts at {v_i} m/s and accelerates at {a} m/s² 
-                    over {x} meters, what velocity does it reach?"""
-                else:
-                    question = f"""If a {noun} decelerates at {-1*a} m/s² from {v_i} m/s 
-                    over {x} meters, what is the final velocity?"""
-            elif var_dice == 2:  # Solve for initial velocity
-                unit = "Initial Velocity (m/s)"
-                answer = v_i
-                if verb == "speeds up":
-                    question = f"""If a {noun} accelerates at {a} m/s² to {v_f} m/s 
-                    over {x} meters, what was its initial velocity?"""
-                else:
-                    question = f"""If a {noun} decelerates at {-1*a} m/s² to {v_f} m/s 
-                    over {x} meters, what was its initial velocity?"""
-            elif var_dice == 3:  # Solve for distance
-                unit = "Distance (meters)"
-                answer = x
-                if verb == "speeds up":
-                    question = f"""A {noun} accelerates from {v_i} m/s to {v_f} m/s at {a} m/s². 
-                    How far did it travel?"""
-                else:
-                    question = f"""A {noun} decelerates from {v_f} m/s to {v_i} m/s at {-1*a} m/s². 
-                    How far did it travel?"""
+        start_stmt = start_ind[3:] if start_ind.startswith("it ") else start_ind
+        end_stmt = end_ind[3:] if end_ind.startswith("it ") else end_ind
 
-        return {"question": question, "answers": [answer], "units": [unit]}
-            
-    "Formatting on HARD here could be improved to state direction textually. still includes negative signs. gotta ship something tho"
-    def no_dist_question(self, difficulty):
-        """has a, needs t, vf, vi"""
-        v_f, v_i, a, t = self.no_dist_eq_nums(difficulty)
-        noun = random_noun()
-        coin = random.randint(0, 1)  # determines speeding up or slowing down
-        var_dice = random.randint(0, 3)  # roll for variable to solve for
-        if coin == 0:
-            verb = "speeds up"
+        return {
+            "start_inf": start_inf,
+            "start_ind": start_ind,
+            "start_stmt": start_stmt,
+            "end_inf": end_inf,
+            "end_ind": end_ind,
+            "end_stmt": end_stmt,
+        }
+
+    def _motion_context(self, initial, final, accel):
+        """Analyze motion parameters and derive narrative details without altering values."""
+        speed_initial = abs(initial)
+        speed_final = abs(final)
+        reverses = initial * final < 0
+
+        if speed_initial == 0 and speed_final == 0:
+            scenario = "stationary"
+        elif reverses:
+            scenario = "reversal"
+        elif speed_initial == 0:
+            scenario = "starting"
+        elif speed_final == 0:
+            scenario = "stopping"
+        elif speed_final > speed_initial:
+            scenario = "increasing"
+        elif speed_final < speed_initial:
+            scenario = "decreasing"
         else:
-            a *= -1
-            verb = "slows down"
-        if difficulty == "Easy":
-            if var_dice == 0:  # Solve for acceleration
-                unit = "Acceleration (m/s²)"
-                answer = a
-                if coin == 0: # speeding up
-                    question = f"""What acceleration would a {noun} initially at rest need to 
-                    experience to get to {v_f} m/s in {t} seconds?"""
-                else: # slowing down
-                    question = f"""What deceleration would a {noun} initally moving at {v_f} m/s need to 
-                    experience to get to rest in {t} seconds?"""
-            elif var_dice in [1,2]:  # Solve for final velocity since initial is zero in easy
-                answer = v_f
-                if coin == 0:
-                    question = f"""If a {noun} starts at rest and accelerates at {a} m/s² for 
-                    {t} seconds, what velocity does it reach?"""
-                    unit = "Final Velocity (m/s)"
-                else:
-                    question = f"""If a {noun} decelerates at {-1*a} m/s² for 
-                    {t} seconds in order to come to rest, what velocity did it start with?"""
-                    unit = "Initial Velocity (m/s)"
-            elif var_dice == 3:  # Solve for time
-                unit = "Time (seconds)"
-                answer = t
-                if coin == 0: #speeding up
-                    question = f"""A {noun} accelerates from rest at {a} m/s², reaching {v_f} m/s. 
-                    How long does it take?"""
-                else:
-                    question = f"""A {noun} decelerates from {v_f} m/s to rest at a rate of {-1*a}  m/s². 
-                    How long does it take?"""
-        elif difficulty == "Medium":
-            if var_dice == 0:  # Solve for acceleration
-                unit = "Acceleration (m/s²)"
-                answer = a
-                if coin == 0:
-                    question = f"""Determine the acceleration required for a {noun} moving at {v_i} m/s 
-                    to speed up to {v_f} m/s in {t} seconds."""
-                else:
-                    question = f"""Determine the deceleration required for a {noun} moving at {v_f} m/s 
-                    to slow to {v_i} m/s in {t} seconds."""
-            elif var_dice in [1,2]:  # Solve for final velocity, they are reversible
-                answer = v_f
-                if coin == 0:
-                    question = f"""A {noun} starts at {v_i} m/s and accelerates at {a} m/s² for {t} seconds. 
-                    What is its final velocity?"""
-                    unit = "Final Velocity (m/s)"
-                else:
-                    question = f"""A {noun} slows to {v_i} m/s after decelerating at {-1*a} m/s² for {t} seconds. 
-                    What was its initial velocity?"""
-                    unit = "Initial Velocity (m/s)"
-            elif var_dice == 3:  # Solve for time
-                unit = "Time (seconds)"
-                answer = t
-                if coin == 0:
-                    question = f"""A {noun} accelerates from {v_i} m/s to {v_f} m/s with an acceleration of {a} m/s². 
-                    How much time does it take?"""
-                else:
-                    question = f"""A {noun} decelerates from {v_f} m/s to {v_i} m/s at a rate of {a} m/s². 
-                    How much time does it take?"""
-        else:  # HARD difficulty
-            if var_dice == 0:  # Solve for acceleration
-                unit = "Acceleration (m/s²)"
-                answer = a
-                question = f"""What acceleration would a {noun} moving at {v_i} m/s need to experience 
-                to {verb} to {v_f} m/s in {t} seconds?"""
-            elif var_dice == 1:  # Solve for final velocity
-                unit = "Final Velocity (m/s)"
-                answer = v_f
-                question = f"""If a {noun} starts at {v_i} m/s and {verb} at {a} m/s² for {t} seconds, 
-                what velocity does it reach?"""
-            elif var_dice == 2:  # Solve for initial velocity
-                unit = "Initial Velocity (m/s)"
-                answer = v_i
-                question = f"""If a {noun} {verb} at {a} m/s² to reach {v_f} m/s in {t} seconds, 
-                what was its initial velocity?"""
-            elif var_dice == 3:  # Solve for time
-                unit = "Time (seconds)"
-                answer = t
-                question = f"""A {noun} {verb} at {a} m/s² from {v_i} m/s to {v_f} m/s. 
-                How long does it take?"""
+            scenario = "steady"
 
-        return {"question": question, "answers": [answer], "units": [unit]}
+        verb_map = {
+            "starting": "speeds up",
+            "increasing": "speeds up",
+            "stopping": "slows down",
+            "decreasing": "slows down",
+            "reversal": "changes direction",
+            "steady": "maintains speed",
+            "stationary": "remains at rest",
+        }
 
-    
-    def no_acc_question(self,difficulty):
-        "has t,x, needs vf, vi"
-        x, v_f,v_i,t = self.no_acc_eq_nums(difficulty)
+        return {
+            "initial": initial,
+            "final": final,
+            "accel": accel,
+            "accel_mag": abs(accel),
+            "initial_direction": self._direction_label(initial),
+            "final_direction": self._direction_label(final),
+            "accel_direction": self._direction_label(accel),
+            "initial_desc": self._describe_velocity(initial),
+            "final_desc": self._describe_velocity(final),
+            "initial_value_str": self._velocity_value_str(initial),
+            "final_value_str": self._velocity_value_str(final),
+            "accel_value_str": self._format_acceleration(accel),
+            "scenario": scenario,
+            "verb": verb_map.get(scenario, "changes speed"),
+            "speed_initial": speed_initial,
+            "speed_final": speed_final,
+            "reverses": reverses,
+        }
+
+
+    # endregion
+
+
+
+
+
+
+    # region question and answer functions
+
+    def no_time_question(self, difficulty, solve_for=None):
+        """Build a no-time kinematics question."""
+        target = self._select_solve_for(
+            solve_for,
+            {
+                "a": ("acceleration",),
+                "vf": ("final", "final_velocity"),
+                "vi": ("initial", "initial_velocity"),
+                "x": ("distance", "displacement"),
+            },
+            "No Time",
+        )
+
+        v_f, v_i, base_a, x = self.no_time_eq_nums(difficulty)
+        if random.choice([True, False]):
+            v_i, v_f, base_a = -v_i, -v_f, -base_a
+        context = self._motion_context(v_i, v_f, base_a)
+        phrases = self._motion_phrases(v_i, v_f, context["scenario"])
         noun = random_noun()
-        coin = random.randint(0,1)
-        var_dice = random.randint(0,1)
-        if difficulty == "Easy":
-            "so clearly, for easy, one of the velocities should be zero"
-            "and the other should be positive. default is speeding up"
-            if var_dice == 0: # time
-                unit = "Time (seconds)"
-                answer = t
-                if coin == 0: # speeding up
-                    question = f"""A {noun} initially at rest accelerates at a constant rate over a distance of {x} meters. 
-                    If it reached a velocity of {v_f} m/s, how much time did it take to get up to that speed?"""
-                else:
-                    question = f"""A {noun} initially moving at a velocity of {v_f} m/s decelerates at a constant rate 
-                    until it is at a full stop. If this occurred over a distance of {x} meters, how much time did it take?"""
-            elif var_dice == 1: # x
-                unit = "Distance (meters)"
-                answer = x
-                if coin == 0: # speeding up
-                    question = f"""A {noun} initially at rest accelerates at a constant rate for {t} seconds. 
-                    If it reached a velocity of {v_f} m/s, how much distance did it cover during that time?"""
-                else:
-                    question = f"""A {noun} initially moving at a velocity of {v_f} m/s decelerates at a constant rate 
-                    until it is at a full stop. If this occurred over {t} seconds, how much distance did it cover?"""
-            elif var_dice in [2,3]: # velocity, reversible
-                answer = v_f
-                if coin == 0: # speeding up
-                    question = f"""A {noun} initially at rest accelerates at a constant rate for {t} seconds. 
-                    If this occurred over {x} meters, what velocity did the {noun} reach?"""
-                    unit = "Final Velocity (m/s)"
-                else:
-                    question = f"""A noun reaches rest after decelerating at a constant rate for {t} seconds. 
-                    If this occurred over {x} meters, what velocity did {noun} start with?"""
-                    unit = "Initial Velocity (m/s)"
 
-        elif difficulty == "Medium":
-            "maybe both non-zero, but positive? no negatives here, no reason"
-            if var_dice == 0: # time
-                unit = "Time (seconds)"
-                answer = t
-                if coin == 0: # speeding up
-                    question = f"""A {noun} initially moving at {v_i} m/s accelerates at a constant rate over a distance of {x} meters. 
-                    If it reaches a final velocity of {v_f} m/s, how much time did it take to get up to that speed?"""
-                else:
-                    question = f"""A {noun} initially moving at a velocity of {v_f} m/s decelerates at a constant rate 
-                    until it is at a new velocity of {v_i} m/s. If this occurred over a distance of {x} meters, how much time did it take?"""
-            elif var_dice == 1: # x
-                unit = "Distance (meters)"
-                answer = x
-                if coin == 0: # speeding up
-                    question = f"""A {noun} initially moving at {v_i} m/s accelerates at a constant rate for {t} seconds. 
-                    If it reaches a final velocity of {v_f} m/s, how much distance did it cover during that time?"""
-                else:
-                    question = f"""A {noun} initially moving at a velocity of {v_f} m/s decelerates at a constant rate 
-                    until it is at a new velocity of {v_i} m/s. If this occurred over {t} seconds, how much distance did it cover?"""
-            elif var_dice in [2,3]: # v_f,vi
-                unit = "Final Velocity (m/s)"
-                if coin == 0:
-                    answer = v_f
-                    question = f"""A {noun} initially moving at {v_i} m/s accelerates at a constant rate for {t} seconds.
-                        If this occurred over a distance of {x} meters, what velocity did it reach?""" 
-                else:
-                    answer = v_i
-                    question = f"""A {noun} initially moving at {v_f} m/s decelerates at a constant rate for {t} seconds.
-                        If this occurred over a distance of {x} meters, what velocity did it reach?"""
-            
-        else: # hard
-            "change in direction, default is pos -> neg, can be swapped"
-            if x > 0:
-                direction_phrase = "to the right"
-            else:
-                direction_phrase = "to the left"
-            if var_dice == 0: # time
-                unit = "Time (seconds)"
-                answer = t
-                if coin == 0: # vi>0, vf<0
-                    question = f"""A {noun}, initially moving at {v_i} m/s to the right, slows all the way down,
-                    and gets back up to {-1*v_f} m/s to the left. 
-                    The {noun} travels {abs(x)} meters {direction_phrase} in the process. 
-                    How much time did this take?"""
-                else: # vi<0, a>0
-                    question = f"""A {noun}, initially moving at {-1*v_f} m/s to the left, 
-                    slows all the way down, and gets back up to {v_i} m/s to the right.  
-                    The {noun} travels {abs(x)} meters {direction_phrase} in the process. 
-                    How much time did this take?"""
-            elif var_dice == 1: # x
-                unit = "Distance (meters)"
-                answer = x
-                if coin == 0: # vi>0, vf<0
-                    question = f"""A {noun}, initially moving at {v_i} m/s to the right,  
-                    slows all the way down, and gets back up to {-1*v_f} m/s to the left in {t} seconds.  
-                    What is the {noun}'s displacement?"""
-                else: # vi<0, a>0
-                    question = f"""A {noun}, initially moving at {-1*v_f} m/s to the left,  
-                    slows all the way down, and gets back up to {v_i} m/s to the right in {t} seconds.  
-                    What is the {noun}'s displacement?"""
-            elif var_dice in [2,3]:
-                unit = "Final Velocity (m/s)"
-                if coin == 0:
-                    answer = v_f
-                    question = f"""A {noun}, initially moving at {v_i} m/s to the right, experiences a constant acceleration that 
-                    slows it all the way down, and speeds it back up to the left. 
-                    The acceleration was applied for {t} seconds, and resulted in the {noun} 
-                    traveling {abs(x)} meters {direction_phrase}.
-                    What is the final velocity of the {noun}?"""
-                else:
-                    answer = v_i
-                    question = f"""A {noun}, initially moving at {-1*v_f} m/s to the left, experiences a constant acceleration that 
-                    slows it all the way down, and speeds it back up to the right. 
-                    The acceleration was applied for {t} seconds, and resulted in the {noun} 
-                    traveling {abs(x)} meters {direction_phrase}.
-                    What is the final velocity of the {noun}?"""
+        accel_phrase = context["accel_value_str"]
+        start_inf = phrases["start_inf"]
+        start_ind = phrases["start_ind"]
+        start_stmt = phrases["start_stmt"]
+        end_inf = phrases["end_inf"]
+        end_ind = phrases["end_ind"]
+        end_stmt = phrases["end_stmt"]
+
+        if target == "a":
+            unit = "Acceleration (m/s^2)"
+            answer = base_a
+            question = (
+                f"What constant acceleration would allow a {noun} to {start_inf} and {end_inf} over {x} meters?"
+            )
+        elif target == "vf":
+            unit = "Final Velocity (m/s)"
+            answer = v_f
+            question = (
+                f"A {noun} experiences a constant acceleration of {accel_phrase} while traveling {x} meters. "
+                f"If {start_ind}, what velocity does it reach?"
+            )
+        elif target == "vi":
+            unit = "Initial Velocity (m/s)"
+            answer = v_i
+            question = (
+                f"A {noun} experiences a constant acceleration of {accel_phrase} while traveling {x} meters. "
+                f"If {end_ind}, what was its initial velocity?"
+            )
+        else:  # target == "x"
+            unit = "Distance (meters)"
+            answer = x
+            question = (
+                f"How far does a {noun} travel if it experiences a constant acceleration of {accel_phrase}, "
+                f"{start_stmt}, and {end_stmt}?"
+            )
 
         return {"question": question, "answers": [answer], "units": [unit]}
-    
-    def no_vf_question(self,difficulty):
-        "has x, needs a, vi, t -> (for easy, hard only)"
-        x, v_i,t,a = self.no_vf_eq_nums(difficulty)
+
+
+    def no_dist_question(self, difficulty, solve_for=None):
+        """Build a no-distance (v_f = v_i + at) kinematics question."""
+        target = self._select_solve_for(
+            solve_for,
+            {
+                "a": ("acceleration",),
+                "vf": ("final", "final_velocity"),
+                "vi": ("initial", "initial_velocity"),
+                "t": ("time", "delta_t"),
+            },
+            "No Distance",
+        )
+
+        v_f, v_i, base_a, t = self.no_dist_eq_nums(difficulty)
+        if random.choice([True, False]):
+            v_i, v_f, base_a = -v_i, -v_f, -base_a
+        context = self._motion_context(v_i, v_f, base_a)
+        phrases = self._motion_phrases(v_i, v_f, context["scenario"])
         noun = random_noun()
-        if difficulty == "Easy":
-            "vi = 0, find only x a t"
-            var_dice = random.randint(0,2)
-            if var_dice == 0: # x
-                question = f"""A {noun}, initially at rest, accelerates at a rate of {a} m/s² for {t} seconds.
-                How far does it go during this time?"""
-                answer = x
-                unit = "Distance (meters)"
-            elif var_dice == 1: # time
-                answer = t
-                unit = "Time (seconds)"
-                question = f"""A {noun}, initially at rest, accelerates at a rate of {a} m/s² over {x} meters.
-                How long does this take?"""
-            else:
-                answer = a
-                unit = "Acceleration (m/s²)"
-                question = f"""A {noun}, initially at rest, accelerates at a constant rate for {t} seconds over {x} meters.
-                How big was the acceleration?"""
-        elif difficulty == "Medium":
-            "non-zero vi but still all positive. find x , vi, a (NOT t)"
-            var_dice = random.randint(0,2)
-            if var_dice == 0: # x
-                question = f"""A {noun}, initially moving at {v_i} m/s, accelerates at a rate of {a} m/s² for {t} seconds.
-                How far does it go during this time?"""
-                answer = x
-                unit = "Distance (meters)"
-            elif var_dice == 1: # vi
-                question = f"""A {noun}, initially moving to the right, accelerates at a rate of {a} m/s² for {t} seconds.
-                The {noun} covers {x} meters. How fast was it initially moving?"""
-                answer = v_i
-                unit = "Initial Velocity (m/s)"
-            else: # a
-                answer = a
-                unit = "Acceleration (m/s²)"
-                question = f"""A {noun}, initially moving at {v_i} m/s, accelerates at a constant rate for {t} seconds over {x} meters.
-                How big was the acceleration?"""
-        else: # hard
-            var_dice = random.randint(0,3)
-            if var_dice == 0: # x
-                question = f"""A {noun} is initially moving at {v_i} m/s to the right, 
-                but is slowed by {-1*a} m/s² for {t} seconds.
-                How far does it go during this time?"""
-                answer = x
-                unit = "Distance (meters)"
-            elif var_dice == 1: #v_i
-                question = f"""A {noun}, initially moving to the right, is slowed at a rate of {-1*a} m/s² for {t} seconds.
-                Despite this, {noun} covers {x} meters. How fast was it initially moving?"""
-                answer = v_i
-                unit = "Initial Velocity (m/s)"
-            elif var_dice == 2: # a
-                answer = a
-                unit = "Acceleration (m/s²)"
-                question = f"""A {noun}, initially moving at {v_i} m/s to the right, is slowed at a constant rate for {t} seconds over {x} meters.
-                What was the acceleration?"""
-            else: # time
-                answer = t
-                unit = "Time (seconds)"
-                question = f"""A {noun}, initially moving at {v_i} m/s to the right, is slowed at a constant rate {-1*a} m/s².
-                How much time does this take for the {noun} to cover {x} meters?"""
 
+        accel_phrase = context["accel_value_str"]
+        start_inf = phrases["start_inf"]
+        start_ind = phrases["start_ind"]
+        start_stmt = phrases["start_stmt"]
+        end_inf = phrases["end_inf"]
+        end_ind = phrases["end_ind"]
+        end_stmt = phrases["end_stmt"]
+        time_phrase = f"{t} seconds"
 
+        if target == "a":
+            unit = "Acceleration (m/s^2)"
+            answer = base_a
+            question = (
+                f"What constant acceleration would allow a {noun} to {start_inf} and {end_inf} in {time_phrase}?"
+            )
+        elif target == "vf":
+            unit = "Final Velocity (m/s)"
+            answer = v_f
+            question = (
+                f"A {noun} experiences a constant acceleration of {accel_phrase} for {time_phrase}. "
+                f"If {start_ind}, what velocity does it reach?"
+            )
+        elif target == "vi":
+            unit = "Initial Velocity (m/s)"
+            answer = v_i
+            question = (
+                f"A {noun} experiences a constant acceleration of {accel_phrase} for {time_phrase}. "
+                f"If {end_ind}, what was its initial velocity?"
+            )
+        else:  # target == "t"
+            unit = "Time (seconds)"
+            answer = t
+            question = (
+                f"How long would it take for a {noun} to {start_inf} and {end_inf} if it experiences a constant "
+                f"acceleration of {accel_phrase}?"
+            )
 
         return {"question": question, "answers": [answer], "units": [unit]}
-    
-    def mixed_question(self,difficulty):
+
+
+    def no_acc_question(self, difficulty, solve_for=None):
+        """Build a no-acceleration (x = (v_f + v_i)/2 * t) kinematics question."""
+        target = self._select_solve_for(
+            solve_for,
+            {
+                "t": ("time",),
+                "x": ("distance", "displacement"),
+                "vf": ("final", "final_velocity"),
+                "vi": ("initial", "initial_velocity"),
+            },
+            "No Acceleration",
+        )
+
+        x, v_f, v_i, t = self.no_acc_eq_nums(difficulty)
+        if random.choice([True, False]):
+            v_i, v_f = -v_i, -v_f
+        effective_accel = (v_f - v_i) / t if t != 0 else 0
+        context = self._motion_context(v_i, v_f, effective_accel)
+        phrases = self._motion_phrases(v_i, v_f, context["scenario"])
+        noun = random_noun()
+
+        start_ind = phrases["start_ind"]
+        start_stmt = phrases["start_stmt"]
+        end_ind = phrases["end_ind"]
+        end_stmt = phrases["end_stmt"]
+
+        if target == "t":
+            unit = "Time (seconds)"
+            answer = t
+            question = (
+                f"A {noun} {start_stmt} and {end_stmt} while covering {x} meters. How long does this motion take?"
+            )
+        elif target == "x":
+            unit = "Distance (meters)"
+            answer = x
+            question = (
+                f"A {noun} {start_stmt} and {end_stmt} over {t} seconds. How much distance does it cover?"
+            )
+        elif target == "vf":
+            unit = "Final Velocity (m/s)"
+            answer = v_f
+            question = (
+                f"A {noun} {start_stmt} for {t} seconds while covering {x} meters. What is its final velocity?"
+            )
+        else:  # target == "vi"
+            unit = "Initial Velocity (m/s)"
+            answer = v_i
+            question = (
+                f"A {noun} {end_stmt} after traveling {x} meters in {t} seconds. What was its initial velocity?"
+            )
+
+        return {"question": question, "answers": [answer], "units": [unit]}
+
+
+    def no_vf_question(self, difficulty, solve_for=None):
+        """Build a no-final-velocity (x = v_i t + 1/2 a t^2) kinematics question."""
+        target = self._select_solve_for(
+            solve_for,
+            {
+                "x": ("distance", "displacement"),
+                "t": ("time",),
+                "vi": ("initial", "initial_velocity"),
+                "a": ("acceleration",),
+            },
+            "No Final Velocity",
+        )
+
+        x, v_i, t, a = self.no_vf_eq_nums(difficulty)
+        if random.choice([True, False]):
+            v_i, a = -v_i, -a
+        v_f = v_i + a * t
+        context = self._motion_context(v_i, v_f, a)
+        phrases = self._motion_phrases(v_i, v_f, context["scenario"])
+        noun = random_noun()
+
+        accel_phrase = context["accel_value_str"]
+        start_inf = phrases["start_inf"]
+        start_ind = phrases["start_ind"]
+        start_stmt = phrases["start_stmt"]
+        end_inf = phrases["end_inf"]
+        end_ind = phrases["end_ind"]
+        end_stmt = phrases["end_stmt"]
+        time_phrase = f"{t} seconds"
+
+        if target == "x":
+            unit = "Distance (meters)"
+            answer = x
+            question = (
+                f"A {noun} experiences a constant acceleration of {accel_phrase} for {time_phrase}. "
+                f"If {start_ind}, how far does it travel?"
+            )
+        elif target == "t":
+            unit = "Time (seconds)"
+            answer = t
+            question = (
+                f"How long would it take for a {noun} to {start_inf} and {end_inf} over {x} meters if it experiences "
+                f"a constant acceleration of {accel_phrase}?"
+            )
+        elif target == "vi":
+            unit = "Initial Velocity (m/s)"
+            answer = v_i
+            question = (
+                f"A {noun} experiences a constant acceleration of {accel_phrase} for {time_phrase} and covers {x} meters. "
+                f"What was its initial velocity?"
+            )
+        else:  # target == "a"
+            unit = "Acceleration (m/s^2)"
+            answer = a
+            question = (
+                f"What constant acceleration would allow a {noun} to {start_inf}, {end_inf}, and cover {x} meters in "
+                f"{time_phrase}?"
+            )
+
+        return {"question": question, "answers": [answer], "units": [unit]}
+
+    def mixed_question(self, difficulty, solve_for=None):
+        """Return a problem from a randomly selected no-kinematics case.
+
+        Mixed questions rotate between the specific generators. Provide a concrete
+        problem type if you need to lock the variable being solved for.
+        """
+        if solve_for is not None:
+            raise ValueError(
+                "Mixed questions do not support a solve_for override; invoke a specific problem type instead."
+            )
+
         dice = random.randint(0,3)
         if dice == 0:
             return self.no_time_question(difficulty)
@@ -526,8 +549,14 @@ class LinearMotionGenerator(BaseGenerator):
             else:
                 return self.no_vf_question(difficulty)
 
+
+    # endregion
     
 
+
+
+
+    # region metadata
     def stored_metadata(self) -> dict[str, dict]:
         """Return metadata mapping for this generator."""
         return {

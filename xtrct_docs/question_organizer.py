@@ -101,8 +101,8 @@ class Org:
                 },
                 {
                 "heading": "Combined Constant",
-                "problems": [self.CM.combined_constant_question("Medium") for _ in range(2)]+[self.CM.combined_constant_question("Hard") for _ in range(1)],
-                "gap": 2
+                "problems": [self.CM.combined_constant_question("Medium") for _ in range(2)]+[self.CM.combined_constant_question("Hard") for _ in range(5)],
+                "gap": 1
                 },
             ]
         return generate_questions

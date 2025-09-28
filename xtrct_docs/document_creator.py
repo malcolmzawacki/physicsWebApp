@@ -2,127 +2,157 @@ from docx import Document
 from docx.shared import Inches
 from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
 import os
+
+
+def _remove_table_borders(table):
+    """Strip borders from a table so wrapper blocks stay invisible."""
+    tbl = table._element
+    tbl_pr = tbl.find(qn('w:tblPr'))
+    if tbl_pr is None:
+        tbl_pr = OxmlElement('w:tblPr')
+        tbl.insert(0, tbl_pr)
+    tbl_borders = tbl_pr.find(qn('w:tblBorders'))
+    if tbl_borders is None:
+        tbl_borders = OxmlElement('w:tblBorders')
+        tbl_pr.append(tbl_borders)
+    for border_name in ('top', 'left', 'bottom', 'right', 'insideH', 'insideV'):
+        border = tbl_borders.find(qn(f'w:{border_name}'))
+        if border is None:
+            border = OxmlElement(f'w:{border_name}')
+            tbl_borders.append(border)
+        border.set(qn('w:val'), 'nil')
+
+
+def _prevent_row_split(row):
+    """Ensure the entire row moves to a new page instead of splitting."""
+    tr = row._element
+    tr_pr = tr.find(qn('w:trPr'))
+    if tr_pr is None:
+        tr_pr = OxmlElement('w:trPr')
+        tr.insert(0, tr_pr)
+    cant_split = tr_pr.find(qn('w:cantSplit'))
+    if cant_split is None:
+        cant_split = OxmlElement('w:cantSplit')
+        tr_pr.append(cant_split)
+
+
+def _set_table_cant_split(table):
+    for row in table.rows:
+        _prevent_row_split(row)
+
+
+def _chain_table_rows(table):
+    """Link every row so paragraph-level keep settings cascade."""
+    last_idx = len(table.rows) - 1
+    for idx, row in enumerate(table.rows):
+        keep_with_next = idx != last_idx
+        for cell in row.cells:
+            for paragraph in cell.paragraphs:
+                paragraph.paragraph_format.keep_together = True
+                paragraph.paragraph_format.keep_with_next = keep_with_next
+
+
+def _prepare_table_block(table):
+    _set_table_cant_split(table)
+    _chain_table_rows(table)
+
+
+def _start_question_block(doc):
+    """Create a 1x1 wrapper table so an entire question stays on a page."""
+    container = doc.add_table(rows=1, cols=1)
+    container.alignment = WD_TABLE_ALIGNMENT.LEFT
+    _remove_table_borders(container)
+    _prevent_row_split(container.rows[0])
+    cell = container.cell(0, 0)
+    cell.text = ''
+    return container, cell
+
 
 # Create main test document
  # Store answers as you generate
-def create_vert_answer_table(doc, problem_units, problem_number):
+def create_vert_answer_table(target, problem_units, problem_number):
     """
     Create a formatted answer table for multipart questions
     
-    :param doc: Document object
+    :param target: Document or cell that receives the content
     :param problem_units: List of unit strings (e.g., ["Direction", "Motion State"])
     :param problem_number: The problem number for labeling
     """
-    # Add a small space before the table
-    doc.add_paragraph()
-    
-    # Add "Final Answers:" label
-    final_answers_para = doc.add_paragraph()
+    spacer_para = target.add_paragraph()
+    spacer_para.paragraph_format.keep_with_next = True
+    spacer_para.paragraph_format.keep_together = True
+
+    final_answers_para = target.add_paragraph()
+    final_answers_para.paragraph_format.keep_with_next = True
+    final_answers_para.paragraph_format.keep_together = True
     final_answers_run = final_answers_para.add_run("Final Answers:")
     final_answers_run.bold = True
-    
-    # Create table with 2 columns and rows equal to number of answer parts
-    table = doc.add_table(rows=len(problem_units), cols=2)
+
+    table = target.add_table(rows=len(problem_units), cols=2)
     table.alignment = WD_TABLE_ALIGNMENT.LEFT
-    
-    # Set table style and format
     table.style = 'Table Grid'
-    
-    # Populate the table
+
     for i, unit in enumerate(problem_units):
-        # Clean up the unit string (remove parentheses if present)
         clean_unit = unit.replace('(', '').replace(')', '').strip()
-        
-        # Left column: unit label
+
         left_cell = table.cell(i, 0)
         left_cell.text = clean_unit
         left_cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
-        
-        # Right column: blank line for student answer
-        right_cell = table.cell(i, 1) 
-        right_cell.text = "_" * 20  # Underline for student to write on
+
+        right_cell = table.cell(i, 1)
+        right_cell.text = "_" * 20
         right_cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
-    
-    # Set column widths - make label column narrower, answer column wider
+
     for row in table.rows:
-        row.cells[0].width = Inches(1.5)  # Unit label column
-        row.cells[1].width = Inches(3.0)  # Answer column
+        row.cells[0].width = Inches(1.5)
+        row.cells[1].width = Inches(3.0)
+
+    _prepare_table_block(table)
 
 
-def create_answer_table(doc, problem_units, problem_number):
+def create_answer_table(target, problem_units, problem_number):
     """
     Create a formatted answer table for multipart questions with horizontal layout
     
-    :param doc: Document object
+    :param target: Document or cell that receives the content
     :param problem_units: List of unit strings (e.g., ["Direction", "Motion State"])
     :param problem_number: The problem number for labeling
     """
-    # Add "Final Answers:" label on same line, no extra spacing
-    final_answers_para = doc.add_paragraph()
+    final_answers_para = target.add_paragraph()
+    final_answers_para.paragraph_format.keep_with_next = True
+    final_answers_para.paragraph_format.keep_together = True
     final_answers_run = final_answers_para.add_run("Final Answers:")
     final_answers_run.bold = True
-    
-    # Keep the "Final Answers:" label with the table
-    final_answers_para.paragraph_format.keep_with_next = True
-    
-    # Create table with 2 rows and columns equal to number of answer parts
+
     num_parts = len(problem_units)
-    table = doc.add_table(rows=2, cols=num_parts)
+    table = target.add_table(rows=2, cols=num_parts)
     table.alignment = WD_TABLE_ALIGNMENT.LEFT
-    
-    # Set table style and format
     table.style = 'Table Grid'
-    
-    # Keep table together and prevent it from breaking across pages
-    try:
-        from docx.oxml.shared import qn
-        from docx.oxml import OxmlElement
-        
-        # Access table properties and set keep together
-        tbl = table._element
-        tbl_pr = tbl.find(qn('w:tblPr'))
-        if tbl_pr is None:
-            tbl_pr = OxmlElement('w:tblPr')
-            tbl.insert(0, tbl_pr)
-        
-        # Add keep together property for the table
-        keep_together = OxmlElement('w:cantSplit')
-        keep_together.set(qn('w:val'), 'true')
-        tbl_pr.append(keep_together)
-        
-    except ImportError:
-        # If XML manipulation fails, continue without it
-        pass
-    
-    # First row: unit labels
+
     for i, unit in enumerate(problem_units):
-        # Clean up the unit string (remove parentheses if present)
-        
-        
-        # Top row: unit label
         header_cell = table.cell(0, i)
         header_cell.text = unit
         header_cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        # Make header row bold
         for paragraph in header_cell.paragraphs:
             for run in paragraph.runs:
                 run.bold = True
-    
-    # Second row: blank spaces for student answers
+
     for i in range(num_parts):
         answer_cell = table.cell(1, i)
-        answer_cell.text = ""  # Leave completely blank for students to write
+        answer_cell.text = ""
         answer_cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-    
-    # Set column widths to be evenly distributed
-    column_width = Inches(6.0 / num_parts)  # Distribute 6 inches across all columns
+
+    column_width = Inches(6.0 / num_parts)
     for row in table.rows:
         for i, cell in enumerate(row.cells):
             cell.width = column_width
-    
-    # Set the height of the answer row (second row, index 1)
-    table.rows[1].height = Inches(0.5)  # Good amount of writing room
+
+    table.rows[1].height = Inches(0.5)
+
+    _prepare_table_block(table)
 
 
 def keep_question_together(doc, question_paragraphs):
@@ -133,13 +163,12 @@ def keep_question_together(doc, question_paragraphs):
 
 def is_multipart_question(problem):
     """
-    Determine if a question has multiple answer parts
+       Determine if a question has multiple answer parts
     
     :param problem: Problem dictionary with 'answers' and 'units' keys
     :return: Boolean indicating if question is multipart
     """
     return len(problem["answers"]) > 1
-
 
 
 def create_and_embed_graph(doc, graph_data, filename = "temp_graph.png"):
@@ -164,89 +193,83 @@ def create_doc(title: str, question_generator, number_of_docs: int, tables: bool
   answer_key = [] 
   for doc_num in range(1, number_of_docs + 1):
       questions = question_generator()
-      # Add test header
-      doc.add_heading(f'{title} {doc_num}', 0)
-      doc.add_paragraph(f'Name: _____________________________________________ Date: __________________')
+      header = doc.add_heading(f'{title} {doc_num}', 0)
+      header.paragraph_format.keep_with_next = True
+      name_line = doc.add_paragraph(f'Name: _____________________________________________ Date: __________________')
+      name_line.paragraph_format.keep_with_next = True
       
-      # Generate problems here
       problem_number = 1
       version_answers = {}
       section_num = 1
 
       for section in questions:
-         
          heading = section["heading"]
-         doc.add_heading(f"Section {section_num}: {heading}", level=2)
+         section_heading = doc.add_heading(f"Section {section_num}: {heading}", level=2)
+         section_heading.paragraph_format.keep_with_next = True
          spaces = section["gap"]
          section_answers = []
 
          for problem in section["problems"]:
-
+            container_table, container_cell = _start_question_block(doc)
             clean_question =" ".join(problem["question"].split())
 
+            problem_is_multi = is_multipart_question(problem)
+            has_graph = "graph" in problem
+            has_spacing = spaces > 0
+            should_keep_with_next = has_spacing or (tables and problem_is_multi) or has_graph
 
-            question_para = doc.add_paragraph(f'{problem_number}. {clean_question}')
-            question_para.paragraph_format.keep_with_next = True
+            question_para = container_cell.paragraphs[0]
+            question_para.text = f'{problem_number}. {clean_question}'
             question_para.paragraph_format.keep_together = True
+            question_para.paragraph_format.keep_with_next = should_keep_with_next
 
-            # Check if this is a multipart question
-            if is_multipart_question(problem):
-                # Create answer table for multipart questions
-                if tables:
-                    create_answer_table(doc, problem["units"], problem_number)
- 
-                
-                # Store formatted answer for answer key
+            if problem_is_multi and tables:
+                create_answer_table(container_cell, problem["units"], problem_number)
+
+            if problem_is_multi:
                 answers = problem["answers"]
                 units = problem["units"]
                 answer_parts = ["Multiple Answers:"]
                 for answer, unit in zip(answers, units):
-
                     answer_parts.append(f"{unit}: {answer}")
                 answer_str = " \n ".join(answer_parts)
                 section_answers.append(f"{problem_number}. {answer_str}")
             else:
-                # Single-part question: use original spacing method
-                #for i in range(spaces):
-                    #doc.add_paragraph()
-                
-                # Store single answer for answer key
                 answer = problem["answers"][0]
                 unit = problem["units"][0]
                 section_answers.append(f"{problem_number}. {unit}: {answer}")
 
             if "graph" in problem:
                 from utils.graph_utils import embed_graph_in_doc
-                embed_graph_in_doc(doc, problem["graph"])
-            for _ in range(spaces):
-                blank_para = doc.add_paragraph()
+                embed_graph_in_doc(container_cell, problem["graph"])
+
+            for idx in range(spaces):
+                blank_para = container_cell.add_paragraph()
                 blank_para.paragraph_format.keep_together = True
-            
+                blank_para.paragraph_format.keep_with_next = idx < spaces - 1
+
             problem_number += 1
           
          version_answers[f"Section {section_num}: {heading}"] = section_answers
          section_num += 1
       
-
-      
-      # Store answers for this version
       answer_key.append({f"Version {doc_num}": version_answers})
-      # ensure full page gap between pages
+      if doc_num < number_of_docs:
+          doc.add_page_break()
+
+  if answer_key:
       doc.add_page_break()
-      doc.add_page_break()
+      doc.add_heading('Answer Key - All Versions', 1)
+      for version_index, version_dict in enumerate(answer_key):
+        for version_name, sections in version_dict.items():
+            doc.add_heading(version_name, level=2)
+            for section_name, answers in sections.items():
+                doc.add_heading(section_name, level=3)
+                for answer in answers:
+                    doc.add_paragraph(answer)
+        if version_index < len(answer_key) - 1:
+            doc.add_page_break()
 
-
-  doc.add_heading('Answer Key - All Versions', 1)
-  for version_dict in answer_key:
-    for version_name, sections in version_dict.items():
-        doc.add_heading(version_name, level=2)
-        for section_name, answers in sections.items():
-            doc.add_heading(section_name, level=3)
-            for answer in answers:
-                doc.add_paragraph(answer)
-    doc.add_page_break()            # Space between versions
-
-  # Save main document
   file_name = f'{title}_x{number_of_docs}.docx'
   doc.save(file_name)
   try:

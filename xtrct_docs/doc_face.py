@@ -1,16 +1,16 @@
 from document_creator import create_doc
 
 from question_organizer import Org
-title = "Projectile Practice"
+title = "Constant Motion Quiz"
 number_of_docs = 1
 org = Org()
 
-question_generator = org.projectile_practice()
+question_generator = org.constant_motion_quiz()
 
 
 def main():
   print("Accessing create document")
-  create_doc(title, question_generator, number_of_docs, tables=False)
+  create_doc(title, question_generator, number_of_docs, tables=True)
 
 
 if __name__ == "__main__":
