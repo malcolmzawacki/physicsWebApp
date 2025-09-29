@@ -1,11 +1,11 @@
 from document_creator import create_doc
 
 from question_organizer import Org
-title = "Constant Motion Quiz"
-number_of_docs = 1
+title = "Motion Test"
+number_of_docs = 2
 org = Org()
 
-question_generator = org.constant_motion_quiz()
+question_generator = org.mixed_motion_with_graphs()
 
 
 def main():

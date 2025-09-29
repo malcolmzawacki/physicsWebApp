@@ -1,17 +1,18 @@
 # Project Roadmap & Backlog
 
-_Last updated: 2025-09-27_
+_Last updated: 2025-09-29_
 
 ## Recently Completed
 
 - Linear motion generator now supports explicit `solve_for` overrides while keeping question narratives coherent.
 - Added shared motion-context helpers to reduce repeated text logic without mutating physics outputs.
 - Document generator now wraps question blocks to keep prompts, tables, and work space together across page breaks.
+- Motion graph exports now share section-level instructions, auto-cycle unique graph types, and render compact button layouts alongside other worksheet sections.
 
 ## In Progress / Short-Term Targets
 
 - **Streamlit Navigation**: Evaluate replacing implicit `pages/` discovery with explicit `st.navigation` / `st.pages` declarations for clearer unit/module groupings.
-- **Image & Graph Quality**: Standardize matplotlib/export styling and file handling so graphs render at consistent DPI in both Streamlit and DOCX exports.
+- **Graph & Image Quality**: Carry the print-friendly theming back into Streamlit views and add regression checks for mixed graph/standard sections.
 
 ## Backlog
 

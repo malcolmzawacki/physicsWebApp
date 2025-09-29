@@ -1,5 +1,5 @@
 from docx import Document
-from docx.shared import Inches
+from docx.shared import Inches, Pt
 from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
@@ -60,6 +60,12 @@ def _prepare_table_block(table):
     _chain_table_rows(table)
 
 
+def _clear_cell(cell):
+    while cell.paragraphs:
+        p = cell.paragraphs[0]._element
+        cell._tc.remove(p)
+
+
 def _start_question_block(doc):
     """Create a 1x1 wrapper table so an entire question stays on a page."""
     container = doc.add_table(rows=1, cols=1)
@@ -67,8 +73,115 @@ def _start_question_block(doc):
     _remove_table_borders(container)
     _prevent_row_split(container.rows[0])
     cell = container.cell(0, 0)
-    cell.text = ''
+    _clear_cell(cell)
+    cell.add_paragraph()
     return container, cell
+
+def _get_or_create_tc_pr(cell):
+    tc = cell._tc
+    tc_pr = tc.find(qn('w:tcPr'))
+    if tc_pr is None:
+        tc_pr = OxmlElement('w:tcPr')
+        tc.insert(0, tc_pr)
+    return tc_pr
+
+
+def _shade_cell(cell, fill="E6E6E6"):
+    tc_pr = _get_or_create_tc_pr(cell)
+    shd = tc_pr.find(qn('w:shd'))
+    if shd is None:
+        shd = OxmlElement('w:shd')
+        tc_pr.append(shd)
+    shd.set(qn('w:val'), 'clear')
+    shd.set(qn('w:color'), 'auto')
+    shd.set(qn('w:fill'), fill)
+
+
+def _style_button_cell(cell):
+    _shade_cell(cell)
+    for paragraph in cell.paragraphs:
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.paragraph_format.space_before = Pt(0)
+        for run in paragraph.runs:
+            run.bold = True
+
+
+def _add_button_group(target_cell, unit_label, options, total_width_inches=None):
+    if not options:
+        return
+
+    label_para = target_cell.add_paragraph(unit_label)
+    label_para.paragraph_format.space_before = Pt(0)
+    label_para.paragraph_format.keep_with_next = True
+    label_para.paragraph_format.space_after = Pt(2)
+    for run in label_para.runs:
+        run.bold = True
+
+    button_table = target_cell.add_table(rows=1, cols=len(options))
+    button_table.style = 'Table Grid'
+    _prepare_table_block(button_table)
+
+    available_width = total_width_inches if total_width_inches is not None else 2.4
+    min_per_option = 0.7
+    max_per_option = 1.1
+    per_option = available_width / max(1, len(options))
+    per_option = max(min_per_option, min(max_per_option, per_option))
+    available_width = per_option * max(1, len(options))
+    column_width = Inches(per_option)
+    for idx, option in enumerate(options):
+        button_cell = button_table.cell(0, idx)
+        button_cell.width = column_width
+        button_cell.text = option
+        _style_button_cell(button_cell)
+
+
+
+def _create_side_by_side_graph_layout(container_cell, graph_data, button_options, units, graph_width_inches=None):
+    if graph_data is None:
+        return
+
+    layout_table = container_cell.add_table(rows=1, cols=2)
+    layout_table.autofit = False
+    _remove_table_borders(layout_table)
+    _prepare_table_block(layout_table)
+
+    left_cell = layout_table.cell(0, 0)
+    right_cell = layout_table.cell(0, 1)
+    _clear_cell(left_cell)
+    _clear_cell(right_cell)
+
+    graph_width = graph_width_inches or 2.9
+    total_width = 6.2
+    side_padding = 0.3
+    min_right = 2.4
+
+    options_map = button_options or {}
+    max_option_count = max((len(opts or []) for opts in options_map.values()), default=1)
+    min_button_cell = 0.75
+    required_right = max(min_right, max_option_count * min_button_cell + 0.5)
+    max_graph = max(1.6, total_width - required_right - side_padding)
+    if graph_width > max_graph:
+        graph_width = max_graph
+
+    left_width = graph_width + side_padding
+    right_width = total_width - left_width
+    if right_width < required_right:
+        right_width = required_right
+        left_width = total_width - right_width
+        graph_width = max(1.5, left_width - side_padding)
+
+    left_cell.width = Inches(left_width)
+    right_cell.width = Inches(right_width)
+
+    content_width = max(right_width - 0.6, max_option_count * min_button_cell)
+    from utils.graph_utils import embed_graph_in_doc
+    embed_graph_in_doc(left_cell, graph_data, width_inches=graph_width)
+    for idx, unit in enumerate(units or []):
+        _add_button_group(right_cell, unit, options_map.get(idx), total_width_inches=content_width)
+
+    if not (units and options_map):
+        right_cell.add_paragraph()
 
 
 # Create main test document
@@ -206,24 +319,42 @@ def create_doc(title: str, question_generator, number_of_docs: int, tables: bool
          heading = section["heading"]
          section_heading = doc.add_heading(f"Section {section_num}: {heading}", level=2)
          section_heading.paragraph_format.keep_with_next = True
+         instructions = section.get("section_instructions")
+         if instructions:
+             instructions_para = doc.add_paragraph(instructions)
+             instructions_para.paragraph_format.keep_with_next = True
          spaces = section["gap"]
          section_answers = []
 
          for problem in section["problems"]:
             container_table, container_cell = _start_question_block(doc)
-            clean_question =" ".join(problem["question"].split())
+            original_question = problem.get("question", "")
+            clean_question = " ".join(original_question.split()).strip()
+            suppress_question_text = problem.get("suppress_question_text")
 
             problem_is_multi = is_multipart_question(problem)
-            has_graph = "graph" in problem
+            graph_data = problem.get("graph") or problem.get("diagram_data")
+            button_options = problem.get("button_options")
+            side_by_side_layout = bool(button_options) and problem.get("side_by_side") and graph_data is not None
+            has_graph = graph_data is not None
             has_spacing = spaces > 0
-            should_keep_with_next = has_spacing or (tables and problem_is_multi) or has_graph
+            should_keep_with_next = has_spacing or (tables and problem_is_multi and not side_by_side_layout) or has_graph or side_by_side_layout
 
             question_para = container_cell.paragraphs[0]
-            question_para.text = f'{problem_number}. {clean_question}'
+            question_label = f"{problem_number}."
+            if suppress_question_text or not clean_question:
+                question_para.text = question_label
+            else:
+                question_para.text = f"{question_label} {clean_question}"
             question_para.paragraph_format.keep_together = True
             question_para.paragraph_format.keep_with_next = should_keep_with_next
+            if suppress_question_text:
+                question_para.paragraph_format.space_after = Pt(0)
+            question_para.paragraph_format.keep_with_next = should_keep_with_next
 
-            if problem_is_multi and tables:
+            if side_by_side_layout:
+                _create_side_by_side_graph_layout(container_cell, graph_data, button_options, problem.get("units", []), problem.get("graph_doc_width"))
+            elif problem_is_multi and tables:
                 create_answer_table(container_cell, problem["units"], problem_number)
 
             if problem_is_multi:
@@ -239,14 +370,14 @@ def create_doc(title: str, question_generator, number_of_docs: int, tables: bool
                 unit = problem["units"][0]
                 section_answers.append(f"{problem_number}. {unit}: {answer}")
 
-            if "graph" in problem:
+            if not side_by_side_layout and graph_data:
                 from utils.graph_utils import embed_graph_in_doc
-                embed_graph_in_doc(container_cell, problem["graph"])
-
-            for idx in range(spaces):
+                embed_graph_in_doc(container_cell, graph_data)
+            effective_spaces = 0 if suppress_question_text else spaces
+            for idx in range(effective_spaces):
                 blank_para = container_cell.add_paragraph()
                 blank_para.paragraph_format.keep_together = True
-                blank_para.paragraph_format.keep_with_next = idx < spaces - 1
+                blank_para.paragraph_format.keep_with_next = idx < effective_spaces - 1
 
             problem_number += 1
           

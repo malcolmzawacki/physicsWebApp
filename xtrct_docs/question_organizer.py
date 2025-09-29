@@ -2,17 +2,38 @@ import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
+from typing import Any
 
 from utils.generators.linear_motion_generator import LinearMotionGenerator
 from utils.generators.const_motion_generator import ConstantMotionGenerator
 from utils.generators.dist_disp_generator import DistDispGenerator
 from utils.generators.projectile_generator import ProjectileGenerator
+from utils.generators.motion_graph_generator import MotionGraphGenerator
 class Org:
     def __init__(self):
         self.AM = LinearMotionGenerator()
         self.CM = ConstantMotionGenerator()
         self.DDG = DistDispGenerator()
         self.PG = ProjectileGenerator()
+        self.MGG = MotionGraphGenerator()
+
+    def motion_graph_section(self, difficulty: str = "Medium") -> dict[str, Any]:
+        problems = self.MGG.unique_graph_problems_for_doc(
+            "Position-Time Graph",
+            difficulty,
+            graph_doc_width=2.0,
+            figsize=(2.2, 1.6),
+            suppress_question_text=True,
+        )
+        instructions = (
+            "For each graph below, determine the motion direction and motion state. Mark your choices using the buttons provided."
+        )
+        return {
+            "heading": "Position-Time Graphs",
+            "section_instructions": instructions,
+            "problems": problems,
+            "gap": 0,
+        }
 
     def create_first_doc(self):
         def question_generator():
@@ -159,5 +180,27 @@ class Org:
 
             ]
         return generate_question
+
+
+    def motion_graph_test(self):
+        def generate_question():
+            return [self.motion_graph_section("Medium")]
+
+        return generate_question
+
+
+    def mixed_motion_with_graphs(self):
+        def generate_question():
+            return [
+                self.motion_graph_section("Medium"),
+                {
+                    "heading": "Accelerated Motion Practice",
+                    "problems": [self.AM.no_acc_question("Medium") for _ in range(3)],
+                    "gap": 2,
+                },
+            ]
+
+        return generate_question
+
 
 
