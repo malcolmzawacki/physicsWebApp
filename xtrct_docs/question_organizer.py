@@ -35,6 +35,25 @@ class Org:
             "gap": 0,
         }
 
+
+    def velocity_graph_section(self, difficulty: str = "Medium") -> dict[str, Any]:
+        problems = self.MGG.unique_graph_problems_for_doc(
+            "Velocity-Time Graph",
+            difficulty,
+            graph_doc_width=2.0,
+            figsize=(2.2, 1.6),
+            suppress_question_text=True,
+        )
+        instructions = (
+            "For each velocity-time graph below, determine the direction of motion and whether the object is speeding up, slowing down, or moving at constant speed."
+        )
+        return {
+            "heading": "Velocity-Time Graphs",
+            "section_instructions": instructions,
+            "problems": problems,
+            "gap": 0,
+        }
+
     def create_first_doc(self):
         def question_generator():
             return [
@@ -184,7 +203,10 @@ class Org:
 
     def motion_graph_test(self):
         def generate_question():
-            return [self.motion_graph_section("Medium")]
+            return [
+                self.motion_graph_section("Medium"),
+                self.velocity_graph_section("Medium"),
+            ]
 
         return generate_question
 
@@ -193,9 +215,54 @@ class Org:
         def generate_question():
             return [
                 self.motion_graph_section("Medium"),
+                self.velocity_graph_section("Medium"),
                 {
-                    "heading": "Accelerated Motion Practice",
-                    "problems": [self.AM.no_acc_question("Medium") for _ in range(3)],
+                    "heading": "Accelerated Motion Questions",
+                    "problems": [
+                        self.AM.no_acc_question("Easy", solve_for="t"), 
+                        self.AM.no_dist_question("Easy",solve_for="vi"),
+                        self.AM.no_vf_question("Easy", solve_for='x'),
+                        self.AM.no_time_question("Easy",solve_for='vf'),
+
+                        #self.AM.no_acc_question("Medium", solve_for="vi"), 
+                        self.AM.no_dist_question("Medium",solve_for="a"),
+                        #self.AM.no_vf_question("Medium", solve_for='x'),
+                        self.AM.no_time_question("Medium",solve_for='vi'),
+
+                        self.AM.no_acc_question("Medium", solve_for="t"), 
+                        #self.AM.no_dist_question("Medium",solve_for="vf"),
+                        self.AM.no_vf_question("Medium", solve_for='a'),
+                        #self.AM.no_time_question("Medium",solve_for='x'),
+                        ],
+                    "gap": 2,
+                },
+            ]
+
+        return generate_question
+    
+    def mixed_motion_with_graphs_H(self):
+        def generate_question():
+            return [
+                self.motion_graph_section("Medium"),
+                self.velocity_graph_section("Medium"),
+                {
+                    "heading": "Accelerated Motion Questions",
+                    "problems": [
+                        self.AM.no_acc_question("Easy", solve_for="t"), 
+                        self.AM.no_dist_question("Easy",solve_for="vi"),
+                        self.AM.no_vf_question("Easy", solve_for='x'),
+                        self.AM.no_time_question("Easy",solve_for='vf'),
+
+                        self.AM.no_acc_question("Medium", solve_for="vf"), 
+                        self.AM.no_dist_question("Medium",solve_for="t"),
+                        self.AM.no_vf_question("Medium", solve_for='x'),
+                        self.AM.no_time_question("Medium",solve_for='vi'),
+
+                        self.AM.no_acc_question("Medium", solve_for="t"), 
+                        self.AM.no_dist_question("Medium",solve_for="vf"),
+                        self.AM.no_vf_question("Medium", solve_for='a'),
+                        self.AM.no_time_question("Medium",solve_for='x'),
+                        ],
                     "gap": 2,
                 },
             ]

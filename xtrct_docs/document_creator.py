@@ -387,6 +387,7 @@ def create_doc(title: str, question_generator, number_of_docs: int, tables: bool
       answer_key.append({f"Version {doc_num}": version_answers})
       if doc_num < number_of_docs:
           doc.add_page_break()
+          doc.add_page_break() # ensures new page for next test regardless of current position
 
   if answer_key:
       doc.add_page_break()
