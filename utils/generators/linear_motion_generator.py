@@ -126,19 +126,23 @@ class LinearMotionGenerator(BaseGenerator):
             a_mult = 2
         if difficulty == "Easy":
             v_i = 0
-            a = random.randint(1,max_val)
+            a = a_mult*random.randint(1,max_val)
         elif difficulty == "Medium":
             "non-zero vi but still all positive"
             v_i = random.randint(1,max_val)
-            a = random.randint(1,max_val)
+            a = a_mult*random.randint(1,max_val)
         else: # hard
-            "mis-matched velocity and acceleration"
-            "slowed, but not reversed hmmmm"
-            "2vi/t > a"
-            v_i = random.randint(1,max_val)
-            a = -1*random.randint(1,(2*v_i//t)+2)
-        a*=a_mult # ensures divisibility if t is odd
-        v_i*=a_mult # ensures directionality is preserved
+           "needs to change direction in order for there to be a unique answer"
+           "I mean I could also set the net displacement equal to zero but where's the variety in that?"
+           a = random.randint(2,max_val)
+           t = random.randint(2,max_val)
+           v_i = ri(1, a*t - 1)
+           t*=2 # now the change in velocity is more than twice the size of the initial
+           if random.choice([True,False]):
+               a*=-1
+           else:
+               v_i*=-1
+
         x = v_i*t + 0.5*a*t**2
         return x, v_i,t,a
 
@@ -302,7 +306,7 @@ class LinearMotionGenerator(BaseGenerator):
 
         v_f, v_i, base_a, x = self.no_time_eq_nums(difficulty)
         if random.choice([True, False]):
-            v_i, v_f, base_a = -v_i, -v_f, -base_a
+            v_i, v_f, base_a, x = -v_i, -v_f, -base_a, -x
         context = self._motion_context(v_i, v_f, base_a)
         phrases = self._motion_phrases(v_i, v_f, context["scenario"])
         noun = random_noun()
@@ -421,7 +425,8 @@ class LinearMotionGenerator(BaseGenerator):
 
         x, v_f, v_i, t = self.no_acc_eq_nums(difficulty)
         if random.choice([True, False]):
-            v_i, v_f = -v_i, -v_f
+            v_i, v_f, x = -v_i, -v_f, -x
+
         effective_accel = (v_f - v_i) / t if t != 0 else 0
         context = self._motion_context(v_i, v_f, effective_accel)
         phrases = self._motion_phrases(v_i, v_f, context["scenario"])
@@ -475,7 +480,7 @@ class LinearMotionGenerator(BaseGenerator):
 
         x, v_i, t, a = self.no_vf_eq_nums(difficulty)
         if random.choice([True, False]):
-            v_i, a = -v_i, -a
+            v_i, a, x = -v_i, -a, -x
         v_f = v_i + a * t
         context = self._motion_context(v_i, v_f, a)
         phrases = self._motion_phrases(v_i, v_f, context["scenario"])

@@ -11,6 +11,7 @@ _Last updated: 2025-09-29_
 
 ## In Progress / Short-Term Targets
 
+- **Question Formatting**: consolidating logic of signs, directions, and phrase handling in the linear_motion_generator is not yet complete; some phrases are too long and give information not intended for given problem type (ex. no_vf_question("Hard") provides vf due to bundling of vars in string phrases)
 - **Streamlit Navigation**: Evaluate replacing implicit `pages/` discovery with explicit `st.navigation` / `st.pages` declarations for clearer unit/module groupings.
 - **Graph & Image Quality**: Carry the print-friendly theming back into Streamlit views and add regression checks for mixed graph/standard sections.
 

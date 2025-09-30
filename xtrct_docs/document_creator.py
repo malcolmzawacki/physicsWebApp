@@ -1,6 +1,7 @@
 from docx import Document
 from docx.shared import Inches, Pt
 from docx.enum.table import WD_TABLE_ALIGNMENT
+from docx.enum.section import WD_SECTION_START
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
@@ -305,6 +306,8 @@ def create_doc(title: str, question_generator, number_of_docs: int, tables: bool
   doc = Document()
   answer_key = [] 
   for doc_num in range(1, number_of_docs + 1):
+      if doc_num != 1:
+          doc.add_section(WD_SECTION_START.ODD_PAGE)
       questions = question_generator()
       header = doc.add_heading(f'{title} {doc_num}', 0)
       header.paragraph_format.keep_with_next = True
@@ -385,12 +388,12 @@ def create_doc(title: str, question_generator, number_of_docs: int, tables: bool
          section_num += 1
       
       answer_key.append({f"Version {doc_num}": version_answers})
-      if doc_num < number_of_docs:
-          doc.add_page_break()
-          doc.add_page_break() # ensures new page for next test regardless of current position
+     # if doc_num < number_of_docs:
+         # doc.add_page_break()
+          #doc.add_page_break() # ensures new page for next test regardless of current position
 
   if answer_key:
-      doc.add_page_break()
+      doc.add_section(WD_SECTION_START.ODD_PAGE)
       doc.add_heading('Answer Key - All Versions', 1)
       for version_index, version_dict in enumerate(answer_key):
         for version_name, sections in version_dict.items():
