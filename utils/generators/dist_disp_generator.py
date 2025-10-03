@@ -155,8 +155,9 @@ class DistDispGenerator(BaseGenerator):
         dirn_final = dirn_y_final + dirn_x_final
         dirn_final = "None" if len(dirn_final) < 4 else dirn_final
         displacement = (disp_x**2  + disp_y**2)**(1/2)
+        answers = [distance, displacement, dirn_final]
 
-        return question, [distance, displacement, dirn_final], label_set, movements
+        return {"question": question, "answers": answers, "units": label_set, "diagram_data": movements}
     
 
     def generate_diagram(self,movements: list, problem_type: str, difficulty: str):
