@@ -214,19 +214,25 @@ class ProjectileGenerator(BaseGenerator):
 
 
 
-    def _generate_type1_question(self, difficulty):
+    def _generate_type1_question(self, difficulty, solve_for = None):
+        """
+        Easy targets: x, h, v_i
+        Medium or hard targets: v_i and h, v_f and theta, v_f and x 
+        """
+        
         v_x, v_r, theta, d_x, d_y = self.calculate_type1_values(difficulty)
         object_name = random_noun()
         verb = random_proj_verb()
         
         if difficulty == "Easy":
-            choice = random.randint(1,3)
-
-            if choice == 1:
+            if solve_for == None:
+                solve_for = random.choice(["x","h","v_i"])
+            choice = solve_for
+            if choice == "x":
                 question = f"If a {object_name} is {verb} horizontally off of a {d_y:.2f} m cliff with an initial velocity of {v_x:.2f} m/s, how far away does it land?"
                 answers = [d_x]
                 units = ["Horizontal Distance (m)"]
-            elif choice == 2:
+            elif choice == "h":
                 question = f"If a {object_name} is {verb} horizontally off of a cliff at {v_x:.2f} m/s, and lands {d_x:.2f} m away, what was the height of the cliff?"
                 answers = [d_y]
                 units = ["Cliff Height (m)"]
@@ -235,13 +241,15 @@ class ProjectileGenerator(BaseGenerator):
                 answers = [v_x]
                 units = ["Initial Velocity (m/s)"]
         else:  # Hard
-            choice = random.randint(1,3)
-            if choice == 1:
+            if solve_for == None:
+                solve_for = random.choice(["v_f and x","v_i and h","v_f and theta"])
+            choice = solve_for
+            if choice == "v_i and h":
                 question = f"If a {object_name} was {verb} horizontally off of a cliff and lands at {v_r:.2f} m/s at a {theta:.2f} degree angle, how fast was it {verb}, and from how high?"
                 answers = [v_x, d_y]
                 units = ["Initial Velocity (m/s)","Cliff Height (m)"]
 
-            elif choice == 2:
+            elif choice == "v_f and theta":
                 question = f"If a {object_name} is {verb} horizontally off of a cliff at {v_x:.2f} m/s, and lands {d_x:.2f} m away, what speed and angle does it land with?"
                 answers = [v_r, theta]
                 units = ["Final Velocity (m/s)","Angle (degrees)"]
@@ -254,7 +262,11 @@ class ProjectileGenerator(BaseGenerator):
         
         return {"question": question, "answers": answers, "units": units}
 
-    def _generate_type2_question(self, difficulty):
+    def _generate_type2_question(self, difficulty, solve_for = None):
+        """
+        Easy targets: x and y_max
+        medium and hard: v_i and theta, v_i and x, theta and x
+        """
         v_r, theta, d_x, d_y = self.calculate_type2_values(difficulty)
         object_name = random_noun()
         verb = random_proj_verb()
@@ -266,14 +278,16 @@ class ProjectileGenerator(BaseGenerator):
             answer2 = d_y
             unit2 = "Maximum Height (m)"
         else:  # Hard
-            choice = random.randint(1,3)
-            if choice == 1:
+            if solve_for == None:
+                solve_for = random.choice(["v_i and theta", "v_i and x", "theta and x"])
+            choice = solve_for
+            if choice == "v_i and theta":
                 question = f"A {verb} {object_name} reaches a maximum height of {d_y:.2f} m and lands {d_x:.2f} m away from where it started. What speed and angle was it launched at?"
                 answer = v_r
                 unit = "Initial Velocity (m/s)"
                 answer2 = theta
                 unit2 = "Launch Angle (degrees)"
-            elif choice == 2:
+            elif choice == "v_i and x":
                 question = f"A {object_name} is {verb} at {theta:.2f} degrees, and reaches a maximum height of {d_y:.2f} m. What was its initial speed and how far away does it land?"
                 answer = v_r
                 unit = "Initial Velocity (m/s)"
