@@ -3,6 +3,7 @@ import streamlit as st
 from tools.loading import lazy_tabs
 from utils.ui import interface
 from utils.generators.force_generator import ForceGenerator
+from utils.generators.tension_generator import TensionGenerator
 
 
 def newtons_2nd():
@@ -15,6 +16,15 @@ def newtons_2nd():
     ui.unified_smart_layout()
 
 
+def tension():
+    title = "Tension Problems"
+    prefix = "tension"
+    difficulties = ["Easy","Medium","Hard"]
+    generator = TensionGenerator()
+    metadata = generator.stored_metadata()
+    ui = interface(prefix, title, generator, metadata, difficulties)
+    ui.unified_smart_layout()
+
 def _under_construction_tab():
     st.write("Currently Under Construction")
 
@@ -22,7 +32,7 @@ def _under_construction_tab():
 def main():
     tab_specs = [
         ("Newton's Second Law", newtons_2nd),
-        ("TBD", _under_construction_tab),
+        ("Tension", tension),
     ]
 
     lazy_tabs(tab_specs, state_key="forces_tabs", auto_load_first=True)

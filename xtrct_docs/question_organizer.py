@@ -54,6 +54,61 @@ class Org:
             "gap": 0,
         }
 
+    def projectile_quiz_CP(self):
+        def question_generator():
+            return [
+                {
+                    "heading": "Type I Projectiles",
+                    "problems": [
+                        self.PG._generate_type1_question("Easy","x"),
+                        self.PG._generate_type1_question("Easy","h"),
+                        self.PG._generate_type1_question("Easy","v_i"),
+                        self.PG._generate_type1_question("Medium","v_f and theta")
+                        ],
+                    "gap": 2
+                },
+                {
+                    "heading": "Type II Projectiles",
+                    "problems": [
+                        self.PG._generate_type2_question("Easy"),
+                        self.PG._generate_type2_question("Medium","v_i and x"),
+                        self.PG._generate_type2_question("Easy")
+                    ],
+                    "gap": 2
+                }
+            ]
+        return question_generator
+    
+
+
+    def projectile_quiz_H(self):
+        def question_generator():
+            return [
+                {
+                    "heading": "Type I Projectiles",
+                    "problems": [
+                        self.PG._generate_type1_question("Easy","x"),
+                        self.PG._generate_type1_question("Easy","h"),
+                        self.PG._generate_type1_question("Easy","v_i"),
+                        self.PG._generate_type1_question("Medium","v_f and theta"),
+                        self.PG._generate_type1_question("Medium","v_i and h")
+                        ],
+                    "gap": 2
+                },
+                {
+                    "heading": "Type II Projectiles",
+                    "problems": [
+                        self.PG._generate_type2_question("Easy"),
+                        self.PG._generate_type2_question("Medium","v_i and x"),
+                        self.PG._generate_type2_question("Medium", "v_i and theta")
+                    ],
+                    "gap": 2
+                }
+            ]
+        return question_generator
+    
+
+    
     def create_first_doc(self):
         def question_generator():
             return [
