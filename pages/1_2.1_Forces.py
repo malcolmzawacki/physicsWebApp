@@ -3,7 +3,7 @@ import streamlit as st
 from tools.loading import lazy_tabs
 from utils.ui import interface
 from utils.generators.force_generator import ForceGenerator
-from utils.generators.tension_generator import TensionGenerator
+from utils.generators.forces.tension_generator import TensionGenerator
 
 
 def newtons_2nd():
