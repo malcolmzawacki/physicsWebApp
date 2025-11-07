@@ -105,7 +105,7 @@ class InclineGenerator(BaseGenerator):
                 "accel"
             ])
         q_nums = self.incline_nums()
-        accel = q_nums["accel w/o friction"]
+        accel = q_nums["accel w/o frict"]
         noun = random_noun()
         mass = ri(1,25)
         if solve_for == "angle":
@@ -131,7 +131,7 @@ class InclineGenerator(BaseGenerator):
                 "coeff"
             ])
         q_nums = self.incline_nums()
-        accel = q_nums["accel w/ friction"]
+        accel = q_nums["accel w/ frict"]
         coeff = q_nums["kinetic coeff"]
         noun = random_noun()
         mass = ri(1,25)
