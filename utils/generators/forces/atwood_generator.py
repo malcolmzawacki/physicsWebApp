@@ -69,7 +69,7 @@ class AtwoodGenerator(BaseGenerator):
             "mu max": mu_max
         }
     
-
+    # region static atwood
     def static_half_atwood(self, solve_for = None):
         """solve for options: tension, mass 1, mass 2, coefficient of friction"""
         eq_nums = self.half_atwood_nums()
@@ -85,6 +85,12 @@ class AtwoodGenerator(BaseGenerator):
             )
         noun1 = random_noun()
         noun2 = random_noun()
+
+        diagram_data = {
+            "m1": eq_nums["mass 1"],
+            "m2": eq_nums["mass 2"],
+            "mu_s": eq_nums["mu max"]
+        }
         if solve_for == "tension":
           question = f"""A {eq_nums["mass 1"]} kg {noun1} is at rest on a table, 
           despite being attached by a string to a {eq_nums["mass 2"]} kg {noun2} hanging off the table.
@@ -113,7 +119,7 @@ class AtwoodGenerator(BaseGenerator):
           What coefficient of static friction would hold the system in place?"""
           answer = [eq_nums["mu max"]]
           unit = ["coefficient of friction"]
-        return {"question": question, "answers": answer, "units": unit}
+        return {"question": question, "answers": answer, "units": unit, "diagram_data": diagram_data}
     
 
     def frictionless_half_atwood(self, solve_for = None):
@@ -130,6 +136,11 @@ class AtwoodGenerator(BaseGenerator):
        noun2 = random_noun()
        accel = 10*eq_nums["mass 2"] / (eq_nums["mass 1"] + eq_nums["mass 2"])
        tension = eq_nums["mass 1"]*accel
+
+       diagram_data = {
+           "m1": eq_nums["mass 1"],
+           "m2": eq_nums["mass 2"]
+       }
 
        q_template_m1_m2 = f"""A {eq_nums["mass 1"]} kg {noun1} is placed on a table with negligible friction. 
           It is attached by a string to a {eq_nums["mass 2"]} kg {noun2} hanging off the table."""
@@ -168,7 +179,7 @@ class AtwoodGenerator(BaseGenerator):
           question = question + f" What is the mass of the {noun1}?"
           answer = [accel]
           unit = ["acceleration (m/s2)"]
-       return {"question": question, "answers": answer, "units": unit}
+       return {"question": question, "answers": answer, "units": unit, "diagram_data": diagram_data}
 
 
     def kinetic_half_atwood(self, solve_for = None):
@@ -192,6 +203,12 @@ class AtwoodGenerator(BaseGenerator):
        m2 = eq_nums["mass 2"]
        accel = 10*((m2 - mu*m1)/(m1+m2))
        tension = m2*(10-accel)
+
+       diagram_data = {
+            "m1": m1,
+            "m2": m2,
+            "mu_k": mu
+        }
 
        if solve_for == None:
           solve_for = random.choice([
@@ -261,4 +278,94 @@ class AtwoodGenerator(BaseGenerator):
          question = start_str1_no_m1 + start_str2_no_m2 + coeff_str + tension_str + accel_str + m1_q + m2_q
          answers = [m1, m2]
          units = [f"{noun1} mass (kg)", f"{noun2} mass (kg)"]
-       return {"question": question, "answers": answers, "units": units}
+       return {"question": question, "answers": answers, "units": units, "diagram_data": diagram_data}
+    
+
+    def generate_diagram(self, diagram_data: dict, problem_type: str, difficulty: str):
+        """
+        Generate a Matplotlib figure for the half-Atwood problem.
+        This method is called by the Interface's add_diagram_smart().
+        """
+        import matplotlib.pyplot as plt
+        plt.tight_layout()
+        plt.style.use("dark_background")
+        # Increase figsize height to fit table
+        fig, ax = plt.subplots(figsize=(5, 4))
+
+        # 1. Get data
+        m1 = diagram_data.get("m1")
+        m2 = diagram_data.get("m2")
+        
+        # 2. Draw static components (table, pulley, blocks, strings)
+        
+        # Table
+        ax.plot([-5, 1], [0, 0], 'w-', lw=2)  # Table surface
+        ax.plot([1, 1], [0, -5], 'w-', lw=2)  # Table leg
+        
+        # Pulley
+        circle = plt.Circle((1, 0), 0.5, color='gray', fill=True, zorder=5)
+        ax.add_artist(circle)
+        
+        # Mass 1 (on table)
+        rect1 = plt.Rectangle((-2, 0), 1.5, 1, color='cyan', zorder=10)
+        ax.add_artist(rect1)
+        ax.text(-1.25, 0.5, '$m_1$', color='black', ha='center', va='center', fontsize=12, zorder=11)
+
+        
+        # Mass 2 (hanging)
+        rect2 = plt.Rectangle((1.5, -4), 1, 1, color='magenta', zorder=10)
+        ax.add_artist(rect2)
+        ax.text(2, -3.5, '$m_2$', color='black', ha='center', va='center', fontsize=12, zorder=11)
+ 
+        
+        # Strings
+        ax.plot([-0.5, 1], [0.5, 0.5], 'w-', zorder=7)  # Horizontal string
+        ax.plot([1.5, 1.5], [-3, 0.25], 'w-', zorder=7)  # Vertical string
+
+        # 3. Draw dynamic components (force/acceleration arrows)
+        
+        # Arrow style
+        arrow_style = dict(head_width=0.2, head_length=0.2, fc='yellow', ec='yellow', length_includes_head=True, zorder=20)
+        
+        if "Static" in problem_type:
+            mu_s = diagram_data.get("mu_s", 0)
+            ax.set_title(f"Static System (a=0)", color='white')
+            # Static friction arrow
+            ax.arrow(-1.25, -0.25, -1, 0, **arrow_style)
+            ax.text(-2.25, -0.5, '$f_s$', color='yellow', ha='center', va='top', fontsize=12)
+            # Tension arrows (equal to m2g)
+            ax.arrow(-0.5, 0.25, 0.75, 0, **arrow_style) # On m1
+            ax.text(0.125, 0.5, '$F_T$', color='yellow', ha='center', va='bottom', fontsize=12)
+            ax.arrow(2, -4, 0, -0.75, **arrow_style) # On m2 (down)
+            ax.text(2, -5.5, '$W_2$', color='yellow', ha='center', va='bottom', fontsize=12)
+            ax.arrow(2, -3, 0, 0.75, **arrow_style) # On m2 (up)
+            ax.text(2, -1.5, '$F_T$', color='yellow', ha='center', va='top', fontsize=12)
+
+
+        elif "Frictionless" in problem_type:
+            ax.set_title("Frictionless System (a > 0)", color='white')
+            # Acceleration arrows
+            ax.arrow(-1.25, 1.25, 1, 0, **arrow_style) # m1 right
+            ax.text(0, 1.25, 'a', color='yellow', ha='center', va='center', fontsize=12)
+            ax.arrow(2.5, -3.5, 0, -1, **arrow_style) # m2 down
+            ax.text(2.5, -2.5, 'a', color='yellow', ha='center', va='center', fontsize=12)
+
+        elif "Kinetic" in problem_type:
+            mu_k = diagram_data.get("mu_k", 0)
+            ax.set_title(f"Kinetic System (a > 0, $\mu_k$ > 0)", color='white')
+            # Kinetic friction arrow
+            ax.arrow(-1.25, -0.25, -1, 0, **arrow_style)
+            ax.text(-2.25, -0.5, '$f_k$', color='yellow', ha='center', va='top', fontsize=12)
+            # Acceleration arrows
+            ax.arrow(-1.25, 1.25, 1, 0, **arrow_style) # m1 right
+            ax.text(0, 1.25, 'a', color='yellow', ha='center', va='center', fontsize=12)
+            ax.arrow(2.5, -3.5, 0, -1, **arrow_style) # m2 down
+            ax.text(2.5, -2.5, 'a', color='yellow', ha='center', va='center', fontsize=12)
+
+        # 4. Clean up the plot
+        ax.set_xlim(-5, 5)
+        ax.set_ylim(-5, 3)
+        ax.set_aspect('equal')
+        ax.axis('off')
+
+        return fig
