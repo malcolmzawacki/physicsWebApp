@@ -9,6 +9,10 @@ from utils.generators.const_motion_generator import ConstantMotionGenerator
 from utils.generators.dist_disp_generator import DistDispGenerator
 from utils.generators.projectile_generator import ProjectileGenerator
 from utils.generators.motion_graph_generator import MotionGraphGenerator
+from utils.generators.forces.atwood_generator import AtwoodGenerator
+from utils.generators.forces.incline_generator import InclineGenerator
+from utils.generators.forces.tension_generator import TensionGenerator
+
 class Org:
     def __init__(self):
         self.AM = LinearMotionGenerator()
@@ -16,6 +20,10 @@ class Org:
         self.DDG = DistDispGenerator()
         self.PG = ProjectileGenerator()
         self.MGG = MotionGraphGenerator()
+        self.TG = TensionGenerator()
+        self.AWG = AtwoodGenerator()
+        self.IncG = InclineGenerator()
+
 
     def motion_graph_section(self, difficulty: str = "Medium") -> dict[str, Any]:
         problems = self.MGG.unique_graph_problems_for_doc(
@@ -53,6 +61,73 @@ class Org:
             "problems": problems,
             "gap": 0,
         }
+    
+
+    def funny_forces_practice(self):
+        def question_generator():
+            return [
+                {
+                    "heading": "Tension Problems",
+                    "problems": [
+                        self.TG.suspension_question("Easy") for _ in range(5)
+                        ]+[
+                            self.TG.suspension_question("Hard") for _ in range(5)
+                    ],
+                    "gap": 1
+                },
+                {
+                    "heading": "Atwood Problems",
+                    "problems": [
+                        self.AWG.static_half_atwood(solve_for="tension"),
+                        self.AWG.static_half_atwood(solve_for="mass 1"),
+                        self.AWG.static_half_atwood(solve_for="mass 2"),
+                        self.AWG.static_half_atwood(solve_for="coefficient of friction"),
+                        self.AWG.static_half_atwood(solve_for="tension"),
+                        self.AWG.static_half_atwood(solve_for="mass 1"),
+                        self.AWG.static_half_atwood(solve_for="mass 2"),
+                        self.AWG.static_half_atwood(solve_for="coefficient of friction"),
+                        self.AWG.frictionless_half_atwood(solve_for="tension"),
+                        self.AWG.frictionless_half_atwood(solve_for="mass 1"),
+                        self.AWG.frictionless_half_atwood(solve_for="mass 2"),
+                        self.AWG.frictionless_half_atwood(solve_for="acceleration"),
+                        self.AWG.frictionless_half_atwood(solve_for="tension"),
+                        self.AWG.frictionless_half_atwood(solve_for="mass 1"),
+                        self.AWG.frictionless_half_atwood(solve_for="mass 2"),
+                        self.AWG.frictionless_half_atwood(solve_for="acceleration"),
+                        self.AWG.kinetic_half_atwood(solve_for="acceleration and tension"),
+                        self.AWG.kinetic_half_atwood(solve_for="acceleration and coefficient"),
+                        self.AWG.kinetic_half_atwood(solve_for="coefficient and tension"),
+                        self.AWG.kinetic_half_atwood(solve_for="mass 2 and tension"),
+                        self.AWG.kinetic_half_atwood(solve_for="mass 2 and coefficient"),
+                        self.AWG.kinetic_half_atwood(solve_for="mass 1 and acceleration"),
+                        self.AWG.kinetic_half_atwood(solve_for="mass 1 and tension"),
+                        self.AWG.kinetic_half_atwood(solve_for="mass 1 and coefficient"),
+                        self.AWG.kinetic_half_atwood(solve_for="mass 1 and mass 2"),
+                    ],
+                    "gap": 1
+
+                },
+                {
+                    "heading": "Inclined Planes",
+                    "problems": [
+                        self.IncG.static_incline(solve_for="angle") for _ in range(5)
+                    ]+[
+                        self.IncG.static_incline(solve_for="static coeff") for _ in range(5)
+                    ]+[
+                        self.IncG.frictionless_incline(solve_for="angle") for _ in range(5)
+                    ]+[
+                        self.IncG.frictionless_incline(solve_for="accel") for _ in range(5)
+                    ]+[
+                        self.IncG.kinetic_friction_incline(solve_for="angle") for _ in range(5)
+                    ]+[
+                        self.IncG.kinetic_friction_incline(solve_for="accel") for _ in range(5)
+                    ]+[
+                        self.IncG.kinetic_friction_incline(solve_for="coeff") for _ in range(5)
+                    ],
+                    "gap": 1
+                }
+            ]
+        return question_generator
 
     def projectile_quiz_CP(self):
         def question_generator():

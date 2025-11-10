@@ -63,7 +63,7 @@ class InclineGenerator(BaseGenerator):
         theta = ri(1,44)
         mu_max = math.tan(math.pi*theta/180)
         accel_no_mu = 10*math.sin(math.pi*theta/180)
-        mu_k = ri(1, math.floor(100*mu_max)-1)/100
+        mu_k = ri(1, math.floor(100*mu_max))/100
         accel_mu_k = accel_no_mu - 10*mu_k*math.cos(math.pi*theta/180)
         return {
             "angle": theta,

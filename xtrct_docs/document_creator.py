@@ -302,7 +302,7 @@ def create_and_embed_graph(doc, graph_data, filename = "temp_graph.png"):
     os.remove(filename)
     
 
-def create_doc(title: str, question_generator, number_of_docs: int, tables: bool = True):
+def create_doc(title: str, question_generator, number_of_docs: int, tables: bool = True, include_graphs = False):
   doc = Document()
   answer_key = [] 
   for doc_num in range(1, number_of_docs + 1):
@@ -373,7 +373,7 @@ def create_doc(title: str, question_generator, number_of_docs: int, tables: bool
                 unit = problem["units"][0]
                 section_answers.append(f"{problem_number}. {unit}: {answer}")
 
-            if not side_by_side_layout and graph_data:
+            if not side_by_side_layout and graph_data and include_graphs:
                 from utils.graph_utils import embed_graph_in_doc
                 embed_graph_in_doc(container_cell, graph_data)
             effective_spaces = 0 if suppress_question_text else spaces

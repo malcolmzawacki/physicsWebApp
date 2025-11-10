@@ -1,13 +1,12 @@
 # Project Roadmap & Backlog
 
-_Last updated: 2025-09-29_
+_Last updated: 2025-11-10_
 
 ## Recently Completed
 
-- Linear motion generator now supports explicit `solve_for` overrides while keeping question narratives coherent.
-- Added shared motion-context helpers to reduce repeated text logic without mutating physics outputs.
-- Document generator now wraps question blocks to keep prompts, tables, and work space together across page breaks.
-- Motion graph exports now share section-level instructions, auto-cycle unique graph types, and render compact button layouts alongside other worksheet sections.
+- `projectile_generator.py` now supports explicit `solve_for` overrides while keeping question narratives coherent.
+- `xtrct_docs/document_creator.py` has an `include_graphs` parameter to add flexibility when diagrams are helpful but not needed
+- Created and then moved additional force tab generators to `forces/` folder for better organization, includes `atwood_generator.py`, `tension_generator.py`, and `incline_generator.py`
 
 ## In Progress / Short-Term Targets
 
@@ -34,6 +33,8 @@ _Last updated: 2025-09-29_
 - Refactor `xtrct_docs/document_creator.py` to separate data extraction, markdown cleaning, table rendering, and answer-key assembly.
 - Allow generator callbacks used for documents to receive contextual metadata (version index, seed) for reproducibility.
 - Replace `os.startfile` with a platform-aware opener and wrap temp image creation in context managers for safer cleanup.
+- modify `xtrct_docs/document_creator.py` and `xtrct_docs/question_generator.py` parameter passing to capture context (`include_graphs=False`, `tables=True`) rather than passing them as separate, whole document arguments
+- enhance `xtrct_docs/document_creator.py` answer type recognition to truncate float vals in answer key
 
 ### Content & UX Polish
 
