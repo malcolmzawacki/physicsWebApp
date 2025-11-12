@@ -94,21 +94,21 @@ class AtwoodGenerator(BaseGenerator):
         if solve_for == "tension":
           question = f"""A {eq_nums["mass 1"]} kg {noun1} is at rest on a table, 
           despite being attached by a string to a {eq_nums["mass 2"]} kg {noun2} hanging off the table.
-          This is mainly due to the {eq_nums['mu max']:.2f} coefficient of static friction.
+          This is mainly due to the {eq_nums['mu max']:.4f} coefficient of static friction.
           What is the tension in the string?"""
           answer = [tension]
           unit = ["Tension (Newtons)"]
         elif solve_for == "mass 1":
           question = f"""A {noun1} is at rest on a table, 
           despite being attached by a string to a {eq_nums["mass 2"]} kg {noun2} hanging off the table.
-          This is partly due to the {eq_nums['mu max']:.2f} coefficient of static friction, which is just high enough to keep the system at rest.
+          This is partly due to the {eq_nums['mu max']:.4f} coefficient of static friction, which is just high enough to keep the system at rest.
           What mass of the {noun1} would produce the necessary frictional force to hold the system in place?"""
           answer = [eq_nums["mass 1"]]
           unit = ["mass 1 (kg)"]
         elif solve_for == "mass 2":
           question = f"""A {eq_nums["mass 1"]} kg {noun1} is at rest on a table, 
           despite being attached by a string to a {noun2} hanging off the table.
-          This is partly due to the {eq_nums['mu max']:.2f} coefficient of static friction, which is just high enough to keep the system at rest.
+          This is partly due to the {eq_nums['mu max']:.4f} coefficient of static friction, which is just high enough to keep the system at rest.
           What is the maximum mass of the {noun2} that the frictional force could oppose to hold the system in place?"""
           answer = [eq_nums["mass 2"]]
           unit = ["mass 2 (kg)"]
@@ -146,19 +146,19 @@ class AtwoodGenerator(BaseGenerator):
           It is attached by a string to a {eq_nums["mass 2"]} kg {noun2} hanging off the table."""
        q_template_m1_a = f"""A {eq_nums["mass 1"]} kg {noun1} is placed on a table with negligible friction. 
           It is attached by a string to a {noun2} hanging off the table, 
-          which causes the system to accelerate at {accel:.2f} m/s2."""
+          which causes the system to accelerate at {accel:.4f} m/s2."""
        q_template_m1_Ft = f"""A {eq_nums["mass 1"]} kg {noun1} is placed on a table with negligible friction. 
           It is attached by a string to a {noun2} hanging off the table, 
-          which produces a tension of {tension:.2f} Newtons."""
+          which produces a tension of {tension:.4f} Newtons."""
        q_template_m2_a = f"""A {noun1} is placed on a table with negligible friction. 
           It is attached by a string to a {eq_nums["mass 2"]} kg {noun2} hanging off the table, 
-          which causes the system to accelerate at {accel:.2f} m/s2."""
+          which causes the system to accelerate at {accel:.4f} m/s2."""
        q_template_m2_Ft = f"""A {noun1} is placed on a table with negligible friction. 
           It is attached by a string to a {eq_nums["mass 2"]} kg {noun2} hanging off the table, 
-          which produces a tension of {tension:.2f} Newtons."""
+          which produces a tension of {tension:.4f} Newtons."""
        q_template_a_Ft = f"""A {noun1} is placed on a table with negligible friction. 
           It is attached by a string to a {noun2} hanging off the table, 
-          which produces a tension of {tension:.2f} Newtons and an acceleration of {accel:.2f} m/s2."""
+          which produces a tension of {tension:.4f} Newtons and an acceleration of {accel:.4f} m/s2."""
        if solve_for == "tension":
           question = random.choice([q_template_m1_m2, q_template_m1_a, q_template_m2_a])
           question = question + " What is the tension in the string?"
@@ -230,9 +230,9 @@ class AtwoodGenerator(BaseGenerator):
        start_str2_w_m2 = f"a {m2} kg {noun2} hanging off the table. "
        start_str1_no_m1 = f"A {noun1} on a table is connected by a string to "
        start_str2_no_m2 = f"a {noun2} hanging off the table. "
-       coeff_str = f"The coefficient of kinetic friction between the {noun1} and the table is {mu:.2f}. "
-       tension_str = f"The tension in the string is {tension:.2f} Newtons. "
-       accel_str = f"The system accelerates at {accel:.2f} m/s^2. "
+       coeff_str = f"The coefficient of kinetic friction between the {noun1} and the table is {mu:.4f}. "
+       tension_str = f"The tension in the string is {tension:.4f} Newtons. "
+       accel_str = f"The system accelerates at {accel:.4f} m/s^2. "
        m1_q = f"What is the mass of the {noun1}? "
        m2_q = f"What is the mass of the {noun2}? "
        mu_q = f"What is the coefficient of friction between the {noun1} and the table? "

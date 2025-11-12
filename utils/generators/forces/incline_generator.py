@@ -85,7 +85,7 @@ class InclineGenerator(BaseGenerator):
         mass = ri(1,25)
         if solve_for == "angle":
             question = f"""A {mass} kg {noun} sits at rest on an inclined plane.
-            The coefficient of static friction between the {noun} and the plane is {q_nums["static coeff"]:.2f}.
+            The coefficient of static friction between the {noun} and the plane is {q_nums["static coeff"]:.4f}.
             What is the angle of the inclined plane?"""
             answer = [q_nums["angle"]]
             unit = ["Angle (degrees)"]
@@ -109,7 +109,7 @@ class InclineGenerator(BaseGenerator):
         noun = random_noun()
         mass = ri(1,25)
         if solve_for == "angle":
-            question = f"""A {mass} kg {noun} accelerates down an inclined plane at a rate of {accel:.2f}.
+            question = f"""A {mass} kg {noun} accelerates down an inclined plane at a rate of {accel:.4f}.
             What is the angle of the inclined plane?"""
             answer = [q_nums["angle"]]
             unit = ["Angle (degrees)"]
@@ -136,20 +136,20 @@ class InclineGenerator(BaseGenerator):
         noun = random_noun()
         mass = ri(1,25)
         if solve_for == "angle":
-            question = f"""A {mass} kg {noun} accelerates down an inclined plane at a rate of {accel:.2f}.
-            The coefficient of kinetic friction between the {noun} and the plane is {coeff:.2f}.
+            question = f"""A {mass} kg {noun} accelerates down an inclined plane at a rate of {accel:.4f}.
+            The coefficient of kinetic friction between the {noun} and the plane is {coeff:.4f}.
             What is the angle of the inclined plane?"""
             answer = [q_nums["angle"]]
             unit = ["Angle (degrees)"]
         elif solve_for == "accel":
             question = f"""A {mass} kg {noun} accelerates down an inclined plane.
             The plane sits at an angle of {q_nums["angle"]} degrees.
-            The coefficient of kinetic friction between the {noun} and the plane is {coeff:.2f}.
+            The coefficient of kinetic friction between the {noun} and the plane is {coeff:.4f}.
             What is the acceleration of the {noun} down the plane?"""
             answer = [accel]
             unit = [f"{noun}'s acceleration (m/s^2)"]
         else:
-            question = f"""A {mass} kg {noun} accelerates down an inclined plane at a rate of {accel:.2f}.
+            question = f"""A {mass} kg {noun} accelerates down an inclined plane at a rate of {accel:.4f}.
             The plane sits at an angle of {q_nums["angle"]} degrees.
             What is the coefficient of kinetic friction between the {noun} and the plane?"""
             answer = [coeff]
