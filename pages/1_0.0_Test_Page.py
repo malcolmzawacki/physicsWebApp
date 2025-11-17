@@ -180,5 +180,83 @@ def lorentz():
     st.pyplot(fig)
 
 
+def roulette():
+    import random
+    outcomes = []
+
+    # enumerate all possible outcomes from 0 to 37 (using 37 as standin for 00)
+    for i in range(38):
+        outcomes.append(i)
+
+    # this is betting on black, but betting on red would be symmetric in probability
+    winning_outcomes = set([2,4,6,8,10,11,13,15,17,20,22,24,26,28,29,31,33,35])
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        # set the minimum of the table
+        init_bet = st.number_input("Minimum", 2, 100, step=None)
+    with col2:
+        # set how long person is at the table
+        time_limit = st.number_input("Rounds",10,10000, value=100, step=None)
+    with col3:
+        # set number of paths to examine
+        samples = st.number_input("Samples",10,10000, step=None)
+
+    yields = [] # this will hold the results of each sample
+    max_bets = [] # this will hold the largest bet each sample has to make
+    for i in range(samples):
+        # initialize the circumstances of each sample
+        time_plot = []
+        yield_plot = []
+        bet = init_bet
+        net_yield = 0
+        time = 0
+        max_bet = init_bet
+        while time < time_limit:
+            result = random.choice(outcomes)
+            if result in winning_outcomes:
+                net_yield += bet
+                bet = init_bet # reset the bet on a win
+            else:
+                net_yield -= bet
+                bet*=2 # double the bet on a loss
+                if bet > max_bet:
+                    max_bet = bet
+            time_plot.append(time) # add current time step to list (for plotting)
+            yield_plot.append(net_yield) # add current yield to list (for plotting)
+            time += 1 # go to next step / play
+        yields.append(yield_plot) # add sample's results to larger list
+        max_bets.append(max_bet)
+    # print(net_yield)
+    # print(max_bet)
+
+    # graphing stuff
+    fig = plt.figure()
+    ax = fig.add_subplot()
+    average_yield = []
+
+    # add all results to the graph
+    for yield_plot in yields:
+        ax.plot(time_plot, yield_plot)
+        average_yield.append(yield_plot[len(yield_plot)-1])
+
+
+    with st.expander("Graph"):
+        st.pyplot(fig)
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.write("Maximum bet stats:")
+        st.write(f"Mean: ${np.mean(max_bets):,.0f}")
+        st.write(f"Median: ${np.median(max_bets):,.0f}")
+        st.write(f"Max: ${max(max_bets):,.0f}")
+        st.write(f"Min: ${min(max_bets):,.0f}")
+    with col2:
+        st.write("Payout Stats")
+        st.write(f"Mean: ${np.mean(average_yield):,.0f}")
+        st.write(f"Median: ${np.median(average_yield):,.0f}")
+        st.write(f"Max: ${max(average_yield):,.0f}")
+        st.write(f"Min: ${min(average_yield):,.0f}")
+
 if __name__ == "__main__":
-    lorentz()
+    roulette()
