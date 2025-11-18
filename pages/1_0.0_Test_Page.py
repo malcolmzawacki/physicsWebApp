@@ -182,12 +182,17 @@ def lorentz():
 
 def roulette():
     import random
-    outcomes = []
+    st.title("Roulette: Modified Martingale Strategy")
+ 
     st.write("Rules:")
     st.write("1. Betting ends either when all money is lost, or all rounds are played")
-    st.write("2. Bet on win is minimum")
-    st.write("3. Bet on loss is either double last bet, or table max if doubling exceeds table max, or all cash if cash remaining is less than either of the former")
+    st.write("2. Next bet on win is minimum")
+    st.write("""3. Next bet on loss is either double last bet, 
+             or table max if doubling exceeds table max, 
+             or all remaining cash, if that's the least of the three options""")
+    st.write("")
     # enumerate all possible outcomes from 0 to 37 (using 37 as standin for 00)
+    outcomes = []
     for i in range(38):
         outcomes.append(i)
 
@@ -197,19 +202,19 @@ def roulette():
     col1, col2, col3, col4, col5 = st.columns(5)
     with col1:
         # set the minimum of the table
-        init_bet = st.number_input("Minimum", 1, 100, value = 2, step = None)
+        init_bet = st.number_input("Minimum Bet", 1, 100, value = 2, step = None)
     with col2:
         # set entering money
-        starting_cash = st.number_input("Starting Value", 2, None, 5_000, step=None)
+        starting_cash = st.number_input("Starting Cash", 2, None, 5_000, step=None)
     with col3:
         # set maximum multiplier
-        max_mult = st.number_input("Maximum", 10, 100_000, 5_000, step=None)
+        max_mult = st.number_input("Maximum Bet", 10, 100_000, 5_000, step=None)
     with col4:
         # set how long person is at the table
-        time_limit = st.number_input("Rounds", 10, 10_000, value=1_000, step=None)
+        time_limit = st.number_input("Rounds of Play", 10, 100_000, value=10_000, step=None)
     with col5:
         # set number of paths to examine
-        samples = st.number_input("Samples", 10, 10_000, value=1_000, step=None)
+        samples = st.number_input("Samples", 10, 10_000, value=100, step=None)
 
     yields = []      # this will hold the results of each sample (time series)
     max_bets = []    # this will hold the largest bet each sample has to make
@@ -224,7 +229,7 @@ def roulette():
         cash = starting_cash
         time = 0
         max_bet = init_bet
-
+        # play the game
         while time < time_limit:
             lost = False
 
@@ -233,9 +238,10 @@ def roulette():
             if result in winning_outcomes:
                 cash += bet
                 bet = init_bet  # reset the bet on a win
+
             else:  # loss
                 cash -= bet
-                if cash <= 0:
+                if cash <= 0: # went broke, sample is done
                     # this stops the normal generation of plotted data, and fills the remainder with last value
                     # which forces a match up in graph size
                     lost = True
@@ -243,9 +249,10 @@ def roulette():
                         time_plot.append(j)
                         yield_plot.append(cash - starting_cash)
                     time = time_limit  # game is over, walk away
-                else:
+
+                else: # still some cash left
                     # choose the lowest of: doubling the bet, maxing out the table, remaining cash
-                    bet = min(2 * bet, max_mult * init_bet, cash)
+                    bet = min(2 * bet, max_mult, cash)
                     if bet > max_bet:
                         max_bet = bet
 
@@ -262,7 +269,7 @@ def roulette():
     final_yields = [yp[-1] for yp in yields]
 
     # fraction of samples that ended with a true loss (negative net)
-    negative_return_count = sum(1 for y in final_yields if y < 0)
+    negative_return_count = sum(1 for y in final_yields if y <= 0)
     negative_rate = 100 * negative_return_count / samples
 
     # graphing stuff
