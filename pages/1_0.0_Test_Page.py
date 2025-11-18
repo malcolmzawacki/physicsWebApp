@@ -183,7 +183,10 @@ def lorentz():
 def roulette():
     import random
     outcomes = []
-
+    st.write("Rules:")
+    st.write("1. Betting ends either when all money is lost, or all rounds are played")
+    st.write("2. Bet on win is minimum")
+    st.write("3. Bet on loss is either double last bet, or table max if doubling exceeds table max, or all cash if cash remaining is less than either of the former")
     # enumerate all possible outcomes from 0 to 37 (using 37 as standin for 00)
     for i in range(38):
         outcomes.append(i)
@@ -191,44 +194,76 @@ def roulette():
     # this is betting on black, but betting on red would be symmetric in probability
     winning_outcomes = set([2,4,6,8,10,11,13,15,17,20,22,24,26,28,29,31,33,35])
 
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4, col5 = st.columns(5)
     with col1:
         # set the minimum of the table
-        init_bet = st.number_input("Minimum", 2, 100, step=None)
+        init_bet = st.number_input("Minimum", 1, 100, value = 2, step = None)
     with col2:
-        # set how long person is at the table
-        time_limit = st.number_input("Rounds",10,10000, value=100, step=None)
+        # set entering money
+        starting_cash = st.number_input("Starting Value", 2, None, 5_000, step=None)
     with col3:
+        # set maximum multiplier
+        max_mult = st.number_input("Maximum", 10, 100_000, 5_000, step=None)
+    with col4:
+        # set how long person is at the table
+        time_limit = st.number_input("Rounds", 10, 10_000, value=1_000, step=None)
+    with col5:
         # set number of paths to examine
-        samples = st.number_input("Samples",10,10000, step=None)
+        samples = st.number_input("Samples", 10, 10_000, value=1_000, step=None)
 
-    yields = [] # this will hold the results of each sample
-    max_bets = [] # this will hold the largest bet each sample has to make
+    yields = []      # this will hold the results of each sample (time series)
+    max_bets = []    # this will hold the largest bet each sample has to make
+
     for i in range(samples):
         # initialize the circumstances of each sample
         time_plot = []
         yield_plot = []
+        if init_bet is None:
+            init_bet = 2
         bet = init_bet
-        net_yield = 0
+        cash = starting_cash
         time = 0
         max_bet = init_bet
+
         while time < time_limit:
+            lost = False
+
+            # spin the wheel
             result = random.choice(outcomes)
             if result in winning_outcomes:
-                net_yield += bet
-                bet = init_bet # reset the bet on a win
-            else:
-                net_yield -= bet
-                bet*=2 # double the bet on a loss
-                if bet > max_bet:
-                    max_bet = bet
-            time_plot.append(time) # add current time step to list (for plotting)
-            yield_plot.append(net_yield) # add current yield to list (for plotting)
-            time += 1 # go to next step / play
-        yields.append(yield_plot) # add sample's results to larger list
+                cash += bet
+                bet = init_bet  # reset the bet on a win
+            else:  # loss
+                cash -= bet
+                if cash <= 0:
+                    # this stops the normal generation of plotted data, and fills the remainder with last value
+                    # which forces a match up in graph size
+                    lost = True
+                    for j in range(time, time_limit):
+                        time_plot.append(j)
+                        yield_plot.append(cash - starting_cash)
+                    time = time_limit  # game is over, walk away
+                else:
+                    # choose the lowest of: doubling the bet, maxing out the table, remaining cash
+                    bet = min(2 * bet, max_mult * init_bet, cash)
+                    if bet > max_bet:
+                        max_bet = bet
+
+            if not lost:
+                time_plot.append(time)  # add current time step to list (for plotting)
+                yield_plot.append(cash - starting_cash)  # add current yield to list (for plotting)
+
+            time += 1  # go to next step / play
+
+        yields.append(yield_plot)  # add sample's results to larger list
         max_bets.append(max_bet)
-    # print(net_yield)
-    # print(max_bet)
+
+    # compute final yields from the plotted data so stats match the graph
+    final_yields = [yp[-1] for yp in yields]
+
+    # fraction of samples that ended with a true loss (negative net)
+    negative_return_count = sum(1 for y in final_yields if y < 0)
+    negative_rate = 100 * negative_return_count / samples
 
     # graphing stuff
     fig = plt.figure()
@@ -237,13 +272,12 @@ def roulette():
 
     # add all results to the graph
     for yield_plot in yields:
-        ax.plot(time_plot, yield_plot)
-        average_yield.append(yield_plot[len(yield_plot)-1])
-
+        ax.plot(range(len(yield_plot)), yield_plot)
+        average_yield.append(yield_plot[-1])
 
     with st.expander("Graph"):
         st.pyplot(fig)
-    
+
     col1, col2 = st.columns(2)
     with col1:
         st.write("Maximum bet stats:")
@@ -257,6 +291,7 @@ def roulette():
         st.write(f"Median: ${np.median(average_yield):,.0f}")
         st.write(f"Max: ${max(average_yield):,.0f}")
         st.write(f"Min: ${min(average_yield):,.0f}")
+        st.write(f"Negative Return Rate: {negative_rate:.2f}%")
 
 if __name__ == "__main__":
     roulette()
