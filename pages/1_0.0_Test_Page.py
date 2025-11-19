@@ -300,5 +300,127 @@ def roulette():
         st.write(f"Min: ${min(average_yield):,.0f}")
         st.write(f"Negative Return Rate: {negative_rate:.2f}%")
 
+P_WIN = 18/38
+P_LOSE = 1 - P_WIN
+
+import random
+def reverse_roulette(min_bet, max_bet, starting_cash, target_profit, max_rounds):
+
+
+    cash = starting_cash
+    bet = min_bet
+    rounds = 0
+
+    target_cash = starting_cash + target_profit
+
+    while rounds < max_rounds and cash > 0 and cash < target_cash:
+        # legal bet: can't exceed cash or table max
+        b = min(bet, cash, max_bet)
+        if b <= 0:
+            break
+
+        result = random.random()  # quicker than choice()
+        if result < P_WIN:
+            cash += b
+            bet = min_bet
+        else:
+            cash -= b
+            if cash <= 0:
+                break
+            # double up, capped by table max and remaining cash
+            bet = min(2 * b, max_bet, cash)
+
+        rounds += 1
+
+
+    return cash, rounds
+
+def planner_tab():
+    st.header("martingale profit planner (simulated)")
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        min_bet = st.number_input("table minimum ($)", 1, 1_000, value=5, step=1)
+        max_bet = st.number_input("table maximum ($)", min_bet, 1_000_000, value=1_000, step=10)
+    with col2:
+        target_profit = st.number_input("desired profit ($)", 1, 100_000, value=100, step=10)
+        bankroll = st.number_input("starting bankroll ($)", min_bet, 1_000_000, value=2_000, step=50)
+    with col3:
+        desired_prob = st.number_input(
+            "desired success probability",
+            min_value=0.01,
+            max_value=0.99,
+            value=0.90,
+            step=0.01,
+        )
+        max_rounds = st.number_input(
+            "max spins to simulate",
+            min_value=10,
+            max_value=5_000,
+            value=500,
+            step=10,
+        )
+
+    samples = st.slider("number of simulated sessions", 100, 10_000, 2000, step=100)
+
+    if st.button("run planner simulation"):
+        successes = 0
+        break_evens = 0
+        losses = 0
+        total_losses = 0
+        success_rounds = []
+
+        for _ in range(samples):
+            cash, r = reverse_roulette(
+                min_bet=min_bet,
+                max_bet=max_bet,
+                starting_cash=bankroll,
+                target_profit=target_profit,
+                max_rounds=max_rounds,
+            )
+            success = True if cash >= bankroll + target_profit else False
+            break_even = True if cash == bankroll else False
+            loss = True if 0 < cash < bankroll else False
+            total_loss = True if cash == 0 else False
+            if success:
+                successes += 1
+                success_rounds.append(r)
+            if break_even:
+                break_evens += 1
+            if loss:
+                losses += 1
+            if total_loss:
+                total_losses += 1
+
+
+        success_rate = successes / samples
+        break_even_rate = break_evens / samples
+        loss_rate = losses / samples
+        total_loss_rate = total_losses / samples
+        avg_success_rounds = np.mean(success_rounds)
+
+
+        st.write(f"**empirical success rate:** {100*success_rate:.2f}% "
+                 f"(target: {100*desired_prob:.2f}%)")
+        st.write(f"**average number of spins until success:** {avg_success_rounds:.0f}")
+        st.write(f"**break-even rate:** {100*break_even_rate:.2f}%")
+        st.write(f"**loss rate:** {100*loss_rate:.2f}%")
+        st.write(f"**total loss rate:** {100*total_loss_rate:.2f}%")
+        if success_rate >= desired_prob:
+            st.success("with these conditions, you *approximately* meet your desired success probability.")
+        else:
+            st.warning("with these conditions, you fall SHORT of your desired success probability.")
+
+        st.caption(
+            "note: this is a monte carlo estimate, not exact math. "
+            "increase 'number of simulated sessions' for a more stable estimate (at the cost of speed)."
+        )
+
+
+
 if __name__ == "__main__":
-    roulette()
+    tab1, tab2 = st.tabs(["Roulette", "Reverse Engineering"])
+    with tab1:
+        roulette()
+    with tab2:
+        planner_tab()
