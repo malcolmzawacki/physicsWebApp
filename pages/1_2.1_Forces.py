@@ -49,7 +49,15 @@ def inclines():
     ui = interface(prefix, title, generator, metadata, difficulties)
     ui.unified_smart_layout()
 
-
+def center_of_mass():
+    from utils.generators.forces.center_of_mass_generator import CenterOfMassGenerator
+    title = "Center of Mass"
+    prefix = "com"
+    difficulties = ["Easy", "Medium", "Hard"]
+    generator = CenterOfMassGenerator()
+    metadata = generator.stored_metadata()
+    ui = interface(prefix, title, generator, metadata, difficulties)
+    ui.unified_smart_layout()
 
 def _under_construction_tab():
     st.write("Currently Under Construction")
@@ -58,9 +66,11 @@ def _under_construction_tab():
 def main():
     tab_specs = [
         ("Newton's Second Law", newtons_2nd),
+        ("Center of Mass", center_of_mass),
         ("Tension", tension),
         ("Atwood Machines", atwood),
-        ("Inclined Planes", inclines)
+        ("Inclined Planes", inclines),
+   
     ]
 
     lazy_tabs(tab_specs, state_key="forces_tabs", auto_load_first=True)

@@ -365,11 +365,12 @@ def planner_tab():
 
     if st.button("run planner simulation"):
         successes = 0
+        some_successes = 0
         break_evens = 0
         losses = 0
         total_losses = 0
         success_rounds = []
-
+        net_profit_list = []
         for _ in range(samples):
             cash, r = reverse_roulette(
                 min_bet=min_bet,
@@ -378,34 +379,43 @@ def planner_tab():
                 target_profit=target_profit,
                 max_rounds=max_rounds,
             )
-            success = True if cash >= bankroll + target_profit else False
+            success = True if cash >= (bankroll + target_profit) else False
+            some_success = True if cash > bankroll else False
             break_even = True if cash == bankroll else False
-            loss = True if 0 < cash < bankroll else False
+            loss = True if (0 < cash) and (cash < bankroll) else False
             total_loss = True if cash == 0 else False
             if success:
                 successes += 1
                 success_rounds.append(r)
+            if some_success:
+                some_successes += 1
             if break_even:
                 break_evens += 1
             if loss:
                 losses += 1
             if total_loss:
                 total_losses += 1
-
-
+            net_profit_list.append(cash-bankroll)
+        
+        expected_profit = np.mean(net_profit_list)
+        se = np.std(net_profit_list, ddof=1) / np.sqrt(len(net_profit_list))
         success_rate = successes / samples
+        some_success_rate = some_successes / samples
+        some_success_rate -= some_success_rate
         break_even_rate = break_evens / samples
         loss_rate = losses / samples
         total_loss_rate = total_losses / samples
         avg_success_rounds = np.mean(success_rounds)
 
 
-        st.write(f"**empirical success rate:** {100*success_rate:.2f}% "
+        st.write(f"***complete*** **success rate:** {100*success_rate:.2f}% "
                  f"(target: {100*desired_prob:.2f}%)")
         st.write(f"**average number of spins until success:** {avg_success_rounds:.0f}")
+        st.write(f"***some*** **success rate (profit, but less than target):** {100*some_success_rate:.2f}%")
         st.write(f"**break-even rate:** {100*break_even_rate:.2f}%")
-        st.write(f"**loss rate:** {100*loss_rate:.2f}%")
-        st.write(f"**total loss rate:** {100*total_loss_rate:.2f}%")
+        st.write(f"***some*** **loss rate (loss, but not total):** {100*loss_rate:.2f}%")
+        st.write(f"***complete*** **loss rate:** {100*total_loss_rate:.2f}%")
+        st.write(f"**expected outcome(\$):** {expected_profit:.0f}  $\pm$  {se:.0f}")
         if success_rate >= desired_prob:
             st.success("with these conditions, you *approximately* meet your desired success probability.")
         else:
