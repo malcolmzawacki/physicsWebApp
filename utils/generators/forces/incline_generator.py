@@ -123,10 +123,9 @@ class InclineGenerator(BaseGenerator):
     
         
     def kinetic_friction_incline(self, solve_for = None):
-        """solve for options are: angle, accel, coeff"""
+        """solve for options are: accel, coeff"""
         if solve_for == None:
             solve_for = random.choice([
-                "angle",
                 "accel",
                 "coeff"
             ])
@@ -135,13 +134,8 @@ class InclineGenerator(BaseGenerator):
         coeff = q_nums["kinetic coeff"]
         noun = random_noun()
         mass = ri(1,25)
-        if solve_for == "angle":
-            question = f"""A {mass} kg {noun} accelerates down an inclined plane at a rate of {accel:.4f}.
-            The coefficient of kinetic friction between the {noun} and the plane is {coeff:.4f}.
-            What is the angle of the inclined plane?"""
-            answer = [q_nums["angle"]]
-            unit = ["Angle (degrees)"]
-        elif solve_for == "accel":
+
+        if solve_for == "accel":
             question = f"""A {mass} kg {noun} accelerates down an inclined plane.
             The plane sits at an angle of {q_nums["angle"]} degrees.
             The coefficient of kinetic friction between the {noun} and the plane is {coeff:.4f}.
