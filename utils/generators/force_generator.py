@@ -83,13 +83,23 @@ class ForceGenerator(BaseGenerator):
                       "honors": r"""
                       \Sigma F \;=\; ma""",
 
-                      "conceptual": r"""\Large{
-                      \Sigma F \;=\; ma 
-                      \quad\quad | \quad\quad
+                      "conceptual": r""" 
+                      \Sigma F \;=\; m \cdot a \quad , \quad 
+                      a \;=\; \frac{\Sigma F}{m} \quad , \quad 
                       m \;=\; \frac{\Sigma F}{a}
-                      \quad\quad | \quad\quad
-                      a \;=\; \frac{\Sigma F}{m}
-                      }"""
+                      \newline ~ \newline ~ \newline
+                      \Sigma F \;=\; F_{right} \;-\; F_{left} \quad , \quad 
+                      F_{right} \;=\; \Sigma F \;+\; F_{left} \quad , \quad 
+                      F_{left} \;=\; F_{right} \;-\; \Sigma F
+                      \newline ~ \newline ~ \newline
+                      F_g \;=\; m \cdot g \quad , \quad 
+                      m \;=\; \frac{F_g}{g} \quad , \quad 
+                      F_g \;=\; F_N
+                      \newline ~ \newline ~ \newline
+                      F_f \;=\; \mu \cdot m \cdot g \quad , \quad 
+                      \mu \;=\; \frac{F_f}{m \cdot g} \quad , \quad 
+                      F_N \;=\; \frac{F_f}{\mu}
+                      """
             },
         }
 
