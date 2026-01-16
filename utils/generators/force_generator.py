@@ -48,13 +48,13 @@ class ForceGenerator(BaseGenerator):
         else:
             flip = random.randint(1,3)
             if flip == 1: # find friction, mu
-                question = f"""A {appliedForce} Newton force accelerates a {m:.2f} kg {object1} at {a:.2f} m/s2.
+                question = f"""A {appliedForce:.2f} Newton force accelerates a {m:.2f} kg {object1} at {a:.2f} m/s2.
                 What is the net force on {object1}? What is the coefficient of friction?"""
                 answer = [netForce, mu]
                 unit = [f"Net Force (N)",f"coefficient of friction"]
 
             elif flip == 2: # find acceleration
-                question = f"""A {appliedForce} Newton force accelerates a {m:.2f} kg {object1} over a surface with a
+                question = f"""A {appliedForce:.2f} Newton force accelerates a {m:.2f} kg {object1} over a surface with a
                  coefficient of friction of {mu:.2f} .
                 What is the net force on {object1}? What is the resulting acceleration?"""
                 answer = [netForce, a]
