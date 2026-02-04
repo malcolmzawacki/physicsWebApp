@@ -18,7 +18,7 @@ def impulse():
     from utils.generators.momentum_generators.impulse_generator import ImpulseGenerator
     title = "Impulse"
     prefix = "impulse"
-    difficulties = ["Easy","Medium"]
+    difficulties = ["Easy","Medium","Hard"]
     generator = ImpulseGenerator()
     metadata = generator.stored_metadata()
     ui = interface(prefix, title, generator, metadata, difficulties)
@@ -39,7 +39,7 @@ def collisions():
 def main():
     tab_specs = [
         ("Momentum", momentum),
-        #("Impulse", impulse),
+        ("Impulse", impulse),
         ("Collisions", collisions),
     ]
 
