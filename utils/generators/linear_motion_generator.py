@@ -10,6 +10,30 @@ class LinearMotionGenerator(BaseGenerator):
     def __init__(self):
         super().__init__(state_prefix="linear_")
 
+        self.INFO_CLAUSES = {
+            "vi": "{start_stmt}",
+            "vf": "{end_stmt}",
+            "a": "experiences {accel_phrase}",
+            "t": "for {time_phrase}",
+            "x": "over {dist_phrase}",
+        }
+        
+        self.QUESTION_CLAUSES = {
+            "vi": "What was its initial velocity?",
+            "vf": "What is its final velocity?",
+            "a": "What is its acceleration?",
+            "t": "How much time did this take?",
+            "x": "What is its overall displacement?",
+        }
+
+        self.UNIT_LABELS = {
+            "vi": "Initial Velocity (m/s)",
+            "vf": "Final Velocity (m/s)",
+            "a": "Acceleration (m/s^2)",
+            "t": "Time (seconds)",
+            "x": "Distance (meters)",
+        }
+
 
     def choose_problem_dict(self, problem_type, difficulty, solve_for=None):
         """Return a problem dictionary for the requested kinematics case."""
@@ -37,114 +61,66 @@ class LinearMotionGenerator(BaseGenerator):
 
     # region get numbers for equations
 
-    def no_time_eq_nums(self, difficulty): # v_f,v_i,a,x 
+    def combined_eq_nums(self, difficulty):
+        """Calculates a consistent, integer-based set of all 5 kinematics variables."""
         max_val = self.get_difficulty_range(difficulty)
-
-        """
-        changing direction is not worth scrutinizing over,
-        (at least for initial launch) 
-        """
-        m = random.randint(3,max_val)
-        if difficulty in ["Easy", "Medium"]: # v_i = 0
-            n = m
-            "this covers starting or ending at zero"
-            """stopping (or slowing) can be handled at 
-            word problem level as swapping vf, vi, a*= -1"""
-        elif difficulty == "Hard":
-            n = random.randint(1,m-1)
-        v_i = m**2 - n**2
-        v_f = m**2 + n**2
-        a_x = 2* m**2 * n**2
-        temp_list = []
-        for i in range(2,a_x + 1):
-            if a_x % i == 0:
-                temp_list.append((i,a_x//i))
-        list_choice = random.randint(0,len(temp_list)-1)
-        a = temp_list[list_choice][0]
-        x = temp_list[list_choice][1]
-        return v_f,v_i,a,x
-    
-    def no_dist_eq_nums(self,difficulty):
-        max_val = self.get_difficulty_range(difficulty)
-        t = random.randint(2,max_val)
-        if difficulty == "Easy":
-            """easy means no initial velocity
-            (or final in case of swap)"""
-            v_i = 0
-            a = random.randint(1,max_val)
-        elif difficulty == "Medium":
-            """in medium, non-zero velocities, but same dirn"""
-            v_i = random.randint(1,max_val)
-            a = random.randint(1,max_val)
-        else: # Hard"
-            """in HARD, deliberately switching direction"""
-            v_i = random.randint(1,max_val)
-            a = -1*random.randint((v_i//t)+1,(3*(v_i//t +2)))
-            # different range of a ensures a*t is larger than v_i
-            # but not unreasonably large once multiplied by t
-            # somewhat balanced final velocity
-            # default is v_i to right, a to left, but can be swapped
-        v_f = v_i + a*t
-        return v_f,v_i,a,t
-    
-    def no_acc_eq_nums(self,difficulty):
-        max_val = self.get_difficulty_range(difficulty)
-        "case of zero not currently handled here"
-        "avoid by differentiating more by difficulty"
-        if difficulty == "Easy":
-            "so clearly, for easy, one of the velocities should be zero"
-            "and the other should be positive"
-            v_i = 0
-            v_f = random.randint(1,max_val)
-        elif difficulty == "Medium":
-            "maybe both non-zero, but positive? no negatives here, no reason"
-            v_i = random.randint(1,max_val)
-            v_f = random.randint(v_i+1,v_i+max_val)
-        else: # hard
-            "change in direction, default is pos -> neg, can be swapped"
-            v_i = random.randint(3,max_val)
-            "need to make sure NOT equal and opposite"
-            coin = random.randint(0,1)
-            if coin == 0:
-                v_f = -1*random.randint(1,v_i-1)
+        
+        # 1. Choose a and t, ensuring one is even for an integer 'x'
+        a = ri(2, max_val)
+        t = ri(2, max_val) # both have min of 2 to avoid edge case errors in reversal scenarios
+        
+        if a % 2 != 0 and t % 2 != 0:
+            # If both are odd, make one even
+            if random.choice([True, False]):
+                t += 1 # A simple way to make it even
             else:
-                v_f = -1*random.randint(v_i+1,v_i+max_val)
-        if (v_f + v_i)%2 == 0:
-            t = random.randint(2,max_val)
-        else: # odd sum, needs factor of 2
-            t = 2 * random.randint(1,max_val//2)
-        x = (v_f + v_i)*t//2
-        return x, v_f,v_i,t
-    
-    def no_vf_eq_nums(self,difficulty):
-        max_val = self.get_difficulty_range(difficulty)
-        t = random.randint(2,max_val)
-        "easy: v_i = 0, a > 0"
-        if t%2 == 0:
-            a_mult = 1
-        else:
-            a_mult = 2
+                a += 1
+                
+        # 2. Determine v_i and sign of 'a' based on difficulty
         if difficulty == "Easy":
             v_i = 0
-            a = a_mult*random.randint(1,max_val)
+            # Keep 'a' positive for simplicity
+        
         elif difficulty == "Medium":
-            "non-zero vi but still all positive"
-            v_i = random.randint(1,max_val)
-            a = a_mult*random.randint(1,max_val)
-        else: # hard
-           "needs to change direction in order for there to be a unique answer"
-           "I mean I could also set the net displacement equal to zero but where's the variety in that?"
-           a = random.randint(2,max_val)
-           t = random.randint(2,max_val)
-           v_i = ri(1, a*t - 1)
-           t*=2 # now the change in velocity is more than twice the size of the initial
-           if random.choice([True,False]):
-               a*=-1
-           else:
-               v_i*=-1
+            # "Medium" = No reversal. v_i and a have the same sign
+            v_i = ri(1, max_val)
+            if random.choice([True, False]): # 50/50 chance to make it a "slowing down" problem
+                # Make v_i and a have opposite signs, but don't reverse
+                a *= -1 # Make 'a' negative
+                # Ensure |v_i| > |a*t| so it just slows down, no reversal
+                v_i = ri(abs(a * t) + 1, abs(a * t) + max_val//2) 
+            
+        else: # "Hard"
+            # "Hard" = Guaranteed reversal. v_i and a have opposite signs.
+            if random.choice([True, False]):
+                a *= -1 # Make 'a' negative
+            
+            # Ensure |v_i| < |a*t| to guarantee reversal
+            max_vi = abs(a * t) - 1
+            
+            # This is the one v_i magnitude that results in x = 0
+            critical_vi_mag = 0.5 * abs(a * t) 
+            v_i_mag = ri(1, max_vi)
+            # Re-roll if we hit the one bad value
+            while v_i_mag == critical_vi_mag:
+                v_i_mag = ri(1, max_vi)
+                
+            v_i = v_i_mag
 
-        x = v_i*t + 0.5*a*t**2
-        return x, v_i,t,a
+            if a > 0: # If 'a' is positive, 'v_i' must be negative
+                v_i *= -1
+
+        # 3. Calculate the remaining variables
+        v_f = v_i + a * t
+        x = int(v_i * t + 0.5 * a * t**2) # Cast to int to avoid 0.0
+
+        return {
+            "vi": v_i,
+            "vf": v_f,
+            "a": a,
+            "t": t,
+            "x": x
+        }
 
 
     # endregion
@@ -204,30 +180,76 @@ class LinearMotionGenerator(BaseGenerator):
             return f"{base} ({direction})"
         return base
 
-    def _motion_phrases(self, initial, final, scenario):
-        start_inf = "start from rest" if initial == 0 else f"start by moving at {self._velocity_value_str(initial)}"
-        start_ind = "it starts from rest" if initial == 0 else f"it starts by moving at {self._velocity_value_str(initial)}"
+    def _motion_state_details(self, value, role):
+        """Return semantic data describing a motion state."""
+        direction = self._direction_label(value)
+        description = self._describe_velocity(value)
+        return {
+            "value": value,
+            "speed": abs(value),
+            "direction": direction,
+            "is_rest": value == 0,
+            "velocity_value": self._velocity_value_str(value),
+            "velocity_desc": description,
+            "role": role,
+            "label": "initial" if role == "start" else "final",
+        }
 
-        if final == 0:
-            end_inf = "come to rest"
-            end_ind = "it comes to rest"
-        elif scenario == "reversal":
-            end_inf = f"reach {self._velocity_value_str(final)} after changing direction"
-            end_ind = f"it reaches {self._velocity_value_str(final)} after changing direction"
+    def _state_phrases(self, state, *, scenario):
+        """Build reusable phrase fragments for a motion state."""
+        subject = "it"
+        role = state["role"]
+        is_rest = state["is_rest"]
+        velocity_value = state["velocity_value"]
+
+        if role == "start":
+            if is_rest:
+                infinitive = "start from rest"
+                indicative_subjectless = "is at rest initially"
+                indicative_it = f"{subject} is at rest initially"
+            else:
+                infinitive = f"begin with an initial velocity of {velocity_value}"
+                indicative_subjectless = f"has an initial velocity of {velocity_value}"
+                indicative_it = f"{subject} has an initial velocity of {velocity_value}"
         else:
-            end_inf = f"reach {self._velocity_value_str(final)}"
-            end_ind = f"it reaches {self._velocity_value_str(final)}"
-
-        start_stmt = start_ind[3:] if start_ind.startswith("it ") else start_ind
-        end_stmt = end_ind[3:] if end_ind.startswith("it ") else end_ind
+            if is_rest:
+                infinitive = "come to rest"
+                indicative_subjectless = "comes to rest"
+                indicative_it = f"{subject} comes to rest"
+            else:
+                if scenario == "reversal":
+                    infinitive = f"change direction and reach {velocity_value}"
+                    indicative_subjectless = f"changes direction and reaches {velocity_value}"
+                    indicative_it = f"{subject} changes direction and reaches {velocity_value}"
+                elif scenario == "steady":
+                    infinitive = f"continue moving at {velocity_value}"
+                    indicative_subjectless = f"continues moving at {velocity_value}"
+                    indicative_it = f"{subject} continues moving at {velocity_value}"
+                else:
+                    infinitive = f"reach {velocity_value}"
+                    indicative_subjectless = f"reaches {velocity_value}"
+                    indicative_it = f"{subject} reaches {velocity_value}"
 
         return {
-            "start_inf": start_inf,
-            "start_ind": start_ind,
-            "start_stmt": start_stmt,
-            "end_inf": end_inf,
-            "end_ind": end_ind,
-            "end_stmt": end_stmt,
+            "infinitive": infinitive,
+            "indicative_subjectless": indicative_subjectless,
+            "indicative_it": indicative_it,
+        }
+
+    def _motion_phrases(self, initial, final, scenario):
+        """Return semantic state data and phrase fragments for the motion."""
+        start_state = self._motion_state_details(initial, role="start")
+        end_state = self._motion_state_details(final, role="end")
+
+        return {
+            "start": {
+                "state": start_state,
+                "phrases": self._state_phrases(start_state, scenario=scenario),
+            },
+            "end": {
+                "state": end_state,
+                "phrases": self._state_phrases(end_state, scenario=scenario),
+            },
         }
 
     def _motion_context(self, initial, final, accel):
@@ -282,6 +304,37 @@ class LinearMotionGenerator(BaseGenerator):
         }
 
 
+    def _build_question(self, eq_nums, target, noun, info_keys):
+        """Assemble a question dict using clause templates and shared motion phrasing."""
+        context = self._motion_context(eq_nums["vi"], eq_nums["vf"], eq_nums["a"])
+        motion = self._motion_phrases(eq_nums["vi"], eq_nums["vf"], context["scenario"])
+
+        start_phrases = motion["start"]["phrases"]
+        end_phrases = motion["end"]["phrases"]
+
+        format_vars = {
+            "noun": noun,
+            "x": eq_nums["x"],
+            "t": eq_nums["t"],
+            "accel_phrase": context["accel_value_str"],
+            "time_phrase": f"{eq_nums['t']} seconds",
+            "dist_phrase": f"{eq_nums['x']} meters",
+            "start_stmt": start_phrases["indicative_subjectless"],
+            "end_stmt": end_phrases["indicative_subjectless"],
+        }
+
+        info_parts = [
+            self.INFO_CLAUSES[key].format(**format_vars)
+            for key in info_keys
+            if key != target
+        ]
+        info_sentence = ", ".join(info_parts)
+        question = f"A {noun} {info_sentence}. {self.QUESTION_CLAUSES[target]}"
+        answer = eq_nums[target]
+        unit = self.UNIT_LABELS[target]
+
+        return {"question": question, "answers": [answer], "units": [unit]}
+
     # endregion
 
 
@@ -304,50 +357,11 @@ class LinearMotionGenerator(BaseGenerator):
             "No Time",
         )
 
-        v_f, v_i, base_a, x = self.no_time_eq_nums(difficulty)
-        if random.choice([True, False]):
-            v_i, v_f, base_a, x = -v_i, -v_f, -base_a, -x
-        context = self._motion_context(v_i, v_f, base_a)
-        phrases = self._motion_phrases(v_i, v_f, context["scenario"])
+        eq_nums = self.combined_eq_nums(difficulty)
         noun = random_noun()
 
-        accel_phrase = context["accel_value_str"]
-        start_inf = phrases["start_inf"]
-        start_ind = phrases["start_ind"]
-        start_stmt = phrases["start_stmt"]
-        end_inf = phrases["end_inf"]
-        end_ind = phrases["end_ind"]
-        end_stmt = phrases["end_stmt"]
-
-        if target == "a":
-            unit = "Acceleration (m/s^2)"
-            answer = base_a
-            question = (
-                f"What constant acceleration would allow a {noun} to {start_inf} and {end_inf} over {x} meters?"
-            )
-        elif target == "vf":
-            unit = "Final Velocity (m/s)"
-            answer = v_f
-            question = (
-                f"A {noun} experiences a constant acceleration of {accel_phrase} while traveling {x} meters. "
-                f"If {start_ind}, what velocity does it reach?"
-            )
-        elif target == "vi":
-            unit = "Initial Velocity (m/s)"
-            answer = v_i
-            question = (
-                f"A {noun} experiences a constant acceleration of {accel_phrase} while traveling {x} meters. "
-                f"If {end_ind}, what was its initial velocity?"
-            )
-        else:  # target == "x"
-            unit = "Distance (meters)"
-            answer = x
-            question = (
-                f"How far does a {noun} travel if it experiences a constant acceleration of {accel_phrase}, "
-                f"{start_stmt}, and {end_stmt}?"
-            )
-
-        return {"question": question, "answers": [answer], "units": [unit]}
+        info_keys = ["vi", "vf", "a", "x"]
+        return self._build_question(eq_nums, target, noun, info_keys)
 
 
     def no_dist_question(self, difficulty, solve_for=None):
@@ -363,51 +377,11 @@ class LinearMotionGenerator(BaseGenerator):
             "No Distance",
         )
 
-        v_f, v_i, base_a, t = self.no_dist_eq_nums(difficulty)
-        if random.choice([True, False]):
-            v_i, v_f, base_a = -v_i, -v_f, -base_a
-        context = self._motion_context(v_i, v_f, base_a)
-        phrases = self._motion_phrases(v_i, v_f, context["scenario"])
+        eq_nums = self.combined_eq_nums(difficulty)
         noun = random_noun()
 
-        accel_phrase = context["accel_value_str"]
-        start_inf = phrases["start_inf"]
-        start_ind = phrases["start_ind"]
-        start_stmt = phrases["start_stmt"]
-        end_inf = phrases["end_inf"]
-        end_ind = phrases["end_ind"]
-        end_stmt = phrases["end_stmt"]
-        time_phrase = f"{t} seconds"
-
-        if target == "a":
-            unit = "Acceleration (m/s^2)"
-            answer = base_a
-            question = (
-                f"What constant acceleration would allow a {noun} to {start_inf} and {end_inf} in {time_phrase}?"
-            )
-        elif target == "vf":
-            unit = "Final Velocity (m/s)"
-            answer = v_f
-            question = (
-                f"A {noun} experiences a constant acceleration of {accel_phrase} for {time_phrase}. "
-                f"If {start_ind}, what velocity does it reach?"
-            )
-        elif target == "vi":
-            unit = "Initial Velocity (m/s)"
-            answer = v_i
-            question = (
-                f"A {noun} experiences a constant acceleration of {accel_phrase} for {time_phrase}. "
-                f"If {end_ind}, what was its initial velocity?"
-            )
-        else:  # target == "t"
-            unit = "Time (seconds)"
-            answer = t
-            question = (
-                f"How long would it take for a {noun} to {start_inf} and {end_inf} if it experiences a constant "
-                f"acceleration of {accel_phrase}?"
-            )
-
-        return {"question": question, "answers": [answer], "units": [unit]}
+        info_keys = ["vi", "vf", "a", "t"]
+        return self._build_question(eq_nums, target, noun, info_keys)
 
 
     def no_acc_question(self, difficulty, solve_for=None):
@@ -423,46 +397,11 @@ class LinearMotionGenerator(BaseGenerator):
             "No Acceleration",
         )
 
-        x, v_f, v_i, t = self.no_acc_eq_nums(difficulty)
-        if random.choice([True, False]):
-            v_i, v_f, x = -v_i, -v_f, -x
-
-        effective_accel = (v_f - v_i) / t if t != 0 else 0
-        context = self._motion_context(v_i, v_f, effective_accel)
-        phrases = self._motion_phrases(v_i, v_f, context["scenario"])
+        eq_nums = self.combined_eq_nums(difficulty)
         noun = random_noun()
 
-        start_ind = phrases["start_ind"]
-        start_stmt = phrases["start_stmt"]
-        end_ind = phrases["end_ind"]
-        end_stmt = phrases["end_stmt"]
-
-        if target == "t":
-            unit = "Time (seconds)"
-            answer = t
-            question = (
-                f"A {noun} {start_stmt} and {end_stmt} while covering {x} meters. How long does this motion take?"
-            )
-        elif target == "x":
-            unit = "Distance (meters)"
-            answer = x
-            question = (
-                f"A {noun} {start_stmt} and {end_stmt} over {t} seconds. How much distance does it cover?"
-            )
-        elif target == "vf":
-            unit = "Final Velocity (m/s)"
-            answer = v_f
-            question = (
-                f"A {noun} {start_stmt} for {t} seconds while covering {x} meters. What is its final velocity?"
-            )
-        else:  # target == "vi"
-            unit = "Initial Velocity (m/s)"
-            answer = v_i
-            question = (
-                f"A {noun} {end_stmt} after traveling {x} meters in {t} seconds. What was its initial velocity?"
-            )
-
-        return {"question": question, "answers": [answer], "units": [unit]}
+        info_keys = ["vi", "vf", "t", "x"]
+        return self._build_question(eq_nums, target, noun, info_keys)
 
 
     def no_vf_question(self, difficulty, solve_for=None):
@@ -478,53 +417,11 @@ class LinearMotionGenerator(BaseGenerator):
             "No Final Velocity",
         )
 
-        x, v_i, t, a = self.no_vf_eq_nums(difficulty)
-        if random.choice([True, False]):
-            v_i, a, x = -v_i, -a, -x
-        v_f = v_i + a * t
-        context = self._motion_context(v_i, v_f, a)
-        phrases = self._motion_phrases(v_i, v_f, context["scenario"])
+        eq_nums = self.combined_eq_nums(difficulty)
         noun = random_noun()
 
-        accel_phrase = context["accel_value_str"]
-        start_inf = phrases["start_inf"]
-        start_ind = phrases["start_ind"]
-        start_stmt = phrases["start_stmt"]
-        end_inf = phrases["end_inf"]
-        end_ind = phrases["end_ind"]
-        end_stmt = phrases["end_stmt"]
-        time_phrase = f"{t} seconds"
-
-        if target == "x":
-            unit = "Distance (meters)"
-            answer = x
-            question = (
-                f"A {noun} experiences a constant acceleration of {accel_phrase} for {time_phrase}. "
-                f"If {start_ind}, how far does it travel?"
-            )
-        elif target == "t":
-            unit = "Time (seconds)"
-            answer = t
-            question = (
-                f"How long would it take for a {noun} to {start_inf} and {end_inf} over {x} meters if it experiences "
-                f"a constant acceleration of {accel_phrase}?"
-            )
-        elif target == "vi":
-            unit = "Initial Velocity (m/s)"
-            answer = v_i
-            question = (
-                f"A {noun} experiences a constant acceleration of {accel_phrase} for {time_phrase} and covers {x} meters. "
-                f"What was its initial velocity?"
-            )
-        else:  # target == "a"
-            unit = "Acceleration (m/s^2)"
-            answer = a
-            question = (
-                f"What constant acceleration would allow a {noun} to {start_inf}, {end_inf}, and cover {x} meters in "
-                f"{time_phrase}?"
-            )
-
-        return {"question": question, "answers": [answer], "units": [unit]}
+        info_keys = ["vi", "a", "t", "x"]
+        return self._build_question(eq_nums, target, noun, info_keys)
 
     def mixed_question(self, difficulty, solve_for=None):
         """Return a problem from a randomly selected no-kinematics case.

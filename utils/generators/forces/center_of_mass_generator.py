@@ -63,8 +63,10 @@ class CenterOfMassGenerator(BaseGenerator):
             x_list.append(ri(0, 25))
         center = sum(x*m for x,m in zip(x_list, mass_list))/sum(m for m in mass_list)
         info_str = ""
+        mass_num = 1
         for x, m in zip(x_list, mass_list):
-            info_str += f" Mass {m} is located at {x} meters. "
+            info_str += f" Mass {mass_num} is {m} kg, and is located at position {x} meters. "
+            mass_num += 1
         question = f"""A set of {len(mass_list)} masses are placed along a line.
         {info_str} Where is the center of mass?"""
         unit = "Center of Mass (meters)"
@@ -96,8 +98,10 @@ class CenterOfMassGenerator(BaseGenerator):
         center_x = sum(x*m for x,m in zip(x_list, mass_list))/sum(m for m in mass_list)
         center_y = sum(y*m for y,m in zip(y_list, mass_list))/sum(m for m in mass_list)
         info_str = ""
+        mass_num = 1
         for m, x, y in zip(mass_list, x_list, y_list):
-            info_str += f" Mass {m} is located at position ({x},{y}). "
+            info_str += f" Mass {mass_num} is {m} kg, and is located at position ({x},{y}). "
+            mass_num += 1
         question = f"""A set of {len(mass_list)} masses are placed around a plane.
         {info_str} Where is the center of mass?"""
         answers = [center_x, center_y]
@@ -131,10 +135,6 @@ class CenterOfMassGenerator(BaseGenerator):
             for _ in x_list:
                 y_list.append(0)
     
-
-
-
-
         # scaling for circles (distance weighted by sum of masses)
         dist_1_2 = (((x_list[1] - x_list[0])**2 + (y_list[1] - y_list[0])**2)**(0.5)) / (mass_list[0] + mass_list[1])
         dist_list = [dist_1_2]
@@ -150,34 +150,31 @@ class CenterOfMassGenerator(BaseGenerator):
             dist_list.append(dist_2_4)
             dist_list.append(dist_3_4)
 
-
         scale = round(min(dist_list)/(2) , 2)
-    
 
-
-        r1 = mass_list[0]*scale
-        r2 = mass_list[1]*scale
+        r1 = max(mass_list[0]*scale, 0.5)
+        r2 = max(mass_list[1]*scale, 0.5)
         r_list = [r1, r2]
         circle1 = plt.Circle((x_list[0], y_list[0]), radius=r1, color='cyan', fill=True, zorder=5)
         ax.add_artist(circle1)
-        ax.text(x_list[0], y_list[0], '$m_1$', color='black', ha='center', va='center', fontsize=12*r1, zorder=11)
+        ax.text(x_list[0], y_list[0], '$m_1$', color='black', ha='center', va='center', fontsize=10*r1, zorder=11)
         circle2 = plt.Circle((x_list[1], y_list[1]), radius=r2, color='green', fill=True, zorder=5)
         ax.add_artist(circle2)
-        ax.text(x_list[1], y_list[1], '$m_2$', color='black', ha='center', va='center', fontsize=12*r2, zorder=11)
+        ax.text(x_list[1], y_list[1], '$m_2$', color='black', ha='center', va='center', fontsize=10*r2, zorder=11)
 
         if difficulty != "Easy":
-            r3 = mass_list[2]*scale
+            r3 = max(mass_list[2]*scale, 0.5)
             r_list.append(r3)
             circle3 = plt.Circle((x_list[2], y_list[2]), radius = r3, color='yellow', fill=True, zorder=5)
             ax.add_artist(circle3)
-            ax.text(x_list[2], y_list[2], '$m_3$', color='black', ha='center', va='center', fontsize=12*r3, zorder=11)
+            ax.text(x_list[2], y_list[2], '$m_3$', color='black', ha='center', va='center', fontsize=10*r3, zorder=11)
 
         if difficulty == "Hard":
-            r4 = mass_list[3]*scale
+            r4 = max(mass_list[3]*scale, 0.5)
             r_list.append(r4)
             circle4 = plt.Circle((x_list[3], y_list[3]), radius= r4, color='magenta', fill=True, zorder=5)
             ax.add_artist(circle4)
-            ax.text(x_list[3], y_list[3], '$m_4$', color='black', ha='center', va='center', fontsize=12*r4, zorder=11)
+            ax.text(x_list[3], y_list[3], '$m_4$', color='black', ha='center', va='center', fontsize=10*r4, zorder=11)
 
         # check for out of bounds circles
         x_min_list = []
@@ -189,6 +186,7 @@ class CenterOfMassGenerator(BaseGenerator):
             x_max_list.append(r + x)
             y_min_list.append(y - r)
             y_max_list.append(y + r)
+        
         max_x = max(x_max_list)
         min_x = min(x_min_list)
         x_center = (max_x + min_x) // 2
@@ -204,7 +202,8 @@ class CenterOfMassGenerator(BaseGenerator):
         y_axis_min = y_center - axes_range
         y_axis_max = y_center + axes_range
 
-
         ax.set_xlim(x_axis_min, x_axis_max)
         ax.set_ylim(y_axis_min, y_axis_max)
+        ax.grid(True, which = 'both', color= 'gray')
+        
         return fig

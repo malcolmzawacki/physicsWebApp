@@ -217,7 +217,8 @@ class ProjectileGenerator(BaseGenerator):
     def _generate_type1_question(self, difficulty, solve_for = None):
         """
         Easy targets: x, h, v_i
-        Medium or hard targets: v_i and h, v_f and theta, v_f and x 
+        Medium or hard targets: v_i and h, v_f and theta, v_f and x
+        to-do targets: must be based on steps needed. possible overhaul of logic tbh, easier to score difficulty by givens than unknowns
         """
         
         v_x, v_r, theta, d_x, d_y = self.calculate_type1_values(difficulty)
