@@ -274,7 +274,7 @@ class ImpulseGenerator(BaseGenerator):
                 unit = ["Initial Velocity (m/s)"]
             elif solve_for == "final velocity":
                 question = f"""A {mass} kg {noun} {sign[1]} from {v_i} m/s, 
-                changing its velocity by {delta_p} Ns.
+                changing its momentum by {delta_p} Ns.
                 What is the final velocity of the {noun}?"""
                 answer = [v_f]
                 unit = ["Final Velocity (m/s)"]
