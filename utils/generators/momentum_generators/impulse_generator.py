@@ -267,7 +267,7 @@ class ImpulseGenerator(BaseGenerator):
                 ])
            
             if solve_for == "initial velocity":
-                question = f"""A {mass} kg {noun} {sign[1]}, changing its velocity by {delta_p} Ns.
+                question = f"""A {mass} kg {noun} {sign[1]}, changing its momentum by {delta_p} Ns.
                 It ends up moving at {v_f} m/s.
                 What was the initial velocity of the {noun}?"""
                 answer = [v_i]
