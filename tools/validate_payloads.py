@@ -9,7 +9,7 @@ from utils.generators.force_generator import ForceGenerator
 from utils.generators.vector_generator import VectorGenerator
 from utils.generators.projectile_generator import ProjectileGenerator
 from utils.generators.waves_generator import WaveGenerator
-from utils.generators.collision_generator import CollisionGenerator
+from utils.generators.momentum_generators.collision_generator import CollisionGenerator
 from utils.generators.motion_graph_generator import MotionGraphGenerator
 from utils.generators.dist_disp_generator import DistDispGenerator
 from utils.problem_payload import payload_from_dict, ProblemPayloadError
