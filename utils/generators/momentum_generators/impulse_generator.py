@@ -71,7 +71,7 @@ class ImpulseGenerator(BaseGenerator):
                 How much momentum does the {noun} have now?"""
                 answer = [p_f]
                 unit = ["Final Momentum (Ns)"]
-            return {"question": question, "answers": [answer], "units": [unit]}
+            return {"question": question, "answers": answer, "units": unit}
 
         elif difficulty == "Medium":
             if solve_for == None:
@@ -103,7 +103,7 @@ class ImpulseGenerator(BaseGenerator):
                 How much did the velocity of the {noun} change?"""
                 answer = [delta_v]
                 unit = ["Change in Velocity (m/s)"]
-            return {"question": question, "answers": [answer], "units": [unit]}
+            return {"question": question, "answers": answer, "units": unit}
 
         
         

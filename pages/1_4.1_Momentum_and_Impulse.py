@@ -39,7 +39,7 @@ def collisions():
 def main():
     tab_specs = [
         ("Momentum", momentum),
-        ("Impulse", impulse),
+        #("Impulse", impulse),
         ("Collisions", collisions),
     ]
 
