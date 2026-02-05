@@ -1,5 +1,3 @@
-import streamlit as st
-
 from tools.loading import lazy_tabs
 from utils.ui import interface
 

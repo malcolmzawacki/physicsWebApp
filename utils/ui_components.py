@@ -106,23 +106,6 @@ def show_equations_expander(
                 st.latex(equation)
 
 
-def render_debug_panel(
-    problem_type: Optional[str],
-    difficulty: Optional[str],
-    answers: list,
-    units: list,
-    features: dict,
-) -> None:
-    try:
-        with st.expander("Debug", expanded=False):
-            st.write(f"Type: {problem_type} | Difficulty: {difficulty}")
-            st.write(f"Answers: {answers}")
-            st.write(f"Units: {units}")
-            st.json(features)
-    except Exception as e:
-        st.write(f"Debug panel error: {e}")
-
-
 def draw_answer_inputs(prefix: str, units: list[str], correct_answers: list, question_id: int) -> list[str]:
     """Render text inputs for each answer part and return raw user inputs as strings."""
     user_answers: list[str] = []

@@ -4,8 +4,7 @@ import random
 import matplotlib.pyplot as plt
 import numpy as np
 from utils.generators.base_generator import BaseGenerator
-from typing import Optional, Any, Tuple, Iterable
-import matplotlib
+from typing import Optional, Any, Tuple
 
 class MotionGraphGenerator(BaseGenerator):
     def __init__(self):

@@ -45,10 +45,6 @@ def julia_quadratic(zx, zy, cx, cy, threshold):
 
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-from random import randint as ri
-
-from matplotlib.animation import FuncAnimation, PillowWriter
 
 W, H = 6, 6
 depth_max = 7

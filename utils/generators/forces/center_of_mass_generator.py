@@ -1,7 +1,4 @@
-import random
 from random import randint as ri
-import math
-from utils.word_lists import random_noun
 from utils.generators.base_generator import BaseGenerator
 
 

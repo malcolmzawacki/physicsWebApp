@@ -7,7 +7,7 @@ import streamlit as st
 from utils.config import AUTHOR_MODE
 from utils.word_lists import random_correct_message, random_error_message
 from utils.ui_state import State
-from utils.ui_components import (render_header, build_performance_table, performance_expander, draw_answer_inputs, render_button_options, render_hints, init_performance, record_performance, show_equations_expander, render_debug_panel)
+from utils.ui_components import (render_header, build_performance_table, performance_expander, draw_answer_inputs, render_button_options, render_hints, init_performance, record_performance, show_equations_expander)
 from utils.problem_payload import payload_from_dict, ProblemPayload, ProblemPayloadError
 
 
@@ -180,27 +180,12 @@ class Interface:
         self.state.set("correct_answers", payload.answers)
         self.state.set("units", payload.units)
         self.state.set("submitted", False)
-        self.state.set("generation_format", "dict")
 
         for feature in ["diagram_data", "hints", "button_options", "timer", "explanation", "tags", "show_equations"]:
             if feature in result:
                 self.state.set(feature, result[feature])
             else:
                 self.state.pop(feature)
-
-    def _store_legacy_result(self, result: tuple, problem_type: str, difficulty: str) -> None:
-        """Support tuple-based generators until they are migrated to the dict contract."""
-        question, answers, units, diagram_data = result
-        self.state.inc("question_id", 1)
-        self.state.set("problem_type", problem_type)
-        self.state.set("difficulty", difficulty)
-        self.state.set("current_question", question)
-        self.state.set("correct_answers", answers)
-        self.state.set("units", units)
-        self.state.set("submitted", False)
-        self.state.set("generation_format", "legacy")
-        if diagram_data is not None:
-            self.state.set("diagram_data", diagram_data)
 
     def unified_question_options(self, equations: bool = True, ifDifficulty: bool = True) -> None:
         """Render selectors for problem type and difficulty, auto-refreshing when the choice changes."""
@@ -238,64 +223,37 @@ class Interface:
                 expanded=True,
             )
 
-    def _show_equations_unified(self, problem_type: str) -> None:
-        """Legacy helper for equation display; retained for compatibility with older pages."""
-        with st.expander("equation(s)", expanded=True):
-            if hasattr(self.generator, "get_problem_metadata"):
-                metadata = self.generator.get_problem_metadata(problem_type)
-                if self.state.get("level"):
-                    equation = metadata.get("conceptual", "")
-                else:
-                    equation = metadata.get("honors", "")
-                if equation:
-                    st.latex(equation)
-                    return
-            if self.problem_type_dict is not None:
-                equation_dict = self.problem_type_dict.get(problem_type, {})
-                if self.state.get("level"):
-                    equation = equation_dict.get("conceptual", "")
-                else:
-                    equation = equation_dict.get("honors", "")
-                if equation:
-                    st.latex(equation)
-
     def unified_smart_layout(self, **kwargs):
         """Co-ordinate the full question lifecycle, handling diagrams, hints, and answer UIs."""
         self.initialize_session_state()
         self.header_component()
         equations = kwargs.get("equations", True)
         self.unified_question_options(equations)
-        generation_format = self.state.get("generation_format", "legacy")
-        if generation_format == "dict":
-            available_features = self.get_current_problem_features()
-            
-            if kwargs.get("side_by_side"):
-                col1, col2 = st.columns(2)
-                with col1:
-                    if available_features.get("diagram_data") is not None:
-                        self.add_diagram_smart(kwargs.get("diagram_title", "Diagram"), expanded=kwargs.get("expanded"))
-                with col2:
-                    if available_features.get("button_options"):
-                        self.question_ui_buttons()
-                    else:
-                        timer = kwargs.get("timer", 3)
-                        self.question_ui_dict(timer)
-            else:
+        available_features = self.get_current_problem_features()
+
+        if kwargs.get("side_by_side"):
+            col1, col2 = st.columns(2)
+            with col1:
+                if available_features.get("diagram_data") is not None:
+                    self.add_diagram_smart(kwargs.get("diagram_title", "Diagram"), expanded=kwargs.get("expanded"))
+            with col2:
                 if available_features.get("button_options"):
                     self.question_ui_buttons()
                 else:
                     timer = kwargs.get("timer", 3)
                     self.question_ui_dict(timer)
-                if available_features.get("diagram_data") is not None:
-                    self.add_diagram_smart(kwargs.get("diagram_title", "Diagram"), expanded=kwargs.get("expanded"))
-            if available_features.get("hints"):
-                self.show_hints()
-            if AUTHOR_MODE:
-                self.debug_panel()
         else:
-            # Legacy fallback if needed
-            timer = kwargs.get("timer", 3)
-            self.question_ui_dict(timer)
+            if available_features.get("button_options"):
+                self.question_ui_buttons()
+            else:
+                timer = kwargs.get("timer", 3)
+                self.question_ui_dict(timer)
+            if available_features.get("diagram_data") is not None:
+                self.add_diagram_smart(kwargs.get("diagram_title", "Diagram"), expanded=kwargs.get("expanded"))
+        if available_features.get("hints"):
+            self.show_hints()
+        if AUTHOR_MODE:
+            self.debug_panel()
         self.footer_dict()
 
     def new_question_dict(self, problem_type: str, difficulty: str) -> None:

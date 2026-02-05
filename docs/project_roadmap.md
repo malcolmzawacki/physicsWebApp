@@ -1,9 +1,12 @@
 # Project Roadmap & Backlog
 
-_Last updated: 2026-02-04_
+_Last updated: 2026-02-06_
 
 ## Recently Completed
 
+- Introduced a generic diagram-matching layout (`utils/layouts/diagram_match_layout.py`) with auto-advance timing and first-question autoload.
+- Extracted motion graph matching into a dedicated payload generator (`utils/generators/motion_graph_matching_generator.py`) and wired the motion page to the generic layout.
+- Trimmed legacy UI fallbacks (tuple-based payloads) and removed unused UI helpers/imports across generators/pages.
 - `projectile_generator.py` now supports explicit `solve_for` overrides while keeping question narratives coherent.
 - `xtrct_docs/document_creator.py` has an `include_graphs` parameter to add flexibility when diagrams are helpful but not needed
 - Created and then moved additional force tab generators to `forces/` folder for better organization, includes `atwood_generator.py`, `tension_generator.py`, and `incline_generator.py`

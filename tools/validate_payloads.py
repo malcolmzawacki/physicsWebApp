@@ -12,7 +12,7 @@ from utils.generators.waves_generator import WaveGenerator
 from utils.generators.momentum_generators.collision_generator import CollisionGenerator
 from utils.generators.motion_graph_generator import MotionGraphGenerator
 from utils.generators.dist_disp_generator import DistDispGenerator
-from utils.problem_payload import payload_from_dict, ProblemPayloadError
+from utils.problem_payload import payload_from_dict
 
 
 def validate_generator(gen, problem_types: List[str], difficulties: List[str]) -> Tuple[int, int, List[str]]:

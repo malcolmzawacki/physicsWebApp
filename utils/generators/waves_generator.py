@@ -1,9 +1,5 @@
 from random import randint as ri
-from random import choice as rc
-
 from utils.generators.base_generator import BaseGenerator
-
-from utils.word_lists import random_noun
 
 class WaveGenerator(BaseGenerator):
     def __init__(self):
