@@ -14,6 +14,8 @@ class ImpulseGenerator(BaseGenerator):
     def choose_problem_dict(self, problem_type, difficulty):
         if problem_type == "Change in Momentum":
             return self.change_in_momentum(difficulty)
+        if problem_type == "Change in Momentum (Multiple Choice)":
+            return self.change_in_momentum_multiple_choice(difficulty)
         
 
     def stored_metadata(self) -> dict[str, dict]:
@@ -51,7 +53,37 @@ class ImpulseGenerator(BaseGenerator):
                       
 
     
-                """}
+                """},
+            "Change in Momentum (Multiple Choice)": {
+                "honors": r"""
+                 \Delta p \;=\; m  (v_f - v_i)
+                """,
+                "conceptual": r"""
+                     \Delta p \;=\; p_f - p_i 
+                     \quad , \quad
+                     p_f \;=\; p_i + \Delta p
+                     \quad , \quad
+                     p_i \;=\; p_f - \Delta p
+                     \newline ~ \newline ~ \newline
+                     \Delta p \;=\; m (v_f - v_i)
+                      \quad , \quad
+                      v_f \;=\; v_i + \frac{\Delta p}{m}
+                      \quad , \quad
+                      v_i \;=\; v_f - \frac{\Delta p}{m}
+                     \newline ~ \newline ~ \newline 
+                     \Delta p \;=\; m \Delta v
+                     \quad , \quad
+                     m \;=\; \frac{\Delta p}{\Delta v}
+                     \quad , \quad
+                     \Delta v \;=\; \frac{\Delta p}{m}
+                     \newline ~ \newline ~ \newline 
+                     \Delta v \;=\; v_f - v_i 
+                     \quad , \quad
+                     v_f \;=\; v_i + \Delta v
+                     \quad , \quad
+                     v_i \;=\; v_f - \Delta v
+                """
+            }
         }
            
     
@@ -290,6 +322,184 @@ class ImpulseGenerator(BaseGenerator):
                 answer = [delta_p]
                 unit = ["Change in Momentum (Ns)"]
         return {"question": question, "answers": answer, "units": unit}
+
+    def _format_signed_value(self, value: int, unit: str) -> str:
+        return f"{value} {unit}"
+
+    def _build_delta_p_options(self, delta_p: int, unit: str) -> tuple[list[str], str]:
+        correct = self._format_signed_value(delta_p, unit)
+        wrong_values = { -delta_p }
+        while len(wrong_values) < 3:
+            offset = random.randint(2, 12)
+            candidate = delta_p + random.choice([-1, 1]) * offset
+            if candidate != delta_p:
+                wrong_values.add(candidate)
+        options = [correct] + [self._format_signed_value(val, unit) for val in wrong_values]
+        random.shuffle(options)
+        return options, correct
+
+    def _build_force_time_options(self, delta_p: int) -> tuple[list[str], str]:
+        abs_dp = abs(delta_p)
+        factor_pairs = [(f, abs_dp // f) for f in range(2, 21) if abs_dp % f == 0]
+        if not factor_pairs:
+            factor_pairs = [(1, abs_dp)]
+        force, time = random.choice(factor_pairs)
+        force *= 1 if delta_p >= 0 else -1
+        correct = f"F = {force} N, t = {time} s"
+
+        wrong_options = set()
+        attempts = 0
+        while len(wrong_options) < 3 and attempts < 100:
+            attempts += 1
+            f = random.randint(2, 25)
+            t = random.randint(1, 12)
+            sign = random.choice([-1, 1])
+            if sign * f * t == delta_p:
+                continue
+            wrong_options.add(f"F = {sign * f} N, t = {t} s")
+
+        options = [correct] + list(wrong_options)
+        random.shuffle(options)
+        return options, correct
+
+    def _diagram_payload(self, mass: int, before_value: int, after_value: int, label_type: str) -> dict:
+        if label_type == "momentum":
+            unit = "Ns"
+            prefix = "p"
+        else:
+            unit = "m/s"
+            prefix = "v"
+        before_label = f"{prefix}_i = {before_value} {unit}"
+        after_label = f"{prefix}_f = {after_value} {unit}"
+        return {
+            "mass": mass,
+            "before_value": before_value,
+            "after_value": after_value,
+            "before_label": before_label,
+            "after_label": after_label,
+            "label_type": label_type,
+        }
+
+    def change_in_momentum_multiple_choice(self, difficulty: str) -> dict:
+        noun = random_noun()
+        if difficulty == "Easy":
+            mass = random.randint(2, 10)
+            p_i = random.randint(10, 60)
+            delta_p = random.randint(4, p_i - 1) * random.choice([-1, 1])
+            p_f = p_i + delta_p
+            question = f"Use the diagram to find the change in momentum for the {noun}."
+            options, correct = self._build_delta_p_options(delta_p, "Ns")
+            diagram_data = self._diagram_payload(mass, p_i, p_f, "momentum")
+            unit = ["Change in Momentum (Ns)"]
+            return {
+                "question": question,
+                "answers": [correct],
+                "units": unit,
+                "diagram_data": diagram_data,
+                "button_options": {0: options},
+            }
+
+        mass = random.randint(2, 20)
+        v_i = random.randint(4, 16)
+        if difficulty == "Hard" and random.random() < 0.4:
+            v_f = -random.randint(2, 12)
+        else:
+            delta_v = random.randint(2, v_i - 1) * random.choice([-1, 1])
+            v_f = v_i + delta_v
+        delta_p = mass * (v_f - v_i)
+        diagram_data = self._diagram_payload(mass, v_i, v_f, "velocity")
+
+        if difficulty == "Medium":
+            question = f"Use the diagram to find the change in momentum for the {noun}."
+            options, correct = self._build_delta_p_options(delta_p, "Ns")
+            unit = ["Change in Momentum (Ns)"]
+        else:
+            question = "Use the diagram to choose the force-time pair that matches the impulse."
+            options, correct = self._build_force_time_options(delta_p)
+            unit = ["Impulse (N*s)"]
+
+        return {
+            "question": question,
+            "answers": [correct],
+            "units": unit,
+            "diagram_data": diagram_data,
+            "button_options": {0: options},
+        }
+
+    def generate_diagram(self, diagram_data: dict, problem_type: str, difficulty: str):
+        import math
+        import matplotlib.pyplot as plt
+        from matplotlib.patches import Rectangle, Polygon
+
+        fig, ax = plt.subplots(figsize=(7, 3.5))
+        fig.patch.set_facecolor("#0b1220")
+        ax.set_facecolor("#0b1220")
+        ax.set_xlim(-1, 10)
+        ax.set_ylim(-0.5, 3.5)
+        ax.axis("off")
+
+        box_w = 2.4
+        box_h = 1.3
+        left_x = 0.6
+        right_x = 6.8
+        box_y = 0.6
+
+        left_box = Rectangle((left_x, box_y), box_w, box_h, facecolor="#1e3a8a", edgecolor="#93c5fd", linewidth=2)
+        right_box = Rectangle((right_x, box_y), box_w, box_h, facecolor="#14532d", edgecolor="#86efac", linewidth=2)
+        ax.add_patch(left_box)
+        ax.add_patch(right_box)
+
+        mass = diagram_data["mass"]
+        ax.text(left_x + box_w / 2, box_y + box_h / 2, f"m = {mass} kg", ha="center", va="center", fontsize=10, color="#f8fafc")
+        ax.text(right_x + box_w / 2, box_y + box_h / 2, f"m = {mass} kg", ha="center", va="center", fontsize=10, color="#f8fafc")
+        ax.text(left_x + box_w / 2, box_y - 0.2, "Before", ha="center", va="top", fontsize=9, color="#e2e8f0")
+        ax.text(right_x + box_w / 2, box_y - 0.2, "After", ha="center", va="top", fontsize=9, color="#e2e8f0")
+
+        before_value = diagram_data["before_value"]
+        after_value = diagram_data["after_value"]
+        max_value = max(abs(before_value), abs(after_value), 1)
+        arrow_max = 2.6
+        arrow_min = 1.2
+
+        def draw_arrow(center_x: float, center_y: float, value: int, label: str, color: str) -> None:
+            magnitude = abs(value)
+            length = arrow_min + (arrow_max - arrow_min) * (magnitude / max_value)
+            direction = 1 if value >= 0 else -1
+            start_x = center_x - (length / 2) * direction
+            ax.arrow(
+                start_x,
+                center_y,
+                length * direction,
+                0,
+                head_width=0.18,
+                head_length=0.25,
+                length_includes_head=True,
+                color=color,
+                linewidth=2,
+            )
+            ax.text(center_x, center_y + 0.25, label, ha="center", va="bottom", fontsize=10, color=color)
+
+        arrow_y = box_y + box_h + 0.6
+        draw_arrow(left_x + box_w / 2, arrow_y, before_value, diagram_data["before_label"], "#93c5fd")
+        draw_arrow(right_x + box_w / 2, arrow_y, after_value, diagram_data["after_label"], "#86efac")
+
+        boom_center_x = (left_x + box_w + right_x) / 2
+        boom_center_y = box_y + box_h / 2 + 0.3
+        spikes = 12
+        inner_r = 0.6
+        outer_r = 1.1
+        points = []
+        for i in range(spikes * 2):
+            angle = i * (math.pi / spikes)
+            radius = outer_r if i % 2 == 0 else inner_r
+            points.append(
+                (boom_center_x + radius * math.cos(angle), boom_center_y + radius * math.sin(angle))
+            )
+        boom = Polygon(points, closed=True, facecolor="#f59e0b", edgecolor="#fbbf24", linewidth=2)
+        ax.add_patch(boom)
+        ax.text(boom_center_x, boom_center_y, "IMPULSE", ha="center", va="center", fontsize=10, weight="bold", color="#0f172a")
+
+        return fig
 
         
         

@@ -268,6 +268,7 @@ class Interface:
         generation_format = self.state.get("generation_format", "legacy")
         if generation_format == "dict":
             available_features = self.get_current_problem_features()
+            
             if kwargs.get("side_by_side"):
                 col1, col2 = st.columns(2)
                 with col1:
@@ -286,7 +287,7 @@ class Interface:
                     timer = kwargs.get("timer", 3)
                     self.question_ui_dict(timer)
                 if available_features.get("diagram_data") is not None:
-                    self.add_diagram_smart(kwargs.get("diagram_title", "Diagram"))
+                    self.add_diagram_smart(kwargs.get("diagram_title", "Diagram"), expanded=kwargs.get("expanded"))
             if available_features.get("hints"):
                 self.show_hints()
             if AUTHOR_MODE:
@@ -355,7 +356,9 @@ class Interface:
         st.write(self.state.get("current_question"))
         correct_answers = self.state.get("correct_answers", [])
         units = self.state.get("units", [])
-        options = self.state.get("answer_options")
+        options = self.state.get("button_options")
+        if options is None:
+            options = self.state.get("answer_options")
         if options is None:
             answer_options = self.generator.get_answer_options(units) or {}
             if not answer_options:
