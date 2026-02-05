@@ -1,5 +1,5 @@
 import random
-
+from math import floor
 from utils.generators.base_generator import BaseGenerator
 
 #from base_generator import BaseGenerator
@@ -16,44 +16,15 @@ class ImpulseGenerator(BaseGenerator):
             return self.change_in_momentum(difficulty)
         if problem_type == "Change in Momentum (Multiple Choice)":
             return self.change_in_momentum_multiple_choice(difficulty)
+        if problem_type == "Impulse":
+            return self.impulse_q(difficulty)
         
 
     def stored_metadata(self) -> dict[str, dict]:
         """Return metadata mapping for this generator."""
         return {
-            "Change in Momentum": {
-                "honors": r"""
-                 \Delta p \;=\; m  (v_f - v_i)
-                """,
+            
 
-                "conceptual": r"""
-                     \Delta p \;=\; p_f - p_i 
-                     \quad , \quad
-                     p_f \;=\; p_i + \Delta p
-                     \quad , \quad
-                     p_i \;=\; p_f - \Delta p
-                     \newline ~ \newline ~ \newline
-                     \Delta p \;=\; m (v_f - v_i)
-                      \quad , \quad
-                      v_f \;=\; v_i + \frac{\Delta p}{m}
-                      \quad , \quad
-                      v_i \;=\; v_f - \frac{\Delta p}{m}
-                     \newline ~ \newline ~ \newline 
-                     \Delta p \;=\; m \Delta v
-                     \quad , \quad
-                     m \;=\; \frac{\Delta p}{\Delta v}
-                     \quad , \quad
-                     \Delta v \;=\; \frac{\Delta p}{m}
-                     \newline ~ \newline ~ \newline 
-                     \Delta v \;=\; v_f - v_i 
-                     \quad , \quad
-                     v_f \;=\; v_i + \Delta v
-                     \quad , \quad
-                     v_i \;=\; v_f - \Delta v
-                      
-
-    
-                """},
             "Change in Momentum (Multiple Choice)": {
                 "honors": r"""
                  \Delta p \;=\; m  (v_f - v_i)
@@ -83,7 +54,76 @@ class ImpulseGenerator(BaseGenerator):
                      \quad , \quad
                      v_i \;=\; v_f - \Delta v
                 """
-            }
+            },
+
+            "Change in Momentum": {
+                "honors": r"""
+                 \Delta p \;=\; m  (v_f - v_i)
+                """,
+
+                "conceptual": r"""
+                     \Delta p \;=\; p_f - p_i 
+                     \quad , \quad
+                     p_f \;=\; p_i + \Delta p
+                     \quad , \quad
+                     p_i \;=\; p_f - \Delta p
+                     \newline ~ \newline ~ \newline
+                     \Delta p \;=\; m (v_f - v_i)
+                      \quad , \quad
+                      v_f \;=\; v_i + \frac{\Delta p}{m}
+                      \quad , \quad
+                      v_i \;=\; v_f - \frac{\Delta p}{m}
+                     \newline ~ \newline ~ \newline 
+                     \Delta p \;=\; m \Delta v
+                     \quad , \quad
+                     m \;=\; \frac{\Delta p}{\Delta v}
+                     \quad , \quad
+                     \Delta v \;=\; \frac{\Delta p}{m}
+                     \newline ~ \newline ~ \newline 
+                     \Delta v \;=\; v_f - v_i 
+                     \quad , \quad
+                     v_f \;=\; v_i + \Delta v
+                     \quad , \quad
+                     v_i \;=\; v_f - \Delta v
+    
+                """},
+
+                "Impulse": {
+                "honors": r"""
+                 F \cdot t \;=\; m  (v_f - v_i)
+                """,
+
+                "conceptual": r"""
+                     \Delta p \;=\; F \cdot t 
+                     \quad , \quad
+                     F \;=\; \frac{\Delta p}{t}
+                     \quad , \quad
+                     t \;=\; \frac{\Delta p}{F}
+                     \newline ~ \newline ~ \newline
+                     F \;=\; \frac{m \Delta v}{t}
+                      \quad , \quad
+                      t \;=\; \frac{m \Delta v}{F}
+                      \quad , \quad
+                      m \;=\; \frac{F \cdot t}{\Delta v}
+                      \quad , \quad
+                      \Delta v \;=\; \frac{F \cdot t}{m}
+                     \newline ~ \newline ~ \newline
+                    F \;=\; \frac{m (v_f - v_i)}{t}
+                      \quad , \quad
+                      t \;=\; \frac{m (v_f - v_i)}{F}
+                      \quad , \quad
+                      m \;=\; \frac{F \cdot t}{v_f - v_i}
+                      \newline ~ \newline ~ \newline 
+                      v_f \;=\; v_i + \frac{F \cdot t}{m}
+                      \quad , \quad
+                      v_i \;=\; v_f - \frac{F \cdot t}{m}
+                     \newline ~ \newline ~ \newline 
+                     \Delta v \;=\; v_f - v_i 
+                     \quad , \quad
+                     v_f \;=\; v_i + \Delta v
+                     \quad , \quad
+                     v_i \;=\; v_f - \Delta v
+                """},
         }
            
     
@@ -111,29 +151,30 @@ class ImpulseGenerator(BaseGenerator):
                     "time"])
                 
             if solve_for == "change in momentum":
-                question = f""" """
+                question = f"""How large of an impulse would a {force} Newton force produce if it was applied for {time} seconds?"""
                 answer = [delta_p]
                 unit = ["Impulse (Ns)"]
 
             elif solve_for == "force":
-                question = f""""""
-                answer = []
+                question = f"""How large of a force is needed to create a {delta_p} Ns impulse over {time} seconds?"""
+                answer = [force]
                 unit = ["Force (N)"]
 
             else: # time
-                question = f""""""
-                answer = []
+                question = f"""A {force} Newton force produces a {delta_p} Ns impulse. How long was the force applied for?"""
+                answer = [time]
                 unit = ["Time (s)"]
 
         elif difficulty == "Medium":
 
             mass = random.randint(2,20)
-            v_i = random.randint(4,20)
-            delta_v = random.randint(3,v_i - 1)
+            v_i = random.randint(9,20)
+            acc = random.randint(2, floor((v_i**(0.5))))
+            time = random.randint(2, floor((v_i**(0.5))))
             sign = random.choice([(1,"speeds up"),(-1,"slows down")]) # half the time loses momentum
-            delta_v*=sign[0]
-            v_f = v_i + delta_v
-            delta_p = mass*delta_v
+            acc*=sign[0]
+            delta_v = acc*time
+            force = mass*acc
         
             if solve_for == None:
                 solve_for = random.choice([
@@ -143,34 +184,40 @@ class ImpulseGenerator(BaseGenerator):
                     "time"])
            
             if solve_for == "change in velocity":
-                question = f""" """
+                question = f"""A {force} Newton force pushes a {mass} kg {noun} for {time} seconds. 
+                How much does the {noun}'s velocity change?"""
                 answer = [delta_v]
                 unit = ["Change in Velocity (m/s)"]
             
             elif solve_for == "mass":
-                question = f""""""
-                answer = []
+                question = f"""A {force} Newton force pushes a {noun} for {time} seconds. 
+                If the {noun} {sign[1]} by {delta_v} m/s as a result, what is the mass of the {noun}?"""
+                answer = [mass]
                 unit = ["mass (kg)"]
 
             elif solve_for == "force":
-                question = f""""""
-                answer = []
+                question = f"""A {mass} kg {noun} {sign[1]} by {delta_v} m/s over {time} seconds.
+                How much force was needed to cause this?"""
+                answer = [force]
                 unit = ["Force (N)"]
 
             else: # time
-                question = f""""""
-                answer = []
+                question = f"""A {force} Newton force pushes a {mass} kg {noun}. 
+                 The {noun} {sign[1]} by {delta_v} m/s. How much time was the force applied for?"""
+                answer = [time]
                 unit = ["Time (s)"]
 
         elif difficulty == "Hard":
 
             mass = random.randint(2,20)
-            v_i = random.randint(4,20)
-            delta_v = random.randint(3,v_i - 1)
+            v_i = random.randint(9,20)
+            acc = random.randint(2, floor((v_i**(0.5))))
+            time = random.randint(2, floor((v_i**(0.5))))
             sign = random.choice([(1,"speeds up"),(-1,"slows down")]) # half the time loses momentum
-            delta_v*=sign[0]
+            acc*=sign[0]
+            delta_v = acc*time
             v_f = v_i + delta_v
-            delta_p = mass*delta_v
+            force = mass*acc
         
             if solve_for == None:
                 solve_for = random.choice([
@@ -182,26 +229,32 @@ class ImpulseGenerator(BaseGenerator):
                 ])
            
             if solve_for == "initial velocity":
-                question = f"""A {mass} kg {noun} .
+                question = f"""A {force} Newton force pushes a {mass} kg {noun} for {time} seconds. 
+                The {noun} {sign[1]} to {v_f} m/s.
                 What was the initial velocity of the {noun}?"""
                 answer = [v_i]
                 unit = ["Initial Velocity (m/s)"]
             elif solve_for == "final velocity":
-                question = f"""A {mass} kg {noun} .
-                What is the final velocity of the {noun}?"""
+                question = f"""A {force} Newton force pushes a {noun} for {time} seconds.
+                If the velocity of the {noun} was originally {v_i} m/s, 
+                what is the final velocity of the {noun}?"""
                 answer = [v_f]
                 unit = ["Final Velocity (m/s)"]
             elif solve_for == "mass":
-                question = f"""?"""
+                question = f"""A {force} Newton force pushes a {noun} for {time} seconds. 
+                If the {noun} {sign[1]} from {v_i} m/s to {v_f} m/s, what is the mass of the {noun}?"""
                 answer = [mass]
                 unit = ["Mass (kg)"]
             elif solve_for == "force":
-                question = f""" """
-                answer = []
+                question = f""""A {mass} kg {noun} {sign[1]} from {v_i} m/s to {v_f} m/s over {time} seconds.
+                How much force was needed to cause this?"""
+                answer = [force]
                 unit = ["Force (N)"]
             else: # time
-                question = f""" """
-                answer = []
+                question = f"""A {force} Newton force pushes a {mass} kg {noun}. 
+                 The {noun} {sign[1]} from {v_i} m/s to {v_f} m/s. 
+                 How much time was the force applied for?"""
+                answer = [time]
                 unit = ["Time (s)"]
         return {"question": question, "answers": answer, "units": unit}
 
@@ -387,7 +440,7 @@ class ImpulseGenerator(BaseGenerator):
             p_i = random.randint(10, 60)
             delta_p = random.randint(4, p_i - 1) * random.choice([-1, 1])
             p_f = p_i + delta_p
-            question = f"Use the diagram to find the change in momentum for the {noun}."
+            question = f"Use the diagram below to find the change in momentum for the {noun}."
             options, correct = self._build_delta_p_options(delta_p, "Ns")
             diagram_data = self._diagram_payload(mass, p_i, p_f, "momentum")
             unit = ["Change in Momentum (Ns)"]

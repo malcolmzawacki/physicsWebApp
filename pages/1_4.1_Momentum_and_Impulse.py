@@ -21,20 +21,7 @@ def impulse():
     difficulties = ["Easy","Medium","Hard"]
     generator = ImpulseGenerator()
     metadata = generator.stored_metadata()
-    if isinstance(metadata, dict):
-        metadata = {k: v for k, v in metadata.items() if k == "Change in Momentum"}
-    ui = interface(prefix, title, generator, metadata, difficulties)
-    ui.unified_smart_layout(diagram_title="Diagram", expanded=True)
-
-def matching_impulses():
-    from utils.generators.momentum_generators.impulse_generator import ImpulseGenerator
-    title = "Matching Impulses"
-    prefix = "impulse_mc"
-    difficulties = ["Easy","Medium","Hard"]
-    generator = ImpulseGenerator()
-    metadata = generator.stored_metadata()
-    if isinstance(metadata, dict):
-        metadata = {k: v for k, v in metadata.items() if k == "Change in Momentum (Multiple Choice)"}
+    
     ui = interface(prefix, title, generator, metadata, difficulties)
     ui.unified_smart_layout(diagram_title="Diagram", expanded=True)
 
@@ -53,7 +40,6 @@ def collisions():
 def main():
     tab_specs = [
         ("Momentum", momentum),
-        ("Matching Impulses", matching_impulses),\
         ("Impulse", impulse),
         ("Collisions", collisions),
     ]

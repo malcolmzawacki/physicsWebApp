@@ -402,6 +402,8 @@ class Interface:
                 st.success(f"{random_correct_message()}")
                 self.state.set("stars", self.state.get("stars", 0) + self.give_stars(difficulty, problem_type))
                 self.state.set("show_loading", True)
+                self.state.set("user_answers_selected", [None] * len(correct_answers))
+                self.loading_q_dict()
             else:
                 answer_display = ", ".join([f"{ans}" for ans in correct_answers])
                 st.error(f"{random_error_message()} The correct answers are: {answer_display}.")
