@@ -4,7 +4,7 @@ import time
 import pandas as pd
 import streamlit as st
 
-from utils.config import AUTHOR_MODE
+from config import AUTHOR_MODE
 from utils.word_lists import random_correct_message, random_error_message
 from utils.ui_state import State
 from utils.ui_components import (render_header, build_performance_table, performance_expander, draw_answer_inputs, render_button_options, render_hints, init_performance, record_performance, show_equations_expander)
@@ -19,7 +19,7 @@ class Interface:
         prefix: str,
         title: str,
         generator: object,
-        problem_type_dict: dict | list[str] | tuple[str, ...] | None,
+        problem_type_dict: dict | list[str] | None,
         difficulties: list,
         type_weight: bool = False,
     ) -> None:
@@ -30,7 +30,7 @@ class Interface:
         if isinstance(problem_type_dict, dict):
             self.problem_type_dict = problem_type_dict
             self.problem_types = list(problem_type_dict.keys())
-        elif isinstance(problem_type_dict, (list, tuple)):
+        elif isinstance(problem_type_dict, list):
             self.problem_type_dict = None
             self.problem_types = list(problem_type_dict)
         else:
@@ -53,7 +53,7 @@ class Interface:
                 types = getter()
             except Exception:
                 return []
-            if isinstance(types, (list, tuple)):
+            if isinstance(types, list):
                 return list(types)
             if types is None:
                 return []
@@ -119,13 +119,16 @@ class Interface:
         diagram_data = self.state.get("diagram_data")
         if diagram_data is None:
             return
+        expanded = kwargs.get("expanded", False)
+        if not isinstance(expanded, bool):
+            expanded = bool(expanded)
         problem_type = self.state.get("problem_type")
         difficulty = self.state.get("difficulty")
         if hasattr(self.generator, "generate_diagram"):
             try:
                 fig = self.generator.generate_diagram(diagram_data, problem_type, difficulty)
                 if fig is not None:
-                    with st.expander(expander_title, expanded=kwargs.get("expanded", False)):
+                    with st.expander(expander_title, expanded=expanded):
                         st.pyplot(fig)
             except Exception as e:
                 if AUTHOR_MODE:

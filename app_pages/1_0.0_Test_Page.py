@@ -428,9 +428,3 @@ def planner_tab():
 
 
 
-if __name__ == "__main__":
-    tab1, tab2 = st.tabs(["Roulette", "Reverse Engineering"])
-    with tab1:
-        roulette()
-    with tab2:
-        planner_tab()

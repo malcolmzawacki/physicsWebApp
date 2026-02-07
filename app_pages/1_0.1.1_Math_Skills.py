@@ -7,6 +7,12 @@ from utils.ui import interface
 
 
 
+from utils.state_proxy import StateProxy
+
+
+algebra_state = StateProxy("algebra")
+sci_state = StateProxy("sci_notate")
+
 class arithmetic: 
     
     @staticmethod
@@ -377,29 +383,29 @@ class algebra:
     @staticmethod
     def initialize_session_state():
         """Initialize all session state variables"""
-        if 'problem' not in st.session_state:
-            st.session_state.problem = None
-        if 'feedback' not in st.session_state:
-            st.session_state.feedback = ""
-        if 'solved' not in st.session_state:
-            st.session_state.solved = False
-        if 'question_id' not in st.session_state:
-            st.session_state.question_id = 0
-        if 'next_problem_data' not in st.session_state:
-            st.session_state.next_problem_data = None
-        if 'show_solution' not in st.session_state:
-            st.session_state.show_solution = False
-        if 'stars' not in st.session_state:
-            st.session_state.stars = 0
-        if 'hint_used' not in st.session_state:
-            st.session_state.hint_used = False
-        if 'selected_operation' not in st.session_state:
-            st.session_state.selected_operation = "add"
+        if 'problem' not in algebra_state:
+            algebra_state.problem = None
+        if 'feedback' not in algebra_state:
+            algebra_state.feedback = ""
+        if 'solved' not in algebra_state:
+            algebra_state.solved = False
+        if 'question_id' not in algebra_state:
+            algebra_state.question_id = 0
+        if 'next_problem_data' not in algebra_state:
+            algebra_state.next_problem_data = None
+        if 'show_solution' not in algebra_state:
+            algebra_state.show_solution = False
+        if 'stars' not in algebra_state:
+            algebra_state.stars = 0
+        if 'hint_used' not in algebra_state:
+            algebra_state.hint_used = False
+        if 'selected_operation' not in algebra_state:
+            algebra_state.selected_operation = "add"
 
 
     @staticmethod
     def select_operation(operation):
-        st.session_state.selected_operation = operation
+        algebra_state.selected_operation = operation
 
 
     @staticmethod
@@ -407,7 +413,7 @@ class algebra:
         """Prepare the next problem in advance"""
         next_problem = algebra.generate_equation(difficulty)
         
-        st.session_state.next_problem_data = {
+        algebra_state.next_problem_data = {
             'problem': next_problem
         }
 
@@ -415,14 +421,14 @@ class algebra:
     @staticmethod
     def switch_to_next_problem():
         """Switch to the next problem that was prepared in advance"""
-        if st.session_state.next_problem_data:
-            st.session_state.problem = st.session_state.next_problem_data['problem']
-            st.session_state.feedback = ""
-            st.session_state.solved = False
-            st.session_state.show_solution = False
-            st.session_state.question_id += 1
-            st.session_state.next_problem_data = None
-            st.session_state.hint_used = False
+        if algebra_state.next_problem_data:
+            algebra_state.problem = algebra_state.next_problem_data['problem']
+            algebra_state.feedback = ""
+            algebra_state.solved = False
+            algebra_state.show_solution = False
+            algebra_state.question_id += 1
+            algebra_state.next_problem_data = None
+            algebra_state.hint_used = False
             return True
         return False
 
@@ -440,9 +446,9 @@ class algebra:
                 ['easy', 'medium', 'hard', 'extra_hard']
             )
             # Generate initial problem if needed
-            if st.session_state.problem is None:
-                st.session_state.problem = algebra.generate_equation(difficulty)
-                st.session_state.question_id += 1
+            if algebra_state.problem is None:
+                algebra_state.problem = algebra.generate_equation(difficulty)
+                algebra_state.question_id += 1
                 algebra.prepare_next_problem(difficulty)
         with col2:
             st.write("")    
@@ -454,23 +460,23 @@ class algebra:
                     st.rerun()
                 else:
                     # Fallback if next problem wasn't prepared
-                    st.session_state.problem = algebra.generate_equation(difficulty)
-                    st.session_state.feedback = ""
-                    st.session_state.solved = False
-                    st.session_state.show_solution = False
-                    st.session_state.question_id += 1
+                    algebra_state.problem = algebra.generate_equation(difficulty)
+                    algebra_state.feedback = ""
+                    algebra_state.solved = False
+                    algebra_state.show_solution = False
+                    algebra_state.question_id += 1
         
-        st.markdown(f"### Solve for {st.session_state.problem['target_var']}")
-        current_eq = st.session_state.problem['current_state']
+        st.markdown(f"### Solve for {algebra_state.problem['target_var']}")
+        current_eq = algebra_state.problem['current_state']
         eq_latex = algebra.latex_equation(current_eq)
         st.latex(eq_latex)
             
         # If the problem is solved, show congratulations
-        if st.session_state.solved:
-            st.success(st.session_state.feedback)
+        if algebra_state.solved:
+            st.success(algebra_state.feedback)
             
             # Prepare next problem if needed
-            if st.session_state.next_problem_data is None:
+            if algebra_state.next_problem_data is None:
                 algebra.prepare_next_problem(difficulty)
                 
             if st.button("Try Another Problem", key="new_problem_button"):
@@ -479,11 +485,11 @@ class algebra:
                     st.rerun()
                 else:
                     # Fallback
-                    st.session_state.problem = algebra.generate_equation(difficulty)
-                    st.session_state.feedback = ""
-                    st.session_state.solved = False
-                    st.session_state.show_solution = False
-                    st.session_state.question_id += 1
+                    algebra_state.problem = algebra.generate_equation(difficulty)
+                    algebra_state.feedback = ""
+                    algebra_state.solved = False
+                    algebra_state.show_solution = False
+                    algebra_state.question_id += 1
                     st.rerun()
         else:
             # Show operation selection form
@@ -495,7 +501,7 @@ class algebra:
             with col1:
                 add_button = st.button("Add", 
                                     key="add_button", 
-                                    type="primary" if st.session_state.selected_operation == "add" else "secondary",
+                                    type="primary" if algebra_state.selected_operation == "add" else "secondary",
                                     width='stretch')
                 if add_button:
                     algebra.select_operation("add")
@@ -503,7 +509,7 @@ class algebra:
                 
                 multiply_button = st.button("Multiply", 
                                         key="multiply_button", 
-                                        type="primary" if st.session_state.selected_operation == "multiply" else "secondary",
+                                        type="primary" if algebra_state.selected_operation == "multiply" else "secondary",
                                         width='stretch')
                 if multiply_button:
                     algebra.select_operation("multiply")
@@ -511,7 +517,7 @@ class algebra:
 
                 square_button = st.button("Square", 
                                         key="square_button", 
-                                        type="primary" if st.session_state.selected_operation == "square" else "secondary",
+                                        type="primary" if algebra_state.selected_operation == "square" else "secondary",
                                         width='stretch')
                 if square_button:
                     algebra.select_operation("square")
@@ -521,7 +527,7 @@ class algebra:
             with col2:
                 subtract_button = st.button("Subtract", 
                                         key="subtract_button", 
-                                        type="primary" if st.session_state.selected_operation == "subtract" else "secondary",
+                                        type="primary" if algebra_state.selected_operation == "subtract" else "secondary",
                                         width='stretch')
                 if subtract_button:
                     algebra.select_operation("subtract")
@@ -529,7 +535,7 @@ class algebra:
                     
                 divide_button = st.button("Divide", 
                                         key="divide_button", 
-                                        type="primary" if st.session_state.selected_operation == "divide" else "secondary",
+                                        type="primary" if algebra_state.selected_operation == "divide" else "secondary",
                                         width='stretch')
                 if divide_button:
                     algebra.select_operation("divide")
@@ -537,7 +543,7 @@ class algebra:
                 
                 sqrt_button = st.button("Square Root", 
                                     key="sqrt_button", 
-                                    type="primary" if st.session_state.selected_operation == "sqrt" else "secondary",
+                                    type="primary" if algebra_state.selected_operation == "sqrt" else "secondary",
                                     width='stretch')
                 if sqrt_button:
                     algebra.select_operation("sqrt")
@@ -546,11 +552,11 @@ class algebra:
             with col3:
                 # Only show value input for operations that need it
                 with st.form(f"Answer"):
-                    if st.session_state.selected_operation in ["add", "subtract", "multiply", "divide"]:
+                    if algebra_state.selected_operation in ["add", "subtract", "multiply", "divide"]:
                         value = st.number_input(
                             "Value:",
                             min_value=1, value=2,
-                            key=f"value_{st.session_state.question_id}"
+                            key=f"value_{algebra_state.question_id}"
                         )
                     else:
                         value = None
@@ -559,49 +565,49 @@ class algebra:
                     # Apply Operation button
                     if submitted:
                         success, new_eq, feedback = algebra.process_step(
-                            st.session_state.problem['current_state'],
-                            st.session_state.selected_operation,
+                            algebra_state.problem['current_state'],
+                            algebra_state.selected_operation,
                             value,
-                            st.session_state.problem['target_var']
+                            algebra_state.problem['target_var']
                         )
                         
                         if success:
                             # Update the equation
-                            st.session_state.problem['current_state'] = new_eq
-                            st.session_state.feedback = feedback
+                            algebra_state.problem['current_state'] = new_eq
+                            algebra_state.feedback = feedback
                             
                             # Add to steps taken
-                            step_display = f"{st.session_state.selected_operation.capitalize()}"
+                            step_display = f"{algebra_state.selected_operation.capitalize()}"
                             if value is not None:
                                 step_display += f" {value}"
                             
-                            st.session_state.problem['steps_taken'].append({
-                                'operation': st.session_state.selected_operation.capitalize(),
+                            algebra_state.problem['steps_taken'].append({
+                                'operation': algebra_state.selected_operation.capitalize(),
                                 'value': value,
                                 'display': step_display
                             })
                             
                             # Check if solved
-                            if algebra.is_truly_solved(new_eq, st.session_state.problem['target_var']):
-                                st.session_state.solved = True
+                            if algebra.is_truly_solved(new_eq, algebra_state.problem['target_var']):
+                                algebra_state.solved = True
                             
                             st.rerun()
                         else:
-                            st.session_state.feedback = feedback
+                            algebra_state.feedback = feedback
 
             # Display feedback
-            if st.session_state.feedback:
-                if "solved" in st.session_state.feedback.lower() or "excelente" in st.session_state.feedback.lower():
-                    st.success(st.session_state.feedback)
-                elif "correcto" in st.session_state.feedback.lower() or "bien" in st.session_state.feedback.lower() or "good" in st.session_state.feedback.lower():
-                    st.info(st.session_state.feedback)
+            if algebra_state.feedback:
+                if "solved" in algebra_state.feedback.lower() or "excelente" in algebra_state.feedback.lower():
+                    st.success(algebra_state.feedback)
+                elif "correcto" in algebra_state.feedback.lower() or "bien" in algebra_state.feedback.lower() or "good" in algebra_state.feedback.lower():
+                    st.info(algebra_state.feedback)
                 else:
-                    st.warning(st.session_state.feedback)
+                    st.warning(algebra_state.feedback)
        
         # Show steps taken so far
         with st.expander("Show Steps Taken"):
-            if st.session_state.problem['steps_taken']:
-                for i, step in enumerate(st.session_state.problem['steps_taken']):
+            if algebra_state.problem['steps_taken']:
+                for i, step in enumerate(algebra_state.problem['steps_taken']):
                     if 'display' in step:
                         st.markdown(f"{i+1}. {step['display']}")
                     elif 'operation' in step:
@@ -616,15 +622,15 @@ class algebra:
             else:
                 st.write("No steps taken yet.")
         # Show solution path if requested
-        if st.session_state.show_solution:
+        if algebra_state.show_solution:
             st.markdown("### Solution Path:")
             st.markdown("Here's how to solve this equation:")
             
-            target_var = st.session_state.problem['target_var']
-            current_equation = st.session_state.problem['original_equation']
+            target_var = algebra_state.problem['target_var']
+            current_equation = algebra_state.problem['original_equation']
             
             steps = []
-            for i, step in enumerate(st.session_state.problem['solution_steps']):
+            for i, step in enumerate(algebra_state.problem['solution_steps']):
                 operation = step['operation']
                 value = step['value']
                 
@@ -689,14 +695,14 @@ class sci_notate:
                 ans_term = q_term_1 * q_term_2
                 ans_exp = q_exp_1 + q_exp_2
                 ans_term, ans_exp = sci_notate.sci_not_format(ans_term,ans_exp)
-                question = f"({q_term_1} \;\cdot\; 10^{{{q_exp_1}}})\;\cdot\;({q_term_2}\;\cdot\;10^{{{q_exp_2}}})"
+                question = rf"({q_term_1} \;\cdot\; 10^{{{q_exp_1}}})\;\cdot\;({q_term_2}\;\cdot\;10^{{{q_exp_2}}})"
             else: # division
                 ans_term = q_term_1 * q_term_2
                 ans_term, q_term_1 = q_term_1, ans_term
                 ans_exp = q_exp_1 - q_exp_2
                 q_term_1, q_exp_1 = sci_notate.sci_not_format(q_term_1, q_exp_1)
                 ans_term, ans_exp = sci_notate.sci_not_format(ans_term,ans_exp)
-                question = f"\\frac{{{q_term_1}\;\cdot\;10^{{{q_exp_1}}}}}{{{q_term_2}\;\cdot\;10^{{{q_exp_2}}}}}"
+                question = rf"\\frac{{{q_term_1}\;\cdot\;10^{{{q_exp_1}}}}}{{{q_term_2}\;\cdot\;10^{{{q_exp_2}}}}}"
         elif difficulty == 'medium': # three inputs, negatives (combo mul, div)
             q_term_3 = random.randint(1,9)
             q_exp_3 = random.randint(1,9)
@@ -710,14 +716,14 @@ class sci_notate:
                 ans_exp = q_exp_1 + q_exp_2 - q_exp_3
                 q_term_2, q_exp_2 = sci_notate.sci_not_format(q_term_2, q_exp_2)
                 ans_term, ans_exp = sci_notate.sci_not_format(ans_term,ans_exp)
-                question = f"\\frac{{({q_term_1}\;\cdot\;10^{{{q_exp_1}}})\;\cdot\;({q_term_2}\;\cdot\;10^{{{q_exp_2}}})}}{{{q_term_3}\;\cdot\;10^{{{q_exp_3}}}}}"
+                question = rf"\\frac{{({q_term_1}\;\cdot\;10^{{{q_exp_1}}})\;\cdot\;({q_term_2}\;\cdot\;10^{{{q_exp_2}}})}}{{{q_term_3}\;\cdot\;10^{{{q_exp_3}}}}}"
             else: # 1 mul 2 div
                 ans_term = q_term_1
                 q_term_1*= q_term_2*q_term_3
                 ans_exp = q_exp_1 - q_exp_2 - q_exp_3
                 q_term_1, q_exp_1 = sci_notate.sci_not_format(q_term_1, q_exp_1)
                 ans_term, ans_exp = sci_notate.sci_not_format(ans_term,ans_exp)
-                question = f"\\frac{{{q_term_1}\;\cdot\;10^{{{q_exp_1}}}}}{{({q_term_3}\;\cdot\;10^{{{q_exp_3}}})\;\cdot\;({q_term_2}\;\cdot\;10^{{{q_exp_2}}})}}"
+                question = rf"\\frac{{{q_term_1}\;\cdot\;10^{{{q_exp_1}}}}}{{({q_term_3}\;\cdot\;10^{{{q_exp_3}}})\;\cdot\;({q_term_2}\;\cdot\;10^{{{q_exp_2}}})}}"
         else: # hard
             q_term_3 = random.randint(1,9)
             q_exp_3 = random.randint(1,9)
@@ -736,29 +742,28 @@ class sci_notate:
             q_term_1, q_exp_1 = sci_notate.sci_not_format(q_term_1, q_exp_1)
             q_term_2, q_exp_2 = sci_notate.sci_not_format(q_term_2, q_exp_2)
             ans_term, ans_exp = sci_notate.sci_not_format(ans_term,ans_exp)
-            question = f"({q_term_4}\;\cdot\;10^{{{q_exp_4}}})\;\cdot\;\\frac{{({q_term_1}\;\cdot\;10^{{{q_exp_1}}})\;\cdot\;({q_term_2}\;\cdot\;10^{{{q_exp_2}}})}}{{({q_term_3}\;\cdot\;10^{{{q_exp_3}}})^2}}"
-
+            question = rf"({q_term_4}\;\cdot\;10^{{{q_exp_4}}})\;\cdot\;\\frac{{({q_term_1}\;\cdot\;10^{{{q_exp_1}}})\;\cdot\;({q_term_2}\;\cdot\;10^{{{q_exp_2}}})}}{{({q_term_3}\;\cdot\;10^{{{q_exp_3}}})^2}}"
         return question, ans_term, ans_exp
 
     def initialize_session_state():
-        if 'sci_problem' not in st.session_state:
-            st.session_state.sci_problem = None
-        if 'submitted' not in st.session_state:
-            st.session_state.submitted = False
-        if 'user_input1' not in st.session_state:
-            st.session_state.user_answer1 = None
-        if 'user_input2' not in st.session_state:
-            st.session_state.user_answer2 = None
-        if 'question_id' not in st.session_state:
-            st.session_state.question_id = 0
+        if 'sci_problem' not in sci_state:
+            sci_state.sci_problem = None
+        if 'submitted' not in sci_state:
+            sci_state.submitted = False
+        if 'user_input1' not in sci_state:
+            sci_state.user_answer1 = None
+        if 'user_input2' not in sci_state:
+            sci_state.user_answer2 = None
+        if 'question_id' not in sci_state:
+            sci_state.question_id = 0
 
     def new_question(difficulty):
-        st.session_state.sci_problem, st.session_state.ans1, st.session_state.ans2 = sci_notate.generate_sci_not_problem(difficulty)
-        st.session_state.difficulty = difficulty
-        st.session_state.user_answer = None
-        st.session_state.user_answer2 = None
-        st.session_state.submitted = False
-        st.session_state.question_id += 1
+        sci_state.sci_problem, sci_state.ans1, sci_state.ans2 = sci_notate.generate_sci_not_problem(difficulty)
+        sci_state.difficulty = difficulty
+        sci_state.user_answer = None
+        sci_state.user_answer2 = None
+        sci_state.submitted = False
+        sci_state.question_id += 1
 
     def main():
         st.title("Scientific Notation Practice")
@@ -770,18 +775,18 @@ class sci_notate:
             ['easy', 'medium', 'hard'],key="sci notate difficulty"
         )
 
-        if st.session_state.sci_problem is None:
+        if sci_state.sci_problem is None:
             sci_notate.new_question(difficulty)
 
-        if st.session_state.sci_problem:
-            st.latex(st.session_state.sci_problem)
+        if sci_state.sci_problem:
+            st.latex(sci_state.sci_problem)
 
             col1, col2, col3, col4, col5, col6 = st.columns(6)
             with col2:
                 st.header("")
                 user_input1 = st.number_input(label='leading term', value=None,
                     step=None,
-                    format="%f", key=f"user_input_sci_notate_{st.session_state.question_id}")
+                    format="%f", key=f"user_input_sci_notate_{sci_state.question_id}")
             with col3:
                 st.header("")
                 st.title("x 10",anchor=False)
@@ -791,7 +796,7 @@ class sci_notate:
                 st.write("")
                 user_input2 = st.number_input(label='exponent', value=None,
                     step=None,
-                    format="%f", key=f"user_input2_sci_notate{st.session_state.question_id}")
+                    format="%f", key=f"user_input2_sci_notate{sci_state.question_id}")
             with col1:
                 st.write("")
             with col6:
@@ -800,15 +805,15 @@ class sci_notate:
                 st.write("")
             
             if st.button("Submit",key="sci_notate_submit"):
-                    st.session_state.submitted = True
+                    sci_state.submitted = True
                     if user_input1 is not None:
-                        st.session_state.user_answer1 = user_input1
-                        correct_answer = st.session_state.ans1
+                        sci_state.user_answer1 = user_input1
+                        correct_answer = sci_state.ans1
                         #tolerance = abs(correct_answer * 0.05)
                         
                         if user_input2 is not None:
-                            st.session_state.user_answer2 = user_input2
-                            correct_answer2 = st.session_state.ans2
+                            sci_state.user_answer2 = user_input2
+                            correct_answer2 = sci_state.ans2
                             if (user_input1 == correct_answer) and (user_input2 == correct_answer2):
                                 st.success("Correct!")
                             elif ((user_input1 * 10**user_input2) == (correct_answer * 10**correct_answer2)):
@@ -828,14 +833,3 @@ class sci_notate:
 
 
 
-def main():
-    tab1,tab2, tab3 = st.tabs(["Algebra","Scientific Notation","Arithmetic"])
-    with tab1:
-        algebra.main()
-    with tab2:
-        sci_notate.main()
-    with tab3:
-        arithmetic.main()
-
-if __name__ == "__main__":
-    main()

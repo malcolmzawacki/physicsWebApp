@@ -4,6 +4,7 @@ import random
 import matplotlib.pyplot as plt
 import numpy as np
 from utils.generators.base_generator import BaseGenerator
+from utils.ui_state import State
 from typing import Optional, Any, Tuple
 
 class MotionGraphGenerator(BaseGenerator):
@@ -129,8 +130,10 @@ class MotionGraphGenerator(BaseGenerator):
     
     
     def display_current_graph(self):
-        if f"{self.state_prefix}current_graph" in st.session_state:
-            st.pyplot(st.session_state[f"{self.state_prefix}current_graph"])
+        state = State(self.state_prefix.rstrip("_"))
+        current_graph = state.get("current_graph")
+        if current_graph is not None:
+            st.pyplot(current_graph)
 
 
     def get_answer_options(
@@ -157,7 +160,7 @@ class MotionGraphGenerator(BaseGenerator):
             fig, direction, motion_state = self.generate_position_time_graph(
                 chosen_type, rowsize=self.doc_figsize[0], colsize=self.doc_figsize[1]
             )
-            st.session_state[f"{self.state_prefix}current_graph"] = fig
+            State(self.state_prefix.rstrip("_")).set("current_graph", fig)
             question = "Analyze the position-time graph shown to the left. What is the direction and state of motion?"
             answers = [direction, motion_state]
 
@@ -165,7 +168,7 @@ class MotionGraphGenerator(BaseGenerator):
             fig, direction, motion_state = self.generate_velocity_time_graph(
                 chosen_type, rowsize=self.doc_figsize[0], colsize=self.doc_figsize[1]
             )
-            st.session_state[f"{self.state_prefix}current_graph"] = fig
+            State(self.state_prefix.rstrip("_")).set("current_graph", fig)
             question = "Analyze the velocity-time graph shown to the left. What is the direction and state of motion?"
             answers = [direction, motion_state]
 

@@ -1,4 +1,3 @@
-from tools.loading import lazy_tabs
 from utils.ui import interface
 
 
@@ -49,17 +48,3 @@ def friction_distance_page():
     ui = interface(prefix, title, generator, metadata, difficulties)
     ui.unified_smart_layout()
 
-
-def main():
-    tab_specs = [
-        ("Types of Energy", energy_basics_page),
-        ("Conservation of Energy", energy_conserv_page),
-        ("Thermal Energy", thermal_energy_page),
-        ("Friction and Distance", friction_distance_page),
-    ]
-
-    lazy_tabs(tab_specs, state_key="energy_tabs", auto_load_first=True)
-
-
-if __name__ == "__main__":
-    main()

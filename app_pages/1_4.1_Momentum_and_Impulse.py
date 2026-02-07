@@ -1,4 +1,3 @@
-from tools.loading import lazy_tabs
 from utils.ui import interface
 
 
@@ -35,15 +34,3 @@ def collisions():
     ui.unified_smart_layout()
 
 
-def main():
-    tab_specs = [
-        ("Momentum", momentum),
-        ("Impulse", impulse),
-        ("Collisions", collisions),
-    ]
-
-    lazy_tabs(tab_specs, state_key="momentum_tabs", auto_load_first=True)
-
-
-if __name__ == "__main__":
-    main()

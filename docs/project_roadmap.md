@@ -4,19 +4,20 @@ _Last updated: 2026-02-06_
 
 ## Recently Completed
 
+- Migrated activity modules to `State`-based session handling and removed legacy multipage/tab scaffolding.
 - Introduced a generic diagram-matching layout (`utils/layouts/diagram_match_layout.py`) with auto-advance timing and first-question autoload.
 - Extracted motion graph matching into a dedicated payload generator (`utils/generators/motion_graph_matching_generator.py`) and wired the motion page to the generic layout.
-- Trimmed legacy UI fallbacks (tuple-based payloads) and removed unused UI helpers/imports across generators/pages.
+- Removed legacy tuple payload support and standardized generators on dict payloads.
 - `projectile_generator.py` now supports explicit `solve_for` overrides while keeping question narratives coherent.
 - `xtrct_docs/document_creator.py` has an `include_graphs` parameter to add flexibility when diagrams are helpful but not needed
 - Created and then moved additional force tab generators to `forces/` folder for better organization, includes `atwood_generator.py`, `tension_generator.py`, and `incline_generator.py`
-- Rotational kinematics generator and Streamlit page are in place (`utils/generators/rotational_motion_generator.py`, `pages/1_1.1.2_Rotational_Motion.py`).
+- Rotational kinematics generator and Streamlit page are in place (`utils/generators/rotational_motion_generator.py`, `app_pages/1_1.1.2_Rotational_Motion.py`).
 - Linear motion generator refactor is complete (centralized phrasing, unified variable selection).
 - Center of mass generator wording and diagram tweaks are complete.
 
 ## In Progress / Short-Term Targets
 
-- **Streamlit Navigation**: Evaluate replacing implicit `pages/` discovery with explicit `st.navigation` / `st.pages` declarations for clearer unit/module groupings.
+- **Streamlit Navigation**: Router rollout complete; next steps are refining activity groupings and course-level filters.
 - **Graph & Image Quality**: Carry the print-friendly theming back into Streamlit views and add regression checks for mixed graph/standard sections.
 - **Rotational Dynamics Extension**: Plan torque and moment of inertia extensions for the rotational unit (new page sections and generator updates).
 
@@ -35,7 +36,7 @@ _Last updated: 2026-02-06_
 
 ### UI Layer & State Management
 
-- Continue migrating legacy session-state calls to the `State` helper; audit diagram rendering and answer-checking paths for remaining direct `st.session_state` usage.
+- State migration complete; keep new code on `State` and audit for regressions.
 - Explore author tooling in the UI (e.g., expose solve-for overrides, seeds) for rapid debugging.
 
 ### Document Generation Pipeline

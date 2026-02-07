@@ -1,11 +1,4 @@
-import streamlit as st
-
-from tools.loading import lazy_tabs
 from utils.ui import interface
-
-
-
-
 
 def newtons_2nd():
     from utils.generators.force_generator import ForceGenerator
@@ -59,22 +52,3 @@ def center_of_mass():
     ui = interface(prefix, title, generator, metadata, difficulties)
     ui.unified_smart_layout()
 
-def _under_construction_tab():
-    st.write("Currently Under Construction")
-
-
-def main():
-    tab_specs = [
-        ("Newton's Second Law", newtons_2nd),
-        ("Center of Mass", center_of_mass),
-        ("Tension", tension),
-        ("Atwood Machines", atwood),
-        ("Inclined Planes", inclines),
-   
-    ]
-
-    lazy_tabs(tab_specs, state_key="forces_tabs", auto_load_first=True)
-
-
-if __name__ == "__main__":
-    main()

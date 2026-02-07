@@ -2,6 +2,7 @@ import random
 import math
 import streamlit as st
 
+from utils.ui_state import State
 # A simple dictionary of elements with their atomic masses
 elements = {
     'H': 1.01, 'He': 4.00, 'Li': 6.94, 'Be': 9.01, 'B': 10.81, 'C': 12.01, 'N': 14.01, 'O': 16.00,
@@ -556,31 +557,23 @@ def generate_stoichiometry_problem(reaction_type="Random", difficulty="Medium"):
     
     return question, answer, answer_unit, problem_details
 
-def initialize_stoichiometry_session_state():
-    """Initialize session state variables for the stoichiometry page"""
-    prefix = "stoichiometry_"
-    if f"{prefix}question" not in st.session_state:
-        st.session_state[f"{prefix}question"] = None
-    if f"{prefix}answer" not in st.session_state:
-        st.session_state[f"{prefix}answer"] = None
-    if f"{prefix}units" not in st.session_state:
-        st.session_state[f"{prefix}units"] = None
-    if f"{prefix}details" not in st.session_state:
-        st.session_state[f"{prefix}details"] = None
-    if f"{prefix}submitted" not in st.session_state:
-        st.session_state[f"{prefix}submitted"] = False
-    if f"{prefix}user_answer" not in st.session_state:
-        st.session_state[f"{prefix}user_answer"] = None
-    if f"{prefix}show_solution" not in st.session_state:
-        st.session_state[f"{prefix}show_solution"] = False
+def initialize_stoichiometry_session_state(state: State):
+    """Initialize session state variables for the stoichiometry page."""
+    state.ensure("question", None)
+    state.ensure("answer", None)
+    state.ensure("units", None)
+    state.ensure("details", None)
+    state.ensure("submitted", False)
+    state.ensure("user_answer", None)
+    state.ensure("show_solution", False)
 
 def stoichiometry_practice_page():
     """Create a Streamlit page for stoichiometry practice problems"""
     st.title("Stoichiometry Practice")
-    
-    initialize_stoichiometry_session_state()
-    prefix = "stoichiometry_"
-    
+
+    state = State("stoichiometry")
+    initialize_stoichiometry_session_state(state)
+
     # UI Controls
     col1, col2 = st.columns(2)
     
@@ -588,14 +581,14 @@ def stoichiometry_practice_page():
         reaction_type = st.selectbox(
             "Select reaction type:",
             ["Random", "Combustion", "Decomposition", "Synthesis", "Single Replacement", "Double Replacement"],
-            key=f"{prefix}reaction_type"
+            key=state.key("reaction_type")
         )
     
     with col2:
         difficulty = st.selectbox(
             "Select difficulty level:",
             ["Easy", "Medium", "Hard"],
-            key=f"{prefix}difficulty"
+            key=state.key("difficulty")
         )
         
         if difficulty == "Easy":
@@ -606,53 +599,53 @@ def stoichiometry_practice_page():
             st.caption("Gram-to-gram with limiting reagent")
     
     # Generate a new problem if needed
-    if st.button("New Problem") or st.session_state[f"{prefix}question"] is None:
+    if st.button("New Problem") or state.get("question") is None:
         question, answer, units, details = generate_stoichiometry_problem(reaction_type, difficulty)
-        st.session_state[f"{prefix}question"] = question
-        st.session_state[f"{prefix}answer"] = answer
-        st.session_state[f"{prefix}units"] = units
-        st.session_state[f"{prefix}details"] = details
-        st.session_state[f"{prefix}submitted"] = False
-        st.session_state[f"{prefix}user_answer"] = None
-        st.session_state[f"{prefix}show_solution"] = False
+        state.set("question", question)
+        state.set("answer", answer)
+        state.set("units", units)
+        state.set("details", details)
+        state.set("submitted", False)
+        state.set("user_answer", None)
+        state.set("show_solution", False)
         st.rerun()  # Rerun to reset the form
     
     # Display the current problem
-    if st.session_state[f"{prefix}question"]:
-        st.markdown(st.session_state[f"{prefix}question"])
+    if state.get("question"):
+        st.markdown(state.get("question"))
         
         # Input form for the answer
-        with st.form(key=f"{prefix}answer_form"):
+        with st.form(key=state.key("answer_form")):
             user_answer = st.number_input(
-                f"Enter your answer ({st.session_state[f'{prefix}units']}):",
+                f"Enter your answer ({state.get('units')}):",
                 min_value=0.0,
                 step=0.01,
                 format="%.2f",
-                key=f"{prefix}user_input"
+                key=state.key("user_input")
             )
             
             submitted = st.form_submit_button("Submit Answer")
             if submitted:
-                st.session_state[f"{prefix}submitted"] = True
-                st.session_state[f"{prefix}user_answer"] = user_answer
+                state.set("submitted", True)
+                state.set("user_answer", user_answer)
                 
                 # Check if the answer is correct within tolerance
-                correct_answer = st.session_state[f"{prefix}answer"]
+                correct_answer = state.get("answer")
                 tolerance = correct_answer * 0.05  # 5% tolerance
                 
                 if abs(user_answer - correct_answer) <= tolerance:
                     st.success("Correct! Well done.")
                 else:
-                    st.error(f"Incorrect. The correct answer is {correct_answer} {st.session_state[f'{prefix}units']}.")
+                    st.error(f"Incorrect. The correct answer is {correct_answer} {state.get('units')}.")
                     
                 # Show the solution option
-                st.session_state[f"{prefix}show_solution"] = True
+                state.set("show_solution", True)
                 st.rerun()  # Rerun to show solution button
         
         # Show solution if requested
-        if st.session_state[f"{prefix}submitted"] and st.session_state[f"{prefix}show_solution"]:
+        if state.get("submitted") and state.get("show_solution"):
             if st.button("Show Solution"):
-                explanation = st.session_state[f"{prefix}details"]["explanation"]
+                explanation = state.get("details")["explanation"]
                 st.markdown("### Solution")
                 st.markdown(explanation)
 
@@ -660,10 +653,13 @@ def stoichiometry_explorer_page():
     """Create an exploratory page to learn about stoichiometry concepts"""
     st.title("Stoichiometry Explorer")
     
-    # Tabs for different concepts
-    tab1, tab2, tab3 = st.tabs(["Molar Mass Calculator", "Balancing Equations", "Limiting Reagent"])
-    
-    with tab1:
+    section = st.selectbox(
+        "Choose a topic:",
+        ["Molar Mass Calculator", "Balancing Equations", "Limiting Reagent"],
+        key="stoich_explorer_section",
+    )
+
+    if section == "Molar Mass Calculator":
         st.header("Molar Mass Calculator")
         formula = st.text_input("Enter a chemical formula (e.g., H2O, C6H12O6):", key="molar_mass_input")
         
@@ -684,7 +680,7 @@ def stoichiometry_explorer_page():
             except:
                 st.error("Invalid formula. Please check your input.")
     
-    with tab2:
+    elif section == "Balancing Equations":
         st.header("Balancing Chemical Equations")
         
         col1, col2 = st.columns(2)
@@ -726,7 +722,7 @@ def stoichiometry_explorer_page():
             except:
                 st.error("Invalid input. Please check your formulas.")
     
-    with tab3:
+    else:
         st.header("Limiting Reagent Calculator")
         
         col1, col2 = st.columns(2)
@@ -806,16 +802,3 @@ def stoichiometry_explorer_page():
             except:
                 st.error("Invalid input. Please check your formulas and values.")
 
-# Main function to run the app
-def main():
-    st.sidebar.title("Navigation")
-    page = st.sidebar.radio("Select a page:", ["Practice Problems", "Stoichiometry Explorer"])
-    
-    if page == "Practice Problems":
-        stoichiometry_practice_page()
-    else:
-        stoichiometry_explorer_page()
-
-# For testing directly
-if __name__ == "__main__":
-    main()

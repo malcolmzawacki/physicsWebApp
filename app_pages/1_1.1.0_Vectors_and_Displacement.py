@@ -6,7 +6,6 @@ plt.style.use("dark_background")
 
 
 from utils.ui import interface
-from tools.loading import lazy_tabs
 class dist_disp:
   def distance_displacement():
       problem_type_dict = {
@@ -58,14 +57,4 @@ class vectors:
         ui = interface(prefix, title, generator, metadata, difficulties)
         ui.unified_smart_layout(equations=True)
 
-def main():
-    tab_specs = [
-        ("Distance and Displacement", dist_disp.distance_displacement),
-        ("Vector Practice", vectors.vector_practice),
-    ]
-
-    lazy_tabs(tab_specs, state_key="vectors_tabs", auto_load_first=True)
-
-if __name__ == "__main__":
-    main()
 

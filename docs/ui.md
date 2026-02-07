@@ -28,7 +28,7 @@ All mutation flows through the `State` helper which prefixes keys (`{prefix}_{na
 3. Writes question text, answers, units, and feature metadata back into session state while incrementing the `question_id` counter.
 4. Immediately triggers `st.rerun()` so the freshly stored data renders on the next Streamlit pass.
 
-Legacy tuple-based generators can still be supported through `_store_legacy_result`, but new work should adhere to the dict contract documented in `docs/problem_payload.md`.
+All generators should return dict payloads as documented in `docs/problem_payload.md`.
 
 ### Optional UI Features
 
@@ -56,8 +56,8 @@ Generators can opt into richer interactions by populating extra keys in the resu
 
 - `utils/ui_components.py` bundles reusable fragments (headers, data frames, expander layouts, hint drawers, debug panels). Each helper expects already-prefixed session state data supplied by the `Interface` class.
 - `utils/ui_state.py` centralizes prefixed session-state access to avoid hard-coded key strings and improve testability.
-- `utils/config.py` exposes the `AUTHOR_MODE` toggle; when enabled the UI surfaces tracebacks in-place and keeps the debug panel available.
-- `tools/loading.py` offers `lazy_tabs`, which defers expensive imports until a tab is visited, reducing initial load time for heavy modules like the motion graph generator.
+- `config.py` exposes the `AUTHOR_MODE` toggle; when enabled the UI surfaces tracebacks in-place and keeps the debug panel available.
+- The router lazy-loads activities via handler strings; keep expensive imports inside activity functions for best cold-start performance.
 
 ### Author Mode & Debugging
 
@@ -84,4 +84,4 @@ For unusual layouts (e.g., matching activities), the interface helpers can be mi
 - `utils/ui_state.py` - namespaced session-state wrapper.
 - `utils/problem_payload.py` - payload normalization and validation.
 - `docs/problem_payload.md` - companion schema documentation.
-- `tools/loading.py` - lazy tab loader used by multipage layouts.
+- Legacy multipage lazy tabs are removed; keep imports inside activity functions for fast loads.

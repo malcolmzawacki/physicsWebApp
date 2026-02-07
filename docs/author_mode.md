@@ -9,7 +9,7 @@ Author mode unlocks diagnostics that make it easier to develop and troubleshoot 
   set APP_AUTHOR_MODE=1
   streamlit run Home.py
   ```
-- Alternatively, toggle `AUTHOR_MODE = True` in `utils/config.py` during local development (avoid committing this change).
+- Alternatively, toggle `AUTHOR_MODE = True` in `config.py` during local development (avoid committing this change).
 
 When enabled, `utils/ui.Interface` surfaces additional debugging aids:
 
@@ -20,7 +20,7 @@ When enabled, `utils/ui.Interface` surfaces additional debugging aids:
 ## Helpful Utilities
 
 - `tools/validate_payloads.py` – exercises core generators across problem types and difficulties, ensuring the payload schema stays consistent.
-- `tools/loading.py` (`lazy_tabs`) – demonstrates lazy-loading patterns for expensive modules; use similar approaches in new pages to keep initial load fast.
+- The router lazy-loads activities via handler strings; keep heavy imports inside activity functions for fast startup.
 - `xtrct_docs/` scripts – reuse generators to build printable worksheets and verify that exported artifacts match the interactive experience.
 
 ## Recommended Workflow

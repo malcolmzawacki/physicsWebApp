@@ -18,25 +18,25 @@ Interactive Streamlit workspace for generating and practicing physics (and chemi
 
 ## Project Layout
 
-- `Home.py` � simple landing page that links to Streamlit sub-pages.
-- `pages/` � individual practice flows grouped by topic (motion, forces, energy, waves, chemistry, etc.).
-- `utils/` � shared infrastructure:
-  - `generators/` � problem generators that emit payloads consumed by the UI layer.
-  - `ui.py`, `ui_components.py`, `ui_state.py` � Streamlit interface helpers and session-state utilities.
-  - `problem_payload.py` � canonical schema for generator outputs (see `docs/problem_payload.md`).
-  - `word_lists.py`, `graph_utils.py`, etc. � supporting content helpers.
-- `tools/` � developer scripts such as lazy tab loaders and payload validators.
-- `xtrct_docs/` � utilities for exporting problems into Word documents.
-- `docs/` � architecture notes (e.g., generator payload contract, UI guide).
+- `Home.py` - single-page router that swaps the sidebar based on the current section/activity.
+- `app_pages/` - activity modules referenced by the router (legacy page files, now used as function containers).
+- `utils/` - shared infrastructure:
+  - `generators/` - problem generators that emit payloads consumed by the UI layer.
+  - `ui.py`, `ui_components.py`, `ui_state.py` - Streamlit interface helpers and session-state utilities.
+  - `problem_payload.py` - canonical schema for generator outputs (see `docs/problem_payload.md`).
+  - `word_lists.py`, `graph_utils.py`, etc. - supporting content helpers.
+- `tools/` - developer scripts such as lazy tab loaders and payload validators.
+- `xtrct_docs/` - utilities for exporting problems into Word documents.
+- `docs/` - architecture notes (e.g., generator payload contract, UI guide).
 
 ## Development Workflow
 
-- **Author mode** � set `AUTHOR_MODE=True` in the `utils/config.py` file to surface rich diagnostics inside the UI during generator development.
-- **Testing generators** � run the validation script to ensure each generator returns a valid payload:
+- **Author mode** - set `AUTHOR_MODE=True` in `config.py` to surface rich diagnostics inside the UI during generator development.
+- **Testing generators** - run the validation script to ensure each generator returns a valid payload:
   ```bash
   python tools/validate_payloads.py
   ```
-- **Static checks** � the project currently relies on manual review; add `pydocstyle`, `flake8`, or similar as needed for your workflow.
+- **Static checks** - the project currently relies on manual review; add `pydocstyle`, `flake8`, or similar as needed for your workflow.
 
 ## Contributing Notes
 

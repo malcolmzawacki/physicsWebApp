@@ -33,7 +33,7 @@ class BaseGenerator(ABC):
         """
         Optional method for generators that want to provide button-based answers
         
-        :param units: List of unit strings from choose_problem
+        :param units: List of unit strings from choose_problem_dict
         :returns: Dict mapping answer index to list of button options
                  Empty dict means use text input for all answers
         """

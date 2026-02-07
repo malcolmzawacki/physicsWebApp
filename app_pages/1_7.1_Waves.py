@@ -1,7 +1,4 @@
 from utils.ui import interface
-from tools.loading import lazy_tabs
-
-# region older layout
 
 def wave_properties():
         
@@ -123,28 +120,3 @@ def deciBel_practice():
     ui.unified_smart_layout()
 
 
-def main():
-    tab_specs = [
-        ("Wave Properties", wave_properties),
-        ("Harmonics", Harmonics),
-        ("deciBel Scale", deciBel_practice),
-    ]
-
-    lazy_tabs(tab_specs, state_key="waves_tabs", auto_load_first=True)
-# endregion
-
-
-def main2():
-    from utils.generators.waves_generator import WaveGenerator
-    prefix ="waves_"
-    title = "Waves"
-    generator = WaveGenerator()
-    metadata = generator.stored_metadata()
-    difficulties = ["Easy","Medium","Hard"]
-
-    ui = interface(prefix, title, generator, metadata, difficulties)
-    ui.unified_smart_layout()
-    
-
-if __name__ == "__main__":
-    main()

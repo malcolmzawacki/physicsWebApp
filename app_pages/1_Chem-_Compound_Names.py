@@ -2,8 +2,11 @@ import streamlit as st
 import math
 import random
 
-from tools.loading import lazy_tabs
 
+from utils.state_proxy import StateProxy
+
+
+cn_state = StateProxy("compound_names")
 element_dict = {
     #"Period 1"
     'H': {'name': 'Hydrogen', 'period': 1, 'group': 1, 'charges': [1], 'anion': 'hydride'},
@@ -265,47 +268,47 @@ def generate_polyatomic_formula():
 
 
 def initialize_session_state():
-    if 'formula' not in st.session_state:
-        st.session_state.formula = None
-    if 'correct_name' not in st.session_state:
-        st.session_state.correct_name = None
-    if 'user_answer' not in st.session_state:
-        st.session_state.user_answer = None
-    if 'submitted' not in st.session_state:
-        st.session_state.submitted = False
-    if 'question_id' not in st.session_state:
-        st.session_state.question_id = 0
-    if 'feedback' not in st.session_state:
-        st.session_state.feedback = None
-    if 'include_polyatomic' not in st.session_state:
-        st.session_state.include_polyatomic = False
+    if 'formula' not in cn_state:
+        cn_state.formula = None
+    if 'correct_name' not in cn_state:
+        cn_state.correct_name = None
+    if 'user_answer' not in cn_state:
+        cn_state.user_answer = None
+    if 'submitted' not in cn_state:
+        cn_state.submitted = False
+    if 'question_id' not in cn_state:
+        cn_state.question_id = 0
+    if 'feedback' not in cn_state:
+        cn_state.feedback = None
+    if 'include_polyatomic' not in cn_state:
+        cn_state.include_polyatomic = False
 
 def on_checkbox_change():
     # This triggers when the checkbox value changes
     new_question()
 
 def check_answer():
-    st.session_state.submitted = True
-    user_input = st.session_state.user_input  # Get input from the text_input widget
+    cn_state.submitted = True
+    user_input = cn_state.user_input  # Get input from the text_input widget
     if user_input and user_input.strip():
         # Clean input
         user_input_clean = user_input.strip().lower().replace(' ','').replace('-','')
-        correct_name_clean = st.session_state.correct_name.strip().lower().replace(' ','').replace('-','')
+        correct_name_clean = cn_state.correct_name.strip().lower().replace(' ','').replace('-','')
         if user_input_clean == correct_name_clean:
-            st.session_state.feedback = "Correct!"
+            cn_state.feedback = "Correct!"
         else:
-            st.session_state.feedback = f"Incorrect. The correct name is {st.session_state.correct_name}"
+            cn_state.feedback = f"Incorrect. The correct name is {cn_state.correct_name}"
     else:
-        st.session_state.feedback = "Please enter an answer before submitting"
+        cn_state.feedback = "Please enter an answer before submitting"
 
 def new_question():
-    st.session_state.user_answer = None
-    st.session_state.submitted = False
-    st.session_state.feedback = None
-    st.session_state.question_id += 1
+    cn_state.user_answer = None
+    cn_state.submitted = False
+    cn_state.feedback = None
+    cn_state.question_id += 1
     
     # Use the current include_polyatomic value from session state
-    include_polyatomic = st.session_state.include_polyatomic
+    include_polyatomic = cn_state.include_polyatomic
     
     # Choose a question type based on the include_polyatomic setting
     if include_polyatomic:
@@ -314,11 +317,11 @@ def new_question():
         choice = random.randint(1, 2)  # 1=ionic, 2=covalent
     
     if choice == 1:
-        st.session_state.formula, st.session_state.correct_name = generate_ionic_formula()
+        cn_state.formula, cn_state.correct_name = generate_ionic_formula()
     elif choice == 2:
-        st.session_state.formula, st.session_state.correct_name = generate_covalent_formula()
+        cn_state.formula, cn_state.correct_name = generate_covalent_formula()
     else:  # choice == 3
-        st.session_state.formula, st.session_state.correct_name = generate_polyatomic_formula()
+        cn_state.formula, cn_state.correct_name = generate_polyatomic_formula()
 
 
 def create_exploration_page():
@@ -502,31 +505,31 @@ def practice_quiz_page():
     # Use st.expander to hide settings in a collapsible section
     with st.expander("Settings", expanded=False):
         st.checkbox("Include Polyatomic Ions?", 
-                    value=st.session_state.include_polyatomic,
+                    value=cn_state.include_polyatomic,
                     key="include_polyatomic", 
                     on_change=on_checkbox_change)
 
     # Generate a new problem only if we don't already have one
-    if not st.session_state.formula:
+    if not cn_state.formula:
         new_question()
     
     st.markdown("### Name this compound:")
-    st.latex(f"\\LARGE{{{st.session_state.formula}}}")
+    st.latex(f"\\LARGE{{{cn_state.formula}}}")
     
     # For testing only - Remove in production
-    if st.session_state.get('show_answer', False):
-        st.info(f"Answer: {st.session_state.correct_name}")
+    if cn_state.get('show_answer', False):
+        st.info(f"Answer: {cn_state.correct_name}")
     
     # Use key parameter to connect the text_input to session state
     st.text_input("Enter the name of the compound", 
                   key="user_input", 
-                  disabled=st.session_state.submitted)
+                  disabled=cn_state.submitted)
 
     col1, col2, col3 = st.columns([1, 1, 1])
     with col1:
         st.button("Check Answer", 
                   on_click=check_answer, 
-                  disabled=st.session_state.submitted)
+                  disabled=cn_state.submitted)
     with col2:
         st.button("New Question", 
                   on_click=new_question)
@@ -535,21 +538,11 @@ def practice_quiz_page():
         st.checkbox("Show answers (for testing)", key="show_answer")
     
     # Display feedback if available
-    if st.session_state.feedback:
-        if "Correct" in st.session_state.feedback:
-            st.success(st.session_state.feedback)
-        elif "Incorrect" in st.session_state.feedback:
-            st.error(st.session_state.feedback)
+    if cn_state.feedback:
+        if "Correct" in cn_state.feedback:
+            st.success(cn_state.feedback)
+        elif "Incorrect" in cn_state.feedback:
+            st.error(cn_state.feedback)
         else:
-            st.warning(st.session_state.feedback)
+            st.warning(cn_state.feedback)
 
-def main():
-    tab_specs = [
-        ("Practice Quiz", practice_quiz_page),
-        ("Formula Explorer", create_exploration_page),
-    ]
-
-    lazy_tabs(tab_specs, state_key="compound_names_tabs", auto_load_first=True)
-
-if __name__ == "__main__":
-    main()

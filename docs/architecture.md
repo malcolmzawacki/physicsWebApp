@@ -1,42 +1,40 @@
 # Application Architecture
 
-This project is a multipage Streamlit app built around reusable problem generators. The high-level flow is:
+This project runs as a single-page Streamlit app with a custom router that swaps the sidebar based on where students are in the curriculum. The high-level flow is:
 
-1. A Streamlit page in `pages/` instantiates `utils.ui.Interface` with a generator and difficulty list.
-2. The interface requests a dict payload from the generator (or falls back to legacy tuples) and normalizes it through `utils.problem_payload.payload_from_dict`.
-3. The UI writes question data, metadata, and optional extras into namespaced Streamlit session state via `utils.ui_state.State`.
-4. The interface renders inputs using helpers in `utils.ui_components.py`, validates submissions, and stores performance stats.
-5. Optional tools (e.g., export scripts in `xtrct_docs/`) can re-use generators to build printable worksheets or documents.
+1. `Home.py` renders the custom sidebar (main areas or section-specific activities) and routes to a selected activity.
+2. The activity function instantiates `utils.ui.Interface` with a generator and difficulty list.
+3. The interface requests a dict payload from the generator and normalizes it through `utils.problem_payload.payload_from_dict`.
+4. The UI writes question data, metadata, and optional extras into namespaced Streamlit session state via `utils.ui_state.State`.
+5. The interface renders inputs using helpers in `utils.ui_components.py`, validates submissions, and stores performance stats.
+6. Optional tools (e.g., export scripts in `xtrct_docs/`) can re-use generators to build printable worksheets or documents.
 
 ## Modules at a Glance
 
-- **Home.py** – root entry point that sets basic configuration and lets users pick a topic.
-- **pages/** – Streamlit implementations for each topic. They typically import one or more generators and call `Interface.unified_smart_layout()`.
-- **utils/generators/** – core business logic for creating randomized physics and chemistry problems. Subpackages (like `energy/`) group related domains.
-- **utils/ui.py** – orchestrates question lifecycle, answer validation, diagrams, hints, and gamification.
-- **utils/ui_components.py** – shared render helpers (headers, tables, hints, debug panel, etc.).
-- **utils/ui_state.py** – wrapper to namespace session-state keys per page/prefix.
-- **utils/problem_payload.py** – dataclass and normalizer for generator payloads.
-- **tools/** – developer utilities such as `loading.lazy_tabs` for deferred imports and `validate_payloads.py` for payload smoke tests.
-- **xtrct_docs/** – Word export helpers powered by `python-docx` and `matplotlib`.
-- **docs/** – knowledge base for contributors (`problem_payload.md`, `ui.md`, and the guides in this folder).
+- **Home.py** ? root entry point that owns the custom router and context-aware sidebar.
+- **app_pages/** ? activity modules referenced by the router via lazy handlers.
+- **utils/generators/** ? core business logic for creating randomized physics and chemistry problems. Subpackages (like `energy/`) group related domains.
+- **utils/ui.py** ? orchestrates question lifecycle, answer validation, diagrams, hints, and gamification.
+- **utils/ui_components.py** ? shared render helpers (headers, tables, hints, debug panel, etc.).
+- **utils/ui_state.py** ? wrapper to namespace session-state keys per page/prefix.
+- **utils/problem_payload.py** ? dataclass and normalizer for generator outputs.
+- **tools/** ? developer utilities such as `validate_payloads.py` for payload smoke tests.
+- **xtrct_docs/** ? Word export helpers powered by `python-docx` and `matplotlib`.
+- **docs/** ? knowledge base for contributors (`problem_payload.md`, `ui.md`, and the guides in this folder).
 
 ## Runtime Flow Details
 
 ```
-Streamlit page -> Interface -> Generator -> problem_payload -> UI components -> Session State -> User feedback
+Router (Home.py) -> Activity function -> Interface -> Generator -> problem_payload -> UI components -> Session State -> User feedback
 ```
 
-- **Page layer** declares tab structure, titles, and generator combinations.
+- **Router layer** controls which activities appear in the sidebar and which function runs.
+- **Activity layer** declares titles, prefixes, and generator combinations (formerly page/tab definitions).
+- **Custom activities** that bypass `Interface` should use `utils.ui_state.State` (or a thin proxy) for namespaced session state.
 - **Interface** centralizes state initialization, rendering, and response handling.
 - **Generator** returns a dict payload describing the question, answers, and optional features (see `docs/problem_payload.md`).
 - **UI components** render the question, input widgets, diagrams, hints, and debugging aids.
 - **Session state** keeps the current question, metadata, and performance metrics resilient across reruns.
-
-## Legacy vs Modern Generators
-
-- New work should return dict payloads (`question`, `answers`, `units`, etc.) so the interface can enrich the UI with diagrams, hints, button options, and metadata.
-- Legacy tuple-based generators are still supported through `Interface._store_legacy_result`. The page detects the format (`generation_format`) and renders a classic layout until the generator is migrated.
 
 ## Export & Automation
 
@@ -47,4 +45,4 @@ Streamlit page -> Interface -> Generator -> problem_payload -> UI components -> 
 
 - Stabilize automated linting/testing (consider `pytest`, `pydocstyle`, or `ruff`).
 - Expand docs with diagrams or flowcharts once architecture stabilizes.
-- Gradually migrate remaining legacy generators to the dict payload contract for richer UI integration.
+- Enforce the dict payload contract for all generators to keep UI integration consistent.

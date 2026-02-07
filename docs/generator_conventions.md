@@ -15,8 +15,7 @@ Generators live in `utils/generators/` and are responsible for returning randomi
 ## Modern vs Legacy APIs
 
 - Prefer overriding `choose_problem_dict(problem_type, difficulty)` and returning the dict payload directly.
-- The `BaseGenerator` class still offers a legacy tuple interface (`choose_problem`). If you must use it temporarily, ensure the tuple entries map to `(question, answers, units, diagram_data)` so the interface can adapt.
-- When migrating legacy generators, implement `choose_problem_dict` first, then delete the tuple method and any unused helpers once parity is achieved.
+- Generators must implement `choose_problem_dict` and return dict payloads that match the `ProblemPayload` schema.
 
 ## Difficulty & Randomization
 

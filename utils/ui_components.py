@@ -4,6 +4,8 @@ import pandas as pd
 import streamlit as st
 from typing import Dict, Optional
 
+from utils.ui_state import State
+
 
 def render_header(title: str, stars: int | None = None) -> None:
     col1, col2 = st.columns([10, 4], vertical_alignment='top')
@@ -132,8 +134,8 @@ def draw_answer_inputs(prefix: str, units: list[str], correct_answers: list, que
 
 def render_button_options(prefix: str, units: list[str], answer_options: Dict[int, list[str]], question_id: int) -> None:
     """Render multiple-choice buttons per answer index and store selection in session state."""
-    if f"{prefix}_user_answers_selected" not in st.session_state:
-        st.session_state[f"{prefix}_user_answers_selected"] = [None] * len(units)
+    state = State(prefix)
+    state.ensure("user_answers_selected", [None] * len(units))
 
     for i, unit in enumerate(units):
         st.write(f"**{unit}:**")
@@ -145,12 +147,12 @@ def render_button_options(prefix: str, units: list[str], answer_options: Dict[in
         cols = st.columns(len(options))
         for j, (col, option) in enumerate(zip(cols, options)):
             with col:
-                is_selected = st.session_state[f"{prefix}_user_answers_selected"][i] == option
+                user_answers = state.get("user_answers_selected")
+                is_selected = user_answers[i] == option
                 button_type = "primary" if is_selected else "secondary"
                 if st.button(option, key=f"{prefix}_option_{i}_{j}_{question_id}", type=button_type, use_container_width=True):
-                    user_answers = st.session_state[f"{prefix}_user_answers_selected"]
                     user_answers[i] = option
-                    st.session_state[f"{prefix}_user_answers_selected"] = user_answers
+                    state.set("user_answers_selected", user_answers)
                     st.rerun()
 
 
