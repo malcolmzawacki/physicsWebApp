@@ -1,23 +1,23 @@
 # Project Roadmap & Backlog
 
-_Last updated: 2026-02-06_
+_Last updated: 2026-02-08_
 
 ## Recently Completed
-
+- **Streamlit Navigation**: Router rollout complete; next steps are refining activity groupings and course-level filters (minimum level set to High School; remove Middle School tier; keep Regular High School + Advanced).
+- Reorganized navigation: added a "Rotation (Advanced)" main area, moved vectors/displacement into Foundations, and updated advanced-only activity filters.
+- Moved kinematics generators into `utils/generators/kinematics/` and updated imports/paths across the app.
 - Migrated activity modules to `State`-based session handling and removed legacy multipage/tab scaffolding.
 - Introduced a generic diagram-matching layout (`utils/layouts/diagram_match_layout.py`) with auto-advance timing and first-question autoload.
-- Extracted motion graph matching into a dedicated payload generator (`utils/generators/motion_graph_matching_generator.py`) and wired the motion page to the generic layout.
+- Extracted motion graph matching into a dedicated payload generator (`utils/generators/kinematics/motion_graph_matching_generator.py`) and wired the motion page to the generic layout.
 - Removed legacy tuple payload support and standardized generators on dict payloads.
-- `projectile_generator.py` now supports explicit `solve_for` overrides while keeping question narratives coherent.
+- `utils/generators/kinematics/projectile_generator.py` now supports explicit `solve_for` overrides while keeping question narratives coherent.
 - `xtrct_docs/document_creator.py` has an `include_graphs` parameter to add flexibility when diagrams are helpful but not needed
 - Created and then moved additional force tab generators to `forces/` folder for better organization, includes `atwood_generator.py`, `tension_generator.py`, and `incline_generator.py`
 - Rotational kinematics generator and Streamlit page are in place (`utils/generators/rotational_motion_generator.py`, `app_pages/1_1.1.2_Rotational_Motion.py`).
 - Linear motion generator refactor is complete (centralized phrasing, unified variable selection).
 - Center of mass generator wording and diagram tweaks are complete.
-
 ## In Progress / Short-Term Targets
 
-- **Streamlit Navigation**: Router rollout complete; next steps are refining activity groupings and course-level filters.
 - **Graph & Image Quality**: Carry the print-friendly theming back into Streamlit views and add regression checks for mixed graph/standard sections.
 - **Rotational Dynamics Extension**: Plan torque and moment of inertia extensions for the rotational unit (new page sections and generator updates).
 
@@ -75,12 +75,12 @@ _Last updated: 2026-02-06_
 - **Learning Objectives & Analytics**: Tag problems with objectives/standards, log anonymized attempts to a lightweight datastore, and surface mastery dashboards for teachers.
 - **Adaptive Practice Layer**: Use the collected performance data to bias future question selection (difficulty, solve_for, context) for individualized practice sequences.
 - **Accessibility & Localization Upgrades**: Improve contrast/readability, offer dyslexia-friendly modes, and plan for multilingual prompts using a centralized copy system.
-- **Conceptual Understanding Layer**: Extend generators to emit qualitative reasoning problems alongside calculations—comparison questions ("Which has more energy?"), prediction tasks ("What happens if we double the mass?"), and scenario analysis without numerical computation. Include qualitative button-based responses and short text explanations.
+- **Conceptual Understanding Layer**: Extend generators to emit qualitative reasoning problems alongside calculationsï¿½comparison questions ("Which has more energy?"), prediction tasks ("What happens if we double the mass?"), and scenario analysis without numerical computation. Include qualitative button-based responses and short text explanations.
 - **Multi-Representation Practice**: Build problem variants that require translating between representations (graph ? equation ? verbal description ? diagram). Extend graph generators to include sketching/prediction modes where students select expected graph shapes before seeing calculations. Add diagram annotation tools for labeling forces, energy flow, or motion paths.
 - **Error Analysis & Reasoning Problems**: Create a problem type that presents worked solutions (correct or with deliberate errors) and asks students to identify mistakes, explain reasoning, or verify reasonableness. Include "debugging" mode where students diagnose why a calculation went wrong or why an answer is physically impossible.
 - **Estimation & Reasonableness Checks**: Add pre-solve estimation prompts ("Should this be closer to 10 or 1000?") and post-solve verification questions ("Does your answer make sense? Why?"). Integrate order-of-magnitude checking and dimensional analysis as explicit practice types.
 - **Multi-Step Synthesis Problems**: Design problem chains that combine multiple concepts (e.g., projectile motion ? collision ? energy conservation) requiring students to plan solution strategies across 3-5 connected steps. Include scaffolded versions with planning prompts and strategy hints.
-- **Metacognitive Scaffolding**: Integrate reflection prompts into the UI flow—strategy selection before solving ("Which approach will you use?"), confidence ratings during submission, and post-problem reflection ("What was challenging? What would you check?"). Log these for future adaptive practice.
+- **Metacognitive Scaffolding**: Integrate reflection prompts into the UI flowï¿½strategy selection before solving ("Which approach will you use?"), confidence ratings during submission, and post-problem reflection ("What was challenging? What would you check?"). Log these for future adaptive practice.
 - **Free-Response & Explanation Engine**: Add text input options for conceptual explanations alongside numerical answers. Implement keyword-based or LLM-assisted evaluation for open-ended responses like "Explain why momentum is conserved" or "Describe what happens to kinetic energy."
 - **Partial Credit & Process Tracking**: Extend answer checking to award partial credit for correct approach with calculation errors. Track solution steps for multi-part problems and provide targeted feedback on which stage went wrong (setup vs. algebra vs. units).
 

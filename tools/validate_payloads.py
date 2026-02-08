@@ -3,15 +3,15 @@ from __future__ import annotations
 import sys
 from typing import Dict, List, Tuple
 
-from utils.generators.const_motion_generator import ConstantMotionGenerator
-from utils.generators.linear_motion_generator import LinearMotionGenerator
+from utils.generators.kinematics.const_motion_generator import ConstantMotionGenerator
+from utils.generators.kinematics.linear_motion_generator import LinearMotionGenerator
 from utils.generators.force_generator import ForceGenerator
 from utils.generators.vector_generator import VectorGenerator
-from utils.generators.projectile_generator import ProjectileGenerator
+from utils.generators.kinematics.projectile_generator import ProjectileGenerator
 from utils.generators.waves_generator import WaveGenerator
 from utils.generators.momentum_generators.collision_generator import CollisionGenerator
-from utils.generators.motion_graph_generator import MotionGraphGenerator
-from utils.generators.dist_disp_generator import DistDispGenerator
+from utils.generators.kinematics.motion_graph_generator import MotionGraphGenerator
+from utils.generators.kinematics.dist_disp_generator import DistDispGenerator
 from utils.problem_payload import payload_from_dict
 
 

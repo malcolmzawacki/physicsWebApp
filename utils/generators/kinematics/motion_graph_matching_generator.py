@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import random
 
-from utils.generators.motion_graph_generator import MotionGraphGenerator
+from utils.generators.kinematics.motion_graph_generator import MotionGraphGenerator
 
 
 def generate_motion_graph_match_payload(primary_order: str) -> dict:

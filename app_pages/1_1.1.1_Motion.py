@@ -2,7 +2,9 @@ import matplotlib.pyplot as plt
 import streamlit as st
 
 from utils.layouts import render_diagram_match_layout
-from utils.generators.motion_graph_matching_generator import generate_motion_graph_match_payload
+from utils.generators.kinematics.motion_graph_matching_generator import (
+    generate_motion_graph_match_payload,
+)
 from utils.ui import interface
 
 # Use a dark background for matplotlib so it fits a "dark mode" style
@@ -11,7 +13,7 @@ plt.style.use("dark_background")
 
 def constant_motion():
     # Lazy import - only load when this section is accessed
-    from utils.generators.const_motion_generator import ConstantMotionGenerator
+    from utils.generators.kinematics.const_motion_generator import ConstantMotionGenerator
 
     generator = ConstantMotionGenerator()
     metadata = generator.stored_metadata()
@@ -24,7 +26,7 @@ def constant_motion():
 
 def accelerated_motion():
     # Lazy import - only load when this section is accessed
-    from utils.generators.linear_motion_generator import LinearMotionGenerator
+    from utils.generators.kinematics.linear_motion_generator import LinearMotionGenerator
 
     generator = LinearMotionGenerator()
     metadata = generator.stored_metadata()
@@ -37,7 +39,7 @@ def accelerated_motion():
 
 def motion_graph_types():
     # Lazy import - only load when this section is accessed
-    from utils.generators.motion_graph_generator import MotionGraphGenerator
+    from utils.generators.kinematics.motion_graph_generator import MotionGraphGenerator
 
     difficulties = ["Easy", "Medium", "Hard"]
     generator = MotionGraphGenerator()
@@ -72,7 +74,7 @@ def motion_graph_matching():
 
 def projectiles():
     # Lazy import - only load when this section is accessed
-    from utils.generators.projectile_generator import ProjectileGenerator
+    from utils.generators.kinematics.projectile_generator import ProjectileGenerator
 
     generator = ProjectileGenerator()
     metadata = generator.stored_metadata()

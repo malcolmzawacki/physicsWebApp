@@ -1,4 +1,4 @@
-# utils/generators/projectile_generator.py
+# utils/generators/kinematics/projectile_generator.py
 import math
 import random
 

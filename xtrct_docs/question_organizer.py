@@ -4,11 +4,11 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from typing import Any
 
-from utils.generators.linear_motion_generator import LinearMotionGenerator
-from utils.generators.const_motion_generator import ConstantMotionGenerator
-from utils.generators.dist_disp_generator import DistDispGenerator
-from utils.generators.projectile_generator import ProjectileGenerator
-from utils.generators.motion_graph_generator import MotionGraphGenerator
+from utils.generators.kinematics.linear_motion_generator import LinearMotionGenerator
+from utils.generators.kinematics.const_motion_generator import ConstantMotionGenerator
+from utils.generators.kinematics.dist_disp_generator import DistDispGenerator
+from utils.generators.kinematics.projectile_generator import ProjectileGenerator
+from utils.generators.kinematics.motion_graph_generator import MotionGraphGenerator
 from utils.generators.forces.atwood_generator import AtwoodGenerator
 from utils.generators.forces.incline_generator import InclineGenerator
 from utils.generators.forces.tension_generator import TensionGenerator

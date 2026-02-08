@@ -7,9 +7,8 @@ from config import AUTHOR_MODE
 st.set_page_config(page_title="Physics Practice", layout="wide")
 
 COURSE_LEVELS = (
-    ("middle", "Middle School", 0),
-    ("high", "High School", 1),
-    ("college", "College Preview", 2),
+    ("high", "High School", 0),
+    ("advanced", "Advanced", 1),
 )
 COURSE_LEVEL_LABELS = {key: label for key, label, _ in COURSE_LEVELS}
 COURSE_LEVEL_RANKS = {key: rank for key, _, rank in COURSE_LEVELS}
@@ -21,6 +20,7 @@ HANDLER_CACHE = {}
 SECTIONS = (
     "Foundations",
     "Kinematics",
+    "Rotation (Advanced)",
     "Dynamics",
     "Momentum",
     "Energy",
@@ -31,72 +31,74 @@ SECTIONS = (
 
 ACTIVITIES = {
     "Foundations": {
-        "Algebra": {"handler": "file:app_pages/1_0.1.1_Math_Skills.py::algebra.main", "min_level": "middle"},
+        "Algebra": {"handler": "file:app_pages/1_0.1.1_Math_Skills.py::algebra.main", "min_level": "high"},
         "Scientific Notation": {
             "handler": "file:app_pages/1_0.1.1_Math_Skills.py::sci_notate.main",
-            "min_level": "middle",
+            "min_level": "high",
         },
-        "Arithmetic": {"handler": "file:app_pages/1_0.1.1_Math_Skills.py::arithmetic.main", "min_level": "middle"},
+        "Arithmetic": {"handler": "file:app_pages/1_0.1.1_Math_Skills.py::arithmetic.main", "min_level": "high"},
+        "Vector Practice": {
+            "handler": "file:app_pages/1_1.1.0_Vectors_and_Displacement.py::vectors.vector_practice",
+            "min_level": "high",
+        },
     },
     "Kinematics": {
         "Distance & Displacement": {
             "handler": "file:app_pages/1_1.1.0_Vectors_and_Displacement.py::dist_disp.distance_displacement",
-            "min_level": "middle",
-        },
-        "Vector Practice": {
-            "handler": "file:app_pages/1_1.1.0_Vectors_and_Displacement.py::vectors.vector_practice",
-            "min_level": "middle",
+            "min_level": "high",
         },
         "Constant Motion": {
             "handler": "file:app_pages/1_1.1.1_Motion.py::constant_motion",
-            "min_level": "middle",
+            "min_level": "high",
         },
         "Accelerated Motion": {
             "handler": "file:app_pages/1_1.1.1_Motion.py::accelerated_motion",
-            "min_level": "middle",
+            "min_level": "high",
         },
         "Types of Motion Graphs": {
             "handler": "file:app_pages/1_1.1.1_Motion.py::motion_graph_types",
-            "min_level": "middle",
+            "min_level": "high",
         },
         "Matching Motion Graphs": {
             "handler": "file:app_pages/1_1.1.1_Motion.py::motion_graph_matching",
-            "min_level": "middle",
+            "min_level": "high",
         },
-        "Projectiles": {"handler": "file:app_pages/1_1.1.1_Motion.py::projectiles", "min_level": "middle"},
+        "Projectiles": {"handler": "file:app_pages/1_1.1.1_Motion.py::projectiles", "min_level": "high"},
+    },
+    "Rotation (Advanced)": {
         "Rotational Kinematics": {
             "handler": "file:app_pages/1_1.1.2_Rotational_Motion.py::rotational_kinematics",
-            "min_level": "high",
+            "min_level": "advanced",
         },
     },
     "Dynamics": {
-        "Newton's Second Law": {"handler": "file:app_pages/1_2.1_Forces.py::newtons_2nd", "min_level": "middle"},
-        "Center of Mass": {"handler": "file:app_pages/1_2.1_Forces.py::center_of_mass", "min_level": "middle"},
-        "Tension": {"handler": "file:app_pages/1_2.1_Forces.py::tension", "min_level": "middle"},
-        "Atwood Machines": {"handler": "file:app_pages/1_2.1_Forces.py::atwood", "min_level": "high"},
-        "Inclined Planes": {"handler": "file:app_pages/1_2.1_Forces.py::inclines", "min_level": "high"},
+        "Newton's Second Law": {"handler": "file:app_pages/1_2.1_Forces.py::newtons_2nd", "min_level": "high"},
+        "Center of Mass": {"handler": "file:app_pages/1_2.1_Forces.py::center_of_mass", "min_level": "advanced"},
+        "Tension": {"handler": "file:app_pages/1_2.1_Forces.py::tension", "min_level": "advanced"},
+        "Atwood Machines": {"handler": "file:app_pages/1_2.1_Forces.py::atwood", "min_level": "advanced"},
+        "Inclined Planes": {"handler": "file:app_pages/1_2.1_Forces.py::inclines", "min_level": "advanced"},
     },
     "Momentum": {
-        "Momentum": {"handler": "file:app_pages/1_4.1_Momentum_and_Impulse.py::momentum", "min_level": "middle"},
-        "Impulse": {"handler": "file:app_pages/1_4.1_Momentum_and_Impulse.py::impulse", "min_level": "middle"},
-        "Collisions": {"handler": "file:app_pages/1_4.1_Momentum_and_Impulse.py::collisions", "min_level": "middle"},
+        "Momentum": {"handler": "file:app_pages/1_4.1_Momentum_and_Impulse.py::momentum", "min_level": "high"},
+        "Impulse": {"handler": "file:app_pages/1_4.1_Momentum_and_Impulse.py::impulse", "min_level": "high"},
+        "Collisions": {"handler": "file:app_pages/1_4.1_Momentum_and_Impulse.py::collisions", "min_level": "high"},
     },
     "Energy": {
-        "Types of Energy": {"handler": "file:app_pages/1_6.1_Energy.py::energy_basics_page", "min_level": "middle"},
+        "Types of Energy": {"handler": "file:app_pages/1_6.1_Energy.py::energy_basics_page", "min_level": "high"},
         "Conservation of Energy": {
             "handler": "file:app_pages/1_6.1_Energy.py::energy_conserv_page",
-            "min_level": "middle",
+            "min_level": "high",
         },
-        "Thermal Energy": {"handler": "file:app_pages/1_6.1_Energy.py::thermal_energy_page", "min_level": "middle"},
+        "Thermal Energy": {"handler": "file:app_pages/1_6.1_Energy.py::thermal_energy_page", "min_level": "high"},
         "Friction and Distance": {
             "handler": "file:app_pages/1_6.1_Energy.py::friction_distance_page",
-            "min_level": "middle",
+            "min_level": "high",
         },
     },
     "Waves": {
-        "Wave Properties": {"handler": "file:app_pages/1_7.1_Waves.py::wave_properties", "min_level": "middle"},
-        "Harmonics": {"handler": "file:app_pages/1_7.1_Waves.py::Harmonics", "min_level": "middle"},
-        "deciBel Scale": {"handler": "file:app_pages/1_7.1_Waves.py::deciBel_practice", "min_level": "middle"},
+        "Wave Properties": {"handler": "file:app_pages/1_7.1_Waves.py::wave_properties", "min_level": "high"},
+        "Harmonics": {"handler": "file:app_pages/1_7.1_Waves.py::Harmonics", "min_level": "high"},
+        "deciBel Scale": {"handler": "file:app_pages/1_7.1_Waves.py::deciBel_practice", "min_level": "high"},
     },
     "Chemistry": {
         "Compound Names Practice": {
@@ -117,8 +119,8 @@ ACTIVITIES = {
         },
     },
     "Labs": {
-        "Roulette": {"handler": "file:app_pages/1_0.0_Test_Page.py::roulette", "min_level": "middle"},
-        "Reverse Engineering": {"handler": "file:app_pages/1_0.0_Test_Page.py::planner_tab", "min_level": "middle"},
+        "Roulette": {"handler": "file:app_pages/1_0.0_Test_Page.py::roulette", "min_level": "high"},
+        "Reverse Engineering": {"handler": "file:app_pages/1_0.0_Test_Page.py::planner_tab", "min_level": "high"},
     },
 }
 
@@ -142,7 +144,7 @@ def level_rank(level_key: str) -> int:
 
 
 def activity_visible(activity_meta: dict, current_level: str) -> bool:
-    min_level = activity_meta.get("min_level", "middle")
+    min_level = activity_meta.get("min_level", "high")
     return level_rank(current_level) >= level_rank(min_level)
 
 
@@ -196,9 +198,12 @@ def validate_activity_handlers() -> list[str]:
 
 with st.sidebar:
     st.header("Directory")
+    level_options = [key for key, _, _ in COURSE_LEVELS]
+    if st.session_state.get("nav_level") not in level_options:
+        st.session_state["nav_level"] = level_options[0]
     level_key = st.selectbox(
         "Course level",
-        options=[key for key, _, _ in COURSE_LEVELS],
+        options=level_options,
         format_func=lambda key: COURSE_LEVEL_LABELS.get(key, key),
         key="nav_level",
     )

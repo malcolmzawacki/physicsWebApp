@@ -36,7 +36,7 @@ class dist_disp:
                   """},
           }
       difficulties = ["Easy","Medium","Hard"]
-      from utils.generators.dist_disp_generator import DistDispGenerator
+      from utils.generators.kinematics.dist_disp_generator import DistDispGenerator
       title = "Distance & Displacement"
       prefix = "constant"
       generator = DistDispGenerator()

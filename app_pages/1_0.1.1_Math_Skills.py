@@ -702,7 +702,7 @@ class sci_notate:
                 ans_exp = q_exp_1 - q_exp_2
                 q_term_1, q_exp_1 = sci_notate.sci_not_format(q_term_1, q_exp_1)
                 ans_term, ans_exp = sci_notate.sci_not_format(ans_term,ans_exp)
-                question = rf"\\frac{{{q_term_1}\;\cdot\;10^{{{q_exp_1}}}}}{{{q_term_2}\;\cdot\;10^{{{q_exp_2}}}}}"
+                question = rf"\frac{{{q_term_1}\;\cdot\;10^{{{q_exp_1}}}}}{{{q_term_2}\;\cdot\;10^{{{q_exp_2}}}}}"
         elif difficulty == 'medium': # three inputs, negatives (combo mul, div)
             q_term_3 = random.randint(1,9)
             q_exp_3 = random.randint(1,9)
@@ -716,14 +716,14 @@ class sci_notate:
                 ans_exp = q_exp_1 + q_exp_2 - q_exp_3
                 q_term_2, q_exp_2 = sci_notate.sci_not_format(q_term_2, q_exp_2)
                 ans_term, ans_exp = sci_notate.sci_not_format(ans_term,ans_exp)
-                question = rf"\\frac{{({q_term_1}\;\cdot\;10^{{{q_exp_1}}})\;\cdot\;({q_term_2}\;\cdot\;10^{{{q_exp_2}}})}}{{{q_term_3}\;\cdot\;10^{{{q_exp_3}}}}}"
+                question = rf"\frac{{({q_term_1}\;\cdot\;10^{{{q_exp_1}}})\;\cdot\;({q_term_2}\;\cdot\;10^{{{q_exp_2}}})}}{{{q_term_3}\;\cdot\;10^{{{q_exp_3}}}}}"
             else: # 1 mul 2 div
                 ans_term = q_term_1
                 q_term_1*= q_term_2*q_term_3
                 ans_exp = q_exp_1 - q_exp_2 - q_exp_3
                 q_term_1, q_exp_1 = sci_notate.sci_not_format(q_term_1, q_exp_1)
                 ans_term, ans_exp = sci_notate.sci_not_format(ans_term,ans_exp)
-                question = rf"\\frac{{{q_term_1}\;\cdot\;10^{{{q_exp_1}}}}}{{({q_term_3}\;\cdot\;10^{{{q_exp_3}}})\;\cdot\;({q_term_2}\;\cdot\;10^{{{q_exp_2}}})}}"
+                question = rf"\frac{{{q_term_1}\;\cdot\;10^{{{q_exp_1}}}}}{{({q_term_3}\;\cdot\;10^{{{q_exp_3}}})\;\cdot\;({q_term_2}\;\cdot\;10^{{{q_exp_2}}})}}"
         else: # hard
             q_term_3 = random.randint(1,9)
             q_exp_3 = random.randint(1,9)
@@ -742,7 +742,7 @@ class sci_notate:
             q_term_1, q_exp_1 = sci_notate.sci_not_format(q_term_1, q_exp_1)
             q_term_2, q_exp_2 = sci_notate.sci_not_format(q_term_2, q_exp_2)
             ans_term, ans_exp = sci_notate.sci_not_format(ans_term,ans_exp)
-            question = rf"({q_term_4}\;\cdot\;10^{{{q_exp_4}}})\;\cdot\;\\frac{{({q_term_1}\;\cdot\;10^{{{q_exp_1}}})\;\cdot\;({q_term_2}\;\cdot\;10^{{{q_exp_2}}})}}{{({q_term_3}\;\cdot\;10^{{{q_exp_3}}})^2}}"
+            question = rf"({q_term_4}\;\cdot\;10^{{{q_exp_4}}})\;\cdot\;\frac{{({q_term_1}\;\cdot\;10^{{{q_exp_1}}})\;\cdot\;({q_term_2}\;\cdot\;10^{{{q_exp_2}}})}}{{({q_term_3}\;\cdot\;10^{{{q_exp_3}}})^2}}"
         return question, ans_term, ans_exp
 
     def initialize_session_state():

@@ -1,4 +1,4 @@
-# utils/generators/motion_graph_generator.py
+# utils/generators/kinematics/motion_graph_generator.py
 import streamlit as st
 import random
 import matplotlib.pyplot as plt
