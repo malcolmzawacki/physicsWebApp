@@ -7,6 +7,14 @@ from typing import Dict, Optional
 from utils.ui_state import State
 
 
+def _ensure_selection_state_length(state: State, units: list[str]) -> None:
+    """Ensure selection state always matches the current number of answer parts."""
+    current = state.get("user_answers_selected")
+    target_len = len(units)
+    if not isinstance(current, list) or len(current) != target_len:
+        state.set("user_answers_selected", [None] * target_len)
+
+
 def render_header(title: str, stars: int | None = None) -> None:
     col1, col2 = st.columns([10, 4], vertical_alignment='top')
     with col1:
@@ -135,7 +143,7 @@ def draw_answer_inputs(prefix: str, units: list[str], correct_answers: list, que
 def render_button_options(prefix: str, units: list[str], answer_options: Dict[int, list[str]], question_id: int) -> None:
     """Render multiple-choice buttons per answer index and store selection in session state."""
     state = State(prefix)
-    state.ensure("user_answers_selected", [None] * len(units))
+    _ensure_selection_state_length(state, units)
 
     for i, unit in enumerate(units):
         st.write(f"**{unit}:**")
@@ -154,6 +162,35 @@ def render_button_options(prefix: str, units: list[str], answer_options: Dict[in
                     user_answers[i] = option
                     state.set("user_answers_selected", user_answers)
                     st.rerun()
+
+
+def render_dropdown_options(prefix: str, units: list[str], answer_options: Dict[int, list[str]], question_id: int) -> None:
+    """Render dropdowns in columns and store selections in session state."""
+    state = State(prefix)
+    _ensure_selection_state_length(state, units)
+    cols = st.columns(len(units)) if units else []
+
+    for i, unit in enumerate(units):
+        with cols[i]:
+            options = answer_options.get(i, [])
+            if not options:
+                st.text_input(f"{unit}", key=f"{prefix}_dropdown_fallback_{i}_{question_id}")
+                continue
+
+            key = f"{prefix}_dropdown_{i}_{question_id}"
+            current = state.get("user_answers_selected")[i]
+            if current not in options:
+                current = None
+            selected = st.selectbox(
+                unit,
+                options=["Select..."] + options,
+                index=0 if current is None else options.index(current) + 1,
+                key=key,
+            )
+
+            user_answers = state.get("user_answers_selected")
+            user_answers[i] = None if selected == "Select..." else selected
+            state.set("user_answers_selected", user_answers)
 
 
 def render_hints(hints: list[str]) -> None:

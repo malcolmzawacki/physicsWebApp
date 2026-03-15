@@ -36,6 +36,10 @@ Interactive Streamlit workspace for generating and practicing physics (and chemi
   ```bash
   python tools/validate_payloads.py
   ```
+- **Correctness guardrail** - run prompt/answer and `solve_for` consistency checks:
+  ```bash
+  python tools/check_prompt_answer_consistency.py
+  ```
 - **Static checks** - the project currently relies on manual review; add `pydocstyle`, `flake8`, or similar as needed for your workflow.
 
 ## Contributing Notes

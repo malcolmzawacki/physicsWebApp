@@ -48,4 +48,4 @@ class RelativeMotionGenerator(BaseGenerator):
             """
         
 
-        return {"question": question, "answers": answer, "unit": unit}
+        return {"question": question, "answers": answer, "units": unit}

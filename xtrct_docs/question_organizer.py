@@ -118,7 +118,7 @@ class Org:
                     ]+[
                         self.IncG.frictionless_incline(solve_for="accel") for _ in range(5)
                     ]+[
-                        self.IncG.kinetic_friction_incline(solve_for="angle") for _ in range(5)
+                        self.IncG.kinetic_friction_incline(solve_for="coeff") for _ in range(5)
                     ]+[
                         self.IncG.kinetic_friction_incline(solve_for="accel") for _ in range(5)
                     ]+[

@@ -176,7 +176,7 @@ class AtwoodGenerator(BaseGenerator):
           unit = [f"{noun2} mass (kg)"]
        else: # acceleration
           question = random.choice([q_template_m1_Ft, q_template_m2_Ft, q_template_m1_m2])
-          question = question + f" What is the mass of the {noun1}?"
+          question = question + " What is the acceleration of the system?"
           answer = [accel]
           unit = ["acceleration (m/s2)"]
        return {"question": question, "answers": answer, "units": unit, "diagram_data": diagram_data}

@@ -7,7 +7,7 @@ import streamlit as st
 from config import AUTHOR_MODE
 from utils.word_lists import random_correct_message, random_error_message
 from utils.ui_state import State
-from utils.ui_components import (render_header, build_performance_table, performance_expander, draw_answer_inputs, render_button_options, render_hints, init_performance, record_performance, show_equations_expander)
+from utils.ui_components import (render_header, build_performance_table, performance_expander, draw_answer_inputs, render_button_options, render_dropdown_options, render_hints, init_performance, record_performance, show_equations_expander)
 from utils.problem_payload import payload_from_dict, ProblemPayload, ProblemPayloadError
 
 
@@ -137,7 +137,7 @@ class Interface:
     def get_current_problem_features(self) -> dict:
         """Collect optional features saved in session state for the current question."""
         features = {}
-        for feature in ["diagram_data", "hints", "button_options", "time_limit", "explanation", "tags", "show_equations"]:
+        for feature in ["diagram_data", "hints", "button_options", "time_limit", "explanation", "tags", "show_equations", "answer_input_mode"]:
             val = self.state.get(feature)
             if val is not None:
                 features[feature] = val
@@ -184,7 +184,7 @@ class Interface:
         self.state.set("units", payload.units)
         self.state.set("submitted", False)
 
-        for feature in ["diagram_data", "hints", "button_options", "timer", "explanation", "tags", "show_equations"]:
+        for feature in ["diagram_data", "hints", "button_options", "timer", "explanation", "tags", "show_equations", "answer_input_mode"]:
             if feature in result:
                 self.state.set(feature, result[feature])
             else:
@@ -317,6 +317,7 @@ class Interface:
         st.write(self.state.get("current_question"))
         correct_answers = self.state.get("correct_answers", [])
         units = self.state.get("units", [])
+        answer_input_mode = self.state.get("answer_input_mode")
         options = self.state.get("button_options")
         if options is None:
             options = self.state.get("answer_options")
@@ -332,18 +333,28 @@ class Interface:
                         answer_options[i] = []
             self.state.set("answer_options", answer_options)
             options = answer_options
-        render_button_options(
-            self.prefix,
-            units,
-            options,
-            self.state.get("question_id", 0),
-        )
+        if answer_input_mode == "dropdown":
+            render_dropdown_options(
+                self.prefix,
+                units,
+                options,
+                self.state.get("question_id", 0),
+            )
+        else:
+            render_button_options(
+                self.prefix,
+                units,
+                options,
+                self.state.get("question_id", 0),
+            )
         if st.button(
             "Submit Answers", key=f"{self.prefix}_submit_button_{self.state.get('question_id', 0)}"
         ):
             user_answers = self.state.get("user_answers_selected", [])
             if None in user_answers:
                 st.error("Please answer all questions before submitting.")
+            elif answer_input_mode == "dropdown" and len(set(user_answers)) != len(user_answers):
+                st.error("Each option can be used only once in the ranking.")
             else:
                 self.check_button_answers(user_answers)
 

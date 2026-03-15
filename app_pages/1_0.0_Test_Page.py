@@ -380,7 +380,7 @@ def planner_tab():
                 max_rounds=max_rounds,
             )
             success = True if cash >= (bankroll + target_profit) else False
-            some_success = True if cash > bankroll else False
+            some_success = True if bankroll < cash < (bankroll + target_profit) else False
             break_even = True if cash == bankroll else False
             loss = True if (0 < cash) and (cash < bankroll) else False
             total_loss = True if cash == 0 else False
@@ -401,7 +401,6 @@ def planner_tab():
         se = np.std(net_profit_list, ddof=1) / np.sqrt(len(net_profit_list))
         success_rate = successes / samples
         some_success_rate = some_successes / samples
-        some_success_rate -= some_success_rate
         break_even_rate = break_evens / samples
         loss_rate = losses / samples
         total_loss_rate = total_losses / samples

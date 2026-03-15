@@ -70,6 +70,10 @@ ACTIVITIES = {
             "handler": "file:app_pages/1_1.1.2_Rotational_Motion.py::rotational_kinematics",
             "min_level": "advanced",
         },
+        "Torque": {
+            "handler": "file:app_pages/1_1.1.3_Torque.py::torque_activity",
+            "min_level": "advanced",
+        },
     },
     "Dynamics": {
         "Newton's Second Law": {"handler": "file:app_pages/1_2.1_Forces.py::newtons_2nd", "min_level": "high"},

@@ -29,9 +29,21 @@ Generators live in `utils/generators/` and are responsible for returning randomi
 - Populate `button_options` when the answer set is finite (directions, qualitative states, etc.) to unlock the multiple-choice UI.
 - Set `show_equations` to `True` when a question requires the equations expander even if the user has not opted in.
 
+## Layout-Agnostic Case Pattern
+
+- Prefer generating a single canonical scenario/case first (physics values + context), then rendering it into one or more layouts.
+- Recommended split:
+  - `build_case(problem_type, difficulty)` -> produce canonical values once.
+  - `render_case(case, layout)` -> emit payload variants such as unknown-value, comparison (`More/Less/Same`), ranking, or prediction.
+- Keep `choose_problem_dict(problem_type, difficulty)` as the compatibility entrypoint and dispatch to layout renderers internally.
+- Store canonical case data in `extras` when useful so future layouts (docs/analytics/explanations) can reuse it without recomputation.
+
 ## Testing & Validation
 
 - Run `python tools/validate_payloads.py` after changes to confirm payload shape compliance across all difficulties and problem types.
+- Run `python tools/check_prompt_answer_consistency.py` to catch common correctness regressions in prompt wording, explicit `solve_for` paths, and document-question factories.
+- When adding a new generator or problem type, add at least one deterministic (seeded) regression case to `tools/check_prompt_answer_consistency.py` and ensure it runs at `Hard` difficulty.
+- Keep `stored_metadata()` in sync with `choose_problem_dict()`; `tools/validate_payloads.py` assumes every metadata key is callable for all documented difficulties.
 - Consider lightweight asserts within generators to guard against invalid random draws (e.g., division by zero, negative distances where not allowed).
 - When adding new generators, update validation scripts or tests so they are exercised automatically.
 
