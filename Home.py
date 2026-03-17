@@ -24,6 +24,7 @@ SECTIONS = (
     "Dynamics",
     "Momentum",
     "Energy",
+    "⚡Electricity⚡",
     "Waves",
     "Chemistry",
     "Labs",
@@ -82,6 +83,7 @@ ACTIVITIES = {
         "Atwood Machines": {"handler": "file:app_pages/1_2.1_Forces.py::atwood", "min_level": "advanced"},
         "Inclined Planes": {"handler": "file:app_pages/1_2.1_Forces.py::inclines", "min_level": "advanced"},
     },
+
     "Momentum": {
         "Momentum": {"handler": "file:app_pages/1_4.1_Momentum_and_Impulse.py::momentum", "min_level": "high"},
         "Impulse": {"handler": "file:app_pages/1_4.1_Momentum_and_Impulse.py::impulse", "min_level": "high"},
@@ -99,6 +101,22 @@ ACTIVITIES = {
             "min_level": "high",
         },
     },
+
+    "⚡Electricity⚡": {
+        "Charging by Friction": {
+            "handler": "file:app_pages/1_3.1_Static_Electricity.py::charging_by_friction_page",
+            "min_level": "high",
+        },
+        "Charging by Conduction": {
+            "handler": "file:app_pages/1_3.2_Static_Electricity_Conduction.py::charging_by_conduction_page",
+            "min_level": "high",
+        },
+        "Charging by Induction": {
+            "handler": "file:app_pages/1_3.3_Static_Electricity_Induction.py::charging_by_induction_page",
+            "min_level": "high",
+        },
+    },
+
     "Waves": {
         "Wave Properties": {"handler": "file:app_pages/1_7.1_Waves.py::wave_properties", "min_level": "high"},
         "Harmonics": {"handler": "file:app_pages/1_7.1_Waves.py::Harmonics", "min_level": "high"},
