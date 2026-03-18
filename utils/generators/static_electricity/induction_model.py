@@ -29,7 +29,7 @@ def build_induction_case(difficulty: str) -> dict:
     method = random.choice(("grounding", "separation"))
     inducer_sign = random.choice(("positive", "negative"))
     inducer_chunks = random.choice((4, 6, 8))
-    transfer_chunks = {"Easy": 2, "Medium": 3, "Hard": 4}.get(difficulty, 3)
+    transfer_chunks = inducer_chunks
 
     if method == "grounding":
         return _build_grounding_case(difficulty, inducer_sign, inducer_chunks, transfer_chunks)

@@ -19,6 +19,8 @@ from utils.generators.static_electricity import (
     sign_symbol,
 )
 
+AUTO_ADVANCE_DELAY_SECONDS = 2.2
+
 
 def _render_conduction_box(box_name: str, state_data: dict) -> None:
     sign = state_data["sign"]
@@ -100,10 +102,29 @@ def charging_by_conduction_page() -> None:
 
     case = state.get("case")
     question_number = state.get("question_number", 0)
+    result = state.get("last_result")
 
     st.subheader("Charging by Conduction")
     st.caption(f"Difficulty: {difficulty}")
     _render_conduction_diagram("Before Contact", case["before_states"])
+    if state.get("submitted") and result and result["is_correct"]:
+        _render_conduction_diagram("After Contact", case["after_states"])
+        st.info(case["explanation"])
+        if difficulty == "Easy":
+            st.caption(
+                f"Correct response: Box A = {result['expected_sign']}, Box B = {result['expected_sign']}."
+            )
+        elif difficulty == "Medium":
+            st.caption(
+                f"Correct response: Box A = {result['expected_sign']}, Box B = {result['expected_sign']}, "
+                f"mechanism = {result['expected_mechanism']}."
+            )
+        else:
+            st.caption(
+                f"Correct response: Box A = {result['expected_sign']} with {result['expected_amount']}, "
+                f"Box B = {result['expected_sign']} with {result['expected_amount']}, "
+                f"mechanism = {result['expected_mechanism']}."
+            )
 
     st.markdown("#### Predict the Outcome")
     if difficulty == "Easy":
@@ -189,7 +210,7 @@ def charging_by_conduction_page() -> None:
                 key=state.key(f"amount_b_{question_number}"),
             )
 
-    score_col, action_col, check_col = st.columns((2, 1, 1))
+    score_col, action_col, spacer_col, check_col = st.columns((2, 1, 3, 1.2))
     with score_col:
         attempts = state.get("attempt_count", 0)
         correct = state.get("correct_count", 0)
@@ -198,11 +219,16 @@ def charging_by_conduction_page() -> None:
         else:
             st.caption(f"Score: {correct}/{attempts}")
     with action_col:
-        if st.button("New Scenario", key=state.key("new_scenario")):
+        if st.button("New Scenario", key=state.key("new_scenario"), type="secondary", use_container_width=True):
             _reset_conduction_question(state, difficulty)
             st.rerun()
     with check_col:
-        check_clicked = st.button("Check Answer", key=state.key("check_answer"))
+        check_clicked = st.button(
+            "Check Answer",
+            key=state.key("check_answer"),
+            type="primary",
+            use_container_width=True,
+        )
 
     if check_clicked:
         expected_sign = sign_label(case["final_sign"])
@@ -235,34 +261,14 @@ def charging_by_conduction_page() -> None:
             },
         )
 
-    result = state.get("last_result")
     if state.get("submitted") and result:
         if result["is_correct"]:
             st.success("Correct.")
         else:
             st.error("Not quite.")
-
-        _render_conduction_diagram("After Contact", case["after_states"])
-        st.info(case["explanation"])
-        if difficulty == "Easy":
-            st.caption(
-                f"Correct response: Box A = {result['expected_sign']}, Box B = {result['expected_sign']}."
-            )
-        elif difficulty == "Medium":
-            st.caption(
-                f"Correct response: Box A = {result['expected_sign']}, Box B = {result['expected_sign']}, "
-                f"mechanism = {result['expected_mechanism']}."
-            )
-        else:
-            st.caption(
-                f"Correct response: Box A = {result['expected_sign']} with {result['expected_amount']}, "
-                f"Box B = {result['expected_sign']} with {result['expected_amount']}, "
-                f"mechanism = {result['expected_mechanism']}."
-            )
-
         if result["is_correct"]:
             st.caption("Loading the next conduction scenario...")
-            time.sleep(0.8)
+            time.sleep(AUTO_ADVANCE_DELAY_SECONDS)
             _reset_conduction_question(state, difficulty)
             st.rerun()
 

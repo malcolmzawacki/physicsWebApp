@@ -18,6 +18,8 @@ from utils.generators.static_electricity import (
     sign_symbol,
 )
 
+AUTO_ADVANCE_DELAY_SECONDS = 2.2
+
 
 def _render_induction_box(label: str, sign: str, chunks: int, note: str) -> None:
     charge_text = charge_count_label(sign, chunks)
@@ -127,11 +129,34 @@ def charging_by_induction_page() -> None:
 
     case = state.get("case")
     question_number = state.get("question_number", 0)
+    result = state.get("last_result")
 
     st.subheader("Charging by Induction")
     st.caption(case["title"])
     st.caption(f"Difficulty: {difficulty}")
     _render_induction_diagram("Before the Final Step", case, "before_states")
+    if state.get("submitted") and result and result["is_correct"]:
+        _render_induction_diagram("After the Process", case, "after_states")
+        st.info(case["explanation"])
+
+        if difficulty == "Easy":
+            answer_text = ", ".join(
+                f"{obj} = {result['expected_signs'][obj]}" for obj in case["asked_objects"]
+            )
+        elif difficulty == "Medium":
+            answer_text = ", ".join(
+                f"{obj} = {result['expected_signs'][obj]}" for obj in case["asked_objects"]
+            )
+            answer_text = f"{answer_text}, mechanism = {result['expected_mechanism']}"
+        else:
+            object_parts = []
+            for obj in case["asked_objects"]:
+                object_parts.append(
+                    f"{obj} = {result['expected_signs'][obj]} with {result['expected_amounts'][obj]}"
+                )
+            answer_text = ", ".join(object_parts)
+            answer_text = f"{answer_text}, mechanism = {result['expected_mechanism']}"
+        st.caption(f"Correct response: {answer_text}.")
 
     st.markdown("#### Predict the Outcome")
     if difficulty == "Easy":
@@ -172,7 +197,7 @@ def charging_by_induction_page() -> None:
                     key=state.key(f"amount_{obj}_{question_number}"),
                 )
 
-    score_col, action_col, check_col = st.columns((2, 1, 1))
+    score_col, action_col, spacer_col, check_col = st.columns((2, 1, 3, 1.2))
     with score_col:
         attempts = state.get("attempt_count", 0)
         correct = state.get("correct_count", 0)
@@ -181,11 +206,16 @@ def charging_by_induction_page() -> None:
         else:
             st.caption(f"Score: {correct}/{attempts}")
     with action_col:
-        if st.button("New Scenario", key=state.key("new_scenario")):
+        if st.button("New Scenario", key=state.key("new_scenario"), type="secondary", use_container_width=True):
             _reset_induction_question(state, difficulty)
             st.rerun()
     with check_col:
-        check_clicked = st.button("Check Answer", key=state.key("check_answer"))
+        check_clicked = st.button(
+            "Check Answer",
+            key=state.key("check_answer"),
+            type="primary",
+            use_container_width=True,
+        )
 
     if check_clicked:
         is_correct = True
@@ -216,38 +246,15 @@ def charging_by_induction_page() -> None:
             },
         )
 
-    result = state.get("last_result")
     if state.get("submitted") and result:
         if result["is_correct"]:
             st.success("Correct.")
         else:
             st.error("Not quite.")
 
-        _render_induction_diagram("After the Process", case, "after_states")
-        st.info(case["explanation"])
-
-        if difficulty == "Easy":
-            answer_text = ", ".join(
-                f"{obj} = {result['expected_signs'][obj]}" for obj in case["asked_objects"]
-            )
-        elif difficulty == "Medium":
-            answer_text = ", ".join(
-                f"{obj} = {result['expected_signs'][obj]}" for obj in case["asked_objects"]
-            )
-            answer_text = f"{answer_text}, mechanism = {result['expected_mechanism']}"
-        else:
-            object_parts = []
-            for obj in case["asked_objects"]:
-                object_parts.append(
-                    f"{obj} = {result['expected_signs'][obj]} with {result['expected_amounts'][obj]}"
-                )
-            answer_text = ", ".join(object_parts)
-            answer_text = f"{answer_text}, mechanism = {result['expected_mechanism']}"
-        st.caption(f"Correct response: {answer_text}.")
-
         if result["is_correct"]:
             st.caption("Loading the next induction scenario...")
-            time.sleep(0.8)
+            time.sleep(AUTO_ADVANCE_DELAY_SECONDS)
             _reset_induction_question(state, difficulty)
             st.rerun()
 

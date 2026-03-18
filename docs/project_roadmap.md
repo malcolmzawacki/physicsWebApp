@@ -25,6 +25,8 @@ _Last updated: 2026-02-17_
 - **Dependency Baseline Fixes**: Update `requirements.txt` to include runtime packages used by UI/dataframe/doc export modules (e.g., pandas, python-docx) and verify clean-environment startup.
 - **Payload Contract Audit**: Enforce strict payload-key consistency (`units`/feature keys), fix unfinished generators that violate the contract, and add smoke checks for contract regressions.
 - **UI Runtime Responsiveness**: Replace blocking sleep-based auto-advance loops with rerun-safe timing/state patterns and normalize timer/time-limit handling.
+- **Shared Submission Flow Redesign**: Refactor `utils/ui.py` answer submission so custom feedback/stars can coexist with retryable attempts and an explicit `Show Answer` path instead of immediate forced reveal on first miss.
+- **Nested Activity Lazy Loading**: Standardize selector-driven nested activities (radio/selectbox plus per-mode lazy imports) as the replacement for eager `st.tabs` rendering so multi-mode pages load only the selected activity with one click.
 - **Graph & Image Quality**: Carry the print-friendly theming back into Streamlit views and add regression checks for mixed graph/standard sections.
 - **Encoding & Content Cleanup**: Remove garbled Unicode artifacts, standardize symbol formatting strategy (Unicode vs LaTeX), and correct chemistry data inconsistencies.
 - **Rotational Dynamics Extension**: Plan torque and moment of inertia extensions for the rotational unit (new page sections and generator updates).
