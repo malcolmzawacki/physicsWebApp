@@ -103,17 +103,35 @@ ACTIVITIES = {
     },
 
     "⚡Electricity⚡": {
-        "Charging by Friction": {
-            "handler": "file:app_pages/1_3.1_Static_Electricity.py::charging_by_friction_page",
+        "Static Electricity": {
             "min_level": "high",
+            "items": {
+                "Charging by Friction": {
+                    "handler": "file:app_pages/1_3.1_Static_Electricity.py::charging_by_friction_page",
+                    "min_level": "high",
+                },
+                "Charging by Conduction": {
+                    "handler": "file:app_pages/1_3.2_Static_Electricity_Conduction.py::charging_by_conduction_page",
+                    "min_level": "high",
+                },
+                "Charging by Induction": {
+                    "handler": "file:app_pages/1_3.3_Static_Electricity_Induction.py::charging_by_induction_page",
+                    "min_level": "high",
+                },
+            },
         },
-        "Charging by Conduction": {
-            "handler": "file:app_pages/1_3.2_Static_Electricity_Conduction.py::charging_by_conduction_page",
+        "Current Electricity": {
             "min_level": "high",
-        },
-        "Charging by Induction": {
-            "handler": "file:app_pages/1_3.3_Static_Electricity_Induction.py::charging_by_induction_page",
-            "min_level": "high",
+            "items": {
+                "Circuit Ohm's Law": {
+                    "handler": "file:app_pages/1_3.4_Current_Electricity_Circuits.py::current_electricity_circuits_page",
+                    "min_level": "high",
+                },
+                "Series and Parallel Circuits": {
+                    "handler": "file:app_pages/1_3.5_Current_Electricity_Series_Parallel.py::current_electricity_series_parallel_page",
+                    "min_level": "high",
+                },
+            },
         },
     },
 
@@ -150,10 +168,18 @@ if "router_section" not in st.session_state:
     st.session_state.router_section = "root"
 if "router_activity" not in st.session_state:
     st.session_state.router_activity = None
+if "router_group" not in st.session_state:
+    st.session_state.router_group = None
 
 
 def set_section(section: str) -> None:
     st.session_state.router_section = section
+    st.session_state.router_group = None
+    st.session_state.router_activity = None
+
+
+def set_group(group: str | None) -> None:
+    st.session_state.router_group = group
     st.session_state.router_activity = None
 
 
@@ -165,9 +191,35 @@ def level_rank(level_key: str) -> int:
     return COURSE_LEVEL_RANKS.get(level_key, 1)
 
 
+def entry_is_group(entry_meta: dict) -> bool:
+    return isinstance(entry_meta, dict) and isinstance(entry_meta.get("items"), dict)
+
+
 def activity_visible(activity_meta: dict, current_level: str) -> bool:
     min_level = activity_meta.get("min_level", "high")
-    return level_rank(current_level) >= level_rank(min_level)
+    if level_rank(current_level) < level_rank(min_level):
+        return False
+    if entry_is_group(activity_meta):
+        return any(activity_visible(child_meta, current_level) for child_meta in activity_meta["items"].values())
+    return True
+
+
+def get_visible_entry_names(entries: dict, current_level: str) -> list[str]:
+    return [
+        name
+        for name, meta in entries.items()
+        if activity_visible(meta, current_level)
+    ]
+
+
+def get_current_entries(section: str, group: str | None = None) -> dict:
+    activities = ACTIVITIES.get(section, {})
+    if group is None:
+        return activities
+    group_meta = activities.get(group, {})
+    if not entry_is_group(group_meta):
+        return {}
+    return group_meta["items"]
 
 
 def _resolve_attr(obj, path: str):
@@ -205,16 +257,24 @@ def resolve_handler(handler: str):
 
 def validate_activity_handlers() -> list[str]:
     errors = []
-    for section, activities in ACTIVITIES.items():
-        for name, meta in activities.items():
+
+    def walk(entries: dict, trail: list[str]) -> None:
+        for name, meta in entries.items():
+            path = trail + [name]
+            if entry_is_group(meta):
+                walk(meta["items"], path)
+                continue
             handler = meta.get("handler")
             if not handler:
-                errors.append(f"{section} / {name}: missing handler")
+                errors.append(f"{' / '.join(path)}: missing handler")
                 continue
             try:
                 resolve_handler(handler)
             except Exception as exc:
-                errors.append(f"{section} / {name}: {handler} -> {exc}")
+                errors.append(f"{' / '.join(path)}: {handler} -> {exc}")
+
+    for section, activities in ACTIVITIES.items():
+        walk(activities, [section])
     return errors
 
 
@@ -240,23 +300,33 @@ with st.sidebar:
                 st.rerun()
     else:
         st.subheader(st.session_state.router_section)
-        if st.button("Back to Main", use_container_width=True):
-            set_section("root")
-            st.rerun()
-
         section = st.session_state.router_section
-        activities = ACTIVITIES.get(section, {})
-        visible = [
-            name
-            for name, meta in activities.items()
-            if activity_visible(meta, level_key)
-        ]
+        group = st.session_state.router_group
+
+        if group is None:
+            if st.button("Back to Main", use_container_width=True):
+                set_section("root")
+                st.rerun()
+        else:
+            st.caption(group)
+            if st.button("Back to Section", use_container_width=True):
+                set_group(None)
+                st.rerun()
+
+        entries = get_current_entries(section, group)
+        visible = get_visible_entry_names(entries, level_key)
         if not visible:
             st.caption("No activities available for this level yet.")
-        for activity in visible:
-            if st.button(activity, use_container_width=True):
-                set_activity(activity)
-                st.rerun()
+        for entry_name in visible:
+            entry_meta = entries[entry_name]
+            if entry_is_group(entry_meta):
+                if st.button(entry_name, use_container_width=True):
+                    set_group(entry_name)
+                    st.rerun()
+            else:
+                if st.button(entry_name, use_container_width=True):
+                    set_activity(entry_name)
+                    st.rerun()
 
 if AUTHOR_MODE:
     handler_errors = validate_activity_handlers()
@@ -266,6 +336,7 @@ if AUTHOR_MODE:
             st.sidebar.write(f"- {error}")
 
 section = st.session_state.router_section
+group = st.session_state.router_group
 activity = st.session_state.router_activity
 
 if section == "root":
@@ -276,24 +347,25 @@ if section == "root":
     )
 else:
     st.title(section)
-    activities = ACTIVITIES.get(section, {})
-    visible = [
-        name
-        for name, meta in activities.items()
-        if activity_visible(meta, level_key)
-    ]
+    if group is not None:
+        st.subheader(group)
+    entries = get_current_entries(section, group)
+    visible = get_visible_entry_names(entries, level_key)
     if activity is None:
         if not visible:
             st.info("No activities available here for this level yet.")
         else:
-            st.write("Select an activity from the sidebar.")
+            if any(entry_is_group(entries[name]) for name in visible):
+                st.write("Select a subpage from the sidebar.")
+            else:
+                st.write("Select an activity from the sidebar.")
     else:
-        if activity not in activities:
+        if activity not in entries:
             st.warning("That activity is not available here.")
-        elif not activity_visible(activities[activity], level_key):
+        elif not activity_visible(entries[activity], level_key):
             st.info("That activity is not available at this course level.")
         else:
-            handler = activities[activity].get("handler")
+            handler = entries[activity].get("handler")
             if not handler:
                 st.error("Activity handler is missing.")
             else:

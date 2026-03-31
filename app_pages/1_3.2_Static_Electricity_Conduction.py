@@ -19,7 +19,7 @@ from utils.generators.static_electricity import (
     sign_symbol,
 )
 
-AUTO_ADVANCE_DELAY_SECONDS = 2.2
+AUTO_ADVANCE_DELAY_SECONDS = 5
 
 
 def _render_conduction_box(box_name: str, state_data: dict) -> None:
@@ -260,6 +260,7 @@ def charging_by_conduction_page() -> None:
                 "expected_amount": case["final_chunks"],
             },
         )
+        st.rerun()
 
     if state.get("submitted") and result:
         if result["is_correct"]:

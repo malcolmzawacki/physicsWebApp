@@ -245,6 +245,7 @@ def charging_by_induction_page() -> None:
                 "expected_amounts": case["expected_amounts"],
             },
         )
+        st.rerun()
 
     if state.get("submitted") and result:
         if result["is_correct"]:
