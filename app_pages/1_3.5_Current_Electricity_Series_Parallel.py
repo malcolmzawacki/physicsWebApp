@@ -63,17 +63,17 @@ def _render_parallel_schematic(drawing, elm, diagram: dict) -> None:
     if battery_cls is None:
         raise RuntimeError("schemdraw battery element was not available")
     battery = drawing.add(battery_cls().up().label(diagram["source_label"], loc="left"))
-    left_node = drawing.add(elm.Line().right().length(1.0))
+    left_node = drawing.add(elm.Line().right().length(1.2))
 
     drawing.push()
-    drawing.add(elm.Line().right().length(1.2))
-    drawing.add(elm.Resistor().down().label(diagram["resistor_labels"][0]))
+    drawing.add(elm.Line().right().length(1.4))
+    drawing.add(elm.Resistor().down().label(diagram["resistor_labels"][0], loc="right"))
     drawing.add(elm.Line().toy(battery.start))
     drawing.pop()
 
-    drawing.add(elm.Line().right().length(3.0))
+    drawing.add(elm.Line().right().length(3.6))
     drawing.push()
-    drawing.add(elm.Resistor().down().label(diagram["resistor_labels"][1]))
+    drawing.add(elm.Resistor().down().label(diagram["resistor_labels"][1], loc="left"))
     drawing.add(elm.Line().toy(battery.start))
     drawing.pop()
 
