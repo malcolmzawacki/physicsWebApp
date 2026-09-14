@@ -44,6 +44,10 @@ ACTIVITIES = {
         },
     },
     "Kinematics": {
+        "Relative Motion": {
+            "handler": "file:app_pages/1_1.1.4_Relative_Motion.py::relative_motion",
+            "min_level": "advanced",
+        },
         "Distance & Displacement": {
             "handler": "file:app_pages/1_1.1.0_Vectors_and_Displacement.py::dist_disp.distance_displacement",
             "min_level": "high",

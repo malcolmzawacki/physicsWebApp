@@ -9,9 +9,11 @@ from utils.ui_components import (
     init_performance,
     performance_expander,
     record_performance,
+    show_equations_expander,
 )
 from utils.ui_state import State
 from utils.generators.current_electricity import (
+    SERIES_PARALLEL_EQUATION_METADATA,
     SERIES_PARALLEL_PROBLEM_TYPES,
     build_series_parallel_case,
     format_answer_value,
@@ -25,8 +27,6 @@ def _render_givens(case: dict) -> None:
     st.markdown("#### Givens")
     for label, value in case["givens"]:
         st.markdown(f"- **{label}:** `{value}`")
-    for equation in case.get("equations", ()):
-        st.markdown(equation)
 
 
 def _render_fallback_text(case: dict) -> None:
@@ -140,6 +140,7 @@ def current_electricity_series_parallel_page() -> None:
     state = State("current_electricity_series_parallel")
     state.ensure("problem_type", SERIES_PARALLEL_PROBLEM_TYPES[0])
     state.ensure("difficulty", "Easy")
+    state.ensure("level", False)
     state.ensure("correct_count", 0)
     state.ensure("attempt_count", 0)
     state.ensure("question_number", 0)
@@ -150,7 +151,7 @@ def current_electricity_series_parallel_page() -> None:
         lambda: init_performance(list(SERIES_PARALLEL_PROBLEM_TYPES), list(DIFFICULTIES)),
     )
 
-    top_col1, top_col2 = st.columns((2, 1), gap="large")
+    top_col1, top_col2, top_col3 = st.columns((2, 1, 1), gap="large")
     with top_col1:
         problem_type = st.radio(
             "Mode",
@@ -167,11 +168,18 @@ def current_electricity_series_parallel_page() -> None:
             index=DIFFICULTIES.index(state.get("difficulty", "Easy")),
             key=state.key("difficulty_select"),
         )
+    with top_col3:
+        more_equations = st.checkbox(
+            "More Equations",
+            value=state.get("level", False),
+            key=state.key("equation_level"),
+        )
 
     previous_type = state.get("problem_type")
     previous_difficulty = state.get("difficulty")
     state.set("problem_type", problem_type)
     state.set("difficulty", difficulty)
+    state.set("level", more_equations)
 
     if not state.has("case"):
         _reset_question(state, problem_type, difficulty)
@@ -187,6 +195,13 @@ def current_electricity_series_parallel_page() -> None:
     diagram_col, content_col = st.columns((2, 3), gap="large")
     with diagram_col:
         _render_diagram_panel(case)
+        show_equations_expander(
+            generator=object(),
+            problem_type=case["problem_type"],
+            level=state.get("level", False),
+            fallback_dict=SERIES_PARALLEL_EQUATION_METADATA,
+            expanded=True,
+        )
 
     with content_col:
         st.subheader(case["problem_type"])

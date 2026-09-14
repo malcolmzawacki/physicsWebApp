@@ -1,6 +1,5 @@
 """Streamlit interface helpers that connect problem generators to the UI layer."""
 
-import time
 import pandas as pd
 import streamlit as st
 
@@ -421,23 +420,15 @@ class Interface:
         return problem_type_bonus * difficulty_bonus
 
     def loading_q_dict(self, timer: float = 3) -> None:
-        """Display a progress bar before auto-generating the next question unless canceled."""
+        """Adapt the reusable countdown to Interface's standard generation flow."""
+        from utils.activity_flow import next_question_countdown
+
         problem_type = self.state.get("problem_type")
         difficulty = self.state.get("difficulty")
-        i = 0
-        loading_text = "Next Question"
-        timer *= 100
-        col1, col2 = st.columns([5, 2])
-        with col1:
-            loading_question = st.progress(0, loading_text)
-        with col2:
-            pause = st.checkbox("Cancel Next Question")
-        while i < timer and not pause:
-            time.sleep(0.01)
-            loading_question.progress((i + 1) / timer, loading_text)
-            i += 1
-        if i == timer and not pause:
-            self.generate_question_once(problem_type, difficulty)
+        next_question_countdown(
+            self.state, self.state.get("question_id", 0),
+            lambda: self.generate_question_once(problem_type, difficulty), seconds=timer,
+        )
 
     def debug_panel(self) -> None:
         """In author mode, summarize the payload and metadata for quick inspection."""

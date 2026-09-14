@@ -5,6 +5,15 @@ _Last updated: 2026-02-17_
 ## Purpose
 This file is the fastest onboarding reference for new contributors/agents. Read this first before scanning broader docs.
 
+## Cross-layout Compatibility (2026-09-11)
+
+Before reusing a feature in a different page layout, read
+[Compatibility limits](compatibility_limits.md) and [Activity flow](activity_flow.md).
+These source-verified notes cover unresolved metadata/payload differences,
+grading and mixed-input constraints, the separate diagram-matching lifecycle,
+generator options, and gaps in automated interaction coverage. They supplement
+the older status notes below; they do not claim those gaps have been fixed.
+
 ## Current Priorities
 1. **Validation Pipeline Repair**: keep `tools/validate_payloads.py` aligned with active generator metadata as modules evolve.
 2. **Payload Contract Audit**: enforce consistent payload keys/shape across all generators, including less-used code paths.

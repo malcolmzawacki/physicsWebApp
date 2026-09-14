@@ -84,4 +84,5 @@ For unusual layouts (e.g., matching activities), the interface helpers can be mi
 - `utils/ui_state.py` - namespaced session-state wrapper.
 - `utils/problem_payload.py` - payload normalization and validation.
 - `docs/problem_payload.md` - companion schema documentation.
+- `docs/page_conventions.md` - cross-page UI rules that should survive custom layouts.
 - Legacy multipage lazy tabs are removed; keep imports inside activity functions for fast loads.

@@ -23,6 +23,33 @@ CIRCUIT_MODEL_NOTES = {
 }
 
 
+CIRCUIT_EQUATION_METADATA = {
+    "Single Resistor": {
+        "honors": r"V = IR",
+        "conceptual": r"V = IR \quad,\quad I = \frac{V}{R} \quad,\quad R = \frac{V}{I}",
+    },
+    "Series Current": {
+        "honors": r"R_{\text{total}} = R_1 + R_2 \quad,\quad I = \frac{V}{R_{\text{total}}}",
+        "conceptual": (
+            r"R_{\text{total}} = R_1 + R_2 \quad,\quad "
+            r"I = \frac{V}{R_{\text{total}}} \quad,\quad "
+            r"V = I R_{\text{total}} \quad,\quad "
+            r"R_{\text{total}} = \frac{V}{I}"
+        ),
+    },
+    "Voltage Drop": {
+        "honors": r"R_{\text{total}} = R_1 + R_2 \quad,\quad I = \frac{V_{\text{source}}}{R_{\text{total}}} \quad,\quad V_{\text{drop}} = IR",
+        "conceptual": (
+            r"R_{\text{total}} = R_1 + R_2 \quad,\quad "
+            r"I = \frac{V_{\text{source}}}{R_{\text{total}}} \quad,\quad "
+            r"V_{\text{drop}} = IR \quad,\quad "
+            r"R = \frac{V}{I} \quad,\quad "
+            r"I = \frac{V}{R}"
+        ),
+    },
+}
+
+
 def format_answer_value(value: float) -> str:
     if abs(value - round(value)) < 1e-9:
         return str(int(round(value)))

@@ -475,8 +475,58 @@ def check_for_singular_unit_key() -> FailureList:
     return failures
 
 
+def check_relative_motion() -> FailureList:
+    from utils.generators.kinematics.relative_motion_generator import RelativeMotionGenerator
+    gen = RelativeMotionGenerator()
+    failures = []
+    for kind in gen.TYPES:
+        for difficulty in gen.DIFFICULTIES:
+            for seed in range(20):
+                random.seed(seed)
+                case = gen.build_case(kind, difficulty)
+                for target in ["result"] + gen.eligible_unknowns(case):
+                    context = f"relative motion {kind}/{difficulty}/{seed}/{target}"
+                    try:
+                        payload = gen.render_case(case, target)
+                        _validate_payload_dict(payload, context)
+                        _assert_finite_answers(payload, context)
+                        links = case["links"]
+                        a = sum(x["velocity"] for x in links if x["coefficient"] == 1)
+                        b = sum(x["velocity"] for x in links if x["coefficient"] == -1)
+                        if target == "result":
+                            if case["kind"] == "meeting":
+                                t = payload["answers"][0]
+                                assert t > 0 and math.isclose(a * t, case["gap"] + b * t)
+                            elif case["kind"] == "separation":
+                                expected = abs(case["gap"] + b * case["time"] - a * case["time"])
+                                assert math.isclose(payload["answers"][0], expected)
+                                assert case["gap"] - (a - b) * case["time"] > 0
+                            else:
+                                assert payload["answers"] == [a - b]
+                            assert all(row["value"] is not None for row in payload["diagram_data"])
+                        else:
+                            relative = case["result"]
+                            if case["kind"] == "meeting":
+                                relative = case["gap"] / case["result"]
+                            elif case["kind"] == "separation":
+                                relative = (case["gap"] - case["result"]) / case["time"]
+                            known = sum(x["coefficient"] * x["velocity"] for i, x in enumerate(links) if i != target)
+                            expected = (relative - known) / links[target]["coefficient"]
+                            assert math.isclose(payload["answers"][0], expected)
+                            assert sum(row["value"] is None for row in payload["diagram_data"]) == 1
+                        if kind == "Combined" and difficulty != "Easy":
+                            water = [x for x in links if x["subject"] == "water"]
+                            assert len(water) == 2 and water[0]["velocity"] == water[1]["velocity"]
+                            assert sum(x["coefficient"] * (x["velocity"] + 9) for x in water) == 0
+                    except Exception as exc:
+                        _record_failure(failures, context, exc or "invalid relative motion case")
+    assert gen.example()["answers"] == [2]
+    return failures
+
+
 def main() -> int:
     checks = [
+        ("relative motion", check_relative_motion),
         ("explicit solve_for paths", check_explicit_solve_for_paths),
         ("seeded generator regressions", check_seeded_generator_regressions),
         ("edge-case seed sweeps", check_edge_case_seed_sweeps),

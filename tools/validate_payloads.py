@@ -58,6 +58,7 @@ from utils.generators.momentum_generators.collision_generator import CollisionGe
 from utils.generators.kinematics.motion_graph_generator import MotionGraphGenerator
 from utils.generators.kinematics.dist_disp_generator import DistDispGenerator
 from utils.generators.torque_generator import TorqueGenerator
+from utils.generators.kinematics.relative_motion_generator import RelativeMotionGenerator
 from utils.problem_payload import payload_from_dict
 
 
@@ -109,6 +110,7 @@ def main() -> int:
         MotionGraphGenerator(),
         DistDispGenerator(),
         TorqueGenerator(),
+        RelativeMotionGenerator(),
     ]
     checks: Dict[str, Tuple[object, List[str]]] = {
         gen.__class__.__name__: (gen, list(gen.stored_metadata().keys()))

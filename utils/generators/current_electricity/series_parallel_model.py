@@ -20,6 +20,39 @@ SERIES_PARALLEL_MODEL_NOTES = {
 }
 
 
+SERIES_PARALLEL_EQUATION_METADATA = {
+    "Series Equivalent Resistance": {
+        "honors": r"R_{\text{eq}} = R_1 + R_2",
+        "conceptual": r"R_{\text{eq}} = R_1 + R_2 \quad,\quad R_1 = R_{\text{eq}} - R_2 \quad,\quad R_2 = R_{\text{eq}} - R_1",
+    },
+    "Series Total Current": {
+        "honors": r"R_{\text{total}} = R_1 + R_2 \quad,\quad I = \frac{V}{R_{\text{total}}}",
+        "conceptual": (
+            r"R_{\text{total}} = R_1 + R_2 \quad,\quad "
+            r"I = \frac{V}{R_{\text{total}}} \quad,\quad "
+            r"V = I R_{\text{total}} \quad,\quad "
+            r"R_{\text{total}} = \frac{V}{I}"
+        ),
+    },
+    "Parallel Equivalent Resistance": {
+        "honors": r"\frac{1}{R_{\text{eq}}} = \frac{1}{R_1} + \frac{1}{R_2}",
+        "conceptual": (
+            r"\frac{1}{R_{\text{eq}}} = \frac{1}{R_1} + \frac{1}{R_2} \quad,\quad "
+            r"R_{\text{eq}} = \frac{R_1 R_2}{R_1 + R_2}"
+        ),
+    },
+    "Parallel Branch Current": {
+        "honors": r"V_{\text{branch}} = V_{\text{source}} \quad,\quad I = \frac{V}{R}",
+        "conceptual": (
+            r"V_{\text{branch}} = V_{\text{source}} \quad,\quad "
+            r"I = \frac{V}{R} \quad,\quad "
+            r"V = IR \quad,\quad "
+            r"R = \frac{V}{I}"
+        ),
+    },
+}
+
+
 def _series_pairs(difficulty: str) -> tuple[tuple[float, float], ...]:
     if difficulty == "Easy":
         return ((2, 4), (3, 5), (4, 6), (5, 7), (6, 8))
