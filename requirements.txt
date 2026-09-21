@@ -3,3 +3,6 @@ matplotlib
 numpy
 sympy
 schemdraw
+python-docx
+markdown-it-py>=3,<5
+latex2mathml>=3.77,<4

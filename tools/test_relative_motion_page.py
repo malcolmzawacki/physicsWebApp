@@ -6,6 +6,8 @@ from streamlit.testing.v1 import AppTest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from utils.word_lists import correct_messages, error_messages
+from utils.solve_for import target_options
+from utils.generators.kinematics.relative_motion_generator import RelativeMotionGenerator
 
 
 def main():
@@ -20,13 +22,14 @@ def main():
         at.selectbox(key="relative_motion_type_select").select(kind).run()
         for difficulty in ("Easy", "Medium", "Hard"):
             at.selectbox(key="relative_motion_difficulty_select").select(difficulty).run()
-            for target in ("Result", "Missing velocity", "Mixed practice"):
+            for target in ["mixed", *[o["id"] for o in target_options(RelativeMotionGenerator(), kind, difficulty)]]:
                 at.selectbox(key="relative_motion_target_select").select(target).run()
                 assert not at.exception
                 assert at.session_state["relative_motion_payload"]["question"]
     at.checkbox(key="relative_motion_more_equations").check().run()
     assert "begin{gathered}" in at.latex[0].value
-    at.selectbox(key="relative_motion_target_select").select("Missing velocity").run()
+    selected_target = target_options(RelativeMotionGenerator(), "Combined", "Hard")[1]["id"]
+    at.selectbox(key="relative_motion_target_select").select(selected_target).run()
     question_id = at.session_state["relative_motion_question_id"]
     at.text_input[0].set_value("nan")
     next(b for b in at.button if b.label == "Submit").click().run()
@@ -46,7 +49,7 @@ def main():
     at.checkbox(key=f"relative_motion_cancel_next_{question_id}").uncheck().run()
     assert not at.session_state["relative_motion_submitted"]
     assert at.session_state["relative_motion_question_id"] > question_id
-    assert at.session_state["relative_motion_selection"] == ("Combined", "Hard", "Missing velocity")
+    assert at.session_state["relative_motion_selection"] == ("Combined", "Hard", selected_target)
     assert at.session_state["relative_motion_payload"]["extras"]["solve_for"] != "result"
     # A fresh correct submission advances by default, with no second click.
     question_id = at.session_state["relative_motion_question_id"]
@@ -66,7 +69,7 @@ def main():
     at.selectbox(key="nav_level").select("high").run()
     assert not at.text_input and "Relative Motion" not in [b.label for b in at.sidebar.button]
     assert not at.exception
-    print("Relative motion UI passed: 27 selections, feedback, auto-advance, cancellation, single scoring, and access gate.")
+    print("Relative motion UI passed: all declared targets, feedback, auto-advance, cancellation, single scoring, and access gate.")
 
 
 if __name__ == "__main__":

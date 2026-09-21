@@ -24,6 +24,8 @@ class WaveGenerator(BaseGenerator):
         """Return metadata mapping for this generator."""
         return {
             "Wave Properties": {
+                "id": "wave.wave-properties",
+                "aliases": ["Wave Properties"],
                 "honors": r"""v \;=\; \lambda f
                 \quad , \quad T \;=\; \frac{1}{f}""",
 
@@ -35,6 +37,8 @@ class WaveGenerator(BaseGenerator):
                 \quad , \quad f \;=\; \frac{1}{T}
                 """},
             "String Harmonics": {
+                "id": "wave.string-harmonics",
+                "aliases": ["String Harmonics"],
                 "honors": r"""v \;=\; \lambda f
                 \quad , \quad \lambda \;=\; \frac{2L}{m}
                 \quad , \quad m = 1, 2, 3 ...
@@ -54,6 +58,8 @@ class WaveGenerator(BaseGenerator):
                 \textrm{speed of sound }\approx 343 \frac{m}{s}
                 """},
             "Open Ended Column Harmonics": {
+                "id": "wave.open-ended-column-harmonics",
+                "aliases": ["Open Ended Column Harmonics"],
                 "honors": r"""v \;=\; \lambda f
                 \quad , \quad \lambda \;=\; \frac{2L}{m}
                 \quad , \quad m = 1, 2, 3 ...
@@ -73,6 +79,8 @@ class WaveGenerator(BaseGenerator):
                 \textrm{speed of sound }\approx 343 \frac{m}{s}
                 """},
             "Closed End Column Harmonics": {
+                "id": "wave.closed-end-column-harmonics",
+                "aliases": ["Closed End Column Harmonics"],
                 "honors": r"""v \;=\; \lambda f
                 \quad , \quad \lambda \;=\; \frac{4L}{m}
                 \quad , \quad m = 1, 3, 5 ...
@@ -92,6 +100,8 @@ class WaveGenerator(BaseGenerator):
                 \textrm{speed of sound }\approx 343 \frac{m}{s}
                 """},
             "deciBel Scale": {
+            "id": "wave.decibel-scale",
+            "aliases": ["deciBel Scale"],
             "honors": r"""\textrm{Multplying the intensity by 10 adds 10 on the deciBel scale}
             \newline ~ \newline
             \textrm{Intensity changes with the distance SQUARED, not just distance}""",
@@ -103,11 +113,11 @@ class WaveGenerator(BaseGenerator):
 
 
     
-    def properties_of_waves(self, difficulty):
+    def properties_of_waves(self, difficulty, *, variant=None):
         frequency = ri(2,100)
         wavelength = ri(2,100)
         speed = wavelength*frequency
-        q_type = ri(0,2)
+        q_type = ri(0,2) if variant is None else variant
         if q_type == 0:
             question = f"""A wave has a frequency of {frequency} Hz
             and a wavelength of {wavelength} meters. \n\n How fast is it moving?"""
@@ -128,7 +138,7 @@ class WaveGenerator(BaseGenerator):
     
         return {"question": question, "answers": [answer], "units": [unit]}
     
-    def string_harmonics(self,difficulty):
+    def string_harmonics(self,difficulty, *, variant=None):
         fundamental_frequency = ri(20,5000)
         velocity = 343
         wavelength = velocity / fundamental_frequency
@@ -136,7 +146,7 @@ class WaveGenerator(BaseGenerator):
         
         if difficulty == "Easy":
             # only working forwards
-            q_type = ri(0,3)
+            q_type = ri(0,3) if variant is None else variant
             if q_type == 0:
                 question = f"""What is the wavelength of the first harmonic of a {string_length:.3f} meter long string?"""
                 answer = [wavelength]
@@ -160,7 +170,7 @@ class WaveGenerator(BaseGenerator):
 
         elif difficulty == "Medium":
             # still forwards, multiple answers
-            q_type = ri(0,1)
+            q_type = ri(0,1) if variant is None else variant
             if q_type == 0:
                 question = f"""What are the wavelengths of the first three harmonics of a {string_length:.3f} meter long string?"""
                 answer = [wavelength, wavelength/2, wavelength/3]
@@ -175,7 +185,7 @@ class WaveGenerator(BaseGenerator):
         
         elif difficulty == "Hard":
             # lots of working backwards
-            q_type = ri(0,1)
+            q_type = ri(0,1) if variant is None else variant
             if q_type == 0:
                 question = f"""The third harmonic of a string is {3*fundamental_frequency:.3f} Hertz. 
                 What is the wavelength of the first harmonic? What is the length of the string?"""
@@ -186,11 +196,12 @@ class WaveGenerator(BaseGenerator):
                 What is the fundamental frequency? What is the length of the string?"""
                 answer = [fundamental_frequency, string_length]
                 unit = ["Fundamental Frequency (Hz)","String Length (meters)"]
+        question = "Assume a wave speed of 343 m/s. " + question
         return {"question": question, "answers": answer, "units": unit}
 
 
     
-    def open_column_harmonics(self,difficulty):
+    def open_column_harmonics(self,difficulty, *, variant=None):
         fundamental_frequency = ri(20,5000)
         velocity = 343
         wavelength = velocity / fundamental_frequency
@@ -198,7 +209,7 @@ class WaveGenerator(BaseGenerator):
         
         if difficulty == "Easy":
             # only working forwards
-            q_type = ri(0,3)
+            q_type = ri(0,3) if variant is None else variant
             if q_type == 0:
                 question = f"""What is the wavelength of the first harmonic of a {open_column_length:.3f} meter long open-ended column?"""
                 answer = [wavelength]
@@ -222,7 +233,7 @@ class WaveGenerator(BaseGenerator):
 
         elif difficulty == "Medium":
             # still forwards, multiple answers
-            q_type = ri(0,1)
+            q_type = ri(0,1) if variant is None else variant
             if q_type == 0:
                 question = f"""What are the wavelengths of the first three harmonics of a {open_column_length:.3f} meter long open-ended column?"""
                 answer = [wavelength, wavelength/2, wavelength/3]
@@ -237,7 +248,7 @@ class WaveGenerator(BaseGenerator):
         
         elif difficulty == "Hard":
             # lots of working backwards
-            q_type = ri(0,1)
+            q_type = ri(0,1) if variant is None else variant
             if q_type == 0:
                 question = f"""The third harmonic of an open-ended column is {3*fundamental_frequency:.3f} Hertz. 
                 What is the wavelength of the first harmonic? What is the length of the open-ended column?"""
@@ -248,12 +259,13 @@ class WaveGenerator(BaseGenerator):
                 What is the fundamental frequency? What is the length of the open-ended column?"""
                 answer = [fundamental_frequency, open_column_length]
                 unit = ["Fundamental Frequency (Hz)","Column Length (meters)"]
+        question = "Assume a wave speed of 343 m/s. " + question
         return {"question": question, "answers": answer, "units": unit}
 
 
 
     
-    def closed_column_harmonics(self,difficulty):
+    def closed_column_harmonics(self,difficulty, *, variant=None):
         fundamental_frequency = ri(20,5000)
         velocity = 343
         wavelength = velocity / fundamental_frequency
@@ -261,7 +273,7 @@ class WaveGenerator(BaseGenerator):
         
         if difficulty == "Easy":
             # only working forwards
-            q_type = ri(0,3)
+            q_type = ri(0,3) if variant is None else variant
             if q_type == 0:
                 question = f"""What is the wavelength of the first harmonic of a 
                 {closed_column_length:.3f} meter long closed-end column?"""
@@ -289,7 +301,7 @@ class WaveGenerator(BaseGenerator):
 
         elif difficulty == "Medium":
             # still forwards, multiple answers
-            q_type = ri(0,1)
+            q_type = ri(0,1) if variant is None else variant
             if q_type == 0:
                 question = f"""What are the wavelengths of the first three harmonics of a 
                 {closed_column_length:.3f} meter long closed-end column?"""
@@ -305,7 +317,7 @@ class WaveGenerator(BaseGenerator):
         
         elif difficulty == "Hard":
             # lots of working backwards
-            q_type = ri(0,1)
+            q_type = ri(0,1) if variant is None else variant
             if q_type == 0:
                 question = f"""The fifth harmonic of an closed-end column is {5*fundamental_frequency:.3f} Hertz. 
                 What is the wavelength of the first harmonic? What is the length of the closed-end column?"""
@@ -316,6 +328,7 @@ class WaveGenerator(BaseGenerator):
                 What is the fundamental frequency? What is the length of the closed-end column?"""
                 answer = [fundamental_frequency, closed_column_length]
                 unit = ["Fundamental Frequency (Hz)","Column Length (meters)"]
+        question = "Assume a wave speed of 343 m/s. " + question
         return {"question": question, "answers": answer, "units": unit}
         
     

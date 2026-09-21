@@ -24,4 +24,7 @@ Normalization rules:
 
 - Unknown top-level keys are placed under `extras` by the normalizer.
 - Missing required keys cause a validation error.
-
+- Normalization copies `extras` rather than mutating the caller's dictionary. Numeric answers must be real and finite.
+- Interface stores the normalized payload. Extension fields may be top-level or inside `extras`; canonical fields listed above remain top-level. See [the current compatibility and export contract](implementation_fixes_2026-09-14.md).
+- `unique_choices` is an explicit ranking constraint; dropdown inputs alone do not require unique answers.
+- `diagram_renderer` may supply a callable that converts raw `diagram_data` into a figure for both UI and export.

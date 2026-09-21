@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-import time
+from utils.grading import parse_number, answer_matches, CIRCUIT_POLICY
+from utils.solve_for import select_target, generate_selected, MIXED
+from utils.solve_for_custom import OhmsLawTargets
+from utils.activity_flow import next_question_countdown
 
 import streamlit as st
 
@@ -9,9 +12,10 @@ from utils.ui_components import (
     init_performance,
     performance_expander,
     record_performance,
-    show_equations_expander,
+    equation_controls,
 )
 from utils.ui_state import State
+from utils.layout_config import question_columns
 from utils.generators.current_electricity import (
     CIRCUIT_EQUATION_METADATA,
     PROBLEM_TYPES,
@@ -51,7 +55,7 @@ def _render_schematic(case: dict) -> None:
 
     diagram = case["diagram"]
     try:
-        with schemdraw.Drawing() as drawing:
+        with schemdraw.Drawing(show=False, color="black", bgcolor="white") as drawing:
             if hasattr(elm, "STYLE_IEEE") and hasattr(elm, "style"):
                 elm.style(elm.STYLE_IEEE)
             battery_cls = getattr(elm, "BatteryCell", getattr(elm, "Battery", None))
@@ -90,7 +94,8 @@ def _render_diagram_panel(case: dict) -> None:
 
 
 def _reset_question(state: State, problem_type: str, difficulty: str) -> None:
-    state.set("case", build_circuit_case(problem_type, difficulty))
+    payload = generate_selected(OhmsLawTargets(), problem_type, difficulty, state.get("solve_for", MIXED))
+    state.set("case", payload["extras"]["case"])
     state.inc("question_number")
     state.set("submitted", False)
     state.set("last_result", None)
@@ -102,8 +107,7 @@ def _render_performance(state: State) -> None:
 
 
 def _answer_is_correct(user_value: float, answer: float) -> bool:
-    tolerance = max(abs(answer) * 0.05, 0.05)
-    return abs(user_value - answer) <= tolerance
+    return answer_matches(user_value, answer, CIRCUIT_POLICY)
 
 
 def current_electricity_circuits_page() -> None:
@@ -122,40 +126,35 @@ def current_electricity_circuits_page() -> None:
     )
 
 
-    top_col1, top_col2, top_col3 = st.columns((2, 1, 1), gap="large")
+    top_col1, top_col2, top_col3 = question_columns()
     with top_col1:
-        problem_type = st.radio(
-            "Mode",
+        problem_type = st.selectbox(
+            "Problem Type",
             options=PROBLEM_TYPES,
-            horizontal=True,
             index=PROBLEM_TYPES.index(state.get("problem_type", PROBLEM_TYPES[0])),
             key=state.key("problem_type_select"),
         )
     with top_col2:
-        difficulty = st.radio(
+        difficulty = st.selectbox(
             "Difficulty",
             options=DIFFICULTIES,
-            horizontal=True,
             index=DIFFICULTIES.index(state.get("difficulty", "Easy")),
             key=state.key("difficulty_select"),
         )
-    with top_col3:
-        more_equations = st.checkbox(
-            "More Equations",
-            value=state.get("level", False),
-            key=state.key("equation_level"),
-        )
 
     previous_type = state.get("problem_type")
+    previous_target = state.get("solve_for", MIXED)
+    with top_col3:
+        target = select_target(OhmsLawTargets(), problem_type, difficulty, state)
+    state.set("solve_for", target)
     previous_difficulty = state.get("difficulty")
     state.set("problem_type", problem_type)
     state.set("difficulty", difficulty)
-    state.set("level", more_equations)
 
     if not state.has("case"):
         _reset_question(state, problem_type, difficulty)
         st.rerun()
-    elif previous_type != problem_type or previous_difficulty != difficulty:
+    elif previous_type != problem_type or previous_difficulty != difficulty or previous_target != target:
         _reset_question(state, problem_type, difficulty)
         st.rerun()
 
@@ -163,16 +162,11 @@ def current_electricity_circuits_page() -> None:
     question_number = state.get("question_number", 0)
     result = state.get("last_result")
 
+    equation_controls(object(), case["problem_type"], state,
+                      state.key("equation_level"), CIRCUIT_EQUATION_METADATA)
     diagram_col, content_col = st.columns((2, 3), gap="large")
     with diagram_col:
         _render_diagram_panel(case)
-        show_equations_expander(
-            generator=object(),
-            problem_type=case["problem_type"],
-            level=state.get("level", False),
-            fallback_dict=CIRCUIT_EQUATION_METADATA,
-            expanded=True,
-        )
 
     with content_col:
         st.subheader(case["problem_type"])
@@ -194,13 +188,14 @@ def current_electricity_circuits_page() -> None:
                 f"{case['answer_label']} ({case['unit']})",
                 key=state.key(f"answer_{question_number}"),
             )
-            check_clicked = st.form_submit_button("Check Answer", type="primary", use_container_width=True)
+            check_clicked = st.form_submit_button("Check Answer", type="primary", use_container_width=True,
+                disabled=state.get("submitted"))
 
-        if check_clicked:
+        if check_clicked and not state.get("submitted"):
             try:
-                user_value = float(answer_text.strip())
+                user_value = parse_number(answer_text)
             except ValueError:
-                st.error("Enter a numeric value before checking the answer.")
+                st.error("Enter a finite numeric value before checking the answer.")
             else:
                 is_correct = _answer_is_correct(user_value, case["answer"])
                 state.inc("attempt_count")
@@ -231,9 +226,9 @@ def current_electricity_circuits_page() -> None:
             st.info(case["explanation"])
             st.caption(f"Expected answer: {result['expected_answer']} {case['unit']}")
             if result["is_correct"]:
-                st.caption("Loading the next circuit...")
-                time.sleep(AUTO_ADVANCE_DELAY_SECONDS)
-                _reset_question(state, problem_type, difficulty)
-                st.rerun()
+                def advance():
+                    _reset_question(state, problem_type, difficulty)
+                    st.rerun()
+                next_question_countdown(state, question_number, advance, AUTO_ADVANCE_DELAY_SECONDS)
 
     _render_performance(state)

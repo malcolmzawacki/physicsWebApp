@@ -22,6 +22,8 @@ class InclineGenerator(BaseGenerator):
         """Return metadata mapping for this generator."""
         return {
             "Static Incline": {
+                "id": "incline.static-incline",
+                "aliases": ["Static Incline"],
                 "honors": r"""
                       \Sigma F \;=\; ma""",
 
@@ -34,6 +36,8 @@ class InclineGenerator(BaseGenerator):
                       }"""
             },
             "Frictionless Incline": {
+                "id": "incline.frictionless-incline",
+                "aliases": ["Frictionless Incline"],
                 "honors": r"""
                       \Sigma F \;=\; ma""",
 
@@ -46,6 +50,8 @@ class InclineGenerator(BaseGenerator):
                       }"""
             },
             "Kinetic Friction Incline": {
+                "id": "incline.kinetic-friction-incline",
+                "aliases": ["Kinetic Friction Incline"],
                 "honors": r"""
                       \Sigma F \;=\; ma""",
 
@@ -86,13 +92,13 @@ class InclineGenerator(BaseGenerator):
         if solve_for == "angle":
             question = f"""A {mass} kg {noun} sits at rest on an inclined plane.
             The coefficient of static friction between the {noun} and the plane is {q_nums["static coeff"]:.4f}.
-            What is the angle of the inclined plane?"""
+            What is the maximum angle of the inclined plane that keeps the object at rest?"""
             answer = [q_nums["angle"]]
             unit = ["Angle (degrees)"]
         else:
             question = f"""A {mass} kg {noun} sits at rest on an inclined plane.
             The plane sits at an angle of {q_nums["angle"]} degrees.
-            What is the coefficient of static friction between the {noun} and the plane?"""
+            What is the minimum coefficient of static friction between the {noun} and the plane?"""
             answer = [q_nums["static coeff"]]
             unit = ["Coefficient of Static Friction"]
         return {"question": question, "answers": answer, "units": unit}

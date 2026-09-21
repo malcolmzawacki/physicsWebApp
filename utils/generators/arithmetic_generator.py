@@ -74,18 +74,26 @@ class ArithmeticGenerator(BaseGenerator):
         """Return metadata mapping for this generator."""
         return {
             "Addition": {
+                "id": "arithmetic.addition",
+                "aliases": ["Addition"],
                 "honors_equation": r"a + b = c",
                 "conceptual_equation": r"\textrm{Under Construction}",
             },
             "Subtraction": {
+                "id": "arithmetic.subtraction",
+                "aliases": ["Subtraction"],
                 "honors_equation": r"a - b = c",
                 "conceptual_equation": r"\textrm{Under Construction}",
             },
             "Multiplication": {
+                "id": "arithmetic.multiplication",
+                "aliases": ["Multiplication"],
                 "honors_equation": r"a \times b = c",
                 "conceptual_equation": r"\textrm{Under Construction}",
             },
             "Division": {
+                "id": "arithmetic.division",
+                "aliases": ["Division"],
                 "honors_equation": r"\frac{a}{b} = c",
                 "conceptual_equation": r"\textrm{Under Construction}",
             },

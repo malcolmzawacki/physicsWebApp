@@ -68,11 +68,15 @@ class CollisionGenerator(BaseGenerator):
         """Return metadata mapping for this generator."""
         return {
             "Inelastic Collision": {
+                "id": "collision.inelastic-collision",
+                "aliases": ["Inelastic Collision"],
                 "honors": r"p_1 + p_2 = p'",
                 "conceptual": r""" \frac{m_1v_1 + m_2v_2}{m_1+m_2}=v'
                 """
                 },
             "Elastic Collision": {
+                "id": "collision.elastic-collision",
+                "aliases": ["Elastic Collision"],
                 "honors": r"p_1 + p_2 = p_1' + p_2'",
                 "conceptual": r"""m_1v_1+m_2v_2 = m_1v_1' + m_2v_2'"""
                 },

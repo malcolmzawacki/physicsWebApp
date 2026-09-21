@@ -21,6 +21,8 @@ class DistDispGenerator(BaseGenerator):
         """Return metadata mapping for this generator."""
         return {
             "One Dimensional": {
+                  "id": "dist-disp.one-dimensional",
+                  "aliases": ["One Dimensional"],
                   "honors": r"""
                   \textrm{distance } =\; d_1 + d_2 + ... \newline ~ \newline
                   \textrm{displacement } =\; d_{final} - d_{initial} \; \textrm{(with direction)}
@@ -34,6 +36,8 @@ class DistDispGenerator(BaseGenerator):
                   \newline ~ \newline \textrm{displacement } =\; d_{final} - d_{initial} \; \textrm{(with direction)}
                   """},
           "Two Dimensional": {
+                  "id": "dist-disp.two-dimensional",
+                  "aliases": ["Two Dimensional"],
                   "honors": r"""
                   \textrm{distance } =\; d_1 + d_2 + ... \newline ~ \newline
               \textrm{displacement } =\; \sqrt{d_{horizontal}^2 + d_{vertical}^2} \;\; \textrm{(with direction)}

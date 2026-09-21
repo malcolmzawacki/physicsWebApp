@@ -3,6 +3,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 from typing import Any
+from xtrct_docs.payload_adapter import DocumentGenerator
 
 from utils.generators.kinematics.linear_motion_generator import LinearMotionGenerator
 from utils.generators.kinematics.const_motion_generator import ConstantMotionGenerator
@@ -14,14 +15,24 @@ from utils.generators.forces.incline_generator import InclineGenerator
 from utils.generators.forces.tension_generator import TensionGenerator
 
 class Org:
+    def solve_for_practice(self, generator, problem_type, difficulty="Medium", solve_for="mixed", count=5):
+        """Build a worksheet from the same explicit target catalog as the website."""
+        return DocumentGenerator(generator).section(
+            problem_type, problem_type, difficulty, solve_for, count=count)
+
     def __init__(self):
         self.AM = LinearMotionGenerator()
         self.CM = ConstantMotionGenerator()
-        self.DDG = DistDispGenerator()
+        self.DDG = DocumentGenerator(DistDispGenerator(), {
+            "distance_and_displacement_1D": "One Dimensional",
+            "distance_and_displacement_2D": "Two Dimensional"})
         self.PG = ProjectileGenerator()
         self.MGG = MotionGraphGenerator()
-        self.TG = TensionGenerator()
-        self.AWG = AtwoodGenerator()
+        self.TG = DocumentGenerator(TensionGenerator())
+        self.AWG = DocumentGenerator(AtwoodGenerator(), {
+            "static_half_atwood": "Static Friction Half Atwood",
+            "frictionless_half_atwood": "Frictionless Half Atwood",
+            "kinetic_half_atwood": "Kinetic Friction Half Atwood"})
         self.IncG = InclineGenerator()
 
 
@@ -121,8 +132,6 @@ class Org:
                         self.IncG.kinetic_friction_incline(solve_for="coeff") for _ in range(5)
                     ]+[
                         self.IncG.kinetic_friction_incline(solve_for="accel") for _ in range(5)
-                    ]+[
-                        self.IncG.kinetic_friction_incline(solve_for="coeff") for _ in range(5)
                     ],
                     "gap": 1
                 }
@@ -241,7 +250,7 @@ class Org:
                 "gap": 1
                 }
             ]
-        return question_generator()
+        return question_generator
 
 
     def constant_motion_quiz(self):

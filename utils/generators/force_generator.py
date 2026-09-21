@@ -22,13 +22,13 @@ class ForceGenerator(BaseGenerator):
         return m, a, netForce, mu, appliedForce
        
     
-    def generate_force_question(self, difficulty):
+    def generate_force_question(self, difficulty, *, variant=None):
         range = self.get_difficulty_range(difficulty)
         m, a, netForce, mu, appliedForce = self.numbers(range)
         object1 = random_noun()
         if difficulty == "Easy":
 
-            flip = random.randint(1,3)
+            flip = random.randint(1,3) if variant is None else variant
             if flip == 1: # find acceleration
                  question = f"""A net force of {netForce:.2f} Newtons accelerates a {m:.2f} kg {object1}.
                  What is the resulting acceleration?"""
@@ -46,7 +46,7 @@ class ForceGenerator(BaseGenerator):
                 unit = [f"{object1} mass (kg)"]
 
         else:
-            flip = random.randint(1,3)
+            flip = random.randint(1,3) if variant is None else variant
             if flip == 1: # find friction, mu
                 question = f"""A {appliedForce:.2f} Newton force accelerates a {m:.2f} kg {object1} at {a:.2f} m/s2.
                 What is the net force on {object1}? What is the coefficient of friction?"""
@@ -80,6 +80,8 @@ class ForceGenerator(BaseGenerator):
         """Return metadata mapping for this generator."""
         return {
             "Newton's Second Law": {
+                      "id": "force.newton-s-second-law",
+                      "aliases": ["Newton's Second Law"],
                       "honors": r"""
                       \Sigma F \;=\; ma""",
 

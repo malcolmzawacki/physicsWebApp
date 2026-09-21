@@ -10,7 +10,7 @@ class ThermalWithFrictionGenerator(BaseGenerator):
 
 
     # # # F R I C T I 0 N   A N D   D I S T A N C E   P R 0 B L E M S # # # 
-    def grav_to_kinetic_friction_distance_q(self, difficulty):
+    def grav_to_kinetic_friction_distance_q(self, difficulty, *, variant=None):
         
         mass, height, velocity, thermal = TLG.grav_to_kin_thermal_nums()
         distance = height + ri(int(height//2 + 1),int(2*height + 1))
@@ -18,7 +18,7 @@ class ThermalWithFrictionGenerator(BaseGenerator):
 
         noun = random_noun()
         if difficulty == "Easy":
-            flip = ri(0,2)
+            flip = ri(0,2) if variant is None else variant
             if flip == 0: 
                 question = f"""A {mass:.2f} kg {noun} is released from rest and 
                 slides down a {height:.2f} meter tall ramp.
@@ -54,7 +54,7 @@ class ThermalWithFrictionGenerator(BaseGenerator):
                 unit = [f"{unit1}", f"{unit2}"]
 
         else:
-            flip = ri(0,4)
+            flip = ri(0,4) if variant is None else variant
             if flip == 0: 
                 question = f"""A {mass:.2f} kg {noun} is released from rest and 
                 slides down a {height:.2f} meter tall ramp.
@@ -91,7 +91,7 @@ class ThermalWithFrictionGenerator(BaseGenerator):
                 unit = ["Force of Friction (Newtons)"]
         return {"question": question, "answers": answer, "units": unit}
         
-    def kinetic_to_grav_friction_distance_q(self, difficulty):
+    def kinetic_to_grav_friction_distance_q(self, difficulty, *, variant=None):
         
         mass, height, velocity, thermal = TLG.kin_to_grav_thermal_nums()
         distance = height + ri(int(height//2 + 1),int(2*height + 1))
@@ -99,7 +99,7 @@ class ThermalWithFrictionGenerator(BaseGenerator):
 
         noun = random_noun()
         if difficulty == "Easy":
-            flip = ri(0,2)
+            flip = ri(0,2) if variant is None else variant
             if flip == 0: 
                 question = f"""A {mass:.2f} kg {noun} height increases by {height:.2f} meters 
                 as it slides up a ramp before it comes to rest.
@@ -108,7 +108,7 @@ class ThermalWithFrictionGenerator(BaseGenerator):
                 answer1 = thermal
                 unit1 = "Thermal Energy (Joules)"
                 answer2 = velocity
-                unit2 = "Final Velocity (m/s)"
+                unit2 = "Initial Velocity (m/s)"
                 answer = [answer1, answer2]
                 unit = [f"{unit1}", f"{unit2}"]
             elif flip == 1:
@@ -134,14 +134,14 @@ class ThermalWithFrictionGenerator(BaseGenerator):
                 unit = [f"{unit1}", f"{unit2}"]
 
         else:
-            flip = ri(0,4)
+            flip = ri(0,4) if variant is None else variant
             if flip == 0: 
                 question = f"""A {mass:.2f} kg {noun} increases its height by {height:.2f} meters
                  by sliding up a ramp.
                 \n It experiences {friction:.2f} N of frictional force over the {distance:.2f} m ramp length. 
                 \n How fast was it moving initially?"""
                 answer = [velocity]
-                unit = ["Final Velocity (m/s)"]
+                unit = ["Initial Velocity (m/s)"]
             elif flip == 1:
                 question = f"""A {mass:.2f} kg {noun} initially moving at {velocity:.2f} m/s slides up a ramp. 
                 \n It reaches rest after it experiences {friction:.2f} N of frictional force 
@@ -172,14 +172,14 @@ class ThermalWithFrictionGenerator(BaseGenerator):
                 unit = ["Force of Friction (Newtons)"]
         return {"question": question, "answers": answer, "units": unit}
 
-    def grav_to_elastic_friction_distance_q(self, difficulty):
+    def grav_to_elastic_friction_distance_q(self, difficulty, *, variant=None):
         mass, height, spring_constant, compression, thermal = TLG.grav_to_elastic_thermal_nums()        
         distance = height + ri(int(height//2 + 1), int(2*height + 1))
         friction = thermal / distance
         
         noun = random_noun()
         if difficulty == "Easy":
-            flip = ri(0,3)
+            flip = ri(0,3) if variant is None else variant
             if flip == 0: 
                 question = f"""A {mass:.2f} kg {noun} is released from rest and 
                 slides down a {height:.2f} meter tall ramp.
@@ -228,7 +228,7 @@ class ThermalWithFrictionGenerator(BaseGenerator):
                 answer = [answer1, answer2]
                 unit = [f"{unit1}", f"{unit2}"]
         else:
-            flip = ri(0,5)
+            flip = ri(0,5) if variant is None else variant
             if flip == 0: 
                 question = f"""A {mass:.2f} kg {noun} is released from rest and 
                 slides down a {height:.2f} meter tall ramp.
@@ -277,14 +277,14 @@ class ThermalWithFrictionGenerator(BaseGenerator):
                 unit = ["Force of Friction (Newtons)"]
         return {"question": question, "answers": answer, "units": unit}
 
-    def elastic_to_grav_friction_distance_q(self, difficulty):
+    def elastic_to_grav_friction_distance_q(self, difficulty, *, variant=None):
         mass, height, spring_constant, compression, thermal = TLG.elastic_to_grav_thermal_nums()        
         distance = height + ri(int(height//2 + 1), int(2*height + 1))
         friction = thermal / distance
         
         noun = random_noun()
         if difficulty == "Easy":
-            flip = ri(0,3)
+            flip = ri(0,3) if variant is None else variant
             if flip == 0: 
                 question = f"""A spring of strength {spring_constant:.2f} N/m is compressed by 
                 {compression:.2f} meters and launches a {mass:.2f} kg {noun} up a ramp.
@@ -331,7 +331,7 @@ class ThermalWithFrictionGenerator(BaseGenerator):
                 unit = [f"{unit1}", f"{unit2}"]
 
         else:
-            flip = ri(0,5)
+            flip = ri(0,5) if variant is None else variant
             if flip == 0: 
                 question = f"""A spring of strength {spring_constant:.2f} N/m is compressed by {compression:.2f} meters 
                 and launches a {mass:.2f} kg {noun} up a ramp.
@@ -375,14 +375,14 @@ class ThermalWithFrictionGenerator(BaseGenerator):
                 unit = ["Force of Friction (Newtons)"]
         return {"question": question, "answers": answer, "units": unit}
 
-    def kinetic_to_elastic_friction_distance_q(self, difficulty):
+    def kinetic_to_elastic_friction_distance_q(self, difficulty, *, variant=None):
         mass, velocity, spring_constant, compression, thermal = TLG.kinetic_to_elastic_thermal_nums()
         distance = ri(int(velocity*2), int(velocity*4))  # Reasonable distance range
         friction = thermal / distance
         
         noun = random_noun()
         if difficulty == "Easy":
-            flip = ri(0,3)
+            flip = ri(0,3) if variant is None else variant
             if flip == 0: 
                 question = f"""A {mass:.2f} kg {noun} moving at {velocity:.2f} m/s slides along a surface
                 with {friction:.2f} N of friction over {distance:.2f} m before compressing a spring.
@@ -430,7 +430,7 @@ class ThermalWithFrictionGenerator(BaseGenerator):
                 unit = [f"{unit1}", f"{unit2}"]
 
         else:
-            flip = ri(0,5)
+            flip = ri(0,5) if variant is None else variant
             if flip == 0: 
                 question = f"""A {mass:.2f} kg {noun} moving at 
                 {velocity:.2f} m/s slides along a surface
@@ -480,14 +480,14 @@ class ThermalWithFrictionGenerator(BaseGenerator):
                 unit = ["Force of Friction (Newtons)"]
         return {"question": question, "answers": answer, "units": unit}
 
-    def elastic_to_kinetic_friction_distance_q(self, difficulty):
+    def elastic_to_kinetic_friction_distance_q(self, difficulty, *, variant=None):
         mass, velocity, spring_constant, compression, thermal = TLG.elastic_to_kinetic_thermal_nums()
         distance = ri(int(velocity*2), int(velocity*4))  # Reasonable distance range
         friction = thermal / distance
         
         noun = random_noun()
         if difficulty == "Easy":
-            flip = ri(0,3)
+            flip = ri(0,3) if variant is None else variant
             if flip == 0: 
                 question = f"""A spring of strength {spring_constant:.2f} N/m is 
                 compressed by {compression:.2f} m
@@ -529,7 +529,7 @@ class ThermalWithFrictionGenerator(BaseGenerator):
                 unit = ["Thermal Energy (Joules)","Mass (kilograms)"]
                 
         else:
-            flip = ri(0,5)
+            flip = ri(0,5) if variant is None else variant
             if flip == 0: 
                 question = f"""A spring of strength {spring_constant:.2f} N/m 
                 is compressed by {compression:.2f} m
@@ -609,6 +609,8 @@ class ThermalWithFrictionGenerator(BaseGenerator):
         """Return metadata mapping for this generator."""
         return  {
             "Elastic <--> Kinetic": {
+                "id": "thermal-with-friction.elastic-kinetic",
+                "aliases": ["Elastic <--> Kinetic"],
                 "honors": r"""W_f = F_f \; x
                 \newline ~ \newline ~ \newline
                 EPE = \frac{1}{2} k \Delta x^2 \quad ,
@@ -629,6 +631,8 @@ class ThermalWithFrictionGenerator(BaseGenerator):
                 """
                 },
             "Gravitational <--> Kinetic": {
+                "id": "thermal-with-friction.gravitational-kinetic",
+                "aliases": ["Gravitational <--> Kinetic"],
                 "honors": r"""W_f = F_f \; x
                 \newline ~ \newline ~ \newline
                 GPE = mgh \quad ,
@@ -649,6 +653,8 @@ class ThermalWithFrictionGenerator(BaseGenerator):
                 """
                 },
             "Gravitational <--> Elastic" : {
+                "id": "thermal-with-friction.gravitational-elastic",
+                "aliases": ["Gravitational <--> Elastic"],
                 "honors": r"""W_f = F_f \; x
                 \newline ~ \newline ~ \newline
                 GPE = mgh \quad , \quad

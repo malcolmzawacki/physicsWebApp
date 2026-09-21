@@ -30,3 +30,11 @@ jobs:
         env:
           PYTHONPATH: .
         run: python tools/check_prompt_answer_consistency.py
+
+      - name: Check activity interactions
+        run: |
+          python tools/test_activity_flow.py
+          python tools/test_relative_motion_page.py
+          python tools/test_audit_regressions.py
+          python tools/test_progress_and_formatting.py
+          python tools/test_solve_for.py

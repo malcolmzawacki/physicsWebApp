@@ -4,6 +4,18 @@ Generators live in `utils/generators/` and are responsible for returning randomi
 
 ## Payload Basics
 
+- Declare existing selectable unknowns in `utils/solve_for_catalog.json`; use
+  `utils.solve_for.generate_selected` and `DocumentGenerator.question` for shared
+  browser/export requests. Preserve stable target IDs and declare supported levels.
+  Never expose an inverse just because an equation can be rearranged: its prompt,
+  givens, diagram, and grading must already support the target. See
+  [the solve-for contract and evaluation](solve_for_evaluation.md).
+
+- Every `stored_metadata()` problem type must declare a permanent, globally unique
+  `id` and an `aliases` list of historical display labels. Retain the ID when
+  renaming a type; append its old label to aliases. See the
+  [progress identity contract](implementation_fixes_2026-09-15.md).
+
 - Return a dict with `question`, `answers`, and `units` at minimum; see `docs/problem_payload.md` for the full schema.
 - Use plain strings for display-ready prompts (Markdown/LaTeX is fine; Streamlit renders both).
 - Provide answer lists in the order the UI should render inputs; units must align one-to-one with answers.

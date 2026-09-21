@@ -21,6 +21,8 @@ class MomentumGenerator(BaseGenerator):
         """Return metadata mapping for this generator."""
         return {
             "Momentum": {
+                "id": "momentum.momentum",
+                "aliases": ["Momentum"],
                 "honors": r"""
                  p \;=\; m \cdot v
                 """,

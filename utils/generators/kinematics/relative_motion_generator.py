@@ -28,8 +28,14 @@ class RelativeMotionGenerator(BaseGenerator):
                 "conceptual": [relative, chain, r"v_{P/Q}=(v_{P/B_1}+v_{B_1/W}+v_{W/S})-(v_{Q/B_2}+v_{B_2/W}+v_{W/S})"],
             },
         }
-        return {kind: {level: r"\begin{gathered}" + r"\\".join(equations) + r"\end{gathered}"
-                       for level, equations in levels.items()} for kind, levels in metadata.items()}
+        identities = {
+            "Independent motion": "relative-motion.independent",
+            "Nested reference frames": "relative-motion.nested-frames",
+            "Combined": "relative-motion.combined",
+        }
+        return {kind: {"id": identities[kind], "aliases": [kind],
+                       **{level: r"\begin{gathered}" + r"\\".join(equations) + r"\end{gathered}"
+                          for level, equations in levels.items()}} for kind, levels in metadata.items()}
 
     @staticmethod
     def _link(subject, reference, velocity, coefficient=1):
@@ -153,6 +159,17 @@ class RelativeMotionGenerator(BaseGenerator):
                     problem_type=case["problem_type"], difficulty=case["difficulty"], diagram_data=displayed,
                     hints=["Keep each velocity paired with its observer. Add along a chain; subtract between objects."],
                     extras=dict(case=case, solve_for=solve_for, solution_equations=equations, explanation=explanation))
+
+    def selected_question(self, problem_type, difficulty, target):
+        """Render one declared unknown, identified by its named reference frames."""
+        case = self.build_case(problem_type, difficulty)
+        if target == "result":
+            return self.render_case(case, "result")
+        for index in self.eligible_unknowns(case):
+            link = case["links"][index]
+            if target == link["subject"] + "|" + link["reference"]:
+                return self.render_case(case, index)
+        raise ValueError(f"Target {target!r} is not identifiable in this case")
 
     def choose_problem_dict(self, problem_type, difficulty, solve_for=None):
         case = self.build_case(problem_type, difficulty)

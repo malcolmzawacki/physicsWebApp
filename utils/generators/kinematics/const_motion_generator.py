@@ -233,21 +233,29 @@ class ConstantMotionGenerator(BaseGenerator):
         """Return metadata mapping for this generator."""
         return {
             "Constant Speed": {
+                "id": "constant-motion.constant-speed",
+                "aliases": ["Constant Speed"],
                 "honors": r"d \;=\; v \cdot t",
                 "conceptual": r"d \;=\; v \cdot t \quad , \quad v \;=\; \frac{d}{t} \quad , \quad t \;=\; \frac{d}{v}",
                 "tags": ["constant", "speed", "distance", "time"],
             },
             "Average Speed": {
+                "id": "constant-motion.average-speed",
+                "aliases": ["Average Speed"],
                 "honors": r"v_{avg} \;=\; \frac{d_1 + d_2 + \dots}{t_1 + t_2 + \dots}",
                 "conceptual": r"v_{avg} \;=\; \frac{d_1 + d_2 + \dots}{t_1 + t_2 + \dots} \quad , \quad d \;=\; v \cdot t \quad , \quad v \;=\; \frac{d}{t} \quad , \quad t \;=\; \frac{d}{v}",
                 "tags": ["average", "speed"],
             },
             "Average Velocity": {
+                "id": "constant-motion.average-velocity",
+                "aliases": ["Average Velocity"],
                 "honors": r"v_{avg} \;=\; \frac{d_1 + d_2 + \dots}{t_1 + t_2 + \dots}",
                 "conceptual": r"v_{avg} \;=\; \frac{d_1 + d_2 + \dots}{t_1 + t_2 + \dots} \quad , \quad d \;=\; v \cdot t \quad , \quad v \;=\; \frac{d}{t} \quad , \quad t \;=\; \frac{d}{v}",
                 "tags": ["average", "velocity"],
             },
             "Combined Constant Motion": {
+                "id": "constant-motion.combined-constant-motion",
+                "aliases": ["Combined Constant Motion"],
                 "honors": r"v_{avg} \;=\; \frac{d_1 + d_2 + \dots}{t_1 + t_2 + \dots}",
                 "conceptual": r"v_{avg} \;=\; \frac{d_1 + d_2 + \dots}{t_1 + t_2 + \dots} \quad , \quad d \;=\; v \cdot t \quad , \quad v \;=\; \frac{d}{t} \quad , \quad t \;=\; \frac{d}{v}",
                 "tags": ["distance", "displacement", "speed", "velocity"],

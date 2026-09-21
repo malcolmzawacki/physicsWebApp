@@ -5,6 +5,7 @@ import streamlit as st
 from typing import Dict, Optional
 
 from utils.ui_state import State
+from utils.progress_ids import custom_progress_id, migrate_custom_progress, progress_label
 
 
 def _ensure_selection_state_length(state: State, units: list[str]) -> None:
@@ -27,6 +28,7 @@ def render_header(title: str, stars: int | None = None) -> None:
 
 
 def build_performance_table(performance: Dict[str, Dict[str, Dict[str, int]]], ordered_difficulties: list[str]) -> pd.DataFrame:
+    performance = migrate_custom_progress(performance)
     rows = []
     for problem_type, difficulties in performance.items():
         for difficulty, stats in difficulties.items():
@@ -38,7 +40,7 @@ def build_performance_table(performance: Dict[str, Dict[str, Dict[str, int]]], o
             else:
                 display = "0/0 (0.0%)"
             rows.append({
-                "Problem Type": problem_type,
+                "Problem Type": progress_label(problem_type),
                 "Difficulty": difficulty,
                 "Performance": display
             })
@@ -63,6 +65,7 @@ def init_performance(problem_types: list[str], difficulties: list[str]) -> Dict[
     """
     perf: Dict[str, Dict[str, Dict[str, int]]] = {}
     for p in problem_types:
+        p = custom_progress_id(p)
         perf[p] = {}
         for d in difficulties:
             perf[p][d] = {"attempts": 0, "correct": 0}
@@ -74,6 +77,8 @@ def record_performance(perf: Dict[str, Dict[str, Dict[str, int]]], problem_type:
 
     Mutates the provided dict and returns it for convenience.
     """
+    migrate_custom_progress(perf)
+    problem_type = custom_progress_id(problem_type)
     if problem_type not in perf:
         perf[problem_type] = {}
     if difficulty not in perf[problem_type]:
@@ -82,6 +87,20 @@ def record_performance(perf: Dict[str, Dict[str, Dict[str, int]]], problem_type:
     if is_correct:
         perf[problem_type][difficulty]["correct"] += 1
     return perf
+
+
+def equation_controls(generator, problem_type, state, checkbox_key, fallback_dict=None, expanded=True):
+    """Keep the equation expander and its detail switch together on one row."""
+    from utils import layout_config
+    equation_col, toggle_col = st.columns(
+        [layout_config.EQUATION_EXPANDER_WIDTH, layout_config.EQUATION_TOGGLE_WIDTH],
+        gap=layout_config.CONTROL_GAP, vertical_alignment="top")
+    # Evaluate the switch first so this rerun renders the requested equation set.
+    with toggle_col:
+        level = st.checkbox("More Equations", value=state.get("level", False), key=checkbox_key)
+    state.set("level", level)
+    with equation_col:
+        show_equations_expander(generator, problem_type, level, fallback_dict, expanded)
 
 
 def show_equations_expander(
@@ -97,23 +116,20 @@ def show_equations_expander(
     - level: False = honors_equation, True = conceptual_equation
     - fallback_dict: optional { problem_type: { 'honors': str, 'conceptual': str } }
     """
-    with st.expander("equation(s)", expanded=expanded):
-        # Try generator metadata first
-        if hasattr(generator, "get_problem_metadata"):
-            try:
-                metadata = generator.get_problem_metadata(problem_type)
-                equation = metadata.get("conceptual_equation" if level else "honors_equation", "")
-                if equation:
-                    st.latex(equation)
-                    return
-            except Exception:
-                pass
-        # Fallback to provided dict
-        if fallback_dict is not None:
-            entry = fallback_dict.get(problem_type, {})
-            equation = entry.get("conceptual" if level else "honors", "")
-            if equation:
+    candidates = []
+    if hasattr(generator, "get_problem_metadata"):
+        candidates.append(generator.get_problem_metadata(problem_type))
+    if fallback_dict is not None:
+        candidates.append(fallback_dict.get(problem_type, {}))
+    name = "conceptual" if level else "honors"
+    for metadata in candidates:
+        equation = metadata.get(name + "_equation") or metadata.get(name)
+        if isinstance(equation, (list, tuple)):
+            equation = r"\begin{gathered}" + r" \\ ".join(equation) + r"\end{gathered}"
+        if equation:
+            with st.expander("equation(s)", expanded=expanded):
                 st.latex(equation)
+            break
 
 
 def draw_answer_inputs(prefix: str, units: list[str], correct_answers: list, question_id: int) -> list[str]:
@@ -149,7 +165,10 @@ def render_button_options(prefix: str, units: list[str], answer_options: Dict[in
         st.write(f"**{unit}:**")
         options = answer_options.get(i, [])
         if not options:
-            st.text_input(f"Enter {unit}:", key=f"{prefix}_text_input_{i}")
+            value = st.text_input(f"Enter {unit}:", key=f"{prefix}_text_input_{i}_{question_id}")
+            selections = state.get("user_answers_selected")
+            selections[i] = value if value.strip() else None
+            state.set("user_answers_selected", selections)
             continue
 
         cols = st.columns(len(options))
@@ -174,7 +193,10 @@ def render_dropdown_options(prefix: str, units: list[str], answer_options: Dict[
         with cols[i]:
             options = answer_options.get(i, [])
             if not options:
-                st.text_input(f"{unit}", key=f"{prefix}_dropdown_fallback_{i}_{question_id}")
+                value = st.text_input(f"{unit}", key=f"{prefix}_dropdown_fallback_{i}_{question_id}")
+                selections = state.get("user_answers_selected")
+                selections[i] = value if value.strip() else None
+                state.set("user_answers_selected", selections)
                 continue
 
             key = f"{prefix}_dropdown_{i}_{question_id}"

@@ -27,6 +27,7 @@ Interactive Streamlit workspace for generating and practicing physics (and chemi
   - `word_lists.py`, `graph_utils.py`, etc. - supporting content helpers.
 - `tools/` - developer scripts such as lazy tab loaders and payload validators.
 - `xtrct_docs/` - utilities for exporting problems into Word documents.
+- Export entry point: `python -m xtrct_docs.doc_face` (edit the selected preset/title there). Diagrams are included by default; see [export and compatibility updates](docs/implementation_fixes_2026-09-14.md).
 - `docs/` - architecture notes (e.g., generator payload contract, UI guide).
 
 ## Development Workflow
@@ -41,8 +42,15 @@ Interactive Streamlit workspace for generating and practicing physics (and chemi
   python tools/check_prompt_answer_consistency.py
   ```
 - **Static checks** - the project currently relies on manual review; add `pydocstyle`, `flake8`, or similar as needed for your workflow.
+- **Interaction and export regressions** — run `python tools/test_activity_flow.py`, `python tools/test_relative_motion_page.py`, `python tools/test_audit_regressions.py`, `python tools/test_progress_and_formatting.py`, and `python tools/test_solve_for.py`. CI runs all seven checks. Payload validation discovers generators automatically.
+- **Stable progress IDs and Word formatting** — see the [implementation notes and manual review checklist](docs/implementation_fixes_2026-09-15.md).
 
 ## Contributing Notes
+
+Solve-for controls and worksheet target requests share an explicit catalog. See
+the [page-by-page evaluation and export examples](docs/solve_for_evaluation.md),
+[available targets](docs/solve_for_targets.md), and
+[deferred decisions](docs/solve_for_deferred.md).
 
 1. Extend or create generators in `utils/generators/` and follow the dict payload contract.
 2. Add documentation in `docs/` when introducing new interaction patterns or complex flows.

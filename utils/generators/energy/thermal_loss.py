@@ -4,6 +4,13 @@ from utils.word_lists import random_noun
 from utils.generators.energy.energy_basics import EnergyBasicsGenerator
 EBG = EnergyBasicsGenerator()
 
+
+def sample_thermal_loss(energy):
+    """Keep a positive residual even for one-joule starting cases."""
+    upper = int(energy // 2)
+    return ri(1, upper) if upper >= 1 else energy / 2
+
+
 class ThermalLossGenerator(BaseGenerator):
     def __init__(self):
         super().__init__(state_prefix="thermal_loss_")
@@ -12,14 +19,14 @@ class ThermalLossGenerator(BaseGenerator):
     def grav_to_kin_thermal_nums(self):
         #grav -> Kin
         mass, height, grav = EBG.gravitational_potential_energy("Hard")
-        thermal = ri(1,int(grav//2 + 2))
+        thermal = sample_thermal_loss(grav)
         kinetic = grav - thermal
         velocity = (2*kinetic/mass)**(1/2)
         return mass, height, velocity, thermal
 
     def kin_to_grav_thermal_nums(self):
         mass, velocity, kinetic_e = EBG.kinetic_energy("Hard")
-        thermal = ri(1,int(kinetic_e//2 + 2))
+        thermal = sample_thermal_loss(kinetic_e)
         grav = kinetic_e - thermal
         height = grav / (10*mass)
         return mass, height, velocity, thermal
@@ -27,7 +34,7 @@ class ThermalLossGenerator(BaseGenerator):
     def grav_to_elastic_thermal_nums(self):
         
         mass, height, grav = EBG.gravitational_potential_energy("Hard")
-        thermal = ri(1,int(grav//2 + 2))
+        thermal = sample_thermal_loss(grav)
         elastic = grav - thermal
         compression = height / ri(2,10)
         spring_constant = (2*elastic/(compression**2))
@@ -35,7 +42,7 @@ class ThermalLossGenerator(BaseGenerator):
 
     def elastic_to_grav_thermal_nums(self):
         spring_constant, compression, elastic_e = EBG.elastic_potential_energy("Hard")
-        thermal = ri(1,int(elastic_e//2 +2))
+        thermal = sample_thermal_loss(elastic_e)
         grav = elastic_e - thermal
         height = compression * ri(2,10)
         mass = grav / (10*height)
@@ -44,7 +51,7 @@ class ThermalLossGenerator(BaseGenerator):
     def kinetic_to_elastic_thermal_nums(self):
 
         mass, velocity, kinetic = EBG.kinetic_energy("Hard")
-        thermal = ri(1,int(kinetic//2 + 2))
+        thermal = sample_thermal_loss(kinetic)
         elastic = kinetic - thermal
         spring_constant = ri(2,int(elastic//2 + 3))
         compression = (2*elastic/spring_constant)**(1/2)
@@ -54,7 +61,7 @@ class ThermalLossGenerator(BaseGenerator):
     def elastic_to_kinetic_thermal_nums(self):
 
         spring_constant, compression, elastic_e = EBG.elastic_potential_energy("Hard")
-        thermal = ri(1,int(elastic_e//2 + 2))
+        thermal = sample_thermal_loss(elastic_e)
         kinetic = elastic_e - thermal
         mass = ri(2,int(kinetic//2 + 3))
         velocity = (2*kinetic/mass)**(1/2)
@@ -65,9 +72,9 @@ class ThermalLossGenerator(BaseGenerator):
     # # # T H E R M A L    E N E R G Y   L 0 S S   P R 0 B L E M S # # # 
 
 
-    def grav_to_kin_thermal_q(self,difficulty):
+    def grav_to_kin_thermal_q(self,difficulty, *, variant=None):
         mass, height, velocity, thermal = self.grav_to_kin_thermal_nums()
-        flip = ri(0,2)
+        flip = ri(0,2) if variant is None else variant
         noun = random_noun()
         if flip == 0 or difficulty == "Easy":
             # just find the difference
@@ -92,8 +99,8 @@ class ThermalLossGenerator(BaseGenerator):
             unit = "Height (meters)"
         return {"question": question, "answers": [answer], "units": [unit]}
     
-    def kin_to_grav_thermal_q(self,difficulty):
-        flip = ri(0,2)
+    def kin_to_grav_thermal_q(self,difficulty, *, variant=None):
+        flip = ri(0,2) if variant is None else variant
         noun = random_noun()
         mass, height, velocity, thermal = self.kin_to_grav_thermal_nums()
         if flip == 0 or difficulty == "Easy":
@@ -131,9 +138,9 @@ class ThermalLossGenerator(BaseGenerator):
 
 
 
-    def grav_to_elastic_thermal_q(self,difficulty):
+    def grav_to_elastic_thermal_q(self,difficulty, *, variant=None):
         noun = random_noun()
-        flip = ri(0,4)
+        flip = ri(0,4) if variant is None else variant
         mass, height, spring_constant, compression, thermal = self.grav_to_elastic_thermal_nums()        
         if flip == 0 or difficulty == "Easy":
             # just find the difference
@@ -176,9 +183,9 @@ class ThermalLossGenerator(BaseGenerator):
         return {"question": question, "answers": [answer], "units": [unit]}
 
 
-    def elastic_to_grav_thermal_q(self,difficulty):
+    def elastic_to_grav_thermal_q(self,difficulty, *, variant=None):
         noun = random_noun()
-        flip = ri(0,4)
+        flip = ri(0,4) if variant is None else variant
         mass, height, spring_constant, compression, thermal = self.elastic_to_grav_thermal_nums()        
         if flip == 0 or difficulty == "Easy":
             # just find the difference
@@ -233,9 +240,9 @@ class ThermalLossGenerator(BaseGenerator):
             return self.elastic_to_grav_thermal_q(difficulty)
 
 
-    def kinetic_to_elastic_thermal_q(self,difficulty):
+    def kinetic_to_elastic_thermal_q(self,difficulty, *, variant=None):
         noun = random_noun()
-        flip = ri(0,4)
+        flip = ri(0,4) if variant is None else variant
         mass, velocity, spring_constant, compression, thermal = self.kinetic_to_elastic_thermal_nums()
         if flip == 0 or difficulty == "Easy":
             # just find the difference
@@ -276,9 +283,9 @@ class ThermalLossGenerator(BaseGenerator):
             unit = "Velocity (m/s)"
         return  {"question": question, "answers": [answer], "units": [unit]}
     
-    def elastic_to_kinetic_thermal_q(self,difficulty):
+    def elastic_to_kinetic_thermal_q(self,difficulty, *, variant=None):
         noun = random_noun()
-        flip = ri(0,4)
+        flip = ri(0,4) if variant is None else variant
         mass, velocity, spring_constant, compression, thermal = self.elastic_to_kinetic_thermal_nums()
         if flip == 0 or difficulty == "Easy":
             # just find the difference
@@ -352,6 +359,8 @@ class ThermalLossGenerator(BaseGenerator):
         """Return metadata mapping for this generator."""
         return {
             "Elastic <--> Kinetic": {
+                "id": "thermal-loss.elastic-kinetic",
+                "aliases": ["Elastic <--> Kinetic"],
                 "honors": r"""\Delta E = W_f
                 \newline ~ \newline ~ \newline
                 EPE = \frac{1}{2} k \Delta x^2 \quad ,
@@ -370,6 +379,8 @@ class ThermalLossGenerator(BaseGenerator):
                 """
                 },
             "Gravitational <--> Kinetic": {
+                "id": "thermal-loss.gravitational-kinetic",
+                "aliases": ["Gravitational <--> Kinetic"],
                 "honors": r"""\Delta E = W_f
                 \newline ~ \newline ~ \newline
                 GPE = mgh \quad ,
@@ -388,6 +399,8 @@ class ThermalLossGenerator(BaseGenerator):
                 """
                 },
             "Gravitational <--> Elastic" : {
+                "id": "thermal-loss.gravitational-elastic",
+                "aliases": ["Gravitational <--> Elastic"],
                 "honors": r"""\Delta E = W_f
                 \newline ~ \newline ~ \newline
                 GPE = mgh \quad , \quad

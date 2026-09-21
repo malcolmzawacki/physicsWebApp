@@ -7,7 +7,10 @@ from .conduction_model import charge_count_label, sign_label, sign_symbol
 
 INDUCTION_MODEL_NOTES = {
     "rule": (
-        "In this simplified model, a nearby charged object redistributes electrons without touching."
+        "In this simplified model, a nearby charged object redistributes electrons without touching. "
+        "For charge-count questions, assume the number of transferred classroom charge chunks "
+        "equals the number shown on the rod. This is a specified model rule; real induced "
+        "charge also depends on geometry and separation."
     ),
     "grounding": (
         "If the conductor is grounded while the charged object is nearby, electrons can enter or leave through the ground."

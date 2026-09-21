@@ -48,17 +48,22 @@ def _install_streamlit_stub_if_missing() -> None:
 
 _install_streamlit_stub_if_missing()
 
-from utils.generators.kinematics.const_motion_generator import ConstantMotionGenerator
-from utils.generators.kinematics.linear_motion_generator import LinearMotionGenerator
-from utils.generators.force_generator import ForceGenerator
-from utils.generators.vector_generator import VectorGenerator
-from utils.generators.kinematics.projectile_generator import ProjectileGenerator
-from utils.generators.waves_generator import WaveGenerator
-from utils.generators.momentum_generators.collision_generator import CollisionGenerator
-from utils.generators.kinematics.motion_graph_generator import MotionGraphGenerator
-from utils.generators.kinematics.dist_disp_generator import DistDispGenerator
-from utils.generators.torque_generator import TorqueGenerator
-from utils.generators.kinematics.relative_motion_generator import RelativeMotionGenerator
+import importlib
+import inspect
+from utils.generators.base_generator import BaseGenerator
+
+
+def discover_generators():
+    generators = []
+    for path in sorted((PROJECT_ROOT / "utils/generators").rglob("*.py")):
+        module_name = ".".join(path.relative_to(PROJECT_ROOT).with_suffix("").parts)
+        module = importlib.import_module(module_name)
+        for _, cls in inspect.getmembers(module, inspect.isclass):
+            if cls.__module__ == module_name and cls is not BaseGenerator and issubclass(cls, BaseGenerator):
+                generators.append(cls())
+    return generators
+
+
 from utils.problem_payload import payload_from_dict
 
 
@@ -87,6 +92,9 @@ def validate_generator(
                     if result is None:
                         raise ValueError("choose_problem_dict returned None")
                     payload_from_dict(result)  # raises on error
+                    if result.get("diagram_data") is not None:
+                        import matplotlib.pyplot as plt
+                        plt.close("all")
                 except Exception as e:
                     failures += 1
                     messages.append(
@@ -97,21 +105,9 @@ def validate_generator(
 
 def main() -> int:
     difficulties = ["Easy", "Medium", "Hard"]
-    seeds = [0, 1, 2]
+    seeds = list(range(20))
 
-    generators = [
-        ConstantMotionGenerator(),
-        LinearMotionGenerator(),
-        ForceGenerator(),
-        VectorGenerator(),
-        ProjectileGenerator(),
-        WaveGenerator(),
-        CollisionGenerator(),
-        MotionGraphGenerator(),
-        DistDispGenerator(),
-        TorqueGenerator(),
-        RelativeMotionGenerator(),
-    ]
+    generators = discover_generators()
     checks: Dict[str, Tuple[object, List[str]]] = {
         gen.__class__.__name__: (gen, list(gen.stored_metadata().keys()))
         for gen in generators

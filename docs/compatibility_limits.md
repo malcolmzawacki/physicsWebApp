@@ -1,5 +1,9 @@
 # Compatibility limits across activity layouts
 
+**Historical inspection:** The September 14 fixes supersede the unresolved items below.
+See [current behavior and remaining verification limits](implementation_fixes_2026-09-14.md).
+Keep this earlier inspection as background, not as the current implementation contract.
+
 _Inspected: 2026-09-11. These are source-verified constraints and open follow-ups,
 not a completed repository-wide migration or an exhaustive runtime audit._
 

@@ -22,7 +22,7 @@ def generate_motion_graph_match_payload(primary_order: str) -> dict:
 
     if primary_order == "Position-Time First":
         primary_diagram, _, _ = generator.generate_position_time_graph(
-            graph_type, rowsize=5, colsize=2
+            graph_type, rowsize=4.6, colsize=4.0
         )
         option_diagrams, correct_index = _build_option_diagrams(
             generator.generate_velocity_time_graph, graph_type, graph_types
@@ -30,7 +30,7 @@ def generate_motion_graph_match_payload(primary_order: str) -> dict:
         prompt = "Match this Position-Time Graph to the correct Velocity-Time Graph:"
     else:
         primary_diagram, _, _ = generator.generate_velocity_time_graph(
-            graph_type, rowsize=5, colsize=2
+            graph_type, rowsize=4.6, colsize=4.0
         )
         option_diagrams, correct_index = _build_option_diagrams(
             generator.generate_position_time_graph, graph_type, graph_types
@@ -54,6 +54,6 @@ def _build_option_diagrams(generator_fn, correct_type: str, graph_types: list[st
     choice_list = [correct_type, wrong_1, wrong_2]
     random.shuffle(choice_list)
     option_diagrams = [
-        generator_fn(entry, rowsize=5, colsize=3)[0] for entry in choice_list
+        generator_fn(entry, rowsize=4.6, colsize=2.5)[0] for entry in choice_list
     ]
     return option_diagrams, choice_list.index(correct_type)

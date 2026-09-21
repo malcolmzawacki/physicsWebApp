@@ -1,6 +1,28 @@
 # Current State
 
-_Last updated: 2026-02-17_
+_Last updated: 2026-09-15_
+
+## Solve-for rollout
+
+All 39 routed activities have a [page-by-page evaluation](solve_for_evaluation.md).
+Clear existing targets use one declared catalog for browser controls and worksheet
+requests; ambiguous targets are [documented without implementation](solve_for_deferred.md).
+CI now runs seven guardrail scripts, including `tools/test_solve_for.py`.
+
+## Progress and document follow-up
+
+All 70 generator types and 12 custom types now have explicit progress IDs with
+legacy-history migration. Word export supports structured Markdown and native,
+editable equations. The progress/formatting suite is included in CI. See the
+[follow-up record and human review checklist](implementation_fixes_2026-09-15.md).
+
+## September audit corrections
+
+See [the correction record](implementation_fixes_2026-09-14.md) for the physics,
+export, shared payload, scoring, and interaction fixes. CI now discovers all 23
+generators and runs the two existing guardrails plus all three interaction/export
+test scripts, plus the progress/formatting suite. The older compatibility inspection below is historical. DOCX visual
+pagination checks require LibreOffice, which is not installed in the audit environment.
 
 ## Purpose
 This file is the fastest onboarding reference for new contributors/agents. Read this first before scanning broader docs.

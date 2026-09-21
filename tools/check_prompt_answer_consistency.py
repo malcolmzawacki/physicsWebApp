@@ -425,7 +425,9 @@ def check_doc_question_organizer() -> FailureList:
         try:
             method = getattr(org, name)
             generated = method()
-            sections = generated() if callable(generated) else generated
+            if not callable(generated):
+                raise AssertionError("Worksheet presets must return a fresh-section factory")
+            sections = generated()
             if not isinstance(sections, list):
                 raise AssertionError(f"Expected list of sections, got {type(sections).__name__}")
 

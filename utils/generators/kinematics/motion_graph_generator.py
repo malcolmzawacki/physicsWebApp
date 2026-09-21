@@ -152,7 +152,9 @@ class MotionGraphGenerator(BaseGenerator):
         return options
     
     def choose_problem_dict(self, problem_type, difficulty, graph_type=None):
-        chosen_type = graph_type or random.choice(self.graph_types)
+        # Build from constant motion to acceleration and then deceleration.
+        candidates = self.graph_types[:2] if difficulty == "Easy" else self.graph_types[:4] if difficulty == "Medium" else self.graph_types
+        chosen_type = graph_type or random.choice(candidates)
         units = ["Direction", "Motion State"]
         options = self.get_answer_options(units)
 
@@ -223,23 +225,27 @@ class MotionGraphGenerator(BaseGenerator):
         """Return metadata mapping for this generator."""
         return {
             "Position-Time Graph": {
+            "id": "motion-graph.position-time-graph",
+            "aliases": ["Position-Time Graph"],
             "honors": r"\text{Direction and motion from position-time graphs}",
             "conceptual": r"""
             \text{Positive slope: moving in positive direction} \\
             \text{Negative slope: moving in negative direction} \\
             \text{Straight line: constant velocity} \\
-            \text{Curved (increasing): speeding up} \\
-            \text{Curved (decreasing): slowing down}
+            \text{Increasing slope magnitude: speeding up} \\
+            \text{Decreasing slope magnitude: slowing down}
             """
         },
         "Velocity-Time Graph": {
+            "id": "motion-graph.velocity-time-graph",
+            "aliases": ["Velocity-Time Graph"],
             "honors": r"\text{Direction and motion from velocity-time graphs}",
             "conceptual": r"""
             \text{Above x-axis: moving in positive direction} \\
             \text{Below x-axis: moving in negative direction} \\
             \text{Horizontal line: constant velocity} \\
-            \text{Sloped line (increasing): speeding up} \\
-            \text{Sloped line (decreasing): slowing down}
+            \text{Moving away from zero velocity: speeding up} \\
+            \text{Moving toward zero velocity: slowing down}
             """
         },
     }

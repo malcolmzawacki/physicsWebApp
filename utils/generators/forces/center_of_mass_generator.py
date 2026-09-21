@@ -18,6 +18,8 @@ class CenterOfMassGenerator(BaseGenerator):
         """Return metadata mapping for this generator."""
         return {
             "One Dimensional": {
+                "id": "center-of-mass.one-dimensional",
+                "aliases": ["One Dimensional"],
                 "honors": r"""
                       \Sigma F \;=\; ma""",
 
@@ -30,6 +32,8 @@ class CenterOfMassGenerator(BaseGenerator):
                       }"""
             },
             "Two Dimensional": {
+                "id": "center-of-mass.two-dimensional",
+                "aliases": ["Two Dimensional"],
                 "honors": r"""
                       \Sigma F \;=\; ma""",
 

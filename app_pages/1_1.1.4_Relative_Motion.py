@@ -2,11 +2,13 @@
 
 
 def relative_motion():
-    import math
+    from utils.grading import parse_number, answer_matches
     import streamlit as st
     from utils.generators.kinematics.relative_motion_generator import RelativeMotionGenerator
     from utils.ui import Interface
-    from utils.ui_components import show_equations_expander
+    from utils.solve_for import select_target, generate_selected
+    from utils.ui_components import equation_controls
+    from utils.layout_config import question_columns
     from utils.activity_flow import next_question_countdown
     from utils.word_lists import random_correct_message, random_error_message
 
@@ -19,10 +21,11 @@ def relative_motion():
     state = ui.state
     ui.header_component()
     st.caption("Constant velocity in one dimension. Every velocity is measured relative to a named observer.")
-    cols = st.columns([3, 2, 2])
+    cols = question_columns()
     kind = cols[0].selectbox("Problem Type", generator.TYPES, key=state.key("type_select"))
     difficulty = cols[1].selectbox("Difficulty", generator.DIFFICULTIES, key=state.key("difficulty_select"))
-    target = cols[2].selectbox("Solve for", generator.TARGETS, key=state.key("target_select"))
+    with cols[2]:
+        target = select_target(generator, kind, difficulty, state, key="target_select")
     descriptions = {
         "Independent motion": "Easy: relative velocity. Medium: separation after a time. Hard: meeting or catch-up time.",
         "Nested reference frames": "Easy: 2 velocity links. Medium: 3 links. Hard: 4 links, including a moving walkway.",
@@ -31,18 +34,17 @@ def relative_motion():
     st.caption(descriptions[kind])
     selection = (kind, difficulty, target)
     if state.get("selection") != selection or state.get("payload") is None:
-        state.set("payload", generator.choose_problem_dict(kind, difficulty, target))
+        state.set("payload", generate_selected(generator, kind, difficulty, target))
         state.set("selection", selection)
         state.set("submitted", False)
         state.inc("question_id")
         state.pop("last_result")
         state.pop("feedback_message")
     payload = state.get("payload")
+    equation_controls(generator, kind, state, state.key("more_equations"), generator.stored_metadata())
     left, right = st.columns([1, 1.25])
     with left:
         st.pyplot(generator.generate_diagram(payload["diagram_data"], kind, difficulty))
-        more = st.checkbox("More Equations", key=state.key("more_equations"))
-        show_equations_expander(generator=generator, problem_type=kind, level=more, fallback_dict=generator.stored_metadata(), expanded=True)
     with right:
         st.write(payload["question"])
         with st.form(state.key("answer_form")):
@@ -50,13 +52,11 @@ def relative_motion():
             submitted = st.form_submit_button("Submit", disabled=state.get("submitted"))
         if submitted and not state.get("submitted"):
             try:
-                value = float(raw.strip())
-                if not math.isfinite(value):
-                    raise ValueError
+                value = parse_number(raw)
             except ValueError:
                 st.error("Enter a finite number, including a minus sign when needed.")
             else:
-                correct = math.isclose(value, payload["answers"][0], rel_tol=.1, abs_tol=1e-9)
+                correct = answer_matches(value, payload["answers"][0])
                 ui.update_performance(kind, difficulty, correct)
                 if correct:
                     state.inc("stars", ui.give_stars(difficulty, kind))

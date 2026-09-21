@@ -308,7 +308,7 @@ def generate_reaction_type(reaction_type):
     
     return reactants, products
 
-def generate_stoichiometry_problem(reaction_type="Random", difficulty="Medium"):
+def generate_stoichiometry_problem(reaction_type="Random", difficulty="Medium", conversion_type=None):
     """
     Generate a random stoichiometry problem
     
@@ -319,6 +319,8 @@ def generate_stoichiometry_problem(reaction_type="Random", difficulty="Medium"):
     
     Returns: question text, answer value, answer units, and problem details
     """
+    if conversion_type is not None and (difficulty != "Medium" or conversion_type not in ("gram-to-mole", "mole-to-gram")):
+        raise ValueError("Explicit conversion targets require Medium and gram-to-mole or mole-to-gram")
     # Generate reaction based on type
     reactants, products = generate_reaction_type(reaction_type)
     
@@ -345,7 +347,7 @@ def generate_stoichiometry_problem(reaction_type="Random", difficulty="Medium"):
         # Set the target reactant amount
         if difficulty == "Medium":
             # For medium, we'll do gram-to-mole or mole-to-gram
-            conversion_type = random.choice(["gram-to-mole", "mole-to-gram"])
+            conversion_type = conversion_type or random.choice(["gram-to-mole", "mole-to-gram"])
             
             if conversion_type == "gram-to-mole":
                 # Convert moles to grams for the question
@@ -575,32 +577,37 @@ def stoichiometry_practice_page():
     initialize_stoichiometry_session_state(state)
 
     # UI Controls
-    col1, col2 = st.columns(2)
+    from utils.layout_config import question_columns
+    col1, col2, col3 = question_columns()
     
     with col1:
         reaction_type = st.selectbox(
-            "Select reaction type:",
+            "Reaction Type",
             ["Random", "Combustion", "Decomposition", "Synthesis", "Single Replacement", "Double Replacement"],
             key=state.key("reaction_type")
         )
     
     with col2:
         difficulty = st.selectbox(
-            "Select difficulty level:",
+            "Difficulty",
             ["Easy", "Medium", "Hard"],
             key=state.key("difficulty")
         )
         
-        if difficulty == "Easy":
-            st.caption("Mole-to-mole calculations")
-        elif difficulty == "Medium":
-            st.caption("Gram-to-mole or mole-to-gram calculations")
-        else:  # Hard
-            st.caption("Gram-to-gram with limiting reagent")
     
-    # Generate a new problem if needed
-    if st.button("New Problem") or state.get("question") is None:
-        question, answer, units, details = generate_stoichiometry_problem(reaction_type, difficulty)
+    from utils.solve_for import select_target, generate_selected
+    from utils.solve_for_custom import StoichiometryTargets
+    generator = StoichiometryTargets(generate_stoichiometry_problem, reaction_type)
+    with col3:
+        target = select_target(generator, "Product amount", difficulty, state)
+    st.caption({"Easy": "Mole-to-mole calculations", "Medium": "Gram-to-mole or mole-to-gram calculations",
+                "Hard": "Gram-to-gram with limiting reagent"}[difficulty])
+    selection = (reaction_type, difficulty, target)
+    # A changed request always produces a matching fresh question.
+    if st.button("New Problem") or state.get("question") is None or state.get("selection") != selection:
+        payload = generate_selected(generator, "Product amount", difficulty, target)
+        question, answer, units, details = payload["question"], payload["answers"][0], payload["units"][0], payload["extras"]["details"]
+        state.set("selection", selection)
         state.set("question", question)
         state.set("answer", answer)
         state.set("units", units)

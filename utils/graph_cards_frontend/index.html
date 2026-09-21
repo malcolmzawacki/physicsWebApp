@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+* { box-sizing:border-box; }
+body { margin:0; padding:4px; font:14px system-ui,sans-serif; color:var(--text,#172033); background:var(--bg,#fff); }
+#board { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.card { min-width:0; margin:0; padding:8px; border:2px solid #a5adba; border-radius:10px; background:var(--bg,#fff); color:inherit; text-align:left; font:inherit; }
+button.card { cursor:pointer; }
+button.card:hover:not(:disabled) { border-color:var(--accent,#245edb); }
+button.card:focus-visible { outline:3px solid var(--accent,#245edb); outline-offset:1px; }
+.card.selected { border:3px solid var(--accent,#245edb); padding:7px; }
+.card.correct { border-color:#228548; }
+.card:disabled { cursor:default; opacity:1; }
+.heading { display:flex; justify-content:space-between; align-items:center; min-height:20px; gap:8px; margin-bottom:4px; }
+.status { font-size:12px; }
+.reference { background:var(--secondary,#edf2f7); }
+img { display:block; width:100%; height:clamp(130px,20vw,180px); object-fit:contain; background:white; border-radius:4px; }
+#board.column { grid-template-columns:minmax(0,1.65fr) minmax(0,1fr); }
+#board.column .reference { grid-column:1; grid-row:1 / span 3; align-self:start; }
+#board.column button { grid-column:2; }
+#board.column button img, #board.column .reference img { height:auto; }
+@media(max-width:550px) {
+ #board, #board.column { grid-template-columns:minmax(0,1fr); }
+ #board.column .reference, #board.column button { grid-column:auto; grid-row:auto; }
+ img, #board.column button img, #board.column .reference img { height:auto; max-height:210px; }
+}
+#live { margin:8px 0 0; min-height:20px; }
+</style></head><body>
+<div id="board" role="group" aria-label="Reference graph and answer choices"></div>
+<p id="live" role="status" aria-live="polite">Loading graphs…</p>
+<script>
+// Streamlit components-v1 message protocol. No remote scripts or styles.
+const board=document.getElementById('board'), live=document.getElementById('live');
+let args=null, selected=null, lastHeight=0;
+function send(type,fields) { window.parent.postMessage({isStreamlitMessage:true,type,...fields},'*'); }
+function resize() {
+ const height=Math.ceil(document.body.getBoundingClientRect().height);
+ if(height!==lastHeight) { lastHeight=height; send('streamlit:setFrameHeight',{height}); }
+}
+function paintSelection() {
+ [...board.querySelectorAll('button')].forEach((card,index)=>{
+  card.classList.toggle('selected',index===selected);
+  card.classList.toggle('correct',args.locked && index===args.correct_index);
+  card.setAttribute('aria-pressed',String(index===selected)); card.disabled=Boolean(args.locked);
+  card.querySelector('.status').textContent=args.locked && index===args.correct_index
+   ? (index===selected ? 'Selected · Correct' : 'Correct answer') : index===selected ? 'Selected' : 'Choose';
+ });
+ live.textContent=args.locked ? 'Answer submitted. Choices are locked for this set.'
+  : selected===null ? 'Click a graph to select it, then press Check Match.'
+  : `Graph ${args.labels[selected]} selected. Press Check Match when ready.`;
+ resize();
+}
+function render(message) {
+ const next=message.args, rebuild=!args || next.question_id!==args.question_id;
+ const focusIndex=[...board.querySelectorAll('button')].indexOf(document.activeElement);
+ args=next; selected=Number.isInteger(args.selection) ? args.selection : null;
+ const theme=message.theme || {};
+ for(const [css,key] of [['--bg','backgroundColor'],['--text','textColor'],['--accent','primaryColor'],['--secondary','secondaryBackgroundColor']]) {
+  if(theme[key]) document.documentElement.style.setProperty(css,theme[key]);
+ }
+ board.className=args.layout==='Options in a column' ? 'column' : '';
+ if(rebuild) {
+  board.replaceChildren();
+  args.images.forEach((src,i)=>{
+   const card=document.createElement(i===0 ? 'div' : 'button');
+   card.className='card'+(i===0 ? ' reference' : '');
+   const heading=document.createElement('div'); heading.className='heading';
+   const title=document.createElement('strong'); title.textContent=i===0 ? 'Reference graph' : `Graph ${args.labels[i-1]}`;
+   const status=document.createElement('span'); status.className='status'; heading.append(title,status);
+   const img=document.createElement('img'); img.src=src;
+   img.alt=i===0 ? 'Reference motion graph' : `Motion graph option ${args.labels[i-1]}`;
+   img.onload=resize; card.append(heading,img);
+   if(i>0) {
+    card.type='button'; card.setAttribute('aria-label',`Select graph ${args.labels[i-1]}`);
+    card.addEventListener('click',()=>{
+     if(args.locked) return;
+     selected=i-1; paintSelection();
+     send('streamlit:setComponentValue',{dataType:'json',value:{question_id:args.question_id,index:selected}});
+    });
+   }
+   board.append(card);
+  });
+ }
+ paintSelection();
+ if(focusIndex>=0 && !args.locked) board.querySelectorAll('button')[focusIndex]?.focus({preventScroll:true});
+}
+window.addEventListener('message',event=>{
+ if(event.source===window.parent && event.data?.type==='streamlit:render') render(event.data);
+});
+new ResizeObserver(resize).observe(board);
+window.addEventListener('resize',resize);
+send('streamlit:componentReady',{apiVersion:1});
+</script></body></html>

@@ -22,6 +22,8 @@ class AtwoodGenerator(BaseGenerator):
         """Return metadata mapping for this generator."""
         return {
             "Static Friction Half Atwood": {
+                "id": "atwood.static-friction-half-atwood",
+                "aliases": ["Static Friction Half Atwood"],
                 "honors": r"""
                       \Sigma F \;=\; ma""",
 
@@ -34,6 +36,8 @@ class AtwoodGenerator(BaseGenerator):
                       }"""
             },
             "Frictionless Half Atwood": {
+                "id": "atwood.frictionless-half-atwood",
+                "aliases": ["Frictionless Half Atwood"],
                 "honors": r"""
                       \Sigma F \;=\; ma""",
 
@@ -46,6 +50,8 @@ class AtwoodGenerator(BaseGenerator):
                       }"""
             },
             "Kinetic Friction Half Atwood": {
+                "id": "atwood.kinetic-friction-half-atwood",
+                "aliases": ["Kinetic Friction Half Atwood"],
                 "honors": r"""
                       \Sigma F \;=\; ma""",
 

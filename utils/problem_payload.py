@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
+import math
+from numbers import Number, Real
 
 
 class ProblemPayloadError(ValueError):
@@ -38,6 +40,18 @@ class ProblemPayload:
             raise ProblemPayloadError("'answers' must be a non-empty list")
         if not isinstance(self.units, list) or len(self.units) != len(self.answers):
             raise ProblemPayloadError("'units' must be a list of same length as 'answers'")
+        for answer in self.answers:
+            if isinstance(answer, Number) and (not isinstance(answer, Real) or not math.isfinite(answer)):
+                raise ProblemPayloadError("Numeric answers must be real and finite")
+        if not all(isinstance(unit, str) for unit in self.units):
+            raise ProblemPayloadError("Unit labels must be strings")
+        if not isinstance(self.extras, dict):
+            raise ProblemPayloadError("'extras' must be a dictionary")
+        if not isinstance(self.button_options, dict):
+            raise ProblemPayloadError("'button_options' must be a dictionary")
+        for index, options in self.button_options.items():
+            if not isinstance(index, int) or not 0 <= index < len(self.answers) or not isinstance(options, list):
+                raise ProblemPayloadError("Choice options must map answer indices to lists")
 
 
 def payload_from_dict(data: Dict[str, Any]) -> ProblemPayload:
@@ -64,12 +78,13 @@ def payload_from_dict(data: Dict[str, Any]) -> ProblemPayload:
             optional[key] = data[key]
 
     # Anything else goes to extras
-    extras: Dict[str, Any] = optional.get('extras', {}) or {}
+    raw_extras = optional.get('extras', {})
+    if not isinstance(raw_extras, dict):
+        raise ProblemPayloadError("'extras' must be a dictionary")
+    extras: Dict[str, Any] = dict(raw_extras)
     for k, v in data.items():
         if k not in known:
             extras[k] = v
-    if extras:
-        optional['extras'] = extras
+    optional['extras'] = extras
 
     return ProblemPayload(**{**core, **optional})
-

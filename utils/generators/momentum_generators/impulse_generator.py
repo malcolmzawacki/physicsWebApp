@@ -26,6 +26,8 @@ class ImpulseGenerator(BaseGenerator):
             
 
             "Change in Momentum (Multiple Choice)": {
+                "id": "impulse.change-in-momentum-multiple-choice",
+                "aliases": ["Change in Momentum (Multiple Choice)"],
                 "honors": r"""
                  \Delta p \;=\; m  (v_f - v_i)
                 """,
@@ -57,6 +59,8 @@ class ImpulseGenerator(BaseGenerator):
             },
 
             "Change in Momentum": {
+                "id": "impulse.change-in-momentum",
+                "aliases": ["Change in Momentum"],
                 "honors": r"""
                  \Delta p \;=\; m  (v_f - v_i)
                 """,
@@ -89,6 +93,8 @@ class ImpulseGenerator(BaseGenerator):
                 """},
 
                 "Impulse": {
+                "id": "impulse.impulse",
+                "aliases": ["Impulse"],
                 "honors": r"""
                  F \cdot t \;=\; m  (v_f - v_i)
                 """,

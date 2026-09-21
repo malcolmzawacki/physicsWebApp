@@ -463,26 +463,36 @@ class LinearMotionGenerator(BaseGenerator):
         """Return metadata mapping for this generator."""
         return {
             "No Time": {
+                "id": "linear-motion.no-time",
+                "aliases": ["No Time"],
                 "honors_equation": r"v_f^2 = v_i^2 + 2ax",
                 "conceptual_equation": r"v_f = \sqrt{v_i^2 + 2ax}  \quad , \quad v_i = \sqrt{2ax - v_f^2}  \quad , \quad  x = \frac{v_f^2 - v_i^2}{2a}  \quad, \quad  a = \frac{v_f^2 - v_i^2}{2x}",
                 "tags": ["kinematics", "no time"],
             },
             "No Distance": {
+                "id": "linear-motion.no-distance",
+                "aliases": ["No Distance"],
                 "honors_equation": r"v_f = v_i + at",
                 "conceptual_equation": r"v_f = v_i +at  \quad , \quad v_i =  v_f - at  \quad , \quad a = \frac{v_f - v_i}{t}  \quad, \quad t = \frac{v_f - v_i}{a}",
                 "tags": ["kinematics", "no distance"],
             },
             "No Acceleration": {
+                "id": "linear-motion.no-acceleration",
+                "aliases": ["No Acceleration"],
                 "honors_equation": r"x = \frac{v_f + v_i}{2} t",
                 "conceptual_equation": r"x = \frac{v_f + v_i}{2} t  \quad , \quad t = \frac{2x}{v_f + v_i}  \quad , \quad v_f = \frac{2x}{t} - v_i  \quad , \quad v_i = \frac{2x}{t} - v_f",
                 "tags": ["kinematics", "no acceleration"],
             },
             "No Final Velocity": {
+                "id": "linear-motion.no-final-velocity",
+                "aliases": ["No Final Velocity"],
                 "honors_equation": r"x = v_i t + \frac{1}{2} at^2",
                 "conceptual_equation": r"x = v_i t + \frac{1}{2} at^2  \quad , \quad a = 2 \left( \frac{x - v_i t}{t^2} \right)\quad , \quad t = \frac{\sqrt{v_i^2 + 2ax} - v_i}{a}",
                 "tags": ["kinematics", "no v_f"],
             },
             "Mixed": {
+                "id": "linear-motion.mixed",
+                "aliases": ["Mixed"],
                 "honors_equation": r"v_f^2 = v_i^2 + 2ax \quad , \quad v_f = v_i +at  \quad , \quad x = \frac{v_f + v_i}{2} t  \quad , \quad x = v_i t + \frac{1}{2} at^2",
                 "conceptual_equation": r"""
                 x = \frac{v_f + v_i}{2} t  \quad , \quad 

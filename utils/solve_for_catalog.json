@@ -1,0 +1,376 @@
+{
+  "ConstantMotionGenerator": {
+    "Constant Speed": [
+      {"id": "inst-speed-question.distance", "label": "Distance", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "inst_speed_question", "kwargs": {"solve_for": "Distance"}, "difficulty": false}]},
+      {"id": "inst-speed-question.speed", "label": "Speed", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "inst_speed_question", "kwargs": {"solve_for": "Speed"}, "difficulty": false}]},
+      {"id": "inst-speed-question.time", "label": "Time", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "inst_speed_question", "kwargs": {"solve_for": "Time"}, "difficulty": false}]}
+    ]
+  },
+  "MomentumGenerator": {
+    "Momentum": [
+      {"id": "momentum-q.momentum", "label": "Momentum", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "momentum_q", "kwargs": {"solve_for": "momentum"}, "difficulty": false}]},
+      {"id": "momentum-q.mass", "label": "Mass", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "momentum_q", "kwargs": {"solve_for": "mass"}, "difficulty": false}]},
+      {"id": "momentum-q.velocity", "label": "Velocity", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "momentum_q", "kwargs": {"solve_for": "velocity"}, "difficulty": false}]}
+    ]
+  },
+  "LinearMotionGenerator": {
+    "No Time": [
+      {"id": "no-time-question.acceleration", "label": "Acceleration", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_time_question", "kwargs": {"solve_for": "a"}, "difficulty": true}]},
+      {"id": "no-time-question.final-velocity", "label": "Final velocity", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_time_question", "kwargs": {"solve_for": "vf"}, "difficulty": true}]},
+      {"id": "no-time-question.initial-velocity", "label": "Initial velocity", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_time_question", "kwargs": {"solve_for": "vi"}, "difficulty": true}]},
+      {"id": "no-time-question.displacement", "label": "Displacement", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_time_question", "kwargs": {"solve_for": "x"}, "difficulty": true}]}
+    ],
+    "No Distance": [
+      {"id": "no-dist-question.acceleration", "label": "Acceleration", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_dist_question", "kwargs": {"solve_for": "a"}, "difficulty": true}]},
+      {"id": "no-dist-question.final-velocity", "label": "Final velocity", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_dist_question", "kwargs": {"solve_for": "vf"}, "difficulty": true}]},
+      {"id": "no-dist-question.initial-velocity", "label": "Initial velocity", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_dist_question", "kwargs": {"solve_for": "vi"}, "difficulty": true}]},
+      {"id": "no-dist-question.time", "label": "Time", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_dist_question", "kwargs": {"solve_for": "t"}, "difficulty": true}]}
+    ],
+    "No Acceleration": [
+      {"id": "no-acc-question.time", "label": "Time", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_acc_question", "kwargs": {"solve_for": "t"}, "difficulty": true}]},
+      {"id": "no-acc-question.displacement", "label": "Displacement", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_acc_question", "kwargs": {"solve_for": "x"}, "difficulty": true}]},
+      {"id": "no-acc-question.final-velocity", "label": "Final velocity", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_acc_question", "kwargs": {"solve_for": "vf"}, "difficulty": true}]},
+      {"id": "no-acc-question.initial-velocity", "label": "Initial velocity", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_acc_question", "kwargs": {"solve_for": "vi"}, "difficulty": true}]}
+    ],
+    "No Final Velocity": [
+      {"id": "no-vf-question.displacement", "label": "Displacement", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_vf_question", "kwargs": {"solve_for": "x"}, "difficulty": true}]},
+      {"id": "no-vf-question.time", "label": "Time", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_vf_question", "kwargs": {"solve_for": "t"}, "difficulty": true}]},
+      {"id": "no-vf-question.initial-velocity", "label": "Initial velocity", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_vf_question", "kwargs": {"solve_for": "vi"}, "difficulty": true}]},
+      {"id": "no-vf-question.acceleration", "label": "Acceleration", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_vf_question", "kwargs": {"solve_for": "a"}, "difficulty": true}]}
+    ]
+  },
+  "RotationalMotionGenerator": {
+    "No Time": [
+      {"id": "no-time-question.angular-acceleration", "label": "Angular acceleration", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_time_question", "kwargs": {"solve_for": "a"}, "difficulty": true}]},
+      {"id": "no-time-question.final-angular-velocity", "label": "Final angular velocity", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_time_question", "kwargs": {"solve_for": "vf"}, "difficulty": true}]},
+      {"id": "no-time-question.initial-angular-velocity", "label": "Initial angular velocity", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_time_question", "kwargs": {"solve_for": "vi"}, "difficulty": true}]},
+      {"id": "no-time-question.angular-displacement", "label": "Angular displacement", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_time_question", "kwargs": {"solve_for": "theta"}, "difficulty": true}]}
+    ],
+    "No Distance": [
+      {"id": "no-dist-question.angular-acceleration", "label": "Angular acceleration", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_dist_question", "kwargs": {"solve_for": "a"}, "difficulty": true}]},
+      {"id": "no-dist-question.final-angular-velocity", "label": "Final angular velocity", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_dist_question", "kwargs": {"solve_for": "vf"}, "difficulty": true}]},
+      {"id": "no-dist-question.initial-angular-velocity", "label": "Initial angular velocity", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_dist_question", "kwargs": {"solve_for": "vi"}, "difficulty": true}]},
+      {"id": "no-dist-question.time", "label": "Time", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_dist_question", "kwargs": {"solve_for": "t"}, "difficulty": true}]}
+    ],
+    "No Acceleration": [
+      {"id": "no-acc-question.time", "label": "Time", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_acc_question", "kwargs": {"solve_for": "t"}, "difficulty": true}]},
+      {"id": "no-acc-question.angular-displacement", "label": "Angular displacement", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_acc_question", "kwargs": {"solve_for": "theta"}, "difficulty": true}]},
+      {"id": "no-acc-question.final-angular-velocity", "label": "Final angular velocity", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_acc_question", "kwargs": {"solve_for": "vf"}, "difficulty": true}]},
+      {"id": "no-acc-question.initial-angular-velocity", "label": "Initial angular velocity", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_acc_question", "kwargs": {"solve_for": "vi"}, "difficulty": true}]}
+    ],
+    "No Final Velocity": [
+      {"id": "no-vf-question.angular-displacement", "label": "Angular displacement", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_vf_question", "kwargs": {"solve_for": "theta"}, "difficulty": true}]},
+      {"id": "no-vf-question.time", "label": "Time", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_vf_question", "kwargs": {"solve_for": "t"}, "difficulty": true}]},
+      {"id": "no-vf-question.initial-angular-velocity", "label": "Initial angular velocity", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_vf_question", "kwargs": {"solve_for": "vi"}, "difficulty": true}]},
+      {"id": "no-vf-question.angular-acceleration", "label": "Angular acceleration", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_vf_question", "kwargs": {"solve_for": "a"}, "difficulty": true}]}
+    ]
+  },
+  "AtwoodGenerator": {
+    "Static Friction Half Atwood": [
+      {"id": "static-half-atwood.tension", "label": "Tension", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "static_half_atwood", "kwargs": {"solve_for": "tension"}, "difficulty": false}]},
+      {"id": "static-half-atwood.mass-1", "label": "Mass 1", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "static_half_atwood", "kwargs": {"solve_for": "mass 1"}, "difficulty": false}]},
+      {"id": "static-half-atwood.mass-2", "label": "Mass 2", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "static_half_atwood", "kwargs": {"solve_for": "mass 2"}, "difficulty": false}]},
+      {"id": "static-half-atwood.coefficient-of-friction", "label": "Coefficient of friction", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "static_half_atwood", "kwargs": {"solve_for": "coefficient of friction"}, "difficulty": false}]}
+    ],
+    "Frictionless Half Atwood": [
+      {"id": "frictionless-half-atwood.tension", "label": "Tension", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "frictionless_half_atwood", "kwargs": {"solve_for": "tension"}, "difficulty": false}]},
+      {"id": "frictionless-half-atwood.mass-1", "label": "Mass 1", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "frictionless_half_atwood", "kwargs": {"solve_for": "mass 1"}, "difficulty": false}]},
+      {"id": "frictionless-half-atwood.mass-2", "label": "Mass 2", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "frictionless_half_atwood", "kwargs": {"solve_for": "mass 2"}, "difficulty": false}]},
+      {"id": "frictionless-half-atwood.acceleration", "label": "Acceleration", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "frictionless_half_atwood", "kwargs": {"solve_for": "acceleration"}, "difficulty": false}]}
+    ],
+    "Kinetic Friction Half Atwood": [
+      {"id": "kinetic-half-atwood.acceleration-and-tension", "label": "Acceleration and tension", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "kinetic_half_atwood", "kwargs": {"solve_for": "acceleration and tension"}, "difficulty": false}]},
+      {"id": "kinetic-half-atwood.acceleration-and-coefficient", "label": "Acceleration and coefficient", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "kinetic_half_atwood", "kwargs": {"solve_for": "acceleration and coefficient"}, "difficulty": false}]},
+      {"id": "kinetic-half-atwood.coefficient-and-tension", "label": "Coefficient and tension", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "kinetic_half_atwood", "kwargs": {"solve_for": "coefficient and tension"}, "difficulty": false}]},
+      {"id": "kinetic-half-atwood.mass-2-and-acceleration", "label": "Mass 2 and acceleration", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "kinetic_half_atwood", "kwargs": {"solve_for": "mass 2 and acceleration"}, "difficulty": false}]},
+      {"id": "kinetic-half-atwood.mass-2-and-tension", "label": "Mass 2 and tension", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "kinetic_half_atwood", "kwargs": {"solve_for": "mass 2 and tension"}, "difficulty": false}]},
+      {"id": "kinetic-half-atwood.mass-2-and-coefficient", "label": "Mass 2 and coefficient", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "kinetic_half_atwood", "kwargs": {"solve_for": "mass 2 and coefficient"}, "difficulty": false}]},
+      {"id": "kinetic-half-atwood.mass-1-and-acceleration", "label": "Mass 1 and acceleration", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "kinetic_half_atwood", "kwargs": {"solve_for": "mass 1 and acceleration"}, "difficulty": false}]},
+      {"id": "kinetic-half-atwood.mass-1-and-tension", "label": "Mass 1 and tension", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "kinetic_half_atwood", "kwargs": {"solve_for": "mass 1 and tension"}, "difficulty": false}]},
+      {"id": "kinetic-half-atwood.mass-1-and-coefficient", "label": "Mass 1 and coefficient", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "kinetic_half_atwood", "kwargs": {"solve_for": "mass 1 and coefficient"}, "difficulty": false}]},
+      {"id": "kinetic-half-atwood.mass-1-and-mass-2", "label": "Mass 1 and mass 2", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "kinetic_half_atwood", "kwargs": {"solve_for": "mass 1 and mass 2"}, "difficulty": false}]}
+    ]
+  },
+  "InclineGenerator": {
+    "Static Incline": [
+      {"id": "static-incline.maximum-angle", "label": "Maximum angle", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "static_incline", "kwargs": {"solve_for": "angle"}, "difficulty": false}]},
+      {"id": "static-incline.minimum-static-friction-coefficient", "label": "Minimum static friction coefficient", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "static_incline", "kwargs": {"solve_for": "static coeff"}, "difficulty": false}]}
+    ],
+    "Frictionless Incline": [
+      {"id": "frictionless-incline.angle", "label": "Angle", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "frictionless_incline", "kwargs": {"solve_for": "angle"}, "difficulty": false}]},
+      {"id": "frictionless-incline.acceleration", "label": "Acceleration", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "frictionless_incline", "kwargs": {"solve_for": "accel"}, "difficulty": false}]}
+    ],
+    "Kinetic Friction Incline": [
+      {"id": "kinetic-friction-incline.acceleration", "label": "Acceleration", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "kinetic_friction_incline", "kwargs": {"solve_for": "accel"}, "difficulty": false}]},
+      {"id": "kinetic-friction-incline.kinetic-friction-coefficient", "label": "Kinetic friction coefficient", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "kinetic_friction_incline", "kwargs": {"solve_for": "coeff"}, "difficulty": false}]}
+    ]
+  },
+  "ImpulseGenerator": {
+    "Impulse": [
+      {"id": "impulse-q.change-in-momentum", "label": "Change in momentum", "levels": ["Easy"], "calls": [{"method": "impulse_q", "kwargs": {"solve_for": "change in momentum"}, "difficulty": true}]},
+      {"id": "impulse-q.force", "label": "Force", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "impulse_q", "kwargs": {"solve_for": "force"}, "difficulty": true}]},
+      {"id": "impulse-q.time", "label": "Time", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "impulse_q", "kwargs": {"solve_for": "time"}, "difficulty": true}]},
+      {"id": "impulse-q.mass", "label": "Mass", "levels": ["Medium", "Hard"], "calls": [{"method": "impulse_q", "kwargs": {"solve_for": "mass"}, "difficulty": true}]},
+      {"id": "impulse-q.change-in-velocity", "label": "Change in velocity", "levels": ["Medium"], "calls": [{"method": "impulse_q", "kwargs": {"solve_for": "change in velocity"}, "difficulty": true}]},
+      {"id": "impulse-q.initial-velocity", "label": "Initial velocity", "levels": ["Hard"], "calls": [{"method": "impulse_q", "kwargs": {"solve_for": "initial velocity"}, "difficulty": true}]},
+      {"id": "impulse-q.final-velocity", "label": "Final velocity", "levels": ["Hard"], "calls": [{"method": "impulse_q", "kwargs": {"solve_for": "final velocity"}, "difficulty": true}]}
+    ],
+    "Change in Momentum": [
+      {"id": "change-in-momentum.change-in-momentum", "label": "Change in momentum", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "change_in_momentum", "kwargs": {"solve_for": "change in momentum"}, "difficulty": true}]},
+      {"id": "change-in-momentum.initial-momentum", "label": "Initial momentum", "levels": ["Easy"], "calls": [{"method": "change_in_momentum", "kwargs": {"solve_for": "initial momentum"}, "difficulty": true}]},
+      {"id": "change-in-momentum.final-momentum", "label": "Final momentum", "levels": ["Easy"], "calls": [{"method": "change_in_momentum", "kwargs": {"solve_for": "final momentum"}, "difficulty": true}]},
+      {"id": "change-in-momentum.mass", "label": "Mass", "levels": ["Medium", "Hard"], "calls": [{"method": "change_in_momentum", "kwargs": {"solve_for": "mass"}, "difficulty": true}]},
+      {"id": "change-in-momentum.change-in-velocity", "label": "Change in velocity", "levels": ["Medium"], "calls": [{"method": "change_in_momentum", "kwargs": {"solve_for": "change in velocity"}, "difficulty": true}]},
+      {"id": "change-in-momentum.initial-velocity", "label": "Initial velocity", "levels": ["Hard"], "calls": [{"method": "change_in_momentum", "kwargs": {"solve_for": "initial velocity"}, "difficulty": true}]},
+      {"id": "change-in-momentum.final-velocity", "label": "Final velocity", "levels": ["Hard"], "calls": [{"method": "change_in_momentum", "kwargs": {"solve_for": "final velocity"}, "difficulty": true}]}
+    ]
+  },
+  "ProjectileGenerator": {
+    "Type 1": [
+      {"id": "generate-type1-question.horizontal-distance", "label": "Horizontal distance", "levels": ["Easy"], "calls": [{"method": "_generate_type1_question", "kwargs": {"solve_for": "x"}, "difficulty": true}]},
+      {"id": "generate-type1-question.cliff-height", "label": "Cliff height", "levels": ["Easy"], "calls": [{"method": "_generate_type1_question", "kwargs": {"solve_for": "h"}, "difficulty": true}]},
+      {"id": "generate-type1-question.initial-speed", "label": "Initial speed", "levels": ["Easy"], "calls": [{"method": "_generate_type1_question", "kwargs": {"solve_for": "v_i"}, "difficulty": true}]},
+      {"id": "generate-type1-question.final-speed-and-horizontal-distance", "label": "Final speed and horizontal distance", "levels": ["Medium", "Hard"], "calls": [{"method": "_generate_type1_question", "kwargs": {"solve_for": "v_f and x"}, "difficulty": true}]},
+      {"id": "generate-type1-question.initial-speed-and-cliff-height", "label": "Initial speed and cliff height", "levels": ["Medium", "Hard"], "calls": [{"method": "_generate_type1_question", "kwargs": {"solve_for": "v_i and h"}, "difficulty": true}]},
+      {"id": "generate-type1-question.final-speed-and-landing-angle", "label": "Final speed and landing angle", "levels": ["Medium", "Hard"], "calls": [{"method": "_generate_type1_question", "kwargs": {"solve_for": "v_f and theta"}, "difficulty": true}]}
+    ],
+    "Type 2": [
+      {"id": "generate-type2-question.initial-speed-and-launch-angle", "label": "Initial speed and launch angle", "levels": ["Medium", "Hard"], "calls": [{"method": "_generate_type2_question", "kwargs": {"solve_for": "v_i and theta"}, "difficulty": true}]},
+      {"id": "generate-type2-question.initial-speed-and-horizontal-distance", "label": "Initial speed and horizontal distance", "levels": ["Medium", "Hard"], "calls": [{"method": "_generate_type2_question", "kwargs": {"solve_for": "v_i and x"}, "difficulty": true}]},
+      {"id": "generate-type2-question.launch-angle-and-horizontal-distance", "label": "Launch angle and horizontal distance", "levels": ["Medium", "Hard"], "calls": [{"method": "_generate_type2_question", "kwargs": {"solve_for": "theta and x"}, "difficulty": true}]}
+    ],
+    "Type 3": [
+      {"id": "range-speed", "label": "Horizontal distance and final speed (off cliff)", "levels": ["Easy"], "calls": [{"method": "_generate_type3_question", "kwargs": {"direction": 1, "variant": 1}}]},
+      {"id": "range-angle", "label": "Horizontal distance and landing angle (onto cliff)", "levels": ["Easy"], "calls": [{"method": "_generate_type3_question", "kwargs": {"direction": 2, "variant": 1}}]},
+      {"id": "height-speed", "label": "Cliff height and landing speed (onto cliff)", "levels": ["Easy"], "calls": [{"method": "_generate_type3_question", "kwargs": {"direction": 2, "variant": 2}}]},
+      {"id": "setback-time", "label": "Launch setback and return-to-height time (off cliff)", "levels": ["Medium", "Hard"], "calls": [{"method": "_generate_type3_question", "kwargs": {"direction": 1, "variant": 1}}]},
+      {"id": "angle-range", "label": "Launch angle and distance to cliff (onto cliff)", "levels": ["Medium", "Hard"], "calls": [{"method": "_generate_type3_question", "kwargs": {"direction": 2, "variant": 1}}]}
+    ]
+  },
+  "EnergyBasicsGenerator": {
+    "Elastic Potential Energy": [
+      {"id": "elastic-problem.elastic-potential-energy", "label": "Elastic Potential Energy", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "elastic_problem", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "elastic-problem.compression-distance", "label": "Compression Distance", "levels": ["Medium", "Hard"], "calls": [{"method": "elastic_problem", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "elastic-problem.spring-strength", "label": "Spring Strength", "levels": ["Medium", "Hard"], "calls": [{"method": "elastic_problem", "kwargs": {"variant": 2}, "difficulty": true}]}
+    ],
+    "Kinetic Energy": [
+      {"id": "kinetic-problem.kinetic-energy", "label": "Kinetic Energy", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "kinetic_problem", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "kinetic-problem.velocity", "label": "Velocity", "levels": ["Medium", "Hard"], "calls": [{"method": "kinetic_problem", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "kinetic-problem.mass", "label": "Mass", "levels": ["Medium", "Hard"], "calls": [{"method": "kinetic_problem", "kwargs": {"variant": 2}, "difficulty": true}]}
+    ],
+    "Gravitational Potential Energy": [
+      {"id": "gravitational-problem.gravitational-potential-energy", "label": "Gravitational Potential Energy", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "gravitational_problem", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "gravitational-problem.height", "label": "Height", "levels": ["Medium", "Hard"], "calls": [{"method": "gravitational_problem", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "gravitational-problem.mass", "label": "Mass", "levels": ["Medium", "Hard"], "calls": [{"method": "gravitational_problem", "kwargs": {"variant": 2}, "difficulty": true}]}
+    ],
+    "Work": [
+      {"id": "work-problem.work", "label": "Work", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "work_problem", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "work-problem.distance", "label": "Distance", "levels": ["Medium", "Hard"], "calls": [{"method": "work_problem", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "work-problem.force", "label": "Force", "levels": ["Medium", "Hard"], "calls": [{"method": "work_problem", "kwargs": {"variant": 2}, "difficulty": true}]}
+    ]
+  },
+  "EnergyConservationGenerator": {
+    "Gravitational <--> Kinetic": [
+      {"id": "kinetic-gravitational-problem.velocity", "label": "Velocity", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "kinetic_gravitational_problem", "kwargs": {"variant": 0}, "difficulty": true}, {"method": "kinetic_gravitational_problem", "kwargs": {"variant": 3}, "difficulty": true}]},
+      {"id": "kinetic-gravitational-problem.height", "label": "Height", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "kinetic_gravitational_problem", "kwargs": {"variant": 1}, "difficulty": true}, {"method": "kinetic_gravitational_problem", "kwargs": {"variant": 2}, "difficulty": true}]}
+    ],
+    "Gravitational <--> Elastic": [
+      {"id": "elastic-gravitational-problem.spring-strength", "label": "Spring Strength", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "elastic_gravitational_problem", "kwargs": {"variant": 0}, "difficulty": true}, {"method": "elastic_gravitational_problem", "kwargs": {"variant": 6}, "difficulty": true}]},
+      {"id": "elastic-gravitational-problem.height", "label": "Height", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "elastic_gravitational_problem", "kwargs": {"variant": 1}, "difficulty": true}, {"method": "elastic_gravitational_problem", "kwargs": {"variant": 4}, "difficulty": true}]},
+      {"id": "elastic-gravitational-problem.compression-distance", "label": "Compression Distance", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "elastic_gravitational_problem", "kwargs": {"variant": 2}, "difficulty": true}, {"method": "elastic_gravitational_problem", "kwargs": {"variant": 5}, "difficulty": true}]},
+      {"id": "elastic-gravitational-problem.mass", "label": "Mass", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "elastic_gravitational_problem", "kwargs": {"variant": 3}, "difficulty": true}, {"method": "elastic_gravitational_problem", "kwargs": {"variant": 7}, "difficulty": true}]}
+    ],
+    "Elastic <--> Kinetic": [
+      {"id": "elastic-kinetic-problem.spring-strength", "label": "Spring Strength", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "elastic_kinetic_problem", "kwargs": {"variant": 0}, "difficulty": true}, {"method": "elastic_kinetic_problem", "kwargs": {"variant": 4}, "difficulty": true}]},
+      {"id": "elastic-kinetic-problem.velocity", "label": "Velocity", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "elastic_kinetic_problem", "kwargs": {"variant": 1}, "difficulty": true}, {"method": "elastic_kinetic_problem", "kwargs": {"variant": 5}, "difficulty": true}]},
+      {"id": "elastic-kinetic-problem.compression-distance", "label": "Compression Distance", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "elastic_kinetic_problem", "kwargs": {"variant": 2}, "difficulty": true}, {"method": "elastic_kinetic_problem", "kwargs": {"variant": 6}, "difficulty": true}]},
+      {"id": "elastic-kinetic-problem.mass", "label": "Mass", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "elastic_kinetic_problem", "kwargs": {"variant": 3}, "difficulty": true}, {"method": "elastic_kinetic_problem", "kwargs": {"variant": 7}, "difficulty": true}]}
+    ]
+  },
+  "ThermalLossGenerator": {
+    "Gravitational <--> Kinetic": [
+      {"id": "grav-to-kin-thermal-q.work-done-by-friction-grav-to-kin", "label": "Work done by Friction (gravitational to kinetic)", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "grav_to_kin_thermal_q", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "grav-to-kin-thermal-q.velocity-grav-to-kin", "label": "Velocity (gravitational to kinetic)", "levels": ["Medium", "Hard"], "calls": [{"method": "grav_to_kin_thermal_q", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "grav-to-kin-thermal-q.height-grav-to-kin", "label": "Height (gravitational to kinetic)", "levels": ["Medium", "Hard"], "calls": [{"method": "grav_to_kin_thermal_q", "kwargs": {"variant": 2}, "difficulty": true}]},
+      {"id": "kin-to-grav-thermal-q.work-done-by-friction-kin-to-grav", "label": "Work done by Friction (kinetic to gravitational)", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "kin_to_grav_thermal_q", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "kin-to-grav-thermal-q.velocity-kin-to-grav", "label": "Velocity (kinetic to gravitational)", "levels": ["Medium", "Hard"], "calls": [{"method": "kin_to_grav_thermal_q", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "kin-to-grav-thermal-q.height-kin-to-grav", "label": "Height (kinetic to gravitational)", "levels": ["Medium", "Hard"], "calls": [{"method": "kin_to_grav_thermal_q", "kwargs": {"variant": 2}, "difficulty": true}]}
+    ],
+    "Gravitational <--> Elastic": [
+      {"id": "grav-to-elastic-thermal-q.work-done-by-friction-grav-to-elastic", "label": "Work done by Friction (gravitational to elastic)", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "grav_to_elastic_thermal_q", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "grav-to-elastic-thermal-q.spring-strength-grav-to-elastic", "label": "Spring Strength (gravitational to elastic)", "levels": ["Medium", "Hard"], "calls": [{"method": "grav_to_elastic_thermal_q", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "grav-to-elastic-thermal-q.compression-distance-grav-to-elastic", "label": "Compression Distance (gravitational to elastic)", "levels": ["Medium", "Hard"], "calls": [{"method": "grav_to_elastic_thermal_q", "kwargs": {"variant": 2}, "difficulty": true}]},
+      {"id": "grav-to-elastic-thermal-q.mass-grav-to-elastic", "label": "Mass (gravitational to elastic)", "levels": ["Medium", "Hard"], "calls": [{"method": "grav_to_elastic_thermal_q", "kwargs": {"variant": 3}, "difficulty": true}]},
+      {"id": "grav-to-elastic-thermal-q.ramp-height-grav-to-elastic", "label": "Ramp Height (gravitational to elastic)", "levels": ["Medium", "Hard"], "calls": [{"method": "grav_to_elastic_thermal_q", "kwargs": {"variant": 4}, "difficulty": true}]},
+      {"id": "elastic-to-grav-thermal-q.work-done-by-friction-elastic-to-grav", "label": "Work done by Friction (elastic to gravitational)", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "elastic_to_grav_thermal_q", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "elastic-to-grav-thermal-q.spring-strength-elastic-to-grav", "label": "Spring Strength (elastic to gravitational)", "levels": ["Medium", "Hard"], "calls": [{"method": "elastic_to_grav_thermal_q", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "elastic-to-grav-thermal-q.compression-distance-elastic-to-grav", "label": "Compression Distance (elastic to gravitational)", "levels": ["Medium", "Hard"], "calls": [{"method": "elastic_to_grav_thermal_q", "kwargs": {"variant": 2}, "difficulty": true}]},
+      {"id": "elastic-to-grav-thermal-q.mass-elastic-to-grav", "label": "Mass (elastic to gravitational)", "levels": ["Medium", "Hard"], "calls": [{"method": "elastic_to_grav_thermal_q", "kwargs": {"variant": 3}, "difficulty": true}]},
+      {"id": "elastic-to-grav-thermal-q.ramp-height-elastic-to-grav", "label": "Ramp Height (elastic to gravitational)", "levels": ["Medium", "Hard"], "calls": [{"method": "elastic_to_grav_thermal_q", "kwargs": {"variant": 4}, "difficulty": true}]}
+    ],
+    "Elastic <--> Kinetic": [
+      {"id": "kinetic-to-elastic-thermal-q.work-done-by-friction-kinetic-to-elastic", "label": "Work done by Friction (kinetic to elastic)", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "kinetic_to_elastic_thermal_q", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "kinetic-to-elastic-thermal-q.spring-strength-kinetic-to-elastic", "label": "Spring Strength (kinetic to elastic)", "levels": ["Medium", "Hard"], "calls": [{"method": "kinetic_to_elastic_thermal_q", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "kinetic-to-elastic-thermal-q.compression-distance-kinetic-to-elastic", "label": "Compression Distance (kinetic to elastic)", "levels": ["Medium", "Hard"], "calls": [{"method": "kinetic_to_elastic_thermal_q", "kwargs": {"variant": 2}, "difficulty": true}]},
+      {"id": "kinetic-to-elastic-thermal-q.mass-kinetic-to-elastic", "label": "Mass (kinetic to elastic)", "levels": ["Medium", "Hard"], "calls": [{"method": "kinetic_to_elastic_thermal_q", "kwargs": {"variant": 3}, "difficulty": true}]},
+      {"id": "kinetic-to-elastic-thermal-q.velocity-kinetic-to-elastic", "label": "Velocity (kinetic to elastic)", "levels": ["Medium", "Hard"], "calls": [{"method": "kinetic_to_elastic_thermal_q", "kwargs": {"variant": 4}, "difficulty": true}]},
+      {"id": "elastic-to-kinetic-thermal-q.work-done-by-friction-elastic-to-kinetic", "label": "Work done by Friction (elastic to kinetic)", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "elastic_to_kinetic_thermal_q", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "elastic-to-kinetic-thermal-q.spring-strength-elastic-to-kinetic", "label": "Spring Strength (elastic to kinetic)", "levels": ["Medium", "Hard"], "calls": [{"method": "elastic_to_kinetic_thermal_q", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "elastic-to-kinetic-thermal-q.compression-distance-elastic-to-kinetic", "label": "Compression Distance (elastic to kinetic)", "levels": ["Medium", "Hard"], "calls": [{"method": "elastic_to_kinetic_thermal_q", "kwargs": {"variant": 2}, "difficulty": true}]},
+      {"id": "elastic-to-kinetic-thermal-q.mass-elastic-to-kinetic", "label": "Mass (elastic to kinetic)", "levels": ["Medium", "Hard"], "calls": [{"method": "elastic_to_kinetic_thermal_q", "kwargs": {"variant": 3}, "difficulty": true}]},
+      {"id": "elastic-to-kinetic-thermal-q.velocity-elastic-to-kinetic", "label": "Velocity (elastic to kinetic)", "levels": ["Medium", "Hard"], "calls": [{"method": "elastic_to_kinetic_thermal_q", "kwargs": {"variant": 4}, "difficulty": true}]}
+    ]
+  },
+  "ThermalWithFrictionGenerator": {
+    "Gravitational <--> Kinetic": [
+      {"id": "grav-to-kinetic-friction-distance-q.thermal-energy-and-final-velocity-grav-to-kinetic", "label": "Thermal Energy and Final Velocity (grav to kinetic)", "levels": ["Easy"], "calls": [{"method": "grav_to_kinetic_friction_distance_q", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "grav-to-kinetic-friction-distance-q.thermal-energy-and-ramp-height-grav-to-kinetic", "label": "Thermal Energy and Ramp Height (grav to kinetic)", "levels": ["Easy"], "calls": [{"method": "grav_to_kinetic_friction_distance_q", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "grav-to-kinetic-friction-distance-q.thermal-energy-and-mass-grav-to-kinetic", "label": "Thermal Energy and Mass (grav to kinetic)", "levels": ["Easy"], "calls": [{"method": "grav_to_kinetic_friction_distance_q", "kwargs": {"variant": 2}, "difficulty": true}]},
+      {"id": "grav-to-kinetic-friction-distance-q.final-velocity-grav-to-kinetic", "label": "Final Velocity (grav to kinetic)", "levels": ["Medium", "Hard"], "calls": [{"method": "grav_to_kinetic_friction_distance_q", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "grav-to-kinetic-friction-distance-q.ramp-height-grav-to-kinetic", "label": "Ramp Height (grav to kinetic)", "levels": ["Medium", "Hard"], "calls": [{"method": "grav_to_kinetic_friction_distance_q", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "grav-to-kinetic-friction-distance-q.mass-grav-to-kinetic", "label": "Mass (grav to kinetic)", "levels": ["Medium", "Hard"], "calls": [{"method": "grav_to_kinetic_friction_distance_q", "kwargs": {"variant": 2}, "difficulty": true}]},
+      {"id": "grav-to-kinetic-friction-distance-q.ramp-length-grav-to-kinetic", "label": "Ramp Length (grav to kinetic)", "levels": ["Medium", "Hard"], "calls": [{"method": "grav_to_kinetic_friction_distance_q", "kwargs": {"variant": 3}, "difficulty": true}]},
+      {"id": "grav-to-kinetic-friction-distance-q.force-of-friction-grav-to-kinetic", "label": "Force of Friction (grav to kinetic)", "levels": ["Medium", "Hard"], "calls": [{"method": "grav_to_kinetic_friction_distance_q", "kwargs": {"variant": 4}, "difficulty": true}]},
+      {"id": "kinetic-to-grav-friction-distance-q.thermal-energy-and-final-velocity-kinetic-to-grav", "label": "Thermal Energy and Initial Velocity (kinetic to grav)", "levels": ["Easy"], "calls": [{"method": "kinetic_to_grav_friction_distance_q", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "kinetic-to-grav-friction-distance-q.thermal-energy-and-ramp-height-kinetic-to-grav", "label": "Thermal Energy and Ramp Height (kinetic to grav)", "levels": ["Easy"], "calls": [{"method": "kinetic_to_grav_friction_distance_q", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "kinetic-to-grav-friction-distance-q.thermal-energy-and-mass-kinetic-to-grav", "label": "Thermal Energy and Mass (kinetic to grav)", "levels": ["Easy"], "calls": [{"method": "kinetic_to_grav_friction_distance_q", "kwargs": {"variant": 2}, "difficulty": true}]},
+      {"id": "kinetic-to-grav-friction-distance-q.final-velocity-kinetic-to-grav", "label": "Initial Velocity (kinetic to grav)", "levels": ["Medium", "Hard"], "calls": [{"method": "kinetic_to_grav_friction_distance_q", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "kinetic-to-grav-friction-distance-q.ramp-height-kinetic-to-grav", "label": "Ramp Height (kinetic to grav)", "levels": ["Medium", "Hard"], "calls": [{"method": "kinetic_to_grav_friction_distance_q", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "kinetic-to-grav-friction-distance-q.mass-kinetic-to-grav", "label": "Mass (kinetic to grav)", "levels": ["Medium", "Hard"], "calls": [{"method": "kinetic_to_grav_friction_distance_q", "kwargs": {"variant": 2}, "difficulty": true}]},
+      {"id": "kinetic-to-grav-friction-distance-q.ramp-length-kinetic-to-grav", "label": "Ramp Length (kinetic to grav)", "levels": ["Medium", "Hard"], "calls": [{"method": "kinetic_to_grav_friction_distance_q", "kwargs": {"variant": 3}, "difficulty": true}]},
+      {"id": "kinetic-to-grav-friction-distance-q.force-of-friction-kinetic-to-grav", "label": "Force of Friction (kinetic to grav)", "levels": ["Medium", "Hard"], "calls": [{"method": "kinetic_to_grav_friction_distance_q", "kwargs": {"variant": 4}, "difficulty": true}]}
+    ],
+    "Gravitational <--> Elastic": [
+      {"id": "grav-to-elastic-friction-distance-q.thermal-energy-and-spring-compression-grav-to-elastic", "label": "Thermal Energy and Spring Compression (gravitational to elastic)", "levels": ["Easy"], "calls": [{"method": "grav_to_elastic_friction_distance_q", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "grav-to-elastic-friction-distance-q.thermal-energy-and-spring-constant-grav-to-elastic", "label": "Thermal Energy and Spring Constant (gravitational to elastic)", "levels": ["Easy"], "calls": [{"method": "grav_to_elastic_friction_distance_q", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "grav-to-elastic-friction-distance-q.thermal-energy-and-ramp-height-grav-to-elastic", "label": "Thermal Energy and Ramp Height (gravitational to elastic)", "levels": ["Easy"], "calls": [{"method": "grav_to_elastic_friction_distance_q", "kwargs": {"variant": 2}, "difficulty": true}]},
+      {"id": "grav-to-elastic-friction-distance-q.thermal-energy-and-mass-grav-to-elastic", "label": "Thermal Energy and Mass (gravitational to elastic)", "levels": ["Easy"], "calls": [{"method": "grav_to_elastic_friction_distance_q", "kwargs": {"variant": 3}, "difficulty": true}]},
+      {"id": "grav-to-elastic-friction-distance-q.spring-compression-grav-to-elastic", "label": "Spring Compression (gravitational to elastic)", "levels": ["Medium", "Hard"], "calls": [{"method": "grav_to_elastic_friction_distance_q", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "grav-to-elastic-friction-distance-q.spring-constant-grav-to-elastic", "label": "Spring Constant (gravitational to elastic)", "levels": ["Medium", "Hard"], "calls": [{"method": "grav_to_elastic_friction_distance_q", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "grav-to-elastic-friction-distance-q.mass-grav-to-elastic", "label": "Mass (gravitational to elastic)", "levels": ["Medium", "Hard"], "calls": [{"method": "grav_to_elastic_friction_distance_q", "kwargs": {"variant": 2}, "difficulty": true}]},
+      {"id": "grav-to-elastic-friction-distance-q.ramp-length-grav-to-elastic", "label": "Ramp Length (gravitational to elastic)", "levels": ["Medium", "Hard"], "calls": [{"method": "grav_to_elastic_friction_distance_q", "kwargs": {"variant": 3}, "difficulty": true}]},
+      {"id": "grav-to-elastic-friction-distance-q.ramp-height-grav-to-elastic", "label": "Ramp Height (gravitational to elastic)", "levels": ["Medium", "Hard"], "calls": [{"method": "grav_to_elastic_friction_distance_q", "kwargs": {"variant": 4}, "difficulty": true}]},
+      {"id": "grav-to-elastic-friction-distance-q.force-of-friction-grav-to-elastic", "label": "Force of Friction (gravitational to elastic)", "levels": ["Medium", "Hard"], "calls": [{"method": "grav_to_elastic_friction_distance_q", "kwargs": {"variant": 5}, "difficulty": true}]},
+      {"id": "elastic-to-grav-friction-distance-q.thermal-energy-and-height-elastic-to-grav", "label": "Thermal Energy and Height (elastic to gravitational)", "levels": ["Easy"], "calls": [{"method": "elastic_to_grav_friction_distance_q", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "elastic-to-grav-friction-distance-q.thermal-energy-and-spring-compression-elastic-to-grav", "label": "Thermal Energy and Spring Compression (elastic to gravitational)", "levels": ["Easy"], "calls": [{"method": "elastic_to_grav_friction_distance_q", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "elastic-to-grav-friction-distance-q.thermal-energy-and-spring-constant-elastic-to-grav", "label": "Thermal Energy and Spring Constant (elastic to gravitational)", "levels": ["Easy"], "calls": [{"method": "elastic_to_grav_friction_distance_q", "kwargs": {"variant": 2}, "difficulty": true}]},
+      {"id": "elastic-to-grav-friction-distance-q.thermal-energy-and-mass-elastic-to-grav", "label": "Thermal Energy and Mass (elastic to gravitational)", "levels": ["Easy"], "calls": [{"method": "elastic_to_grav_friction_distance_q", "kwargs": {"variant": 3}, "difficulty": true}]},
+      {"id": "elastic-to-grav-friction-distance-q.height-elastic-to-grav", "label": "Height (elastic to gravitational)", "levels": ["Medium", "Hard"], "calls": [{"method": "elastic_to_grav_friction_distance_q", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "elastic-to-grav-friction-distance-q.spring-compression-elastic-to-grav", "label": "Spring Compression (elastic to gravitational)", "levels": ["Medium", "Hard"], "calls": [{"method": "elastic_to_grav_friction_distance_q", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "elastic-to-grav-friction-distance-q.mass-elastic-to-grav", "label": "Mass (elastic to gravitational)", "levels": ["Medium", "Hard"], "calls": [{"method": "elastic_to_grav_friction_distance_q", "kwargs": {"variant": 2}, "difficulty": true}]},
+      {"id": "elastic-to-grav-friction-distance-q.ramp-length-elastic-to-grav", "label": "Ramp Length (elastic to gravitational)", "levels": ["Medium", "Hard"], "calls": [{"method": "elastic_to_grav_friction_distance_q", "kwargs": {"variant": 3}, "difficulty": true}]},
+      {"id": "elastic-to-grav-friction-distance-q.spring-constant-elastic-to-grav", "label": "Spring Constant (elastic to gravitational)", "levels": ["Medium", "Hard"], "calls": [{"method": "elastic_to_grav_friction_distance_q", "kwargs": {"variant": 4}, "difficulty": true}]},
+      {"id": "elastic-to-grav-friction-distance-q.force-of-friction-elastic-to-grav", "label": "Force of Friction (elastic to gravitational)", "levels": ["Medium", "Hard"], "calls": [{"method": "elastic_to_grav_friction_distance_q", "kwargs": {"variant": 5}, "difficulty": true}]}
+    ],
+    "Elastic <--> Kinetic": [
+      {"id": "kinetic-to-elastic-friction-distance-q.thermal-energy-and-spring-compression-kinetic-to-elastic", "label": "Thermal Energy and Spring Compression (kinetic to elastic)", "levels": ["Easy"], "calls": [{"method": "kinetic_to_elastic_friction_distance_q", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "kinetic-to-elastic-friction-distance-q.thermal-energy-and-spring-constant-kinetic-to-elastic", "label": "Thermal Energy and Spring Constant (kinetic to elastic)", "levels": ["Easy"], "calls": [{"method": "kinetic_to_elastic_friction_distance_q", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "kinetic-to-elastic-friction-distance-q.thermal-energy-and-initial-velocity-kinetic-to-elastic", "label": "Thermal Energy and Initial Velocity (kinetic to elastic)", "levels": ["Easy"], "calls": [{"method": "kinetic_to_elastic_friction_distance_q", "kwargs": {"variant": 2}, "difficulty": true}]},
+      {"id": "kinetic-to-elastic-friction-distance-q.thermal-energy-and-mass-kinetic-to-elastic", "label": "Thermal Energy and Mass (kinetic to elastic)", "levels": ["Easy"], "calls": [{"method": "kinetic_to_elastic_friction_distance_q", "kwargs": {"variant": 3}, "difficulty": true}]},
+      {"id": "kinetic-to-elastic-friction-distance-q.spring-compression-kinetic-to-elastic", "label": "Spring Compression (kinetic to elastic)", "levels": ["Medium", "Hard"], "calls": [{"method": "kinetic_to_elastic_friction_distance_q", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "kinetic-to-elastic-friction-distance-q.spring-constant-kinetic-to-elastic", "label": "Spring Constant (kinetic to elastic)", "levels": ["Medium", "Hard"], "calls": [{"method": "kinetic_to_elastic_friction_distance_q", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "kinetic-to-elastic-friction-distance-q.mass-kinetic-to-elastic", "label": "Mass (kinetic to elastic)", "levels": ["Medium", "Hard"], "calls": [{"method": "kinetic_to_elastic_friction_distance_q", "kwargs": {"variant": 2}, "difficulty": true}]},
+      {"id": "kinetic-to-elastic-friction-distance-q.distance-kinetic-to-elastic", "label": "Distance (kinetic to elastic)", "levels": ["Medium", "Hard"], "calls": [{"method": "kinetic_to_elastic_friction_distance_q", "kwargs": {"variant": 3}, "difficulty": true}]},
+      {"id": "kinetic-to-elastic-friction-distance-q.initial-velocity-kinetic-to-elastic", "label": "Initial Velocity (kinetic to elastic)", "levels": ["Medium", "Hard"], "calls": [{"method": "kinetic_to_elastic_friction_distance_q", "kwargs": {"variant": 4}, "difficulty": true}]},
+      {"id": "kinetic-to-elastic-friction-distance-q.force-of-friction-kinetic-to-elastic", "label": "Force of Friction (kinetic to elastic)", "levels": ["Medium", "Hard"], "calls": [{"method": "kinetic_to_elastic_friction_distance_q", "kwargs": {"variant": 5}, "difficulty": true}]},
+      {"id": "elastic-to-kinetic-friction-distance-q.thermal-energy-and-velocity-elastic-to-kinetic", "label": "Thermal Energy and Velocity (elastic to kinetic)", "levels": ["Easy"], "calls": [{"method": "elastic_to_kinetic_friction_distance_q", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "elastic-to-kinetic-friction-distance-q.thermal-energy-and-spring-compression-elastic-to-kinetic", "label": "Thermal Energy and Spring Compression (elastic to kinetic)", "levels": ["Easy"], "calls": [{"method": "elastic_to_kinetic_friction_distance_q", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "elastic-to-kinetic-friction-distance-q.thermal-energy-and-spring-constant-elastic-to-kinetic", "label": "Thermal Energy and Spring Constant (elastic to kinetic)", "levels": ["Easy"], "calls": [{"method": "elastic_to_kinetic_friction_distance_q", "kwargs": {"variant": 2}, "difficulty": true}]},
+      {"id": "elastic-to-kinetic-friction-distance-q.thermal-energy-and-mass-elastic-to-kinetic", "label": "Thermal Energy and Mass (elastic to kinetic)", "levels": ["Easy"], "calls": [{"method": "elastic_to_kinetic_friction_distance_q", "kwargs": {"variant": 3}, "difficulty": true}]},
+      {"id": "elastic-to-kinetic-friction-distance-q.velocity-elastic-to-kinetic", "label": "Velocity (elastic to kinetic)", "levels": ["Medium", "Hard"], "calls": [{"method": "elastic_to_kinetic_friction_distance_q", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "elastic-to-kinetic-friction-distance-q.spring-compression-elastic-to-kinetic", "label": "Spring Compression (elastic to kinetic)", "levels": ["Medium", "Hard"], "calls": [{"method": "elastic_to_kinetic_friction_distance_q", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "elastic-to-kinetic-friction-distance-q.mass-elastic-to-kinetic", "label": "Mass (elastic to kinetic)", "levels": ["Medium", "Hard"], "calls": [{"method": "elastic_to_kinetic_friction_distance_q", "kwargs": {"variant": 2}, "difficulty": true}]},
+      {"id": "elastic-to-kinetic-friction-distance-q.distance-elastic-to-kinetic", "label": "Distance (elastic to kinetic)", "levels": ["Medium", "Hard"], "calls": [{"method": "elastic_to_kinetic_friction_distance_q", "kwargs": {"variant": 3}, "difficulty": true}]},
+      {"id": "elastic-to-kinetic-friction-distance-q.spring-constant-elastic-to-kinetic", "label": "Spring Constant (elastic to kinetic)", "levels": ["Medium", "Hard"], "calls": [{"method": "elastic_to_kinetic_friction_distance_q", "kwargs": {"variant": 4}, "difficulty": true}]},
+      {"id": "elastic-to-kinetic-friction-distance-q.force-of-friction-elastic-to-kinetic", "label": "Force of Friction (elastic to kinetic)", "levels": ["Medium", "Hard"], "calls": [{"method": "elastic_to_kinetic_friction_distance_q", "kwargs": {"variant": 5}, "difficulty": true}]}
+    ]
+  },
+  "WaveGenerator": {
+    "Wave Properties": [
+      {"id": "properties-of-waves.wave-speed", "label": "Wave Speed", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "properties_of_waves", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "properties-of-waves.wavelength", "label": "Wavelength", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "properties_of_waves", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "properties-of-waves.frequency", "label": "Frequency", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "properties_of_waves", "kwargs": {"variant": 2}, "difficulty": true}]}
+    ],
+    "String Harmonics": [
+      {"id": "string-harmonics.wavelength", "label": "Wavelength", "levels": ["Easy"], "calls": [{"method": "string_harmonics", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "string-harmonics.fundamental-frequency", "label": "Fundamental Frequency", "levels": ["Easy"], "calls": [{"method": "string_harmonics", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "string-harmonics.string-length", "label": "String Length", "levels": ["Easy"], "calls": [{"method": "string_harmonics", "kwargs": {"variant": 2}, "difficulty": true}, {"method": "string_harmonics", "kwargs": {"variant": 3}, "difficulty": true}]},
+      {"id": "string-harmonics.first-harmonic-wavelength-and-second-harmonic-wavelength-and-third-harmonic-wavelength", "label": "First Harmonic Wavelength and Second Harmonic Wavelength and Third Harmonic Wavelength", "levels": ["Medium"], "calls": [{"method": "string_harmonics", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "string-harmonics.fundamental-frequency-and-second-harmonic-frequency-and-third-harmonic-frequency", "label": "Fundamental Frequency and Second Harmonic Frequency and Third Harmonic Frequency", "levels": ["Medium"], "calls": [{"method": "string_harmonics", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "string-harmonics.wavelength-and-string-length", "label": "Wavelength and String Length", "levels": ["Hard"], "calls": [{"method": "string_harmonics", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "string-harmonics.fundamental-frequency-and-string-length", "label": "Fundamental Frequency and String Length", "levels": ["Hard"], "calls": [{"method": "string_harmonics", "kwargs": {"variant": 1}, "difficulty": true}]}
+    ],
+    "Open Ended Column Harmonics": [
+      {"id": "open-column-harmonics.wavelength", "label": "Wavelength", "levels": ["Easy"], "calls": [{"method": "open_column_harmonics", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "open-column-harmonics.fundamental-frequency", "label": "Fundamental Frequency", "levels": ["Easy"], "calls": [{"method": "open_column_harmonics", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "open-column-harmonics.column-length", "label": "Column Length", "levels": ["Easy"], "calls": [{"method": "open_column_harmonics", "kwargs": {"variant": 2}, "difficulty": true}, {"method": "open_column_harmonics", "kwargs": {"variant": 3}, "difficulty": true}]},
+      {"id": "open-column-harmonics.first-harmonic-wavelength-and-second-harmonic-wavelength-and-third-harmonic-wavelength", "label": "First Harmonic Wavelength and Second Harmonic Wavelength and Third Harmonic Wavelength", "levels": ["Medium"], "calls": [{"method": "open_column_harmonics", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "open-column-harmonics.fundamental-frequency-and-second-harmonic-frequency-and-third-harmonic-frequency", "label": "Fundamental Frequency and Second Harmonic Frequency and Third Harmonic Frequency", "levels": ["Medium"], "calls": [{"method": "open_column_harmonics", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "open-column-harmonics.wavelength-and-column-length", "label": "Wavelength and Column Length", "levels": ["Hard"], "calls": [{"method": "open_column_harmonics", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "open-column-harmonics.fundamental-frequency-and-column-length", "label": "Fundamental Frequency and Column Length", "levels": ["Hard"], "calls": [{"method": "open_column_harmonics", "kwargs": {"variant": 1}, "difficulty": true}]}
+    ],
+    "Closed End Column Harmonics": [
+      {"id": "closed-column-harmonics.wavelength", "label": "Wavelength", "levels": ["Easy"], "calls": [{"method": "closed_column_harmonics", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "closed-column-harmonics.fundamental-frequency", "label": "Fundamental Frequency", "levels": ["Easy"], "calls": [{"method": "closed_column_harmonics", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "closed-column-harmonics.column-length", "label": "Column Length", "levels": ["Easy"], "calls": [{"method": "closed_column_harmonics", "kwargs": {"variant": 2}, "difficulty": true}, {"method": "closed_column_harmonics", "kwargs": {"variant": 3}, "difficulty": true}]},
+      {"id": "closed-column-harmonics.first-harmonic-wavelength-and-third-harmonic-wavelength-and-fifth-harmonic-wavelength", "label": "First Harmonic Wavelength and Third Harmonic Wavelength and Fifth Harmonic Wavelength", "levels": ["Medium"], "calls": [{"method": "closed_column_harmonics", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "closed-column-harmonics.fundamental-frequency-and-third-harmonic-frequency-and-fifth-harmonic-frequency", "label": "Fundamental Frequency and Third Harmonic Frequency and Fifth Harmonic Frequency", "levels": ["Medium"], "calls": [{"method": "closed_column_harmonics", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "closed-column-harmonics.wavelength-and-column-length", "label": "Wavelength and Column Length", "levels": ["Hard"], "calls": [{"method": "closed_column_harmonics", "kwargs": {"variant": 0}, "difficulty": true}]},
+      {"id": "closed-column-harmonics.fundamental-frequency-and-column-length", "label": "Fundamental Frequency and Column Length", "levels": ["Hard"], "calls": [{"method": "closed_column_harmonics", "kwargs": {"variant": 1}, "difficulty": true}]}
+    ]
+  },
+  "ForceGenerator": {
+    "Newton's Second Law": [
+      {"id": "generate-force-question.object-acceleration", "label": "Object acceleration", "levels": ["Easy"], "calls": [{"method": "generate_force_question", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "generate-force-question.net-force-on-object", "label": "Net Force on Object", "levels": ["Easy"], "calls": [{"method": "generate_force_question", "kwargs": {"variant": 2}, "difficulty": true}]},
+      {"id": "generate-force-question.object-mass", "label": "Object mass", "levels": ["Easy"], "calls": [{"method": "generate_force_question", "kwargs": {"variant": 3}, "difficulty": true}]},
+      {"id": "generate-force-question.net-force-and-coefficient-of-friction", "label": "Net Force and coefficient of friction", "levels": ["Medium", "Hard"], "calls": [{"method": "generate_force_question", "kwargs": {"variant": 1}, "difficulty": true}]},
+      {"id": "generate-force-question.net-force-and-acceleration", "label": "Net Force and acceleration", "levels": ["Medium", "Hard"], "calls": [{"method": "generate_force_question", "kwargs": {"variant": 2}, "difficulty": true}]},
+      {"id": "generate-force-question.net-force-and-applied-force", "label": "Net Force and Applied Force", "levels": ["Medium", "Hard"], "calls": [{"method": "generate_force_question", "kwargs": {"variant": 3}, "difficulty": true}]}
+    ]
+  },
+  "RelativeMotionGenerator": {
+    "Independent motion": [
+      {"id": "selected-question.relative-velocity", "label": "Relative velocity", "levels": ["Easy"], "calls": [{"method": "selected_question", "kwargs": {"target": "result", "problem_type": "Independent motion"}, "difficulty": true}]},
+      {"id": "selected-question.object-a-velocity-relative-to-ground", "label": "Object A velocity relative to ground", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "selected_question", "kwargs": {"target": "Object A|ground", "problem_type": "Independent motion"}, "difficulty": true}]},
+      {"id": "selected-question.object-b-velocity-relative-to-ground", "label": "Object B velocity relative to ground", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "selected_question", "kwargs": {"target": "Object B|ground", "problem_type": "Independent motion"}, "difficulty": true}]},
+      {"id": "selected-question.separation-after-stated-time", "label": "Separation after stated time", "levels": ["Medium"], "calls": [{"method": "selected_question", "kwargs": {"target": "result", "problem_type": "Independent motion"}, "difficulty": true}]},
+      {"id": "selected-question.meeting-time", "label": "Meeting time", "levels": ["Hard"], "calls": [{"method": "selected_question", "kwargs": {"target": "result", "problem_type": "Independent motion"}, "difficulty": true}]}
+    ],
+    "Nested reference frames": [
+      {"id": "selected-question.person-velocity-relative-to-shore", "label": "Person velocity relative to shore", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "selected_question", "kwargs": {"target": "result", "problem_type": "Nested reference frames"}, "difficulty": true}]},
+      {"id": "selected-question.person-velocity-relative-to-boat", "label": "Person velocity relative to boat", "levels": ["Easy", "Medium"], "calls": [{"method": "selected_question", "kwargs": {"target": "Person|boat", "problem_type": "Nested reference frames"}, "difficulty": true}]},
+      {"id": "selected-question.boat-velocity-relative-to-shore", "label": "boat velocity relative to shore", "levels": ["Easy"], "calls": [{"method": "selected_question", "kwargs": {"target": "boat|shore", "problem_type": "Nested reference frames"}, "difficulty": true}]},
+      {"id": "selected-question.boat-velocity-relative-to-water", "label": "boat velocity relative to water", "levels": ["Medium", "Hard"], "calls": [{"method": "selected_question", "kwargs": {"target": "boat|water", "problem_type": "Nested reference frames"}, "difficulty": true}]},
+      {"id": "selected-question.water-velocity-relative-to-shore", "label": "water velocity relative to shore", "levels": ["Medium", "Hard"], "calls": [{"method": "selected_question", "kwargs": {"target": "water|shore", "problem_type": "Nested reference frames"}, "difficulty": true}]},
+      {"id": "selected-question.person-velocity-relative-to-moving-walkway", "label": "Person velocity relative to moving walkway", "levels": ["Hard"], "calls": [{"method": "selected_question", "kwargs": {"target": "Person|moving walkway", "problem_type": "Nested reference frames"}, "difficulty": true}]},
+      {"id": "selected-question.moving-walkway-velocity-relative-to-boat", "label": "moving walkway velocity relative to boat", "levels": ["Hard"], "calls": [{"method": "selected_question", "kwargs": {"target": "moving walkway|boat", "problem_type": "Nested reference frames"}, "difficulty": true}]}
+    ],
+    "Combined": [
+      {"id": "selected-question.person-a-velocity-relative-to-person-b", "label": "Person A velocity relative to Person B", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "selected_question", "kwargs": {"target": "result", "problem_type": "Combined"}, "difficulty": true}]},
+      {"id": "selected-question.person-a-velocity-relative-to-boat-a", "label": "Person A velocity relative to boat A", "levels": ["Easy", "Medium"], "calls": [{"method": "selected_question", "kwargs": {"target": "Person A|boat A", "problem_type": "Combined"}, "difficulty": true}]},
+      {"id": "selected-question.boat-a-velocity-relative-to-shore", "label": "boat A velocity relative to shore", "levels": ["Easy"], "calls": [{"method": "selected_question", "kwargs": {"target": "boat A|shore", "problem_type": "Combined"}, "difficulty": true}]},
+      {"id": "selected-question.person-b-velocity-relative-to-boat-b", "label": "Person B velocity relative to boat B", "levels": ["Easy", "Medium"], "calls": [{"method": "selected_question", "kwargs": {"target": "Person B|boat B", "problem_type": "Combined"}, "difficulty": true}]},
+      {"id": "selected-question.boat-b-velocity-relative-to-shore", "label": "boat B velocity relative to shore", "levels": ["Easy"], "calls": [{"method": "selected_question", "kwargs": {"target": "boat B|shore", "problem_type": "Combined"}, "difficulty": true}]},
+      {"id": "selected-question.boat-a-velocity-relative-to-water", "label": "boat A velocity relative to water", "levels": ["Medium", "Hard"], "calls": [{"method": "selected_question", "kwargs": {"target": "boat A|water", "problem_type": "Combined"}, "difficulty": true}]},
+      {"id": "selected-question.boat-b-velocity-relative-to-water", "label": "boat B velocity relative to water", "levels": ["Medium", "Hard"], "calls": [{"method": "selected_question", "kwargs": {"target": "boat B|water", "problem_type": "Combined"}, "difficulty": true}]},
+      {"id": "selected-question.person-a-velocity-relative-to-walkway-a", "label": "Person A velocity relative to walkway A", "levels": ["Hard"], "calls": [{"method": "selected_question", "kwargs": {"target": "Person A|walkway A", "problem_type": "Combined"}, "difficulty": true}]},
+      {"id": "selected-question.walkway-a-velocity-relative-to-boat-a", "label": "walkway A velocity relative to boat A", "levels": ["Hard"], "calls": [{"method": "selected_question", "kwargs": {"target": "walkway A|boat A", "problem_type": "Combined"}, "difficulty": true}]},
+      {"id": "selected-question.person-b-velocity-relative-to-walkway-b", "label": "Person B velocity relative to walkway B", "levels": ["Hard"], "calls": [{"method": "selected_question", "kwargs": {"target": "Person B|walkway B", "problem_type": "Combined"}, "difficulty": true}]},
+      {"id": "selected-question.walkway-b-velocity-relative-to-boat-b", "label": "walkway B velocity relative to boat B", "levels": ["Hard"], "calls": [{"method": "selected_question", "kwargs": {"target": "walkway B|boat B", "problem_type": "Combined"}, "difficulty": true}]}
+    ]
+  },
+  "OhmsLawTargets": {
+    "Single Resistor": [
+      {"id": "voltage", "label": "Voltage", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "single_resistor", "kwargs": {"solve_for": "Voltage"}}]},
+      {"id": "current", "label": "Current", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "single_resistor", "kwargs": {"solve_for": "Current"}}]},
+      {"id": "resistance", "label": "Resistance", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "single_resistor", "kwargs": {"solve_for": "Resistance"}}]}
+    ]
+  },
+  "StoichiometryTargets": {
+    "Product amount": [
+      {"id": "gram-to-mole", "label": "Product moles (given reactant mass)", "levels": ["Medium"], "calls": [{"method": "conversion", "kwargs": {"conversion_type": "gram-to-mole"}}]},
+      {"id": "mole-to-gram", "label": "Product mass (given reactant moles)", "levels": ["Medium"], "calls": [{"method": "conversion", "kwargs": {"conversion_type": "mole-to-gram"}}]}
+    ]
+  }
+}

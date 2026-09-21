@@ -9,10 +9,10 @@ class EnergyConservationGenerator(BaseGenerator):
         super().__init__(state_prefix="energy_conserv_")
     
     # # # E N E R G Y   C 0 N S E R V A T I 0 N   P R 0 B L E M S # # # 
-    def kinetic_gravitational_problem(self,difficulty):
+    def kinetic_gravitational_problem(self,difficulty, *, variant=None):
         mass, velocity, _ = EBG.kinetic_energy(difficulty)
         height = velocity**2 / 20
-        q_type = ri(0,3)
+        q_type = ri(0,3) if variant is None else variant
         noun = random_noun()
         if q_type == 0:
             question = f"""A {mass:.2f} kg {noun} is dropped from a height of {height:.2f} meters.
@@ -38,12 +38,12 @@ class EnergyConservationGenerator(BaseGenerator):
 
         return {"question": question, "answers": [answer], "units": [unit]}
     
-    def elastic_gravitational_problem(self, difficulty):
+    def elastic_gravitational_problem(self, difficulty, *, variant=None):
         spring_constant, compression, elastic_e = EBG.elastic_potential_energy(difficulty)
         height = compression * ri(2, int(elastic_e//5  + 3))
         mass = elastic_e / (10*height)
 
-        q_type = ri(0,7)
+        q_type = ri(0,7) if variant is None else variant
         noun = random_noun()
         if q_type == 0:
             # find k
@@ -102,13 +102,13 @@ class EnergyConservationGenerator(BaseGenerator):
 
         return {"question": question, "answers": [answer], "units": [unit]}
 
-    def elastic_kinetic_problem(self, difficulty):
+    def elastic_kinetic_problem(self, difficulty, *, variant=None):
             spring_constant, compression, _ = EBG.elastic_potential_energy(difficulty)
             upper = self.get_difficulty_range(difficulty)
             mass = ri(1,upper)
             velocity = compression  * (spring_constant / mass )**(1/2)
             
-            q_type = ri(0,7)
+            q_type = ri(0,7) if variant is None else variant
             noun = random_noun()
             if q_type == 0:
                 # find k
@@ -187,6 +187,8 @@ class EnergyConservationGenerator(BaseGenerator):
         """Return metadata mapping for this generator."""
         return {
             "Elastic <--> Kinetic": {
+                "id": "energy-conservation.elastic-kinetic",
+                "aliases": ["Elastic <--> Kinetic"],
                 "honors": r"\frac{1}{2} m v^2 = \frac{1}{2} k \Delta x^2",
                 "conceptual": r""" m = k \cdot \left( \frac{ \Delta x}{v} \right)^2 \;\; ,
                 \;\; v = \Delta x \cdot \sqrt{\frac{k}{m}} \;\; ,
@@ -194,11 +196,15 @@ class EnergyConservationGenerator(BaseGenerator):
                 \;\; \Delta x = v \cdot \sqrt{\frac{m}{k}}"""
                 },
             "Gravitational <--> Kinetic": {
+                "id": "energy-conservation.gravitational-kinetic",
+                "aliases": ["Gravitational <--> Kinetic"],
                 "honors": r"mgh = \frac{1}{2} m v^2",
                 "conceptual": r"""h = \frac{v^2}{2g} \;\;,
                  \;\; v = \sqrt{2gh}"""
                 },
             "Gravitational <--> Elastic" : {
+                "id": "energy-conservation.gravitational-elastic",
+                "aliases": ["Gravitational <--> Elastic"],
                 "honors": r"mgh = \frac{1}{2} k \Delta x^2",
                 "conceptual": r"""m = \frac{k \Delta x^2}{2gh}\;\;,
                 \;\; h = \frac{k \Delta x^2}{2mg} \;\;,

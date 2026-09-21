@@ -53,9 +53,9 @@ class EnergyBasicsGenerator(BaseGenerator):
 
 
   # # # B A S I C    E N E R G Y    P R 0 B L E M S # # # 
-  def elastic_problem(self,difficulty):
+  def elastic_problem(self,difficulty, *, variant=None):
       spring_constant, compression, elastic_e = self.elastic_potential_energy(difficulty)
-      q_type = ri(0,2)
+      q_type = ri(0,2) if variant is None else variant
       dirn = ri(0,1)
       dirn_string = "compressed" if dirn == 0 else "stretched"
       if q_type == 0 or difficulty == "Easy":
@@ -76,9 +76,9 @@ class EnergyBasicsGenerator(BaseGenerator):
 
       return {"question": question, "answers": [answer], "units": [unit]}
   
-  def kinetic_problem(self,difficulty):
+  def kinetic_problem(self,difficulty, *, variant=None):
       mass, velocity, kinetic_e = self.kinetic_energy(difficulty)
-      q_type = ri(0,2)
+      q_type = ri(0,2) if variant is None else variant
       noun = random_noun()
       if q_type == 0 or difficulty == "Easy":
           question = f"""How much kinetic energy does a {mass:.2f} kg {noun} moving at {velocity:.2f} m/s have?"""
@@ -95,9 +95,9 @@ class EnergyBasicsGenerator(BaseGenerator):
 
       return {"question": question, "answers": [answer], "units": [unit]}
   
-  def gravitational_problem(self,difficulty):
+  def gravitational_problem(self,difficulty, *, variant=None):
       mass, height, gravit_e = self.gravitational_potential_energy(difficulty)
-      q_type = ri(0,2)
+      q_type = ri(0,2) if variant is None else variant
       noun = random_noun()
       if q_type == 0 or difficulty == "Easy":
           question = f"""How much gravitational potential energy does a {mass:.2f} kg {noun} 
@@ -117,9 +117,9 @@ class EnergyBasicsGenerator(BaseGenerator):
 
       return {"question": question, "answers": [answer], "units": [unit]}
   
-  def work_problem(self,difficulty):
+  def work_problem(self,difficulty, *, variant=None):
       force, distance, work = self.work(difficulty)
-      q_type = ri(0,2)
+      q_type = ri(0,2) if variant is None else variant
       noun = random_noun()
       if q_type == 0 or difficulty == "Easy":
           question = f"""A {noun} is moved {distance:.2f} meters by a {force} Newton force. 
@@ -156,24 +156,32 @@ class EnergyBasicsGenerator(BaseGenerator):
         """Return metadata mapping for this generator."""
         return {
            "Elastic Potential Energy": {
+                "id": "energy-basics.elastic-potential-energy",
+                "aliases": ["Elastic Potential Energy"],
                 "honors" : r"EPE = \frac{1}{2} k \Delta x^2", 
                 "conceptual": r"""EPE = \frac{1}{2} k \Delta x^2 \;\; , 
                 \;\; k = \frac{2 \cdot EPE}{\Delta x^2} \;\; , 
                 \;\; \Delta x = \sqrt{\frac{2 \cdot EPE}{k}}"""
                 },
             "Kinetic Energy": {
+                "id": "energy-basics.kinetic-energy",
+                "aliases": ["Kinetic Energy"],
                 "honors": r"KE = \frac{1}{2} m v^2",
                 "conceptual": r"""KE = \frac{1}{2} m v^2\;\; ,
                 \;\; m = \frac{2KE}{v^2} \;\; ,
                 \;\; v = \sqrt{\frac{2KE}{m}}"""
             },               
             "Gravitational Potential Energy" : {
+                "id": "energy-basics.gravitational-potential-energy",
+                "aliases": ["Gravitational Potential Energy"],
                 "honors": r"GPE = mgh",
                 "conceptual": r"""GPE = mgh\;\; ,
                 \;\; m = \frac{GPE}{gh} \;\; ,
                 \;\; h = \frac{GPE}{mg}"""
             },
             "Work": {
+                "id": "energy-basics.work",
+                "aliases": ["Work"],
                 "honors": r"W = Fd",
                 "conceptual": r"""W = Fd\;\; ,
                 \;\; F = \frac{W}{d} \;\; ,

@@ -1,5 +1,9 @@
 """Streamlit interface helpers that connect problem generators to the UI layer."""
 
+from utils.grading import answer_matches, DIFFICULTY_STARS
+from utils.layout_config import question_columns
+from utils.ui_components import equation_controls
+from utils.solve_for import generate_selected, select_target, MIXED
 import pandas as pd
 import streamlit as st
 
@@ -65,16 +69,24 @@ class Interface:
     # region performance
     def clear_performance_dataframe(self) -> dict:
         """Create a fresh performance dict (pure) using ui_components helper."""
-        return init_performance(self.problem_types, self.difficulties)
+        return init_performance([self.problem_id(label) for label in self.problem_types], self.difficulties)
 
     def create_performance_dataframe(self) -> pd.DataFrame:
         performance = self.state.get("performance")
         ordered = list(self.difficulties)
-        return build_performance_table(performance, ordered)
+        labels = {self.problem_id(label): label for label in self.problem_types}
+        displayed = {labels.get(key, key): value for key, value in performance.items()}
+        return build_performance_table(displayed, ordered)
+
+    def problem_id(self, label: str) -> str:
+        """Use an explicit stable metadata ID; retain legacy label keys by default."""
+        getter = getattr(self.generator, "get_problem_metadata", None)
+        metadata = getter(label) if callable(getter) else {}
+        return metadata.get("id", label)
 
     def update_performance(self, problem_type: str, difficulty: str, is_correct: bool) -> None:
         performance = self.state.get("performance")
-        new_perf = record_performance(performance, problem_type, difficulty, is_correct)
+        new_perf = record_performance(performance, self.problem_id(problem_type), difficulty, is_correct)
         self.state.set("performance", new_perf)
 
     def performance_dropdown(self) -> None:
@@ -102,7 +114,22 @@ class Interface:
             self.state.ensure(var, 0)
         # Performance tracking
         # Lazily initialize performance dict to avoid resetting on reruns
-        self.state.ensure_lazy("performance", lambda: init_performance(self.problem_types, self.difficulties))
+        self.state.ensure_lazy("performance", self.clear_performance_dataframe)
+        # Migrate existing display-label history when a generator adopts IDs or
+        # declares old labels as aliases. Never discard prior attempts.
+        performance = self.state.get("performance")
+        getter = getattr(self.generator, "get_problem_metadata", None)
+        for label in self.problem_types:
+            identity = self.problem_id(label)
+            metadata = getter(label) if callable(getter) else {}
+            for old in [label, *metadata.get("aliases", [])]:
+                if old != identity and old in performance:
+                    previous = performance.pop(old)
+                    target = performance.setdefault(identity, {})
+                    for difficulty, stats in previous.items():
+                        bucket = target.setdefault(difficulty, {"attempts": 0, "correct": 0})
+                        for metric in ("attempts", "correct"):
+                            bucket[metric] += stats.get(metric, 0)
         # Equation level toggle default
         if self.state.get("level") is None:
             self.state.set("level", False)
@@ -123,6 +150,17 @@ class Interface:
             expanded = bool(expanded)
         problem_type = self.state.get("problem_type")
         difficulty = self.state.get("difficulty")
+        if hasattr(diagram_data, "savefig"):
+            with st.expander(expander_title, expanded=expanded):
+                st.pyplot(diagram_data)
+            return
+        renderer = self.get_current_problem_features().get("diagram_renderer")
+        if callable(renderer):
+            fig = renderer(diagram_data)
+            if fig is not None:
+                with st.expander(expander_title, expanded=expanded):
+                    st.pyplot(fig)
+            return
         if hasattr(self.generator, "generate_diagram"):
             try:
                 fig = self.generator.generate_diagram(diagram_data, problem_type, difficulty)
@@ -135,12 +173,11 @@ class Interface:
 
     def get_current_problem_features(self) -> dict:
         """Collect optional features saved in session state for the current question."""
-        features = {}
-        for feature in ["diagram_data", "hints", "button_options", "time_limit", "explanation", "tags", "show_equations", "answer_input_mode"]:
-            val = self.state.get(feature)
-            if val is not None:
-                features[feature] = val
-        return features
+        payload = self.state.get("payload")
+        if payload is None:
+            return {}
+        return {**payload.extras, "diagram_data": payload.diagram_data,
+                "hints": payload.hints, "button_options": payload.button_options}
 
     def show_hints(self) -> None:
         """Display ordered hints, if any were supplied by the generator."""
@@ -149,12 +186,12 @@ class Interface:
     def show_problem_tags(self, tags: list) -> None:
         """Render topic tags for the current question when generators provide them."""
         if tags:
-            st.caption(" ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ ".join(tags))
+            st.caption(" · ".join(tags))
 
     def generate_question_once(self, problem_type: str, difficulty: str) -> None:
         """Fetch a new problem from the generator, normalize it, and trigger a rerun."""
         try:
-            result = self.generator.choose_problem_dict(problem_type, difficulty)
+            result = generate_selected(self.generator, problem_type, difficulty, self.state.get("solve_for", MIXED))
         except Exception as e:
             if AUTHOR_MODE:
                 st.exception(e)
@@ -178,20 +215,27 @@ class Interface:
         self.state.inc("question_id", 1)
         self.state.set("problem_type", problem_type)
         self.state.set("difficulty", difficulty)
+        self.state.set("generated_solve_for", self.state.get("solve_for", MIXED))
         self.state.set("current_question", payload.question)
         self.state.set("correct_answers", payload.answers)
         self.state.set("units", payload.units)
         self.state.set("submitted", False)
 
-        for feature in ["diagram_data", "hints", "button_options", "timer", "explanation", "tags", "show_equations", "answer_input_mode"]:
-            if feature in result:
-                self.state.set(feature, result[feature])
-            else:
-                self.state.pop(feature)
+        self.state.set("payload", payload)
+        self.state.set("user_answers_selected", [None] * len(payload.answers))
+        self.state.pop("answer_options")
+        self.state.pop("last_result")
+        self.state.pop("feedback_message")
+        features = {**payload.extras, "diagram_data": payload.diagram_data,
+                    "hints": payload.hints, "button_options": payload.button_options}
+        for feature in ("diagram_data", "hints", "button_options", "timer", "time_limit",
+                        "explanation", "tags", "show_equations", "answer_input_mode",
+                        "unique_choices", "grading", "solution_equations"):
+            self.state.set(feature, features.get(feature))
 
     def unified_question_options(self, equations: bool = True, ifDifficulty: bool = True) -> None:
         """Render selectors for problem type and difficulty, auto-refreshing when the choice changes."""
-        col1, col2, col3 = st.columns([3, 2, 2], vertical_alignment="bottom", gap="medium")
+        col1, col2, col3 = question_columns()
         with col1:
             selected_problem_type = st.selectbox(
                 "Problem Type", options=list(self.problem_types), key=f"{self.prefix}_problem_type_select_unified"
@@ -204,23 +248,23 @@ class Interface:
             else:
                 difficulty = "Easy"
         with col3:
-            if equations:
-                lvl = st.checkbox(
-                    "More Equations", value=self.state.get('level',False), key=f"{self.prefix}_levels_check_unified"
-                )
-
+            target = select_target(self.generator, selected_problem_type, difficulty, self.state)
+        self.state.set("solve_for", target)
         if (
             selected_problem_type != self.state.get("problem_type")
             or self.state.get("current_question") is None
+            or self.state.get("payload") is None
             or difficulty != self.state.get("difficulty")
+            or target != self.state.get("generated_solve_for")
         ):
             self.generate_question_once(selected_problem_type, difficulty)
 
         if equations:
-            show_equations_expander(
+            equation_controls(
                 generator=self.generator,
                 problem_type=selected_problem_type,
-                level=lvl,
+                state=self.state,
+                checkbox_key=f"{self.prefix}_levels_check_unified",
                 fallback_dict=self.problem_type_dict,
                 expanded=True,
             )
@@ -229,31 +273,34 @@ class Interface:
         """Co-ordinate the full question lifecycle, handling diagrams, hints, and answer UIs."""
         self.initialize_session_state()
         self.header_component()
-        equations = kwargs.get("equations", True)
+        equations = kwargs.get("equations", self.state.get("show_equations") is not False)
         self.unified_question_options(equations)
         available_features = self.get_current_problem_features()
+        timer = kwargs.get("timer", available_features.get("time_limit", available_features.get("timer", 3)))
+        if timer is None:
+            timer = 3
 
-        if kwargs.get("side_by_side"):
+        if kwargs.get("side_by_side", available_features.get("side_by_side", False)):
             col1, col2 = st.columns(2)
             with col1:
                 if available_features.get("diagram_data") is not None:
                     self.add_diagram_smart(kwargs.get("diagram_title", "Diagram"), expanded=kwargs.get("expanded"))
             with col2:
                 if available_features.get("button_options"):
-                    self.question_ui_buttons()
+                    self.question_ui_buttons(timer)
                 else:
-                    timer = kwargs.get("timer", 3)
                     self.question_ui_dict(timer)
         else:
             if available_features.get("button_options"):
-                self.question_ui_buttons()
+                self.question_ui_buttons(timer)
             else:
-                timer = kwargs.get("timer", 3)
                 self.question_ui_dict(timer)
             if available_features.get("diagram_data") is not None:
                 self.add_diagram_smart(kwargs.get("diagram_title", "Diagram"), expanded=kwargs.get("expanded"))
         if available_features.get("hints"):
             self.show_hints()
+        if available_features.get("tags"):
+            self.show_problem_tags(available_features["tags"])
         if AUTHOR_MODE:
             self.debug_panel()
         self.footer_dict()
@@ -282,36 +329,12 @@ class Interface:
                 self.state.get("correct_answers", []),
                 self.state.get("question_id", 0),
             )
-            submitted = st.form_submit_button("Submit")
-        if submitted:
-            validated_answers = []
-            validation_passed = True
-            units = self.state.get("units", [])
-            for i, (raw_answer, correct_answer) in enumerate(
-                zip(user_answers, self.state.get("correct_answers", []))
-            ):
-                if isinstance(correct_answer, str):
-                    validated_answers.append(raw_answer)
-                else:
-                    if not raw_answer or not raw_answer.strip():
-                        st.error(f"Please enter a value for {units[i] if i < len(units) else ''}")
-                        validation_passed = False
-                        validated_answers.append(None)
-                    else:
-                        try:
-                            validated_answers.append(float(raw_answer.strip()))
-                        except ValueError:
-                            st.error(
-                                f"'{raw_answer}' is not a valid number for {units[i] if i < len(units) else ''}"
-                            )
-                            validation_passed = False
-                            validated_answers.append(None)
-            if validation_passed:
-                self.check_answers_dict(validated_answers, timer)
-            else:
-                st.warning("Please fix the errors above and try again.")
+            submitted = st.form_submit_button("Submit", disabled=bool(self.state.get("submitted")))
+        if submitted and not self.state.get("submitted"):
+            self.check_answers_dict(user_answers, timer)
+        self.render_feedback(timer)
 
-    def question_ui_buttons(self) -> None:
+    def question_ui_buttons(self, timer: float = 3) -> None:
         """Render multiple-choice style inputs when generators provide answer options."""
         st.write(self.state.get("current_question"))
         correct_answers = self.state.get("correct_answers", [])
@@ -347,77 +370,65 @@ class Interface:
                 self.state.get("question_id", 0),
             )
         if st.button(
-            "Submit Answers", key=f"{self.prefix}_submit_button_{self.state.get('question_id', 0)}"
+            "Submit Answers", key=f"{self.prefix}_submit_button_{self.state.get('question_id', 0)}",
+            disabled=bool(self.state.get("submitted")),
         ):
             user_answers = self.state.get("user_answers_selected", [])
             if None in user_answers:
                 st.error("Please answer all questions before submitting.")
-            elif answer_input_mode == "dropdown" and len(set(user_answers)) != len(user_answers):
+            elif self.state.get("unique_choices") and len(set(user_answers)) != len(user_answers):
                 st.error("Each option can be used only once in the ranking.")
             else:
                 self.check_button_answers(user_answers)
+        self.render_feedback(timer)
 
     def check_button_answers(self, user_answers):
-        """Evaluate button-based answers, update performance, and show feedback."""
-        correct_answers = self.state.get("correct_answers", [])
-        all_correct = True
-        for user_input, correct_answer in zip(user_answers, correct_answers):
-            is_correct = user_input == correct_answer
-            all_correct = all_correct and is_correct
-        if not self.state.get("submitted", False):
-            problem_type = self.state.get("problem_type")
-            difficulty = self.state.get("difficulty")
-            self.update_performance(problem_type, difficulty, all_correct)
-            self.state.set("submitted", True)
-            if all_correct:
-                st.success(f"{random_correct_message()}")
-                self.state.set("stars", self.state.get("stars", 0) + self.give_stars(difficulty, problem_type))
-                self.state.set("show_loading", True)
-                self.state.set("user_answers_selected", [None] * len(correct_answers))
-                self.loading_q_dict()
-            else:
-                answer_display = ", ".join([f"{ans}" for ans in correct_answers])
-                st.error(f"{random_error_message()} The correct answers are: {answer_display}.")
-                self.state.set("show_loading", True)
-        self.state.set("user_answers_selected", [None] * len(correct_answers))
+        """Choice and text fallback parts share parsing and grading."""
+        self.check_answers_dict(user_answers, 3)
 
     def check_answers_dict(self, user_answers: list, timer: float):
-        """Score free-response answers with a +/-10% tolerance for numeric entries."""
-        correct_answers = self.state.get("correct_answers", [])
-        all_correct = True
-        if None not in user_answers:
-            for user_input, correct_answer in zip(user_answers, correct_answers):
-                if isinstance(user_input, str):
-                    is_correct = user_input.lower().strip() == str(correct_answer).lower()
-                else:
-                    tolerance = correct_answer * 0.1
-                    is_correct = abs(user_input - correct_answer) <= abs(tolerance)
-                all_correct = all_correct and is_correct
-            if not self.state.get("submitted", False):
-                problem_type = self.state.get("problem_type")
-                difficulty = self.state.get("difficulty")
-                self.update_performance(problem_type, difficulty, all_correct)
-                self.state.set("submitted", True)
-                if all_correct:
-                    st.success(f"{random_correct_message()}")
-                    self.state.set("stars", self.state.get("stars", 0) + self.give_stars(difficulty, problem_type))
-                    self.loading_q_dict(timer)
-                else:
-                    answers_disp = []
-                    for ans in correct_answers:
-                        answers_disp.append(f"{ans if isinstance(ans, str) else f'{ans:.2f}'}")
-                    article = "is" if len(correct_answers) < 2 else "are"
-                    st.error(
-                        f"{random_error_message()} The correct answers {article}: {', '.join(answers_disp)}."
-                    )
+        if self.state.get("submitted"):
+            return
+        expected = self.state.get("correct_answers", [])
+        if len(user_answers) != len(expected) or any(v is None or not str(v).strip() for v in user_answers):
+            st.error("Please enter all answers before submitting.")
+            return
+        try:
+            results = [answer_matches(value, answer, self.state.get("grading"))
+                       for value, answer in zip(user_answers, expected)]
+        except (ValueError, TypeError):
+            st.error("Enter a finite number for each numeric answer.")
+            return
+        correct = all(results)
+        difficulty, problem_type = self.state.get("difficulty"), self.state.get("problem_type")
+        self.update_performance(problem_type, difficulty, correct)
+        self.state.set("submitted", True)
+        self.state.set("last_result", correct)
+        self.state.set("feedback_message", random_correct_message() if correct else random_error_message())
+        if correct:
+            self.state.inc("stars", self.give_stars(difficulty, problem_type))
+
+    def render_feedback(self, timer: float):
+        """Render saved feedback and pending advancement on every rerun."""
+        if not self.state.get("submitted"):
+            return
+        if self.state.get("last_result"):
+            st.success(self.state.get("feedback_message"))
         else:
-            st.error("Please enter all answers before submitting")
+            answers = ", ".join(str(a) if isinstance(a, str) else f"{a:g}"
+                                for a in self.state.get("correct_answers", []))
+            st.error(f"{self.state.get('feedback_message')} The correct answers are: {answers}.")
+        if self.state.get("explanation"):
+            st.write(self.state.get("explanation"))
+        for equation in self.state.get("solution_equations") or []:
+            st.latex(equation)
+        if self.state.get("last_result"):
+            self.loading_q_dict(timer)
 
     def give_stars(self, difficulty: str, problem_type: str) -> int:
-        """Calculate the star bonus using difficulty order and optional problem-type weighting."""
-        problem_type_bonus = self.problem_types.index(problem_type) + 1 if self.type_weight else 1
-        difficulty_bonus = self.difficulties.index(difficulty) + 1
-        return problem_type_bonus * difficulty_bonus
+        metadata = self.generator.get_problem_metadata(problem_type) if hasattr(self.generator, "get_problem_metadata") else {}
+        weight = metadata.get("star_weight", 1) if self.type_weight else 1
+        return DIFFICULTY_STARS.get(difficulty, 1) * weight
 
     def loading_q_dict(self, timer: float = 3) -> None:
         """Adapt the reusable countdown to Interface's standard generation flow."""

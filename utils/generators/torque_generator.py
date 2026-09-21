@@ -223,6 +223,7 @@ class TorqueGenerator(BaseGenerator):
             "units": slot_labels,
             "button_options": {idx: option_labels for idx, _ in enumerate(slot_labels)},
             "answer_input_mode": "dropdown",
+            "unique_choices": True,
             "diagram_data": {
                 "mode": "multi",
                 "panels": [
@@ -301,26 +302,36 @@ class TorqueGenerator(BaseGenerator):
     def stored_metadata(self) -> dict[str, dict]:
         return {
             "Perpendicular Force": {
+                "id": "torque.perpendicular-force",
+                "aliases": ["Perpendicular Force"],
                 "honors_equation": r"\tau = rF",
                 "conceptual_equation": r"\tau = rF \quad (\theta = 90^\circ)",
                 "tags": ["rotation", "torque", "perpendicular"],
             },
             "Angled Force": {
+                "id": "torque.angled-force",
+                "aliases": ["Angled Force"],
                 "honors_equation": r"\tau = rF\sin\theta",
                 "conceptual_equation": r"\tau = rF\sin\theta",
                 "tags": ["rotation", "torque", "angle"],
             },
             "Net Torque": {
+                "id": "torque.net-torque",
+                "aliases": ["Net Torque"],
                 "honors_equation": r"\tau_{net} = \tau_{ccw} - \tau_{cw}",
                 "conceptual_equation": r"\tau_{net} = \tau_{ccw} - \tau_{cw}",
                 "tags": ["rotation", "torque", "net"],
             },
             "Torque Comparison (More/Less/Same)": {
+                "id": "torque.torque-comparison-more-less-same",
+                "aliases": ["Torque Comparison (More/Less/Same)"],
                 "honors_equation": r"|\tau| = rF\sin\theta",
                 "conceptual_equation": r"\text{Compare } |\tau_A| \text{ and } |\tau_B| \text{ using } rF\sin\theta",
                 "tags": ["rotation", "torque", "conceptual", "comparison"],
             },
             "Torque Ranking (Least to Greatest)": {
+                "id": "torque.torque-ranking-least-to-greatest",
+                "aliases": ["Torque Ranking (Least to Greatest)"],
                 "honors_equation": r"|\tau| = rF\sin\theta",
                 "conceptual_equation": r"\text{Rank multiple } |\tau| \text{ values using } rF\sin\theta",
                 "tags": ["rotation", "torque", "conceptual", "ranking"],

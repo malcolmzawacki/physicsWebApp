@@ -215,16 +215,22 @@ class VectorGenerator(BaseGenerator):
         """Return metadata mapping for this generator."""
         return {
             "Find Components": {
+                "id": "vector.find-components",
+                "aliases": ["Find Components"],
                 "honors": r"x = r\cos(\theta) \quad , \quad y = r\sin(\theta)",
                 "conceptual": r"\text{Resolve the vector into horizontal (x) and vertical (y) components}",
                 "tags": ["vectors", "components"],
             },
             "Find Resultant": {
+                "id": "vector.find-resultant",
+                "aliases": ["Find Resultant"],
                 "honors": r"r = \sqrt{x^2 + y^2} \quad , \quad \theta = \tan^{-1}\!\left(\frac{y}{x}\right)",
                 "conceptual": r"\text{Magnitude from Pythagorean theorem; angle from inverse tangent}",
                 "tags": ["vectors", "resultant"],
             },
             "Summing Vectors": {
+                "id": "vector.summing-vectors",
+                "aliases": ["Summing Vectors"],
                 "honors": r"x_r = x_1 + x_2 \quad , \quad y_r = y_1 + y_2 \quad , \quad r = \sqrt{x_r^2 + y_r^2} \quad , \quad \theta = \tan^{-1}\!\left(\frac{y_r}{x_r}\right)",
                 "conceptual": r"\text{Add components, then convert to magnitude/angle}",
                 "tags": ["vectors", "addition"],

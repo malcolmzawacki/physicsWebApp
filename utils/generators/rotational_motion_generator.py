@@ -252,6 +252,8 @@ class RotationalMotionGenerator(BaseGenerator):
         """Return metadata mapping for this generator."""
         return {
             "No Time": {
+                "id": "rotational-motion.no-time",
+                "aliases": ["No Time"],
                 "honors_equation": r"\omega_f^2 = \omega_i^2 + 2\alpha\theta",
                 "conceptual_equation": (
                     r"\omega_f = \sqrt{\omega_i^2 + 2\alpha\theta}  \quad , \quad "
@@ -262,6 +264,8 @@ class RotationalMotionGenerator(BaseGenerator):
                 "tags": ["kinematics", "rotational", "no time"],
             },
             "No Distance": {
+                "id": "rotational-motion.no-distance",
+                "aliases": ["No Distance"],
                 "honors_equation": r"\omega_f = \omega_i + \alpha t",
                 "conceptual_equation": (
                     r"\omega_f = \omega_i + \alpha t  \quad , \quad "
@@ -272,6 +276,8 @@ class RotationalMotionGenerator(BaseGenerator):
                 "tags": ["kinematics", "rotational", "no distance"],
             },
             "No Acceleration": {
+                "id": "rotational-motion.no-acceleration",
+                "aliases": ["No Acceleration"],
                 "honors_equation": r"\theta = \frac{\omega_f + \omega_i}{2} t",
                 "conceptual_equation": (
                     r"\theta = \frac{\omega_f + \omega_i}{2} t  \quad , \quad "
@@ -282,6 +288,8 @@ class RotationalMotionGenerator(BaseGenerator):
                 "tags": ["kinematics", "rotational", "no acceleration"],
             },
             "No Final Velocity": {
+                "id": "rotational-motion.no-final-velocity",
+                "aliases": ["No Final Velocity"],
                 "honors_equation": r"\theta = \omega_i t + \frac{1}{2} \alpha t^2",
                 "conceptual_equation": (
                     r"\theta = \omega_i t + \frac{1}{2} \alpha t^2  \quad , \quad "
@@ -291,6 +299,8 @@ class RotationalMotionGenerator(BaseGenerator):
                 "tags": ["kinematics", "rotational", "no omega_f"],
             },
             "Mixed": {
+                "id": "rotational-motion.mixed",
+                "aliases": ["Mixed"],
                 "honors_equation": (
                     r"\omega_f^2 = \omega_i^2 + 2\alpha\theta \quad , \quad "
                     r"\omega_f = \omega_i + \alpha t  \quad , \quad "

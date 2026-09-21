@@ -27,6 +27,8 @@ class ProjectileGenerator(BaseGenerator):
         """Return metadata mapping for this generator."""
         return {
             "Type 1": {
+                "id": "projectile.type-1",
+                "aliases": ["Type 1"],
                 "honors": r"""
                 v_{yi} \; = \; 0
                 \newline ~ \newline ~ \newline
@@ -47,6 +49,8 @@ class ProjectileGenerator(BaseGenerator):
                 v_f \;=\; \sqrt{v_x^2 \;+\; v_{yf}^2} \quad , \quad \theta \;=\; \tan^{-1} \Bigl( \frac{v_{yf}}{v_x} \Bigr)
                 """},
         "Type 2": {
+            "id": "projectile.type-2",
+            "aliases": ["Type 2"],
             "honors" : r"""
                 v_{yf} \; = \; - v_{yi}
                 \newline ~ \newline ~ \newline
@@ -84,6 +88,8 @@ class ProjectileGenerator(BaseGenerator):
             """
             },
         "Type 3": {
+            "id": "projectile.type-3",
+            "aliases": ["Type 3"],
             "honors": r"""
             x \; = \; v_x \cdot t   
             \newline ~ \newline ~ \newline
@@ -305,16 +311,16 @@ class ProjectileGenerator(BaseGenerator):
                 "answers": [answer, answer2], 
                 "units": [unit, unit2]}
 
-    def _generate_type3_question(self, difficulty):
+    def _generate_type3_question(self, difficulty, *, direction=None, variant=None):
 
         object_name = random_noun()
         verb = random_proj_verb()
 
-        direction_choice = random.randint(1,2)
+        direction_choice = random.randint(1,2) if direction is None else direction
         if direction_choice == 1: # high to low
             t, t_level, v_x, v_y_i, v_r, theta_i, d_y, t_x, d_x, x_back, v_y_f, v_f, theta_f = self.calculate_type3_high_low_values(difficulty)
             if difficulty == "Easy": # no setback from cliff edge
-                choice = 1 #random.randint(1,3) # room for more variations
+                choice = 1 if variant is None else variant #random.randint(1,3) # room for more variations
                 if choice == 1:
                     question = f"""A {object_name} is {verb} off a {d_y} m high cliff at a {theta_i} degree angle 
                     at {v_r} m/s. How far away from the base of the cliff does this {object_name} land, 
@@ -324,7 +330,7 @@ class ProjectileGenerator(BaseGenerator):
                     answer2 = v_f
                     unit2 = "Final Velocity (m/s)"
             else: # hard: setback, add more options later
-                choice = 1 #random.randint(1,3) # room for more variations
+                choice = 1 if variant is None else variant #random.randint(1,3) # room for more variations
                 if choice == 1:
                     question = f"""A {object_name} is {verb} off a {d_y} m high cliff at {v_r} m/s at a {theta_i} 
                     degree angle. It lands {d_x} m away from the base of the cliff. 
@@ -339,7 +345,7 @@ class ProjectileGenerator(BaseGenerator):
             t_1, t_2, v_x, v_y_i, v_r, theta_i, d_y, t_x, d_x, x_back, v_y_f, v_f, theta_f = self.calculate_type3_low_high_values(difficulty)
             #thing lands near edge of cliff, minimum inroad
             if difficulty == "Easy":
-                choice = random.randint(1,2) # room for more variations
+                choice = random.randint(1,2) if variant is None else variant # room for more variations
                 if choice == 1: # give height velocity and angle, ask for distance and final angle
                     question = f"""A group of people are trying to get a {object_name} to land 
                     on top a {d_y} m high cliff. They {verb} it at {v_r} m/s at a {theta_i} degree angle. It 
@@ -359,7 +365,7 @@ class ProjectileGenerator(BaseGenerator):
                     answer2 = v_f
                     unit2 = "Landing Velocity (m/s)"
             else: # hard, setback, doesn't land on edge
-                choice = 1 #random.randint(1,2) # more room for variations
+                choice = 1 if variant is None else variant #random.randint(1,2) # more room for variations
                 if choice == 1: # gives t_1 height and v_r to find angle, dist from edge to find dist from base
                     question = f"""A {object_name} is {verb} to get it on top of a {d_y} m cliff. 
                     It was initially {verb} at {v_r} m/s, and first reaches the cliff height after {t_1} seconds.

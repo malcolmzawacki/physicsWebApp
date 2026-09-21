@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-import time
+from utils.grading import parse_number, answer_matches, CIRCUIT_POLICY
+from utils.activity_flow import next_question_countdown
 
 import streamlit as st
 
@@ -9,9 +10,10 @@ from utils.ui_components import (
     init_performance,
     performance_expander,
     record_performance,
-    show_equations_expander,
+    equation_controls,
 )
 from utils.ui_state import State
+from utils.layout_config import question_columns
 from utils.generators.current_electricity import (
     SERIES_PARALLEL_EQUATION_METADATA,
     SERIES_PARALLEL_PROBLEM_TYPES,
@@ -41,45 +43,7 @@ def _render_fallback_text(case: dict) -> None:
     )
 
 
-def _render_series_schematic(drawing, elm, diagram: dict) -> None:
-    battery_cls = getattr(elm, "BatteryCell", getattr(elm, "Battery", None))
-    if battery_cls is None:
-        raise RuntimeError("schemdraw battery element was not available")
-    battery = drawing.add(battery_cls().up().label(diagram["source_label"], loc="left"))
-    top_wire = elm.Line().right().length(0.9)
-    if diagram["wire_label"]:
-        top_wire = top_wire.label(diagram["wire_label"], loc="top")
-    drawing.add(top_wire)
-    for resistor_label in diagram["resistor_labels"]:
-        drawing.add(elm.Resistor().right().label(resistor_label))
-        drawing.add(elm.Line().right().length(0.9))
-    drawing.add(elm.Line().down().length(2.0))
-    drawing.add(elm.Line().tox(battery.start))
-    drawing.add(elm.Line().toy(battery.start))
-
-
-def _render_parallel_schematic(drawing, elm, diagram: dict) -> None:
-    battery_cls = getattr(elm, "BatteryCell", getattr(elm, "Battery", None))
-    if battery_cls is None:
-        raise RuntimeError("schemdraw battery element was not available")
-    battery = drawing.add(battery_cls().up().label(diagram["source_label"], loc="left"))
-    left_node = drawing.add(elm.Line().right().length(1.2))
-
-    drawing.push()
-    drawing.add(elm.Line().right().length(1.4))
-    drawing.add(elm.Resistor().down().label(diagram["resistor_labels"][0], loc="right"))
-    drawing.add(elm.Line().toy(battery.start))
-    drawing.pop()
-
-    drawing.add(elm.Line().right().length(3.6))
-    drawing.push()
-    drawing.add(elm.Resistor().down().label(diagram["resistor_labels"][1], loc="left"))
-    drawing.add(elm.Line().toy(battery.start))
-    drawing.pop()
-
-    drawing.add(elm.Line().down().length(2.0))
-    drawing.add(elm.Line().tox(left_node.start))
-    drawing.add(elm.Line().toy(battery.start))
+from utils.circuit_diagrams import draw_series as _render_series_schematic, draw_parallel as _render_parallel_schematic
 
 
 def _render_schematic(case: dict) -> None:
@@ -96,7 +60,7 @@ def _render_schematic(case: dict) -> None:
 
     diagram = case["diagram"]
     try:
-        with schemdraw.Drawing() as drawing:
+        with schemdraw.Drawing(show=False, color="black", bgcolor="white") as drawing:
             if hasattr(elm, "STYLE_IEEE") and hasattr(elm, "style"):
                 elm.style(elm.STYLE_IEEE)
             if diagram["kind"] == "parallel":
@@ -132,8 +96,7 @@ def _render_performance(state: State) -> None:
 
 
 def _answer_is_correct(user_value: float, answer: float) -> bool:
-    tolerance = max(abs(answer) * 0.05, 0.05)
-    return abs(user_value - answer) <= tolerance
+    return answer_matches(user_value, answer, CIRCUIT_POLICY)
 
 
 def current_electricity_series_parallel_page() -> None:
@@ -151,35 +114,26 @@ def current_electricity_series_parallel_page() -> None:
         lambda: init_performance(list(SERIES_PARALLEL_PROBLEM_TYPES), list(DIFFICULTIES)),
     )
 
-    top_col1, top_col2, top_col3 = st.columns((2, 1, 1), gap="large")
+    top_col1, top_col2, top_col3 = question_columns()
     with top_col1:
-        problem_type = st.radio(
-            "Mode",
+        problem_type = st.selectbox(
+            "Problem Type",
             options=SERIES_PARALLEL_PROBLEM_TYPES,
-            horizontal=True,
             index=SERIES_PARALLEL_PROBLEM_TYPES.index(state.get("problem_type", SERIES_PARALLEL_PROBLEM_TYPES[0])),
             key=state.key("problem_type_select"),
         )
     with top_col2:
-        difficulty = st.radio(
+        difficulty = st.selectbox(
             "Difficulty",
             options=DIFFICULTIES,
-            horizontal=True,
             index=DIFFICULTIES.index(state.get("difficulty", "Easy")),
             key=state.key("difficulty_select"),
-        )
-    with top_col3:
-        more_equations = st.checkbox(
-            "More Equations",
-            value=state.get("level", False),
-            key=state.key("equation_level"),
         )
 
     previous_type = state.get("problem_type")
     previous_difficulty = state.get("difficulty")
     state.set("problem_type", problem_type)
     state.set("difficulty", difficulty)
-    state.set("level", more_equations)
 
     if not state.has("case"):
         _reset_question(state, problem_type, difficulty)
@@ -192,16 +146,11 @@ def current_electricity_series_parallel_page() -> None:
     question_number = state.get("question_number", 0)
     result = state.get("last_result")
 
+    equation_controls(object(), case["problem_type"], state,
+                      state.key("equation_level"), SERIES_PARALLEL_EQUATION_METADATA)
     diagram_col, content_col = st.columns((2, 3), gap="large")
     with diagram_col:
         _render_diagram_panel(case)
-        show_equations_expander(
-            generator=object(),
-            problem_type=case["problem_type"],
-            level=state.get("level", False),
-            fallback_dict=SERIES_PARALLEL_EQUATION_METADATA,
-            expanded=True,
-        )
 
     with content_col:
         st.subheader(case["problem_type"])
@@ -223,13 +172,14 @@ def current_electricity_series_parallel_page() -> None:
                 f"{case['answer_label']} ({case['unit']})",
                 key=state.key(f"answer_{question_number}"),
             )
-            check_clicked = st.form_submit_button("Check Answer", type="primary", use_container_width=True)
+            check_clicked = st.form_submit_button("Check Answer", type="primary", use_container_width=True,
+                disabled=state.get("submitted"))
 
-        if check_clicked:
+        if check_clicked and not state.get("submitted"):
             try:
-                user_value = float(answer_text.strip())
+                user_value = parse_number(answer_text)
             except ValueError:
-                st.error("Enter a numeric value before checking the answer.")
+                st.error("Enter a finite numeric value before checking the answer.")
             else:
                 is_correct = _answer_is_correct(user_value, case["answer"])
                 state.inc("attempt_count")
@@ -260,9 +210,9 @@ def current_electricity_series_parallel_page() -> None:
             st.info(case["explanation"])
             st.caption(f"Expected answer: {result['expected_answer']} {case['unit']}")
             if result["is_correct"]:
-                st.caption("Loading the next circuit...")
-                time.sleep(AUTO_ADVANCE_DELAY_SECONDS)
-                _reset_question(state, problem_type, difficulty)
-                st.rerun()
+                def advance():
+                    _reset_question(state, problem_type, difficulty)
+                    st.rerun()
+                next_question_countdown(state, question_number, advance, AUTO_ADVANCE_DELAY_SECONDS)
 
     _render_performance(state)

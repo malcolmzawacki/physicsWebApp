@@ -56,7 +56,7 @@ def format_answer_value(value: float) -> str:
     return f"{value:.2f}".rstrip("0").rstrip(".")
 
 
-def _build_single_resistor_case(difficulty: str) -> dict:
+def _build_single_resistor_case(difficulty: str, solve_for=None) -> dict:
     if difficulty == "Easy":
         resistance = random.randint(2, 12)
         current = random.randint(1, 6)
@@ -68,7 +68,10 @@ def _build_single_resistor_case(difficulty: str) -> dict:
         current = random.choice((0.4, 0.6, 0.8, 1.2, 1.5, 2.4, 3.2))
 
     voltage = resistance * current
-    solve_for = random.choice(("Voltage", "Current", "Resistance"))
+    if solve_for is None:
+        solve_for = random.choice(("Voltage", "Current", "Resistance"))
+    if solve_for not in ("Voltage", "Current", "Resistance"):
+        raise ValueError(f"Unsupported single-resistor target: {solve_for}")
 
     diagram = {
         "kind": "single",
@@ -232,9 +235,11 @@ def _build_voltage_drop_case(difficulty: str) -> dict:
     }
 
 
-def build_circuit_case(problem_type: str, difficulty: str) -> dict:
+def build_circuit_case(problem_type: str, difficulty: str, solve_for=None) -> dict:
+    if solve_for is not None and problem_type != "Single Resistor":
+        raise ValueError("Explicit targets are only supported for Single Resistor")
     if problem_type == "Single Resistor":
-        return _build_single_resistor_case(difficulty)
+        return _build_single_resistor_case(difficulty, solve_for)
     if problem_type == "Series Current":
         return _build_series_current_case(difficulty)
     if problem_type == "Voltage Drop":

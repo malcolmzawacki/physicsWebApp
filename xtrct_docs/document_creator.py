@@ -6,6 +6,8 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 import os
+from utils.problem_payload import payload_from_dict
+from xtrct_docs.rich_text import add_question, add_markdown, add_inline
 
 
 def _remove_table_borders(table):
@@ -179,7 +181,10 @@ def _create_side_by_side_graph_layout(container_cell, graph_data, button_options
     from utils.graph_utils import embed_graph_in_doc
     embed_graph_in_doc(left_cell, graph_data, width_inches=graph_width)
     for idx, unit in enumerate(units or []):
-        _add_button_group(right_cell, unit, options_map.get(idx), total_width_inches=content_width)
+        if options_map.get(idx):
+            _add_button_group(right_cell, unit, options_map[idx], total_width_inches=content_width)
+        else:
+            right_cell.add_paragraph(f"{unit}: ____________________")
 
     if not (units and options_map):
         right_cell.add_paragraph()
@@ -302,7 +307,12 @@ def create_and_embed_graph(doc, graph_data, filename = "temp_graph.png"):
     os.remove(filename)
     
 
-def create_doc(title: str, question_generator, number_of_docs: int, tables: bool = True, include_graphs = False):
+def create_doc(title: str, question_generator, number_of_docs: int, tables: bool = True,
+               include_graphs: bool = True, *, output_path=None, open_document: bool = True):
+  if not callable(question_generator):
+      raise TypeError("question_generator must be a callable returning fresh sections for each version")
+  if not isinstance(number_of_docs, int) or number_of_docs < 1:
+      raise ValueError("number_of_docs must be a positive integer")
   doc = Document()
   answer_key = [] 
   for doc_num in range(1, number_of_docs + 1):
@@ -324,39 +334,49 @@ def create_doc(title: str, question_generator, number_of_docs: int, tables: bool
          section_heading.paragraph_format.keep_with_next = True
          instructions = section.get("section_instructions")
          if instructions:
-             instructions_para = doc.add_paragraph(instructions)
+             instructions_para = add_markdown(doc, instructions)
              instructions_para.paragraph_format.keep_with_next = True
          spaces = section["gap"]
          section_answers = []
 
          for problem in section["problems"]:
             container_table, container_cell = _start_question_block(doc)
-            original_question = problem.get("question", "")
-            clean_question = " ".join(original_question.split()).strip()
-            suppress_question_text = problem.get("suppress_question_text")
-
+            payload = payload_from_dict(problem)
+            problem = {**payload.extras, "question": payload.question, "answers": payload.answers,
+                       "units": payload.units, "diagram_data": payload.diagram_data,
+                       "button_options": payload.button_options}
+            raw_graph = problem.get("graph")
+            if raw_graph is None:
+                raw_graph = payload.diagram_data
+            graph_data = None
+            if include_graphs and raw_graph is not None:
+                if hasattr(raw_graph, "savefig"):
+                    graph_data = raw_graph
+                else:
+                    renderer = problem.get("diagram_renderer")
+                    if not callable(renderer):
+                        raise ValueError("Raw diagram_data needs a diagram_renderer; use with_diagram_renderer or a case adapter")
+                    graph_data = renderer(raw_graph)
+                    if graph_data is None or not hasattr(graph_data, "savefig"):
+                        raise ValueError("diagram_renderer must return a Matplotlib figure")
+            suppress_question_text = problem.get("suppress_question_text") and graph_data is not None
             problem_is_multi = is_multipart_question(problem)
-            graph_data = problem.get("graph") or problem.get("diagram_data")
-            button_options = problem.get("button_options")
+            button_options = payload.button_options
             side_by_side_layout = bool(button_options) and problem.get("side_by_side") and graph_data is not None
-            has_graph = graph_data is not None
-            has_spacing = spaces > 0
-            should_keep_with_next = has_spacing or (tables and problem_is_multi and not side_by_side_layout) or has_graph or side_by_side_layout
-
-            question_para = container_cell.paragraphs[0]
-            question_label = f"{problem_number}."
-            if suppress_question_text or not clean_question:
-                question_para.text = question_label
-            else:
-                question_para.text = f"{question_label} {clean_question}"
-            question_para.paragraph_format.keep_together = True
-            question_para.paragraph_format.keep_with_next = should_keep_with_next
-            if suppress_question_text:
-                question_para.paragraph_format.space_after = Pt(0)
-            question_para.paragraph_format.keep_with_next = should_keep_with_next
-
+            text = "" if suppress_question_text else payload.question
+            last_question_para = add_question(container_cell, text, problem_number)
+            last_question_para.paragraph_format.keep_with_next = bool(graph_data is not None or tables or spaces)
+            if not include_graphs and raw_graph is not None:
+                container_cell.add_paragraph("Diagram omitted for this export.")
             if side_by_side_layout:
                 _create_side_by_side_graph_layout(container_cell, graph_data, button_options, problem.get("units", []), problem.get("graph_doc_width"))
+            elif button_options:
+                for index, unit in enumerate(payload.units):
+                    choices = button_options.get(index)
+                    if choices:
+                        _add_button_group(container_cell, unit, choices, total_width_inches=5.5)
+                    else:
+                        container_cell.add_paragraph(f"{unit}: ____________________")
             elif problem_is_multi and tables:
                 create_answer_table(container_cell, problem["units"], problem_number)
 
@@ -373,7 +393,7 @@ def create_doc(title: str, question_generator, number_of_docs: int, tables: bool
                 unit = problem["units"][0]
                 section_answers.append(f"{problem_number}. {unit}: {answer}")
 
-            if not side_by_side_layout and graph_data and include_graphs:
+            if not side_by_side_layout and graph_data is not None:
                 from utils.graph_utils import embed_graph_in_doc
                 embed_graph_in_doc(container_cell, graph_data)
             effective_spaces = 0 if suppress_question_text else spaces
@@ -401,14 +421,15 @@ def create_doc(title: str, question_generator, number_of_docs: int, tables: bool
             for section_name, answers in sections.items():
                 doc.add_heading(section_name, level=3)
                 for answer in answers:
-                    doc.add_paragraph(answer)
+                    add_inline(doc.add_paragraph(), answer)
         if version_index < len(answer_key) - 1:
             doc.add_page_break()
 
-  file_name = f'{title}_x{number_of_docs}.docx'
+  file_name = output_path if output_path is not None else f'{title}_x{number_of_docs}.docx'
   doc.save(file_name)
   try:
-    os.startfile(file_name)
+    if open_document:
+        os.startfile(file_name)
   except:
     pass
-  print("Saving document")
+  return file_name

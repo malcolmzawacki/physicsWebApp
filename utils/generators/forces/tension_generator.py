@@ -48,16 +48,18 @@ class TensionGenerator(BaseGenerator):
         tension2_phrase = tension2_info["direction"]
         tension1_vert = tension1_info["signs"][1]
         tension2_vert = tension2_info["signs"][1]
-        tension1_div = tension2_vert*math.sin(theta1*math.pi/180) + tension1_vert*math.cos(theta1*math.pi/180)*math.tan(theta2*math.pi/180)
-        tension2_div = tension1_vert*math.sin(theta2*math.pi/180) + tension2_vert*math.cos(theta2*math.pi/180)*math.tan(theta1*math.pi/180)
-        if tension1_div or tension2_div == 0:
-            while (tension1_div or tension2_div) == 0:
-                theta1 = ri(1,89)
-                theta2 = ri(1,89)
-                tension1_div = tension2_vert*math.sin(theta1*math.pi/180) + tension1_vert*math.cos(theta1*math.pi/180)*math.tan(theta2*math.pi/180)
-                tension2_div = tension1_vert*math.sin(theta2*math.pi/180) + tension2_vert*math.cos(theta2*math.pi/180)*math.tan(theta1*math.pi/180)
-        tension1 = mass*10 / tension1_div
-        tension2 = mass*10 / tension2_div
+        # Opposing wires can support the weight only when the upward wire
+        # is steeper. Keep angles distinct and bounded away from parallel.
+        if tension1_vert != tension2_vert:
+            low, high = sorted((theta1, theta2))
+            if high - low < 5:
+                low = ri(1, 70)
+                high = ri(low + 5, 89)
+            theta1, theta2 = (high, low) if tension1_vert > 0 else (low, high)
+        a1, a2 = math.radians(theta1), math.radians(theta2)
+        denominator = tension1_vert * math.sin(a1) + tension2_vert * math.cos(a1) * math.tan(a2)
+        tension1 = mass * 10 / denominator
+        tension2 = tension1 * math.cos(a1) / math.cos(a2)
         return {
             "mass": mass,
             "theta 1": theta1,
@@ -158,6 +160,8 @@ class TensionGenerator(BaseGenerator):
         """Return metadata mapping for this generator."""
         return {
             "Suspension": {
+                "id": "tension.suspension",
+                "aliases": ["Suspension"],
                 "honors": r"""
                       \Sigma F \;=\; ma""",
 
