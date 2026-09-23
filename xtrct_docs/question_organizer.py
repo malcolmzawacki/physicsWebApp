@@ -220,33 +220,64 @@ class Org:
         return question_generator
 
 
+
+    def acc_mixed_practice(self):
+        def question_generator():
+
+            return [
+                {
+                "heading": "Mixed Questions",
+                "problems": [
+                    self.AM.no_acc_question("Medium","time"),
+                    self.AM.no_vf_question("Easy","time"),
+                    self.AM.no_dist_question("Medium","initial"),
+                    self.AM.no_acc_question("Medium","final"),
+                    self.AM.no_time_question("Medium","final"),
+                    self.AM.no_dist_question("Medium","acceleration"),
+                    self.AM.no_dist_question("Medium","time"),
+                    self.AM.no_vf_question("Medium","initial"),
+                    self.AM.no_acc_question("Medium","initial"),
+                    self.AM.no_time_question("Medium","acceleration"),
+                    self.AM.no_acc_question("Medium","displacement"),
+                    self.AM.no_vf_question("Easy","acceleration"),
+                    self.AM.no_time_question("Medium","initial"),
+                    self.AM.no_vf_question("Medium","distance"),
+                    self.AM.no_dist_question("Medium","final"),
+                    self.AM.no_time_question("Medium","distance"),
+                ],
+                "gap": 1
+                }
+            ]
+        return question_generator
+
+    
     def unit1_practice_doc(self):
         def question_generator():
 
             return [
                 {
                 "heading": "No Acceleration Questions",
-                "problems": [self.AM.no_acc_question("Hard") for _ in range(20)],
+                "problems": [self.AM.no_acc_question("Medium") for _ in range(5)],
                 "gap": 1
                 },
                 {
                 "heading": "No Distance Questions",
-                "problems": [self.AM.no_dist_question("Hard") for _ in range(20)],
+                "problems": [self.AM.no_dist_question("Medium") for _ in range(5)],
                 "gap": 1
                 },
                 {
                 "heading": "No Time Questions",
-                "problems": [self.AM.no_time_question("Hard") for _ in range(20)],
+                "problems": [self.AM.no_time_question("Medium") for _ in range(20)],
                 "gap": 1
                 },
                 {
                 "heading": "No Final Velocity Questions",
-                "problems": [self.AM.no_vf_question("Hard") for _ in range(20)],
+                "problems": [self.AM.no_vf_question("Medium") for _ in range(20)],
                 "gap": 1
                 },
                 {
                 "heading": "Mixed Questions",
-                "problems": [self.AM.mixed_question("Hard") for _ in range(20)],
+                "problems": [self.AM.mixed_question("Medium") for _ in range(20)],
                 "gap": 1
                 }
             ]
