@@ -4,6 +4,8 @@ import random
 from utils.generators.base_generator import BaseGenerator
 
 from utils.word_lists import random_noun
+from utils.setup_schema import make_setup
+from utils.quantities import equation
 
 class ConstantMotionGenerator(BaseGenerator):
     def __init__(self):
@@ -55,7 +57,11 @@ class ConstantMotionGenerator(BaseGenerator):
             unit = "Speed (m/s)"
             question = f"""A {noun} moves {dist} meters over {time} seconds. 
             \nHow fast was the {noun} moving?"""
-        return {"question": question, "answers": [answer], "units": [unit]}
+        target = {"Distance": "d", "Time": "t", "Speed": "v"}[solve_for]
+        values = {"d": dist, "t": time, "v": speed}
+        setup = make_setup("constant_speed", values, set(values) - {target}, [target])
+        return {"question": question, "answers": [answer], "units": [unit],
+                "extras": {"setup": setup}}
     
     def average_speed_question(self, difficulty):
         """
@@ -235,8 +241,8 @@ class ConstantMotionGenerator(BaseGenerator):
             "Constant Speed": {
                 "id": "constant-motion.constant-speed",
                 "aliases": ["Constant Speed"],
-                "honors": r"d \;=\; v \cdot t",
-                "conceptual": r"d \;=\; v \cdot t \quad , \quad v \;=\; \frac{d}{t} \quad , \quad t \;=\; \frac{d}{v}",
+                "honors": equation("constant_speed", r"${d} \;=\; ${v} \cdot ${t}"),
+                "conceptual": equation("constant_speed", r"${d} \;=\; ${v} \cdot ${t} \quad , \quad ${v} \;=\; \frac{${d}}{${t}} \quad , \quad ${t} \;=\; \frac{${d}}{${v}}"),
                 "tags": ["constant", "speed", "distance", "time"],
             },
             "Average Speed": {

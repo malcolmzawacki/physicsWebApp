@@ -241,7 +241,9 @@ class Interface:
                 "Problem Type", options=list(self.problem_types), key=f"{self.prefix}_problem_type_select_unified"
             )
         with col2:
-            if ifDifficulty:
+            if getattr(self.generator, "FIXED_DIFFICULTY", None):
+                difficulty = self.generator.FIXED_DIFFICULTY
+            elif ifDifficulty:
                 difficulty = st.selectbox(
                     "Difficulty", self.difficulties, key=f"{self.prefix}_difficulty_select_unified"
                 )
@@ -271,6 +273,7 @@ class Interface:
 
     def unified_smart_layout(self, **kwargs):
         """Co-ordinate the full question lifecycle, handling diagrams, hints, and answer UIs."""
+        self.setup_workspace = kwargs.get("setup_workspace", False)
         self.initialize_session_state()
         self.header_component()
         equations = kwargs.get("equations", self.state.get("show_equations") is not False)
@@ -322,6 +325,9 @@ class Interface:
         """Render the free-response form and enforce numeric validation with tolerance."""
         q = self.state.get("current_question")
         st.title(q) if big_font else st.write(q)
+        if getattr(self, "setup_workspace", False):
+            from utils.setup_workspace import render_setup_workspace
+            render_setup_workspace(self.state)
         with st.form(f"{self.prefix}_form", clear_on_submit=True):
             user_answers = draw_answer_inputs(
                 self.prefix,

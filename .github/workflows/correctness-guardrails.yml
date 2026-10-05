@@ -38,3 +38,9 @@ jobs:
           python tools/test_audit_regressions.py
           python tools/test_progress_and_formatting.py
           python tools/test_solve_for.py
+
+      - name: Install worksheet PDF renderer
+        run: sudo apt-get update && sudo apt-get install -y libreoffice-writer fonts-liberation fonts-dejavu-core
+
+      - name: Check student worksheets including PDF conversion
+        run: python tools/test_student_worksheets.py

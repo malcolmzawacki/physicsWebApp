@@ -15,6 +15,8 @@ def relative_motion():
     if st.session_state.get("nav_level") != "advanced":
         st.info("Relative Motion is available at the Advanced course level.")
         return
+    from utils.worksheet_ui import worksheet_shortcut
+    worksheet_shortcut("Relative Motion")
     generator = RelativeMotionGenerator()
     ui = Interface("relative_motion", "Relative Motion", generator, generator.stored_metadata(), list(generator.DIFFICULTIES))
     ui.initialize_session_state()

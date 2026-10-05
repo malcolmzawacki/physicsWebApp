@@ -37,6 +37,10 @@ def generate_selected(generator, problem_type, difficulty, target_id=MIXED):
         if call.get("difficulty", True):
             kwargs["difficulty"] = difficulty
         result = getattr(generator, call["method"])(**kwargs)
+        if "quantity_roles" in entry:
+            setup = result.get("extras", {}).get("setup")
+            if setup is None or set(setup["target_roles"]) != set(entry["quantity_roles"]):
+                raise ValueError("Generated organizing-help targets disagree with solve-for selection")
     result = dict(result)
     result["problem_type"], result["difficulty"] = problem_type, difficulty
     result["extras"] = {**result.get("extras", {}), "requested_target_id": target_id}

@@ -1,42 +1,42 @@
 {
   "ConstantMotionGenerator": {
     "Constant Speed": [
-      {"id": "inst-speed-question.distance", "label": "Distance", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "inst_speed_question", "kwargs": {"solve_for": "Distance"}, "difficulty": false}]},
-      {"id": "inst-speed-question.speed", "label": "Speed", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "inst_speed_question", "kwargs": {"solve_for": "Speed"}, "difficulty": false}]},
-      {"id": "inst-speed-question.time", "label": "Time", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "inst_speed_question", "kwargs": {"solve_for": "Time"}, "difficulty": false}]}
+      {"id": "inst-speed-question.distance", "label": "Distance", "quantity_roles": ["d"], "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "inst_speed_question", "kwargs": {"solve_for": "Distance"}, "difficulty": false}]},
+      {"id": "inst-speed-question.speed", "label": "Speed", "quantity_roles": ["v"], "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "inst_speed_question", "kwargs": {"solve_for": "Speed"}, "difficulty": false}]},
+      {"id": "inst-speed-question.time", "label": "Time", "quantity_roles": ["t"], "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "inst_speed_question", "kwargs": {"solve_for": "Time"}, "difficulty": false}]}
     ]
   },
   "MomentumGenerator": {
     "Momentum": [
-      {"id": "momentum-q.momentum", "label": "Momentum", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "momentum_q", "kwargs": {"solve_for": "momentum"}, "difficulty": false}]},
-      {"id": "momentum-q.mass", "label": "Mass", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "momentum_q", "kwargs": {"solve_for": "mass"}, "difficulty": false}]},
-      {"id": "momentum-q.velocity", "label": "Velocity", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "momentum_q", "kwargs": {"solve_for": "velocity"}, "difficulty": false}]}
+      {"id": "momentum-q.momentum", "quantity_roles": ["p"], "label": "Momentum", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "momentum_q", "kwargs": {"solve_for": "momentum"}, "difficulty": false}]},
+      {"id": "momentum-q.mass", "quantity_roles": ["m"], "label": "Mass", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "momentum_q", "kwargs": {"solve_for": "mass"}, "difficulty": false}]},
+      {"id": "momentum-q.velocity", "quantity_roles": ["v"], "label": "Velocity", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "momentum_q", "kwargs": {"solve_for": "velocity"}, "difficulty": false}]}
     ]
   },
   "LinearMotionGenerator": {
     "No Time": [
-      {"id": "no-time-question.acceleration", "label": "Acceleration", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_time_question", "kwargs": {"solve_for": "a"}, "difficulty": true}]},
-      {"id": "no-time-question.final-velocity", "label": "Final velocity", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_time_question", "kwargs": {"solve_for": "vf"}, "difficulty": true}]},
-      {"id": "no-time-question.initial-velocity", "label": "Initial velocity", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_time_question", "kwargs": {"solve_for": "vi"}, "difficulty": true}]},
-      {"id": "no-time-question.displacement", "label": "Displacement", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_time_question", "kwargs": {"solve_for": "x"}, "difficulty": true}]}
+      {"id": "no-time-question.acceleration", "label": "Acceleration", "quantity_roles": ["a"], "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_time_question", "kwargs": {"solve_for": "a"}, "difficulty": true}]},
+      {"id": "no-time-question.final-velocity", "label": "Final velocity", "quantity_roles": ["vf"], "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_time_question", "kwargs": {"solve_for": "vf"}, "difficulty": true}]},
+      {"id": "no-time-question.initial-velocity", "label": "Initial velocity", "quantity_roles": ["vi"], "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_time_question", "kwargs": {"solve_for": "vi"}, "difficulty": true}]},
+      {"id": "no-time-question.displacement", "label": "Displacement", "quantity_roles": ["x"], "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_time_question", "kwargs": {"solve_for": "x"}, "difficulty": true}]}
     ],
     "No Distance": [
-      {"id": "no-dist-question.acceleration", "label": "Acceleration", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_dist_question", "kwargs": {"solve_for": "a"}, "difficulty": true}]},
-      {"id": "no-dist-question.final-velocity", "label": "Final velocity", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_dist_question", "kwargs": {"solve_for": "vf"}, "difficulty": true}]},
-      {"id": "no-dist-question.initial-velocity", "label": "Initial velocity", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_dist_question", "kwargs": {"solve_for": "vi"}, "difficulty": true}]},
-      {"id": "no-dist-question.time", "label": "Time", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_dist_question", "kwargs": {"solve_for": "t"}, "difficulty": true}]}
+      {"id": "no-dist-question.acceleration", "label": "Acceleration", "quantity_roles": ["a"], "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_dist_question", "kwargs": {"solve_for": "a"}, "difficulty": true}]},
+      {"id": "no-dist-question.final-velocity", "label": "Final velocity", "quantity_roles": ["vf"], "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_dist_question", "kwargs": {"solve_for": "vf"}, "difficulty": true}]},
+      {"id": "no-dist-question.initial-velocity", "label": "Initial velocity", "quantity_roles": ["vi"], "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_dist_question", "kwargs": {"solve_for": "vi"}, "difficulty": true}]},
+      {"id": "no-dist-question.time", "label": "Time", "quantity_roles": ["t"], "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_dist_question", "kwargs": {"solve_for": "t"}, "difficulty": true}]}
     ],
     "No Acceleration": [
-      {"id": "no-acc-question.time", "label": "Time", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_acc_question", "kwargs": {"solve_for": "t"}, "difficulty": true}]},
-      {"id": "no-acc-question.displacement", "label": "Displacement", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_acc_question", "kwargs": {"solve_for": "x"}, "difficulty": true}]},
-      {"id": "no-acc-question.final-velocity", "label": "Final velocity", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_acc_question", "kwargs": {"solve_for": "vf"}, "difficulty": true}]},
-      {"id": "no-acc-question.initial-velocity", "label": "Initial velocity", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_acc_question", "kwargs": {"solve_for": "vi"}, "difficulty": true}]}
+      {"id": "no-acc-question.time", "label": "Time", "quantity_roles": ["t"], "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_acc_question", "kwargs": {"solve_for": "t"}, "difficulty": true}]},
+      {"id": "no-acc-question.displacement", "label": "Displacement", "quantity_roles": ["x"], "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_acc_question", "kwargs": {"solve_for": "x"}, "difficulty": true}]},
+      {"id": "no-acc-question.final-velocity", "label": "Final velocity", "quantity_roles": ["vf"], "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_acc_question", "kwargs": {"solve_for": "vf"}, "difficulty": true}]},
+      {"id": "no-acc-question.initial-velocity", "label": "Initial velocity", "quantity_roles": ["vi"], "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_acc_question", "kwargs": {"solve_for": "vi"}, "difficulty": true}]}
     ],
     "No Final Velocity": [
-      {"id": "no-vf-question.displacement", "label": "Displacement", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_vf_question", "kwargs": {"solve_for": "x"}, "difficulty": true}]},
-      {"id": "no-vf-question.time", "label": "Time", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_vf_question", "kwargs": {"solve_for": "t"}, "difficulty": true}]},
-      {"id": "no-vf-question.initial-velocity", "label": "Initial velocity", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_vf_question", "kwargs": {"solve_for": "vi"}, "difficulty": true}]},
-      {"id": "no-vf-question.acceleration", "label": "Acceleration", "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_vf_question", "kwargs": {"solve_for": "a"}, "difficulty": true}]}
+      {"id": "no-vf-question.displacement", "label": "Displacement", "quantity_roles": ["x"], "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_vf_question", "kwargs": {"solve_for": "x"}, "difficulty": true}]},
+      {"id": "no-vf-question.time", "label": "Time", "quantity_roles": ["t"], "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_vf_question", "kwargs": {"solve_for": "t"}, "difficulty": true}]},
+      {"id": "no-vf-question.initial-velocity", "label": "Initial velocity", "quantity_roles": ["vi"], "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_vf_question", "kwargs": {"solve_for": "vi"}, "difficulty": true}]},
+      {"id": "no-vf-question.acceleration", "label": "Acceleration", "quantity_roles": ["a"], "levels": ["Easy", "Medium", "Hard"], "calls": [{"method": "no_vf_question", "kwargs": {"solve_for": "a"}, "difficulty": true}]}
     ]
   },
   "RotationalMotionGenerator": {

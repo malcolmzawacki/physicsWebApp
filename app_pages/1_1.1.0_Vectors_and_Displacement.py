@@ -8,6 +8,8 @@ plt.style.use("dark_background")
 from utils.ui import interface
 class dist_disp:
   def distance_displacement():
+      from utils.worksheet_ui import worksheet_shortcut
+      worksheet_shortcut("Distance & Displacement")
       problem_type_dict = {
           "One Dimensional": {
                   "honors": r"""

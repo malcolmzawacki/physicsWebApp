@@ -1,0 +1,30 @@
+{
+  "Kinematics / Accelerated Motion / No Time": {
+    "status": "Migrated; pilot enabled",
+    "notes": "Shared quantities, setup schema, equations, and generator metadata implemented; setup/schema tests cover family. Detailed feedback-rule coverage remains limited. Reviewed 2026-10-02."
+  },
+  "Kinematics / Accelerated Motion / No Distance": {
+    "status": "Migrated; pilot enabled",
+    "notes": "Shared quantities, setup schema, equations, and generator metadata implemented; setup/schema tests cover family. Detailed feedback-rule coverage remains limited. Reviewed 2026-10-02."
+  },
+  "Kinematics / Accelerated Motion / No Acceleration": {
+    "status": "Migrated; pilot enabled",
+    "notes": "Shared quantities, setup schema, equations, and generator metadata implemented; setup/schema tests cover family. Detailed feedback-rule coverage remains limited. Reviewed 2026-10-02."
+  },
+  "Kinematics / Accelerated Motion / No Final Velocity": {
+    "status": "Migrated; pilot enabled",
+    "notes": "Shared quantities, setup schema, equations, and generator metadata implemented; setup/schema tests cover family. Detailed feedback-rule coverage remains limited. Reviewed 2026-10-02."
+  },
+  "Kinematics / Accelerated Motion / Mixed": {
+    "status": "Migrated; pilot enabled",
+    "notes": "Shared quantities, setup schema, equations, and generator metadata implemented; setup/schema tests cover family. Detailed feedback-rule coverage remains limited. Reviewed 2026-10-02."
+  },
+  "Kinematics / Constant Motion / Constant Speed": {
+    "status": "Migrated; enabled",
+    "notes": "Three-role organizing help enabled for Constant Speed only. Page checks cover explicit targets, submission isolation, feedback, and switching to unsupported problem types. Reviewed 2026-10-03."
+  },
+  "Momentum / Momentum / Momentum": {
+    "status": "Migrated; enabled",
+    "notes": "Momentum, mass, velocity profile and equation symbols connected; all three targets checked against prompt facts and page flow. Existing positive one-object values and Ns notation retained. No initial/final hint for ordinary velocity. Reviewed 2026-10-03."
+  }
+}

@@ -15,18 +15,24 @@ def constant_motion():
     # Lazy import - only load when this section is accessed
     from utils.generators.kinematics.const_motion_generator import ConstantMotionGenerator
 
+    from utils.worksheet_ui import worksheet_shortcut
+    worksheet_shortcut("Constant Motion")
+
     generator = ConstantMotionGenerator()
     metadata = generator.stored_metadata()
     difficulties = ["Easy", "Medium", "Hard"]
     title = "Constant Motion"
     prefix = "const_motion_"
     ui = interface(prefix, title, generator, metadata, difficulties)
-    ui.unified_smart_layout()
+    ui.unified_smart_layout(setup_workspace=True)
 
 
 def accelerated_motion():
     # Lazy import - only load when this section is accessed
     from utils.generators.kinematics.linear_motion_generator import LinearMotionGenerator
+    from utils.worksheet_ui import worksheet_shortcut
+
+    worksheet_shortcut("Accelerated Motion")
 
     generator = LinearMotionGenerator()
     metadata = generator.stored_metadata()
@@ -34,10 +40,12 @@ def accelerated_motion():
     title = "Accelerated Motion"
     prefix = "accelerated_motion"
     ui = interface(prefix, title, generator, metadata, difficulties)
-    ui.unified_smart_layout()
+    ui.unified_smart_layout(setup_workspace=True)
 
 
 def motion_graph_types():
+    from utils.worksheet_ui import worksheet_shortcut
+    worksheet_shortcut("Types of Motion Graphs")
     # Lazy import - only load when this section is accessed
     from utils.generators.kinematics.motion_graph_generator import MotionGraphGenerator
 
@@ -51,6 +59,8 @@ def motion_graph_types():
 
 
 def motion_graph_matching():
+    from utils.worksheet_ui import worksheet_shortcut
+    worksheet_shortcut("Matching Motion Graphs")
     def controls(state):
         return {
             "primary_order": st.radio(
@@ -73,6 +83,8 @@ def motion_graph_matching():
 
 
 def projectiles():
+    from utils.worksheet_ui import worksheet_shortcut
+    worksheet_shortcut("Projectiles")
     # Lazy import - only load when this section is accessed
     from utils.generators.kinematics.projectile_generator import ProjectileGenerator
 

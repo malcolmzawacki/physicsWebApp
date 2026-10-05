@@ -6,3 +6,4 @@ schemdraw
 python-docx
 markdown-it-py>=3,<5
 latex2mathml>=3.77,<4
+pypdfium2>=4.30,<5

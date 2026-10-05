@@ -63,6 +63,10 @@ _Last updated: 2026-02-17_
 - Enhance `xtrct_docs/document_creator.py` answer type recognition to truncate float vals in answer key.
 
 ### Content & UX Polish
+- Track per-activity and per-problem-type evaluation in the [full organizing-help inventory](organizing_help_inventory.md). Blank review cells mean unevaluated; source discovery and broad regression checks do not count as a scaffolding review.
+- Organizing-help architecture foundation is implemented for Accelerated Motion and Constant Speed metadata. See [the contract and page readiness matrix](organizing_help_architecture.md) for remaining per-family work; Accelerated Motion and Constant Speed are enabled in the student UI.
+- Centralize quantity IDs, display names, symbols, and units in one shared catalog used by generators, equations, organizing help, and exports. The Accelerated Motion organizing-help pilot uses displacement `x` and velocities `v_i` / `v_f`; preserve these conventions until deliberately revised. Keep the unused-value marker `x` distinct from the displacement quantity ID.
+- Expand organizing help gradually: per-quantity checks now use generator-provided givens, requested (`?`), and absent (`x`) metadata. Feedback stays adjacent to and names its input, uses text as well as color, and distinguishes blanks from incorrect entries. Review narrow-screen and assistive-technology behavior before broader rollout. Detailed misconception feedback and external reporting remain future work; this pilot stores only session-local entries.
 - Fix encoding glitches (e.g., garbled `Home.py` title, inconsistent m/sÂ² symbols) and adopt a consistent Unicode/LaTeX strategy.
 - Audit wording for direction reversals across all generators; align on shared helpers similar to the new linear-motion implementation.
 - Centralize copy for equations, hints, and feedback strings; consider LaTeX helpers for formatting parity across UI and docs.

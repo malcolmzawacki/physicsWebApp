@@ -5,6 +5,8 @@ from random import randint as ri
 from utils.generators.base_generator import BaseGenerator
 
 from utils.word_lists import random_noun
+from utils.setup_schema import make_setup, expected_entries
+from utils.quantities import equation
 
 class LinearMotionGenerator(BaseGenerator):
     def __init__(self):
@@ -333,7 +335,12 @@ class LinearMotionGenerator(BaseGenerator):
         answer = eq_nums[target]
         unit = self.UNIT_LABELS[target]
 
-        return {"question": question, "answers": [answer], "units": [unit]}
+        given = [key for key in info_keys if key != target]
+        implied = {key: self.INFO_CLAUSES[key].format(**format_vars)
+                   for key in given if key in ("vi", "vf") and eq_nums[key] == 0}
+        setup = make_setup("linear_motion", eq_nums, given, [target], implied)
+        return {"question": question, "answers": [answer], "units": [unit],
+                "extras": {"setup": setup, "setup_expected": expected_entries(setup)}}
 
     # endregion
 
@@ -465,56 +472,36 @@ class LinearMotionGenerator(BaseGenerator):
             "No Time": {
                 "id": "linear-motion.no-time",
                 "aliases": ["No Time"],
-                "honors_equation": r"v_f^2 = v_i^2 + 2ax",
-                "conceptual_equation": r"v_f = \sqrt{v_i^2 + 2ax}  \quad , \quad v_i = \sqrt{2ax - v_f^2}  \quad , \quad  x = \frac{v_f^2 - v_i^2}{2a}  \quad, \quad  a = \frac{v_f^2 - v_i^2}{2x}",
+                "honors_equation": equation("linear_motion", r"${vf}^2 = ${vi}^2 + 2${a}${x}"),
+                "conceptual_equation": equation("linear_motion", '${vf} = \\sqrt{${vi}^2 + 2${a}${x}}  \\quad , \\quad ${vi} = \\sqrt{2${a}${x} - ${vf}^2}  \\quad , \\quad  ${x} = \\frac{${vf}^2 - ${vi}^2}{2${a}}  \\quad, \\quad  ${a} = \\frac{${vf}^2 - ${vi}^2}{2${x}}'),
                 "tags": ["kinematics", "no time"],
             },
             "No Distance": {
                 "id": "linear-motion.no-distance",
                 "aliases": ["No Distance"],
-                "honors_equation": r"v_f = v_i + at",
-                "conceptual_equation": r"v_f = v_i +at  \quad , \quad v_i =  v_f - at  \quad , \quad a = \frac{v_f - v_i}{t}  \quad, \quad t = \frac{v_f - v_i}{a}",
+                "honors_equation": equation("linear_motion", r"${vf} = ${vi} + ${a}${t}"),
+                "conceptual_equation": equation("linear_motion", '${vf} = ${vi} +${a}${t}  \\quad , \\quad ${vi} =  ${vf} - ${a}${t}  \\quad , \\quad ${a} = \\frac{${vf} - ${vi}}{${t}}  \\quad, \\quad ${t} = \\frac{${vf} - ${vi}}{${a}}'),
                 "tags": ["kinematics", "no distance"],
             },
             "No Acceleration": {
                 "id": "linear-motion.no-acceleration",
                 "aliases": ["No Acceleration"],
-                "honors_equation": r"x = \frac{v_f + v_i}{2} t",
-                "conceptual_equation": r"x = \frac{v_f + v_i}{2} t  \quad , \quad t = \frac{2x}{v_f + v_i}  \quad , \quad v_f = \frac{2x}{t} - v_i  \quad , \quad v_i = \frac{2x}{t} - v_f",
+                "honors_equation": equation("linear_motion", r"${x} = \frac{${vf} + ${vi}}{2} ${t}"),
+                "conceptual_equation": equation("linear_motion", '${x} = \\frac{${vf} + ${vi}}{2} ${t}  \\quad , \\quad ${t} = \\frac{2${x}}{${vf} + ${vi}}  \\quad , \\quad ${vf} = \\frac{2${x}}{${t}} - ${vi}  \\quad , \\quad ${vi} = \\frac{2${x}}{${t}} - ${vf}'),
                 "tags": ["kinematics", "no acceleration"],
             },
             "No Final Velocity": {
                 "id": "linear-motion.no-final-velocity",
                 "aliases": ["No Final Velocity"],
-                "honors_equation": r"x = v_i t + \frac{1}{2} at^2",
-                "conceptual_equation": r"x = v_i t + \frac{1}{2} at^2  \quad , \quad a = 2 \left( \frac{x - v_i t}{t^2} \right)\quad , \quad t = \frac{\sqrt{v_i^2 + 2ax} - v_i}{a}",
+                "honors_equation": equation("linear_motion", r"${x} = ${vi} ${t} + \frac{1}{2} ${a}${t}^2"),
+                "conceptual_equation": equation("linear_motion", '${x} = ${vi} ${t} + \\frac{1}{2} ${a}${t}^2  \\quad , \\quad ${a} = 2 \\left( \\frac{${x} - ${vi} ${t}}{${t}^2} \\right)\\quad , \\quad ${t} = \\frac{\\sqrt{${vi}^2 + 2${a}${x}} - ${vi}}{${a}}'),
                 "tags": ["kinematics", "no v_f"],
             },
             "Mixed": {
                 "id": "linear-motion.mixed",
                 "aliases": ["Mixed"],
-                "honors_equation": r"v_f^2 = v_i^2 + 2ax \quad , \quad v_f = v_i +at  \quad , \quad x = \frac{v_f + v_i}{2} t  \quad , \quad x = v_i t + \frac{1}{2} at^2",
-                "conceptual_equation": r"""
-                x = \frac{v_f + v_i}{2} t  \quad , \quad 
-                x = v_i t + \frac{1}{2} at^2  \quad , \quad 
-                x = \frac{v_f^2 - v_i^2}{2a}  
-                \newline ~ \newline ~ \newline 
-                t = \frac{2x}{v_f + v_i}  \quad , \quad 
-                t = \frac{v_f - v_i}{a}  \quad , \quad 
-                t = \frac{\sqrt{v_i^2 + 2ax} - v_i}{a}   
-                \newline ~ \newline ~ \newline 
-                v_i = \sqrt{2ax - v_f^2}  \quad , \quad
-                v_i = v_f - at  \quad , \quad 
-                v_i = \frac{2x}{t} - v_f  \quad , \quad 
-                v_i = \frac{x}{t} - \frac{1}{2} at 
-                \newline ~ \newline ~ \newline 
-                v_f = \frac{2x}{t} - v_i  \quad , \quad 
-                v_f = \sqrt{v_i^2 + 2ax}  \quad , \quad 
-                v_f = v_i + at  \quad  
-                \newline ~ \newline ~ \newline 
-                a = 2 \left( \frac{x - v_i t}{t^2} \right)\quad  , \quad 
-                a = \frac{v_f - v_i}{t}  \quad , \quad 
-                a = \frac{v_f^2 - v_i^2}{2x}""",
+                "honors_equation": equation("linear_motion", '${vf}^2 = ${vi}^2 + 2${a}${x} \\quad , \\quad ${vf} = ${vi} +${a}${t}  \\quad , \\quad ${x} = \\frac{${vf} + ${vi}}{2} ${t}  \\quad , \\quad ${x} = ${vi} ${t} + \\frac{1}{2} ${a}${t}^2'),
+                "conceptual_equation": equation("linear_motion", '\n                ${x} = \\frac{${vf} + ${vi}}{2} ${t}  \\quad , \\quad \n                ${x} = ${vi} ${t} + \\frac{1}{2} ${a}${t}^2  \\quad , \\quad \n                ${x} = \\frac{${vf}^2 - ${vi}^2}{2${a}}  \n                \\newline ~ \\newline ~ \\newline \n                ${t} = \\frac{2${x}}{${vf} + ${vi}}  \\quad , \\quad \n                ${t} = \\frac{${vf} - ${vi}}{${a}}  \\quad , \\quad \n                ${t} = \\frac{\\sqrt{${vi}^2 + 2${a}${x}} - ${vi}}{${a}}   \n                \\newline ~ \\newline ~ \\newline \n                ${vi} = \\sqrt{2${a}${x} - ${vf}^2}  \\quad , \\quad\n                ${vi} = ${vf} - ${a}${t}  \\quad , \\quad \n                ${vi} = \\frac{2${x}}{${t}} - ${vf}  \\quad , \\quad \n                ${vi} = \\frac{${x}}{${t}} - \\frac{1}{2} ${a}${t} \n                \\newline ~ \\newline ~ \\newline \n                ${vf} = \\frac{2${x}}{${t}} - ${vi}  \\quad , \\quad \n                ${vf} = \\sqrt{${vi}^2 + 2${a}${x}}  \\quad , \\quad \n                ${vf} = ${vi} + ${a}${t}  \\quad  \n                \\newline ~ \\newline ~ \\newline \n                ${a} = 2 \\left( \\frac{${x} - ${vi} ${t}}{${t}^2} \\right)\\quad  , \\quad \n                ${a} = \\frac{${vf} - ${vi}}{${t}}  \\quad , \\quad \n                ${a} = \\frac{${vf}^2 - ${vi}^2}{2${x}}'),
                 "tags": ["kinematics", "mixed"],
             },
         }

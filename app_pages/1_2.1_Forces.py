@@ -1,6 +1,8 @@
 from utils.ui import interface
+from utils.worksheet_ui import worksheet_shortcut
 
 def newtons_2nd():
+    worksheet_shortcut("Newton's Second Law")
     from utils.generators.force_generator import ForceGenerator
     title = "Newton's Second Law"
     prefix = "newtons_2nd"
@@ -12,6 +14,7 @@ def newtons_2nd():
 
 
 def tension():
+    worksheet_shortcut('Tension')
     from utils.generators.forces.tension_generator import TensionGenerator
     title = "Tension Problems"
     prefix = "tension"
@@ -22,6 +25,7 @@ def tension():
     ui.unified_smart_layout()
 
 def atwood():
+    worksheet_shortcut('Atwood Machines')
     from utils.generators.forces.atwood_generator import AtwoodGenerator
     title = "Atwood Machines"
     prefix = "atwood"
@@ -33,6 +37,7 @@ def atwood():
 
 
 def inclines():
+    worksheet_shortcut('Inclined Planes')
     from utils.generators.forces.incline_generator import InclineGenerator
     title = "Inclined Planes"
     prefix = "incline"
@@ -43,6 +48,7 @@ def inclines():
     ui.unified_smart_layout()
 
 def center_of_mass():
+    worksheet_shortcut('Center of Mass')
     from utils.generators.forces.center_of_mass_generator import CenterOfMassGenerator
     title = "Center of Mass"
     prefix = "com"

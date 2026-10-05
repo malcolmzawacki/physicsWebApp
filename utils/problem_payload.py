@@ -47,6 +47,12 @@ class ProblemPayload:
             raise ProblemPayloadError("Unit labels must be strings")
         if not isinstance(self.extras, dict):
             raise ProblemPayloadError("'extras' must be a dictionary")
+        if "setup" in self.extras:
+            from utils.setup_schema import validate_setup
+            try:
+                validate_setup(self.extras["setup"])
+            except (ValueError, TypeError, KeyError) as exc:
+                raise ProblemPayloadError(f"Invalid organizing-help metadata: {exc}") from exc
         if not isinstance(self.button_options, dict):
             raise ProblemPayloadError("'button_options' must be a dictionary")
         for index, options in self.button_options.items():

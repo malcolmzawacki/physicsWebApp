@@ -13,6 +13,7 @@ Keys:
 - `button_options` (dict[int, list[str]]) — optional. Multiple-choice options indexed by answer part.
 - `hints` (list[str]) — optional. Ordered hints to show in the UI.
 - `extras` (dict[str, Any]) — optional. Freeform bag for future features.
+- `extras.setup` — optional validated organizing-help schema; see [contract and migration gates](organizing_help_architecture.md). Unsupported activities omit it.
 
 Required invariants:
 

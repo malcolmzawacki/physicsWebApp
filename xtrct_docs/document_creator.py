@@ -1,6 +1,6 @@
 from docx import Document
 from docx.shared import Inches, Pt
-from docx.enum.table import WD_TABLE_ALIGNMENT
+from docx.enum.table import WD_TABLE_ALIGNMENT, WD_CELL_VERTICAL_ALIGNMENT
 from docx.enum.section import WD_SECTION_START
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
@@ -232,7 +232,7 @@ def create_vert_answer_table(target, problem_units, problem_number):
     _prepare_table_block(table)
 
 
-def create_answer_table(target, problem_units, problem_number):
+def create_answer_table(target, problem_units, problem_number, compact=False):
     """
     Create a formatted answer table for multipart questions with horizontal layout
     
@@ -243,6 +243,9 @@ def create_answer_table(target, problem_units, problem_number):
     final_answers_para = target.add_paragraph()
     final_answers_para.paragraph_format.keep_with_next = True
     final_answers_para.paragraph_format.keep_together = True
+    if compact:
+        final_answers_para.paragraph_format.space_before = Pt(2)
+        final_answers_para.paragraph_format.space_after = Pt(2)
     final_answers_run = final_answers_para.add_run("Final Answers:")
     final_answers_run.bold = True
 
@@ -307,8 +310,25 @@ def create_and_embed_graph(doc, graph_data, filename = "temp_graph.png"):
     os.remove(filename)
     
 
+def format_answer_key_value(value):
+    """Display numeric answers to three decimals without changing grading values.
+
+    Values below 0.01 use scientific notation so three-place rounding
+    does not introduce a large relative error or turn them into zero. Text answers (directions, graph choices, etc.) stay intact.
+    """
+    from numbers import Real
+    from decimal import Decimal
+    if isinstance(value, bool) or not isinstance(value, (Real, Decimal)):
+        return str(value)
+    if value != 0 and abs(value) < 0.01:
+        return f"{value:.3e}"
+    text = f"{value:.3f}".rstrip("0").rstrip(".")
+    return "0" if text == "-0" else text
+
+
 def create_doc(title: str, question_generator, number_of_docs: int, tables: bool = True,
-               include_graphs: bool = True, *, output_path=None, open_document: bool = True):
+               include_graphs: bool = True, *, output_path=None, open_document: bool = True,
+               include_answer_key: bool = True, answer_key_new_page: bool = False):
   if not callable(question_generator):
       raise TypeError("question_generator must be a callable returning fresh sections for each version")
   if not isinstance(number_of_docs, int) or number_of_docs < 1:
@@ -364,7 +384,43 @@ def create_doc(title: str, question_generator, number_of_docs: int, tables: bool
             button_options = payload.button_options
             side_by_side_layout = bool(button_options) and problem.get("side_by_side") and graph_data is not None
             text = "" if suppress_question_text else payload.question
-            last_question_para = add_question(container_cell, text, problem_number)
+            inset_layout = bool(problem.get("inset_diagram") and graph_data is not None)
+            if inset_layout:
+                _clear_cell(container_cell)
+                layout = container_cell.add_table(rows=1, cols=2)
+                layout.autofit = False
+                _remove_table_borders(layout)
+                _prepare_table_block(layout)
+                for column, cell, width in zip(layout.columns, layout.rows[0].cells, (3.55, 2.2)):
+                    column.width = Inches(width)
+                    cell.width = Inches(width)
+                    cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.TOP
+                    _clear_cell(cell)
+                    cell.add_paragraph()
+                last_question_para = add_question(layout.cell(0, 0), text, problem_number)
+                import io
+                image = io.BytesIO()
+                # Insets own a fixed print canvas; tight cropping would enlarge small
+                # diagrams and undo the physical height/readability guarantee.
+                from matplotlib import rc_context
+                with rc_context({"savefig.bbox": None}):
+                    graph_data.savefig(image, format="png", dpi=200, facecolor="white", bbox_inches=None)
+                image.seek(0)
+                layout.cell(0, 1).paragraphs[0].add_run().add_picture(image, width=Inches(2.0))
+                graph_data.clear()
+                for cell in layout.rows[0].cells:
+                    for paragraph in cell.paragraphs:
+                        paragraph.paragraph_format.space_before = Pt(0)
+                        paragraph.paragraph_format.space_after = Pt(0)
+                        paragraph.paragraph_format.keep_with_next = False
+                # Word requires a paragraph after a nested table; keep it tiny.
+                for paragraph in container_cell.paragraphs:
+                    paragraph.paragraph_format.space_before = Pt(0)
+                    paragraph.paragraph_format.space_after = Pt(0)
+                    paragraph.paragraph_format.line_spacing = Pt(1)
+                    paragraph.paragraph_format.keep_with_next = False
+            else:
+                last_question_para = add_question(container_cell, text, problem_number)
             last_question_para.paragraph_format.keep_with_next = bool(graph_data is not None or tables or spaces)
             if not include_graphs and raw_graph is not None:
                 container_cell.add_paragraph("Diagram omitted for this export.")
@@ -378,25 +434,32 @@ def create_doc(title: str, question_generator, number_of_docs: int, tables: bool
                     else:
                         container_cell.add_paragraph(f"{unit}: ____________________")
             elif problem_is_multi and tables:
-                create_answer_table(container_cell, problem["units"], problem_number)
+                create_answer_table(container_cell, problem["units"], problem_number, compact=inset_layout)
 
             if problem_is_multi:
                 answers = problem["answers"]
                 units = problem["units"]
                 answer_parts = ["Multiple Answers:"]
                 for answer, unit in zip(answers, units):
-                    answer_parts.append(f"{unit}: {answer}")
+                    answer_parts.append(f"{unit}: {format_answer_key_value(answer)}")
                 answer_str = " \n ".join(answer_parts)
                 section_answers.append(f"{problem_number}. {answer_str}")
             else:
                 answer = problem["answers"][0]
                 unit = problem["units"][0]
-                section_answers.append(f"{problem_number}. {unit}: {answer}")
+                section_answers.append(f"{problem_number}. {unit}: {format_answer_key_value(answer)}")
 
-            if not side_by_side_layout and graph_data is not None:
+            if not side_by_side_layout and not inset_layout and graph_data is not None:
                 from utils.graph_utils import embed_graph_in_doc
                 embed_graph_in_doc(container_cell, graph_data)
-            effective_spaces = 0 if suppress_question_text else spaces
+            writing_space = section.get("writing_space_inches")
+            if writing_space is not None and not suppress_question_text:
+                blank_para = container_cell.add_paragraph()
+                blank_para.paragraph_format.space_before = Pt(0)
+                blank_para.paragraph_format.space_after = Pt(0)
+                blank_para.paragraph_format.line_spacing = Inches(writing_space)
+                blank_para.paragraph_format.keep_together = True
+            effective_spaces = 0 if suppress_question_text or writing_space is not None else spaces
             for idx in range(effective_spaces):
                 blank_para = container_cell.add_paragraph()
                 blank_para.paragraph_format.keep_together = True
@@ -412,8 +475,8 @@ def create_doc(title: str, question_generator, number_of_docs: int, tables: bool
          # doc.add_page_break()
           #doc.add_page_break() # ensures new page for next test regardless of current position
 
-  if answer_key:
-      doc.add_section(WD_SECTION_START.ODD_PAGE)
+  if answer_key and include_answer_key:
+      doc.add_section(WD_SECTION_START.NEW_PAGE if answer_key_new_page else WD_SECTION_START.ODD_PAGE)
       doc.add_heading('Answer Key - All Versions', 1)
       for version_index, version_dict in enumerate(answer_key):
         for version_name, sections in version_dict.items():
@@ -421,7 +484,13 @@ def create_doc(title: str, question_generator, number_of_docs: int, tables: bool
             for section_name, answers in sections.items():
                 doc.add_heading(section_name, level=3)
                 for answer in answers:
-                    add_inline(doc.add_paragraph(), answer)
+                    # Markdown soft newlines collapse into spaces; create real Word breaks.
+                    paragraph = doc.add_paragraph()
+                    paragraph.paragraph_format.keep_together = True
+                    for index, line in enumerate(answer.splitlines()):
+                        if index:
+                            paragraph.add_run().add_break()
+                        add_inline(paragraph, line.strip())
         if version_index < len(answer_key) - 1:
             doc.add_page_break()
 

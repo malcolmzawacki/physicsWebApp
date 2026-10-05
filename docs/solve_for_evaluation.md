@@ -19,6 +19,7 @@ of public numeric link indices. See [the readable target list](solve_for_targets
 
 | Activity | Status | Current code and scope | Route source |
 |---|---|---|---|
+| Create a worksheet | Shared builder | Constant and accelerated motion sections use the existing per-type target catalog; this is an export route rather than a practice activity. | [render_kinematics_worksheet](../utils/worksheet_ui.py) |
 
 | Algebra | Deferred | A randomly named symbol is isolated step by step. Choosing a symbol would mostly rename the exercise; inverse target semantics and worksheet representation need a decision. | [algebra.main](../app_pages/1_0.1.1_Math_Skills.py) |
 | Scientific Notation | Fixed task | Evaluate the generated expression in scientific notation. Operation choices are not unknown-quantity choices; inverse operands would be new questions. | [sci_notate.main](../app_pages/1_0.1.1_Math_Skills.py) |

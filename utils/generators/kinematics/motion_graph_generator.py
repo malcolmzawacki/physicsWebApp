@@ -8,6 +8,9 @@ from utils.ui_state import State
 from typing import Optional, Any, Tuple
 
 class MotionGraphGenerator(BaseGenerator):
+    # Graph practice is one complete activity, not a progression of difficulty tiers.
+    # Hard is the legacy identifier for all six shapes, including slowing down.
+    FIXED_DIFFICULTY = "Hard"
     def __init__(self):
         super().__init__(state_prefix="motion_graph_")
         self.graph_types = ["linear_positive", "linear_negative", 
@@ -41,12 +44,16 @@ class MotionGraphGenerator(BaseGenerator):
             spine.set_color("black")
         ax.figure.tight_layout()
 
-    def generate_position_time_graph(self, graph_type=None, rowsize=3, colsize=2.5):
+    def generate_position_time_graph(self, graph_type=None, rowsize=3, colsize=2.5, figure_factory=None):
         """Generate a position-time graph optimized for print output"""
         if graph_type is None:
             graph_type = random.choice(self.graph_types)
 
-        fig, ax = plt.subplots(figsize=(rowsize, colsize))
+        if figure_factory:
+            fig = figure_factory((rowsize, colsize))
+            ax = fig.subplots()
+        else:
+            fig, ax = plt.subplots(figsize=(rowsize, colsize))
         ax.set_xlim(0, 5)
         t = np.linspace(0, 5, 100)
 
@@ -80,12 +87,16 @@ class MotionGraphGenerator(BaseGenerator):
 
         return fig, correct_direction, correct_motion_state
 
-    def generate_velocity_time_graph(self, graph_type=None, rowsize=3, colsize=2.5):
+    def generate_velocity_time_graph(self, graph_type=None, rowsize=3, colsize=2.5, figure_factory=None):
         """Generate a velocity-time graph optimized for print output"""
         if graph_type is None:
             graph_type = random.choice(self.graph_types)
 
-        fig, ax = plt.subplots(figsize=(rowsize, colsize))
+        if figure_factory:
+            fig = figure_factory((rowsize, colsize))
+            ax = fig.subplots()
+        else:
+            fig, ax = plt.subplots(figsize=(rowsize, colsize))
         t = np.linspace(0, 5, 100)
         ax.set_xlim(0, 5)
 
@@ -151,7 +162,12 @@ class MotionGraphGenerator(BaseGenerator):
 
         return options
     
-    def choose_problem_dict(self, problem_type, difficulty, graph_type=None):
+    def choose_problem_dict(self, problem_type, difficulty="Hard", graph_type=None):
+        """Default to all six shapes; Easy/Medium are legacy explicit subsets only.
+
+        Practice UI uses FIXED_DIFFICULTY. Student worksheets also force Hard;
+        do not restore tier selectors without deliberately revisiting that policy.
+        """
         # Build from constant motion to acceleration and then deceleration.
         candidates = self.graph_types[:2] if difficulty == "Easy" else self.graph_types[:4] if difficulty == "Medium" else self.graph_types
         chosen_type = graph_type or random.choice(candidates)

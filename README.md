@@ -28,6 +28,7 @@ Interactive Streamlit workspace for generating and practicing physics (and chemi
 - `tools/` - developer scripts such as lazy tab loaders and payload validators.
 - `xtrct_docs/` - utilities for exporting problems into Word documents.
 - Export entry point: `python -m xtrct_docs.doc_face` (edit the selected preset/title there). Diagrams are included by default; see [export and compatibility updates](docs/implementation_fixes_2026-09-14.md).
+- Student worksheet pilot: **Kinematics > Create a worksheet**. Students download PDFs, requiring LibreOffice on the server; see [setup and verification](docs/student_worksheets.md). Instructor Word exports remain available through the export entry point.
 - `docs/` - architecture notes (e.g., generator payload contract, UI guide).
 
 ## Development Workflow

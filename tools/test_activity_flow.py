@@ -37,7 +37,8 @@ for prefix in ("first", "second"):
     next(b for b in at.sidebar.button if b.label == "Constant Motion").click().run()
     assert not at.exception
     question_id = at.session_state["const_motion__question_id"]
-    for field, answer in zip(at.text_input, at.session_state["const_motion__correct_answers"]):
+    final_inputs = [field for field in at.text_input if "setup_input" not in field.key]
+    for field, answer in zip(final_inputs, at.session_state["const_motion__correct_answers"]):
         field.set_value(str(answer))
     next(b for b in at.button if b.label == "Submit").click().run()
     assert not at.exception

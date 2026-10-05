@@ -4,6 +4,8 @@ from utils.generators.base_generator import BaseGenerator
 
 #from base_generator import BaseGenerator
 from utils.word_lists import random_noun
+from utils.quantities import equation
+from utils.setup_schema import make_setup
 
 
 class MomentumGenerator(BaseGenerator):
@@ -23,17 +25,15 @@ class MomentumGenerator(BaseGenerator):
             "Momentum": {
                 "id": "momentum.momentum",
                 "aliases": ["Momentum"],
-                "honors": r"""
-                 p \;=\; m \cdot v
-                """,
+                "honors": equation("momentum", r"${p} \;=\; ${m} \cdot ${v}"),
 
-                "conceptual": r"""
-                    p \;=\; m \cdot v
+                "conceptual": equation("momentum", r"""
+                    ${p} \;=\; ${m} \cdot ${v}
                     \quad , \quad
-                    m \;=\; \frac{p}{v}
+                    ${m} \;=\; \frac{${p}}{${v}}
                     \quad , \quad
-                    v \;=\; \frac{p}{m}
-                """}
+                    ${v} \;=\; \frac{${p}}{${m}}
+                """)}
         }
 
     
@@ -65,5 +65,9 @@ class MomentumGenerator(BaseGenerator):
             answer = velocity
             unit = "Velocity (m/s)"
             
-        return {"question": question, "answers": [answer], "units": [unit]}
+        target = {"momentum": "p", "mass": "m", "velocity": "v"}[solve_for]
+        values = {"p": momentum, "m": mass, "v": velocity}
+        setup = make_setup("momentum", values, set(values) - {target}, [target])
+        return {"question": question, "answers": [answer], "units": [unit],
+                "extras": {"setup": setup}}
 

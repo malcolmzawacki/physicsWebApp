@@ -44,6 +44,7 @@ ACTIVITIES = {
         },
     },
     "Kinematics": {
+        "Create a worksheet": {"handler": "utils.worksheet_ui:render_kinematics_worksheet", "min_level": "high"},
         "Relative Motion": {
             "handler": "file:app_pages/1_1.1.4_Relative_Motion.py::relative_motion",
             "min_level": "advanced",
@@ -81,6 +82,7 @@ ACTIVITIES = {
         },
     },
     "Dynamics": {
+        "Create a worksheet": {"handler": "utils.worksheet_ui:render_forces_worksheet", "min_level": "high"},
         "Newton's Second Law": {"handler": "file:app_pages/1_2.1_Forces.py::newtons_2nd", "min_level": "high"},
         "Center of Mass": {"handler": "file:app_pages/1_2.1_Forces.py::center_of_mass", "min_level": "advanced"},
         "Tension": {"handler": "file:app_pages/1_2.1_Forces.py::tension", "min_level": "advanced"},

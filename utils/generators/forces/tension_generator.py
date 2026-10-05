@@ -88,7 +88,17 @@ class TensionGenerator(BaseGenerator):
             "scenario": tension_info["scenario"]
         }
 
-        return {"question": question, "answers": answers, "units": units, "diagram_data": diagram_data}
+        # Worksheet wording uses the same sampled givens, without the variable-length
+        # story/noun. Keep the practice-page narrative independent of print layout.
+        directions = {1: "up-right", 2: "up-left", 3: "down-left", 4: "down-right"}
+        worksheet_question = (
+            f"Two wires suspend a {tension_info['mass']} kg object in the air at rest. "
+            f"Wire 1: {tension_info['theta 1']}° {directions[tension_info['scenario'][0]]}; "
+            f"wire 2: {tension_info['theta 2']}° {directions[tension_info['scenario'][1]]}. "
+            "Find the tension in each wire."
+        )
+        return {"question": question, "answers": answers, "units": units,
+                "diagram_data": diagram_data, "worksheet_question": worksheet_question}
     
     def _get_polar_angle(self, quadrant, theta):
         """Helper to convert a quadrant and horizontal angle to a polar angle for Matplotlib."""
