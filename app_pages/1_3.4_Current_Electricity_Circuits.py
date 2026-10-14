@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+from utils.activity_flow import next_question_countdown
+from utils.word_lists import random_correct_message, random_error_message
+
 from utils.grading import parse_number, answer_matches, CIRCUIT_POLICY
 from utils.solve_for import select_target, generate_selected, MIXED
 from utils.solve_for_custom import OhmsLawTargets
-from utils.activity_flow import next_question_countdown
+from utils.problem_payload import payload_from_dict
+from utils.setup_workspace import render_setup_workspace
+from utils.circuit_workspace import render_circuit_workspace
 
 import streamlit as st
 
@@ -13,6 +18,7 @@ from utils.ui_components import (
     performance_expander,
     record_performance,
     equation_controls,
+    render_calculation_feedback,
 )
 from utils.ui_state import State
 from utils.layout_config import question_columns
@@ -23,14 +29,9 @@ from utils.generators.current_electricity import (
     format_answer_value,
 )
 
-AUTO_ADVANCE_DELAY_SECONDS = 2
+AUTO_ADVANCE_DELAY_SECONDS = 5
+
 DIFFICULTIES: tuple[str, ...] = ("Easy", "Medium", "Hard")
-
-
-def _render_givens(case: dict) -> None:
-    st.markdown("#### Givens")
-    for label, value in case["givens"]:
-        st.markdown(f"- **{label}:** `{value}`")
 
 
 def _render_schematic(case: dict) -> None:
@@ -58,17 +59,9 @@ def _render_schematic(case: dict) -> None:
         with schemdraw.Drawing(show=False, color="black", bgcolor="white") as drawing:
             if hasattr(elm, "STYLE_IEEE") and hasattr(elm, "style"):
                 elm.style(elm.STYLE_IEEE)
-            battery_cls = getattr(elm, "BatteryCell", getattr(elm, "Battery", None))
-            if battery_cls is None:
-                raise RuntimeError("schemdraw battery element was not available")
-            battery = drawing.add(battery_cls().up().label(diagram["source_label"], loc="left"))
-            drawing.add(elm.Line().right().length(0.9).label(diagram["wire_label"], loc="top"))
-            for resistor_label in diagram["resistor_labels"]:
-                drawing.add(elm.Resistor().right().label(resistor_label))
-                drawing.add(elm.Line().right().length(0.9))
-            drawing.add(elm.Line().down().length(2.0))
-            drawing.add(elm.Line().tox(battery.start))
-            drawing.add(elm.Line().toy(battery.start))
+            from utils.circuit_diagrams import draw_series, draw_parallel
+            draw = draw_parallel if diagram["kind"] == "parallel" else draw_series
+            draw(drawing, elm, diagram)
             drawing.draw(show=False)
             svg_bytes = drawing.get_imagedata("svg")
     except Exception as exc:
@@ -84,19 +77,19 @@ def _render_schematic(case: dict) -> None:
         )
         return
 
-    st.markdown(svg_bytes.decode("utf-8"), unsafe_allow_html=True)
+    st.image(svg_bytes.decode("utf-8"), width="stretch")
 
 
 def _render_diagram_panel(case: dict) -> None:
     st.markdown("#### Circuit Diagram")
     _render_schematic(case)
-    _render_givens(case)
 
 
 def _reset_question(state: State, problem_type: str, difficulty: str) -> None:
     payload = generate_selected(OhmsLawTargets(), problem_type, difficulty, state.get("solve_for", MIXED))
     state.set("case", payload["extras"]["case"])
-    state.inc("question_number")
+    state.set("payload", payload_from_dict(payload))
+    state.set("question_id", state.inc("question_number"))
     state.set("submitted", False)
     state.set("last_result", None)
 
@@ -126,13 +119,23 @@ def current_electricity_circuits_page() -> None:
     )
 
 
+    # Retired task selections must not leave an old case under a new label.
+    if state.get("problem_type") not in PROBLEM_TYPES:
+        state.set("problem_type", PROBLEM_TYPES[0])
+        state.pop("problem_type_select")
+        state.pop("fundamentals_task_select")
+        state.pop("fundamentals_practice_select")
+        _reset_question(state, PROBLEM_TYPES[0], state.get("difficulty"))
+
+    st.caption("Circuit Fundamentals · Apply current and voltage relationships to individual components. "
+               "For equivalent resistance and calculations that combine several steps, choose Series and Parallel Circuits.")
     top_col1, top_col2, top_col3 = question_columns()
     with top_col1:
         problem_type = st.selectbox(
             "Problem Type",
             options=PROBLEM_TYPES,
             index=PROBLEM_TYPES.index(state.get("problem_type", PROBLEM_TYPES[0])),
-            key=state.key("problem_type_select"),
+            key=state.key("fundamentals_practice_select"),
         )
     with top_col2:
         difficulty = st.selectbox(
@@ -151,7 +154,7 @@ def current_electricity_circuits_page() -> None:
     state.set("problem_type", problem_type)
     state.set("difficulty", difficulty)
 
-    if not state.has("case"):
+    if not state.has("case") or not state.has("payload"):
         _reset_question(state, problem_type, difficulty)
         st.rerun()
     elif previous_type != problem_type or previous_difficulty != difficulty or previous_target != target:
@@ -164,40 +167,41 @@ def current_electricity_circuits_page() -> None:
 
     equation_controls(object(), case["problem_type"], state,
                       state.key("equation_level"), CIRCUIT_EQUATION_METADATA)
-    diagram_col, content_col = st.columns((2, 3), gap="large")
+    diagram_col, content_col = st.columns((1, 1), gap="large")
     with diagram_col:
         _render_diagram_panel(case)
 
     with content_col:
-        st.subheader(case["problem_type"])
-        st.caption(f"Difficulty: {difficulty}")
+        st.subheader(case["problem_type"], help=case.get("relationship"))
         st.write(case["prompt"])
 
-        score_col, action_col, spacer_col = st.columns((2, 1.2, 4.0))
-        with score_col:
-            attempts = state.get("attempt_count", 0)
-            correct = state.get("correct_count", 0)
-            st.caption("Score: 0/0" if attempts == 0 else f"Score: {correct}/{attempts}")
-        with action_col:
-            if st.button("New Circuit", key=state.key("new_circuit"), type="secondary", use_container_width=True):
-                _reset_question(state, problem_type, difficulty)
-                st.rerun()
+        render_setup_workspace(state)
+        render_circuit_workspace(state, case)
 
-        with st.form(state.key(f"answer_form_{question_number}"), clear_on_submit=False):
-            answer_text = st.text_input(
-                f"{case['answer_label']} ({case['unit']})",
-                key=state.key(f"answer_{question_number}"),
-            )
+        attempts = state.get("attempt_count", 0)
+        correct = state.get("correct_count", 0)
+        st.caption("Score: 0/0" if attempts == 0 else f"Score: {correct}/{attempts}")
+
+        answers = case["answers"] if "answers" in case else [case["answer"]]
+        labels = case["answer_labels"] if "answer_labels" in case else [case["answer_label"]]
+        with diagram_col, st.form(state.key(f"answer_form_{question_number}"), clear_on_submit=False):
+            answer_texts = []
+            answer_columns = st.columns(len(labels))
+            for index, (column, label) in enumerate(zip(answer_columns, labels)):
+                # Keep the original single-resistor widget identity.
+                key = f"answer_{question_number}" if len(answers) == 1 else f"answer_{question_number}_{index}"
+                answer_texts.append(column.text_input(f"{label} ({case['unit']})", key=state.key(key), disabled=state.get("submitted")))
             check_clicked = st.form_submit_button("Check Answer", type="primary", use_container_width=True,
                 disabled=state.get("submitted"))
 
         if check_clicked and not state.get("submitted"):
             try:
-                user_value = parse_number(answer_text)
+                user_values = [parse_number(text) for text in answer_texts]
             except ValueError:
-                st.error("Enter a finite numeric value before checking the answer.")
+                st.error("Enter a finite numeric value in every answer field before checking.")
             else:
-                is_correct = _answer_is_correct(user_value, case["answer"])
+                field_results = [_answer_is_correct(value, expected) for value, expected in zip(user_values, answers)]
+                is_correct = all(field_results)
                 state.inc("attempt_count")
                 if is_correct:
                     state.inc("correct_count")
@@ -213,22 +217,33 @@ def current_electricity_circuits_page() -> None:
                     "last_result",
                     {
                         "is_correct": is_correct,
-                        "expected_answer": format_answer_value(case["answer"]),
+                        "message": random_correct_message() if is_correct else random_error_message(),
+                        "expected_answer": format_answer_value(answers[0]) if len(answers) == 1 else "; ".join(
+                            f"{label}: {format_answer_value(answer)} {case['unit']}"
+                            for label, answer in zip(labels, answers)),
+                        "field_results": field_results,
                     },
                 )
                 st.rerun()
 
         if state.get("submitted") and result:
+            render_calculation_feedback(case["explanation"], result["expected_answer"],
+                                        case["unit"] if len(answers) == 1 else "", is_correct=result["is_correct"],
+                                        message=result.get("message"))
+            if len(answers) > 1:
+                for label, correct in zip(labels, result["field_results"]):
+                    st.caption(f"{'✓' if correct else '✗'} {label}: {'Correct' if correct else 'Not quite'}")
             if result["is_correct"]:
-                st.success("Correct.")
-            else:
-                st.error("Not quite.")
-            st.info(case["explanation"])
-            st.caption(f"Expected answer: {result['expected_answer']} {case['unit']}")
-            if result["is_correct"]:
-                def advance():
+                def advance() -> None:
                     _reset_question(state, problem_type, difficulty)
                     st.rerun()
-                next_question_countdown(state, question_number, advance, AUTO_ADVANCE_DELAY_SECONDS)
 
-    _render_performance(state)
+                next_question_countdown(state, question_number, advance, seconds=AUTO_ADVANCE_DELAY_SECONDS)
+
+    new_col, performance_col = st.columns((1.4, 4), vertical_alignment="center")
+    with new_col:
+        st.button("New Question (Circuit)", key=state.key(f"new_circuit_{question_number}"),
+                  on_click=_reset_question, args=(state, problem_type, difficulty),
+                  use_container_width=True)
+    with performance_col:
+        _render_performance(state)

@@ -102,6 +102,8 @@ def generate_sections(requests):
                     if activity == "Tension":
                         problem["optional_tension_diagram"] = problem["diagram_data"]
                         problem["question"] = problem.pop("worksheet_question")
+                    if activity == "Atwood Machines":
+                        problem["optional_atwood_diagram"] = problem.pop("worksheet_diagram_data")
                     problem["diagram_data"] = None
                     problem.pop("diagram_renderer", None)
                     if activity == "Distance & Displacement":
@@ -117,19 +119,31 @@ def generate_sections(requests):
     return sections
 
 
-def render_document(sections, spacing, answers, title="Kinematics Practice", diagrams=False, answer_boxes=True):
+def render_document(sections, spacing, answers, title="Kinematics Practice", diagrams=False, answer_boxes=True, section_layouts=None):
     if spacing not in SPACING or not 1 <= sum(len(s["problems"]) for s in sections) <= 20:
         raise ValueError("Unsupported worksheet length or spacing")
-    sections = [{**section, "writing_space_inches": SPACING[spacing]} for section in sections]
+    if section_layouts is not None and len(section_layouts) != len(sections):
+        raise ValueError("Each section needs its own layout settings")
+    layouts = section_layouts or [(spacing, diagrams, answer_boxes)] * len(sections)
+    if any(layout[0] not in SPACING for layout in layouts):
+        raise ValueError("Unsupported section spacing")
+    sections = [{**section, "writing_space_inches": SPACING[layout[0]], "answer_boxes": layout[2],
+                           "organizing_help": bool(layout[3]) if len(layout) > 3 else False,
+                           "compact_answer_boxes": True}
+                for section, layout in zip(sections, layouts)]
     # Render-time copies preserve both answers and diagram specs when toggling layout.
     from xtrct_docs.tension_diagram import tension_inset
+    from xtrct_docs.atwood_diagram import atwood_inset
     sections = [{**section, "problems": [dict(problem) for problem in section["problems"]]} for section in sections]
-    if diagrams:
-        for section in sections:
+    for section, layout in zip(sections, layouts):
+        if layout[1]:
             for problem in section["problems"]:
                 if problem.get("optional_tension_diagram"):
                     problem.update(diagram_data=problem["optional_tension_diagram"],
                                    diagram_renderer=tension_inset, inset_diagram=True)
+                if problem.get("optional_atwood_diagram"):
+                    problem.update(diagram_data=problem["optional_atwood_diagram"],
+                                   diagram_renderer=atwood_inset, inset_diagram=True)
     output = io.BytesIO()
     create_doc(title, lambda: sections, 1, output_path=output, tables=answer_boxes,
                open_document=False, include_answer_key=answers, answer_key_new_page=True)
@@ -141,36 +155,56 @@ def build_worksheet(problem_type, difficulty, target, count, spacing, answers, *
     return render_document(sections, spacing, answers)
 
 
-def _section_controls(prefix, unit="Kinematics"):
+def _section_controls(prefix, unit="Kinematics", remove_key=None):
+    first_row = st.columns(3)
+    second_row = st.columns(3)
     activities = available_activities(unit)
     if st.session_state.get(prefix + "activity") not in activities:
         st.session_state[prefix + "activity"] = activities[0]
-    activity = st.selectbox("Activity", activities, key=prefix + "activity")
+    activity = first_row[0].selectbox("Activity", activities, key=prefix + "activity")
     generator = ACTIVITIES[activity]()
     kinds = generator.get_problem_types()
     if "Mixed" in kinds:
         kinds = ["Mixed"] + [k for k in kinds if k != "Mixed"]
     if st.session_state.get(prefix + "kind") not in kinds:
         st.session_state[prefix + "kind"] = kinds[0]
-    kind = st.selectbox("Worksheet problem type", kinds, key=prefix + "kind")
+    kind = first_row[1].selectbox("Worksheet problem type", kinds, key=prefix + "kind")
     levels = list(activity_difficulties(activity))
     if st.session_state.get(prefix + "difficulty") not in levels:
         st.session_state[prefix + "difficulty"] = levels[min(1, len(levels) - 1)]
     if getattr(generator, "FIXED_DIFFICULTY", None):
         difficulty = generator.FIXED_DIFFICULTY
         st.session_state[prefix + "difficulty"] = difficulty
-        st.caption("Includes all six motion shapes: constant velocity, speeding up, and slowing down in both directions.")
+        first_row[2].caption("All six motion shapes included.")
     else:
-        difficulty = st.selectbox("Worksheet difficulty", levels, disabled=len(levels) == 1, key=prefix + "difficulty")
+        difficulty = first_row[2].selectbox("Worksheet difficulty", levels, disabled=len(levels) == 1, key=prefix + "difficulty")
     if activity == "Matching Motion Graphs":
-        st.caption("Match position and velocity graphs using three distinct choices. Includes all six motion shapes.")
+        first_row[2].caption("All six motion shapes included.")
     labels = {MIXED: "Mixed practice", **{o["id"]: o["label"] for o in target_options(generator, kind, difficulty)}}
     if st.session_state.get(prefix + "target") not in labels:
         st.session_state[prefix + "target"] = MIXED
-    target = st.selectbox("Worksheet solve for", list(labels), format_func=labels.get,
+    target = second_row[0].selectbox("Worksheet solve for", list(labels), format_func=labels.get,
                           disabled=len(labels) == 1, key=prefix + "target")
-    count = st.number_input("Number of questions", min_value=1, max_value=20, value=5, key=prefix + "count")
-    return activity, kind, difficulty, target, count
+    count = second_row[1].number_input("Number of questions", min_value=1, max_value=20, value=5, key=prefix + "count")
+    space_labels = {"Compact": "Less writing space", "Extra writing space": "More writing space"}
+    if st.session_state.get(prefix + "spacing") not in space_labels:
+        st.session_state[prefix + "spacing"] = "Compact"
+    spacing = second_row[2].selectbox("Writing space", list(space_labels), format_func=space_labels.get,
+                                      key=prefix + "spacing",
+                                      help="Less: 0.25 inches; More: 1 inch below each question.")
+    options = st.columns(3)
+    boxes = options[0].checkbox("Show labeled boxes for final answers", value=True, key=prefix + "answer_boxes",
+                                help="Adds a separate labeled box for each answer in a multipart question.")
+    options[0].caption("Helps organize questions with more than one answer.")
+    diagrams = False
+    if activity in ("Tension", "Atwood Machines"):
+        diagrams = options[1].checkbox("Include compact diagrams", key=prefix + "diagrams")
+    elif activity in ("Types of Motion Graphs", "Matching Motion Graphs"):
+        options[1].caption("Graphs included with these questions.")
+    organizing = options[2].checkbox("Include organizing help", key=prefix + "organizing_help",
+                                      help="Prints blank quantity and planning fields. Activities without a dedicated organizer use a general knowns / find / plan grid.")
+    remove = bool(remove_key and st.button("Remove section", key=remove_key))
+    return (activity, kind, difficulty, target, count), (spacing, diagrams, boxes, organizing), remove
 
 
 
@@ -198,13 +232,23 @@ def render_unit_worksheet(unit):
     with st.container():
         st.caption(f"Build {unit} practice with up to 20 questions in total. Add sections to combine topics from this unit.")
         section_ids = st.session_state.setdefault(prefix + "section_ids", [0])
+        outline = st.empty()
         requests = []
+        layouts = []
+        remove_id = None
         for position, section_id in enumerate(list(section_ids)):
-            st.markdown(f"**Section {position + 1}**")
-            requests.append(_section_controls(prefix if section_id == 0 else prefix + f"section_{section_id}_", unit))
-            if len(section_ids) > 1 and st.button("Remove section", key=prefix + f"remove_{section_id}"):
-                section_ids.remove(section_id)
-                st.rerun()
+            with st.container(border=True):
+                st.markdown(f"**Section {position + 1}**")
+                request, layout, remove = _section_controls(
+                    prefix if section_id == 0 else prefix + f"section_{section_id}_", unit,
+                    prefix + f"remove_{section_id}" if len(section_ids) > 1 else None)
+                requests.append(request)
+                layouts.append(layout)
+                if remove:
+                    remove_id = section_id
+        if remove_id is not None:
+            section_ids.remove(remove_id)
+            st.rerun()
         if st.button("Add section", key=prefix + "add", disabled=len(section_ids) >= 20):
             next_id = st.session_state.get(prefix + "next_section_id", 1)
             section_ids.append(next_id)
@@ -216,16 +260,10 @@ def render_unit_worksheet(unit):
         over_limit = count > 20
         if over_limit:
             st.warning("Reduce the question counts to 20 or fewer in total.")
-        spacing = st.selectbox("Writing space", list(SPACING), index=1, key=prefix + "spacing")
-        st.caption(f"Reserves {SPACING[spacing]:g} inches below each question. Page count depends on question length.")
+        outline.caption(" · ".join(f"{r[4]} {r[0]} ({r[1]})" for r in requests) + f" — {count}/20 questions")
+        layouts = tuple(layouts)
         answers = st.checkbox("Include answer key at the end", value=True, key=prefix + "answers")
-        diagrams = False
-        if any(request[0] == "Tension" for request in requests):
-            diagrams = st.checkbox("Include compact Tension diagrams", value=False, key=prefix + "diagrams")
-            st.caption("Adds a wire-and-angle sketch beside each Tension question. Toggle and update layout to compare the same questions.")
-        answer_boxes = st.checkbox("Include answer boxes", value=True, key=prefix + "answer_boxes",
-                                   help="Show labeled answer boxes for questions with multiple answers. Writing space and the answer key are separate options.")
-        settings = (requests, spacing, answers, diagrams, answer_boxes)
+        settings = (requests, layouts, answers)
         available = bool(libreoffice_path())
         if not available:
             st.info("PDF conversion needs LibreOffice installed on the computer running this app. If it is installed in a custom location, set LIBREOFFICE_PATH to its executable and restart the app.")
@@ -244,7 +282,7 @@ def render_unit_worksheet(unit):
             with st.spinner("Working…"):
                 try:
                     sections = previous["sections"] if layout_changed else generate_sections(requests)
-                    document = render_document(sections, spacing, answers, title=f"{unit} Practice", diagrams=diagrams, answer_boxes=answer_boxes)
+                    document = render_document(sections, "Standard", answers, title=f"{unit} Practice", section_layouts=layouts)
                     timings = {"document": time.perf_counter() - started}
                     result = {"settings": settings, "sections": sections, "docx": document, "pdf": None, "error": None, "timings": timings}
                     st.session_state[prefix + "result"] = result

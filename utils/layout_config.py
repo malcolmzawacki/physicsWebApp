@@ -6,7 +6,7 @@ Streamlit handles stacking at narrow viewport widths.
 """
 PROBLEM_TYPE_WIDTH = 3
 DIFFICULTY_WIDTH = 1.2
-SOLVE_FOR_WIDTH = 4
+SOLVE_FOR_WIDTH = 1.6
 CONTROL_GAP = "small"
 
 EQUATION_EXPANDER_WIDTH = 5

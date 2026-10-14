@@ -1,7 +1,10 @@
 from __future__ import annotations
 
-from utils.grading import parse_number, answer_matches, CIRCUIT_POLICY
 from utils.activity_flow import next_question_countdown
+from utils.circuit_workspace import render_circuit_workspace
+from utils.word_lists import random_correct_message, random_error_message
+
+from utils.grading import parse_number, answer_matches, CIRCUIT_POLICY
 
 import streamlit as st
 
@@ -11,6 +14,7 @@ from utils.ui_components import (
     performance_expander,
     record_performance,
     equation_controls,
+    render_calculation_feedback,
 )
 from utils.ui_state import State
 from utils.layout_config import question_columns
@@ -21,14 +25,9 @@ from utils.generators.current_electricity import (
     format_answer_value,
 )
 
-AUTO_ADVANCE_DELAY_SECONDS = 2
+AUTO_ADVANCE_DELAY_SECONDS = 5
+
 DIFFICULTIES: tuple[str, ...] = ("Easy", "Medium", "Hard")
-
-
-def _render_givens(case: dict) -> None:
-    st.markdown("#### Givens")
-    for label, value in case["givens"]:
-        st.markdown(f"- **{label}:** `{value}`")
 
 
 def _render_fallback_text(case: dict) -> None:
@@ -74,13 +73,12 @@ def _render_schematic(case: dict) -> None:
         _render_fallback_text(case)
         return
 
-    st.markdown(svg_bytes.decode("utf-8"), unsafe_allow_html=True)
+    st.image(svg_bytes.decode("utf-8"), width="stretch")
 
 
 def _render_diagram_panel(case: dict) -> None:
     st.markdown("#### Circuit Diagram")
     _render_schematic(case)
-    _render_givens(case)
 
 
 def _reset_question(state: State, problem_type: str, difficulty: str) -> None:
@@ -114,6 +112,8 @@ def current_electricity_series_parallel_page() -> None:
         lambda: init_performance(list(SERIES_PARALLEL_PROBLEM_TYPES), list(DIFFICULTIES)),
     )
 
+    st.caption("Series and Parallel Circuits · Combine circuit relationships to find equivalent resistance, "
+               "circuit current, or component voltage. For focused relationship practice, choose Circuit Fundamentals.")
     top_col1, top_col2, top_col3 = question_columns()
     with top_col1:
         problem_type = st.selectbox(
@@ -148,26 +148,20 @@ def current_electricity_series_parallel_page() -> None:
 
     equation_controls(object(), case["problem_type"], state,
                       state.key("equation_level"), SERIES_PARALLEL_EQUATION_METADATA)
-    diagram_col, content_col = st.columns((2, 3), gap="large")
+    diagram_col, content_col = st.columns((1, 1), gap="large")
     with diagram_col:
         _render_diagram_panel(case)
 
     with content_col:
         st.subheader(case["problem_type"])
-        st.caption(f"Difficulty: {difficulty}")
         st.write(case["prompt"])
+        render_circuit_workspace(state, case)
 
-        score_col, action_col, spacer_col = st.columns((2, 1.2, 4.0))
-        with score_col:
-            attempts = state.get("attempt_count", 0)
-            correct = state.get("correct_count", 0)
-            st.caption("Score: 0/0" if attempts == 0 else f"Score: {correct}/{attempts}")
-        with action_col:
-            if st.button("New Circuit", key=state.key("new_circuit"), type="secondary", use_container_width=True):
-                _reset_question(state, problem_type, difficulty)
-                st.rerun()
+        attempts = state.get("attempt_count", 0)
+        correct = state.get("correct_count", 0)
+        st.caption("Score: 0/0" if attempts == 0 else f"Score: {correct}/{attempts}")
 
-        with st.form(state.key(f"answer_form_{question_number}"), clear_on_submit=False):
+        with diagram_col, st.form(state.key(f"answer_form_{question_number}"), clear_on_submit=False):
             answer_text = st.text_input(
                 f"{case['answer_label']} ({case['unit']})",
                 key=state.key(f"answer_{question_number}"),
@@ -197,22 +191,27 @@ def current_electricity_series_parallel_page() -> None:
                     "last_result",
                     {
                         "is_correct": is_correct,
+                        "message": random_correct_message() if is_correct else random_error_message(),
                         "expected_answer": format_answer_value(case["answer"]),
                     },
                 )
                 st.rerun()
 
         if state.get("submitted") and result:
+            render_calculation_feedback(case["explanation"], result["expected_answer"],
+                                        case["unit"], is_correct=result["is_correct"],
+                                        message=result.get("message"))
             if result["is_correct"]:
-                st.success("Correct.")
-            else:
-                st.error("Not quite.")
-            st.info(case["explanation"])
-            st.caption(f"Expected answer: {result['expected_answer']} {case['unit']}")
-            if result["is_correct"]:
-                def advance():
+                def advance() -> None:
                     _reset_question(state, problem_type, difficulty)
                     st.rerun()
-                next_question_countdown(state, question_number, advance, AUTO_ADVANCE_DELAY_SECONDS)
 
-    _render_performance(state)
+                next_question_countdown(state, question_number, advance, seconds=AUTO_ADVANCE_DELAY_SECONDS)
+
+    new_col, performance_col = st.columns((1.4, 4), vertical_alignment="center")
+    with new_col:
+        st.button("New Question (Circuit)", key=state.key(f"new_circuit_{question_number}"),
+                  on_click=_reset_question, args=(state, problem_type, difficulty),
+                  use_container_width=True)
+    with performance_col:
+        _render_performance(state)

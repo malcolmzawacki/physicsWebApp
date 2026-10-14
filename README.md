@@ -2,6 +2,38 @@
 
 Interactive Streamlit workspace for generating and practicing physics (and chemistry) problem sets. The project bundles reusable question generators, a shared UI layer, and export tools so instructors can quickly spin up randomized practice or build printable worksheets.
 
+## Where to look
+
+For planning and classroom use, start with the first three documents below.
+The rest are reference material to open when working on a particular feature.
+
+| Question | Document | What it does not establish |
+|---|---|---|
+| Where is the site heading, and what should we work on next? | [Project roadmap](docs/project_roadmap.md) — educational direction, architectural direction, ordered queue, and future candidates | That a proposed feature is implemented |
+| What works today, and what are the known limits? | [Current state](docs/current_state.md) — implemented scope and verification limits | Future priorities or a complete implementation reference |
+| How do we update a family consistently? | [Site update process](docs/site_update_process.md) — work stages, review criteria, and documentation ownership | That a family has passed those stages |
+| Which activities have been reviewed for organizing help? | [Organizing-help inventory](docs/organizing_help_inventory.md) — generated coverage list, linked to the review ledger and family notes | Readiness of every difficulty, target, or random branch |
+| How is the app structured? | [Architecture](docs/architecture.md) — high-level code map; [payload contract](docs/problem_payload.md) and [organizing-help architecture](docs/organizing_help_architecture.md) for specific contracts | A replacement for current-state status or source verification |
+| How do student worksheets work? | [Student worksheets](docs/student_worksheets.md) — controls, export setup, and verification | Automatic export support for every practice activity |
+
+Other feature guides and family reviews are supporting references reached from
+these documents. Dated audits and implementation notes preserve historical
+evidence; use **Current state** for the reconciled status instead of interpreting
+an old finding as an outstanding bug.
+
+### Keeping documentation manageable
+
+- Update the existing owner of a topic before creating another document. Product
+  direction and future work belong in the roadmap; shipped behavior belongs in
+  current state; rollout procedure belongs in the site update process.
+- Keep detailed contracts in their feature guide and branch evidence in the
+  family's review. Link to those details instead of copying them across summaries.
+- Create a new guide only for a distinct, durable topic with no suitable home,
+  and link it from the relevant entry point. Routine changes do not need a new
+  dated report, strategy document, or parallel backlog.
+- When a document is superseded, identify its replacement and retain useful
+  evidence. Any later archive/consolidation pass should preserve incoming links.
+
 ## Quick Start
 
 1. **Install dependencies**
@@ -43,7 +75,7 @@ Interactive Streamlit workspace for generating and practicing physics (and chemi
   python tools/check_prompt_answer_consistency.py
   ```
 - **Static checks** - the project currently relies on manual review; add `pydocstyle`, `flake8`, or similar as needed for your workflow.
-- **Interaction and export regressions** — run `python tools/test_activity_flow.py`, `python tools/test_relative_motion_page.py`, `python tools/test_audit_regressions.py`, `python tools/test_progress_and_formatting.py`, and `python tools/test_solve_for.py`. CI runs all seven checks. Payload validation discovers generators automatically.
+- **Interaction and export regressions** — run `python tools/test_activity_flow.py`, `python tools/test_relative_motion_page.py`, `python tools/test_audit_regressions.py`, `python tools/test_progress_and_formatting.py`, and `python tools/test_solve_for.py`. CI also runs student worksheet and organizing-help checks listed in [current state](docs/current_state.md). Payload validation discovers generators automatically.
 - **Stable progress IDs and Word formatting** — see the [implementation notes and manual review checklist](docs/implementation_fixes_2026-09-15.md).
 
 ## Contributing Notes
@@ -54,5 +86,5 @@ the [page-by-page evaluation and export examples](docs/solve_for_evaluation.md),
 [deferred decisions](docs/solve_for_deferred.md).
 
 1. Extend or create generators in `utils/generators/` and follow the dict payload contract.
-2. Add documentation in `docs/` when introducing new interaction patterns or complex flows.
+2. Update the existing documentation owner for changed behavior or contracts; use the documentation rules above before adding a file.
 3. Keep README steps up to date when setup or testing expectations change.

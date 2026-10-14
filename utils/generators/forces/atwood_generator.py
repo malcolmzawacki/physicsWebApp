@@ -125,7 +125,15 @@ class AtwoodGenerator(BaseGenerator):
           What coefficient of static friction would hold the system in place?"""
           answer = [eq_nums["mu max"]]
           unit = ["coefficient of friction"]
-        return {"question": question, "answers": answer, "units": unit, "diagram_data": diagram_data}
+        worksheet_diagram = {**diagram_data}
+        if solve_for == "mass 1":
+            worksheet_diagram["m1"] = None
+        elif solve_for == "mass 2":
+            worksheet_diagram["m2"] = None
+        elif solve_for == "coefficient of friction":
+            worksheet_diagram["mu_s"] = None
+        return {"question": question, "answers": answer, "units": unit,
+                "diagram_data": diagram_data, "worksheet_diagram_data": worksheet_diagram}
     
 
     def frictionless_half_atwood(self, solve_for = None):
@@ -152,19 +160,19 @@ class AtwoodGenerator(BaseGenerator):
           It is attached by a string to a {eq_nums["mass 2"]} kg {noun2} hanging off the table."""
        q_template_m1_a = f"""A {eq_nums["mass 1"]} kg {noun1} is placed on a table with negligible friction. 
           It is attached by a string to a {noun2} hanging off the table, 
-          which causes the system to accelerate at {accel:.4f} m/s2."""
+          which causes the system to accelerate at {accel:.4f} m/s²."""
        q_template_m1_Ft = f"""A {eq_nums["mass 1"]} kg {noun1} is placed on a table with negligible friction. 
           It is attached by a string to a {noun2} hanging off the table, 
           which produces a tension of {tension:.4f} Newtons."""
        q_template_m2_a = f"""A {noun1} is placed on a table with negligible friction. 
           It is attached by a string to a {eq_nums["mass 2"]} kg {noun2} hanging off the table, 
-          which causes the system to accelerate at {accel:.4f} m/s2."""
+          which causes the system to accelerate at {accel:.4f} m/s²."""
        q_template_m2_Ft = f"""A {noun1} is placed on a table with negligible friction. 
           It is attached by a string to a {eq_nums["mass 2"]} kg {noun2} hanging off the table, 
           which produces a tension of {tension:.4f} Newtons."""
        q_template_a_Ft = f"""A {noun1} is placed on a table with negligible friction. 
           It is attached by a string to a {noun2} hanging off the table, 
-          which produces a tension of {tension:.4f} Newtons and an acceleration of {accel:.4f} m/s2."""
+          which produces a tension of {tension:.4f} Newtons and an acceleration of {accel:.4f} m/s²."""
        if solve_for == "tension":
           question = random.choice([q_template_m1_m2, q_template_m1_a, q_template_m2_a])
           question = question + " What is the tension in the string?"
@@ -184,8 +192,17 @@ class AtwoodGenerator(BaseGenerator):
           question = random.choice([q_template_m1_Ft, q_template_m2_Ft, q_template_m1_m2])
           question = question + " What is the acceleration of the system?"
           answer = [accel]
-          unit = ["acceleration (m/s2)"]
-       return {"question": question, "answers": answer, "units": unit, "diagram_data": diagram_data}
+          unit = ["acceleration (m/s²)"]
+       # A mass may be omitted even when it is not the requested unknown.
+       # Match the selected authored template, not answer values or prose regexes.
+       worksheet_diagram = {
+           "m1": eq_nums["mass 1"] if any(question.startswith(t) for t in
+               (q_template_m1_m2, q_template_m1_a, q_template_m1_Ft)) else None,
+           "m2": eq_nums["mass 2"] if any(question.startswith(t) for t in
+               (q_template_m1_m2, q_template_m2_a, q_template_m2_Ft)) else None,
+       }
+       return {"question": question, "answers": answer, "units": unit,
+               "diagram_data": diagram_data, "worksheet_diagram_data": worksheet_diagram}
 
 
     def kinetic_half_atwood(self, solve_for = None):
@@ -284,7 +301,12 @@ class AtwoodGenerator(BaseGenerator):
          question = start_str1_no_m1 + start_str2_no_m2 + coeff_str + tension_str + accel_str + m1_q + m2_q
          answers = [m1, m2]
          units = [f"{noun1} mass (kg)", f"{noun2} mass (kg)"]
-       return {"question": question, "answers": answers, "units": units, "diagram_data": diagram_data}
+       worksheet_diagram = {**diagram_data}
+       for requested, key in (("mass 1", "m1"), ("mass 2", "m2"), ("coefficient", "mu_k")):
+           if requested in solve_for:
+               worksheet_diagram[key] = None
+       return {"question": question, "answers": answers, "units": units,
+               "diagram_data": diagram_data, "worksheet_diagram_data": worksheet_diagram}
     
 
     def generate_diagram(self, diagram_data: dict, problem_type: str, difficulty: str):

@@ -3,6 +3,8 @@
 For the exhaustive routed activity/problem-type checklist and explicit review
 blanks, use the [organizing-help inventory](organizing_help_inventory.md).
 The family-level recommendations below are planning guidance, not completed reviews.
+Use the [rollout process](site_update_process.md) and [current roadmap](project_roadmap.md)
+for execution order; dated rollout notes below are historical findings.
 
 ## Implemented contract
 
@@ -27,14 +29,15 @@ statuses to the student-facing ? and x markers. The compatibility `setup_expecte
 map remains on accelerated-motion payloads, derived from the new source.
 
 The workspace reads profile roles dynamically and renders nothing without setup
-metadata. Its existing page opt-in remains: Accelerated Motion and Constant Speed show the UI. Constant Speed is enabled
+metadata. Page opt-ins now include Accelerated Motion, Constant Speed, Momentum,
+Wave Properties, and Single Resistor. Constant Speed is enabled
 within Constant Motion; other Constant Motion branches remain unsupported and
 show no organizing-help panel. Explicit checking, independent grading, and session-local
 state behavior are unchanged.
 
-Solve-for catalog entries for both migrated families now declare `quantity_roles`.
+Migrated solve-for catalog entries declare `quantity_roles`.
 The dispatcher checks that explicit selections agree with the generated target.
-Mixed practice retains its sampling behavior; the generated setup reports the
+Mixed practice uses the family's declared sampling policy; generated setup reports the
 actual target even when the request was mixed. Existing target IDs stay unchanged.
 
 Equations use explicit ${role} templates resolved through the same profile symbols.
@@ -63,9 +66,9 @@ branches have been migrated or individually audited for prompt correctness.
 | Forces | Separate net/applied/normal/friction/tension/weight; add body and system context. Tension, incline, Atwood, and center-of-mass branches need their own profiles and prompt metadata. |
 | Momentum and Impulse | Add object and before/after roles; distinguish impulse, momentum, change in momentum, and contact time. Collision and multipart targets require explicit target lists. |
 | Energy | Separate energy type and state, work, power, thermal loss, distance, and height; avoid assuming every internally computed intermediate is given. |
-| Waves | Distinguish frequency, period, speed, wavelength, and sound-level quantities; logarithmic cases need separate validation conventions. |
+| Waves | Wave Properties' four roles and eight forms are migrated/enabled and teacher checked. Harmonics and sound-level quantities remain unreviewed for organizing help. |
 | Static Electricity | Numeric Coulomb/field cases need charge and object roles; friction, conduction, and induction sequence/sign activities need a different organizing interaction. |
-| Current Electricity / Circuits | Define current, potential difference, resistance, power, charge/time where used; bind component and source/total roles to the diagram model. |
+| Current Electricity / Circuits | Single Resistor's V/I/R profile is enabled across all difficulties; teacher review pending. Series Current/Voltage Drop and power/charge/time require separate reviews and component/source/total roles. |
 | Series/Parallel Circuits | Build component/branch/whole-circuit groups from topology; a flat five-column form is not an appropriate default. |
 | Stoichiometry | Add species, amount kind, reaction role, and conversion basis; constants and molar masses need explicit availability rules. Custom page flow needs an adapter to the shared renderer. |
 | Compound Names | Formula/name/charge reasoning requires a distinct scaffold, not numeric givens. |
@@ -84,8 +87,8 @@ branches have been migrated or individually audited for prompt correctness.
 5. Review the layout with realistic field counts and narrow screens, then opt in
    the page. Keep unsupported branches free of organizing-help UI.
 
-Constant Speed is now enabled. Next, review a simple momentum or
-force/mass/acceleration family to validate cross-unit reuse. Build
+Constant Speed, Momentum, Wave Properties, and Single Resistor are enabled. Follow
+Single Resistor's teacher review checkpoint, then simple force/mass/acceleration. Build
 object/axis/component grouping before enabling collisions or circuit networks.
 
 
@@ -122,5 +125,40 @@ All displayed equations use shared profile symbols. The regression test checks
 prompt/given agreement, no feedback before Check setup, all targets, value mix-ups,
 question resets, and independent final-answer grading.
 
-Next simple-scalar candidate: Wave Properties. Its frequency/period distinctions
-and actual generated branches should be reviewed before enabling the organizer.
+## Wave Properties rollout findings (2026-10-12)
+
+Wave Properties now covers eight given/target forms with a four-role organizer,
+shared equations/units, and four solve-for targets. Displayed period givens drive
+answers; derived-but-unstated quantities remain absent. Automated checks passed;
+the teacher confirmed period problems and Tab/Enter behavior. See [its coverage review](wave_properties_review.md).
+The current queue remains in the roadmap.
+
+## Single Resistor rollout findings (2026-10-12)
+
+The case model emits a V/I/R setup profile; both circuit payload adapters preserve
+it. The custom page retains a normalized payload and aligns its existing question
+number with the shared organizer ID, allowing shared checking/reset behavior
+without replacing circuit scoring. Givens and diagram labels use the same displayed
+values. All nine target/difficulty branches and 507 curated cases passed review
+checks; teacher/browser layout review is pending. See the [existing circuit guide](current_electricity_ohms_law.md#single-resistor-organizing-help-scope).
+Other circuit subtypes and printed organizers remain separate work.
+
+## Layout and equation-reference preferences
+
+Group directional information by axis in consistent rows or columns. Within an
+axis, group quantities of the same type together where space allows: initial and
+final vertical velocity can share a row. Equation references should similarly
+group alternative ways of solving for the same quantity, as Accelerated Motion
+does for distance, time, and velocity. Keep given facts separate from supporting
+calculations even when the same quantity type appears in both sections. Optional
+hints carry extra explanation; compactness should preserve readable labels.
+
+Projectile base references contain the general relations. Type-specific derived
+relations (including Type 2 zero net vertical displacement, total flight time,
+and maximum height) belong only in More equations, rather than both reference
+modes. Type 1/2/3 names remain teaching categories. Updated 2026-10-13.
+
+Avoid duplicate organizer inputs for equivalent geometric information: projectile
+cliff height and signed launch-to-landing displacement do not need separate
+entries. Do not add a field solely to reinforce a sign convention when optional
+help can carry that reminder. Type 2 needs no separate zero-displacement input.

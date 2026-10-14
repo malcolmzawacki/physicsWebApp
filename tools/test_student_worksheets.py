@@ -51,6 +51,86 @@ class Worksheets(unittest.TestCase):
                     self.assertLessEqual(box.y1, fig.bbox.height - margin)
                 fig.clear()
 
+    def test_atwood_diagrams_hide_undisclosed_values(self):
+        from utils.generators.forces.atwood_generator import AtwoodGenerator
+        g = AtwoodGenerator()
+        for target, key in (("mass 1", "m1"), ("mass 2", "m2"), ("coefficient of friction", "mu_s")):
+            problem = g.static_half_atwood(target)
+            self.assertIsNone(problem["worksheet_diagram_data"][key])
+        for target in ("mass 1 and mass 2", "mass 1 and coefficient", "mass 2 and coefficient"):
+            spec = g.kinetic_half_atwood(target)["worksheet_diagram_data"]
+            for term, key in (("mass 1", "m1"), ("mass 2", "m2"), ("coefficient", "mu_k")):
+                self.assertEqual(spec[key] is None, term in target)
+        # Tension can be requested with either mass absent from the prompt.
+        for index, expected in ((0, (True, True)), (1, (True, False)), (2, (False, True))):
+            with patch("utils.generators.forces.atwood_generator.random.choice", side_effect=lambda choices: choices[min(index, len(choices)-1)]):
+                spec = g.frictionless_half_atwood("tension")["worksheet_diagram_data"]
+            self.assertEqual((spec["m1"] is not None, spec["m2"] is not None), expected)
+        sections = generate_sections([("Atwood Machines", kind, "Medium", "mixed", 2) for kind in g.get_problem_types()])
+        before = repr(sections)
+        for enabled in (False, True):
+            doc = Document(io.BytesIO(render_document(sections, "Compact", True, "Forces Practice", diagrams=enabled)))
+            self.assertEqual(len(doc.inline_shapes), 6 if enabled else 0)
+            self.assertEqual(repr(sections), before)
+
+    def test_print_organizer_contains_blanks_not_solutions(self):
+        problem = {"question": "Find the result.", "answers": [9876.54321], "units": ["Result"],
+                   "extras": {"force_plan": {"given": {"Mass (kg)": 1234.56789},
+                       "steps": [{"label": "Net force (N)", "answer": 9876.54321, "hint": "SECRET SOLUTION"}]}}}
+        sections = [{"heading": "Organizer", "gap": 0, "problems": [problem]}]
+        before = repr(sections)
+        doc = Document(io.BytesIO(render_document(sections, "Compact", False,
+            section_layouts=[("Compact", False, True, True)])))
+        xml = doc.element.xml
+        self.assertIn("Organizing help", xml)
+        self.assertIn("Mass (kg)", xml)
+        self.assertIn("Net force (N)", xml)
+        self.assertNotIn("9876.54321", xml)
+        self.assertNotIn("1234.56789", xml)
+        self.assertNotIn("SECRET SOLUTION", xml)
+        self.assertEqual(repr(sections), before)
+        plain = Document(io.BytesIO(render_document(sections, "Compact", False)))
+        self.assertNotIn("Organizing help", plain.element.xml)
+
+    def test_per_section_layout_export(self):
+        sections = generate_sections([("Tension", "Suspension", "Medium", "mixed", 2)] * 2)
+        original = repr(sections)
+        doc = Document(io.BytesIO(render_document(sections, "Standard", True,
+            section_layouts=[("Compact", True, False), ("Extra writing space", False, True)])))
+        self.assertEqual(len(doc.inline_shapes), 2)
+        self.assertEqual(doc.element.xml.count("Final Answers:"), 2)
+        self.assertIn('w:line="360"', doc.element.xml)
+        self.assertIn('w:line="1440"', doc.element.xml)
+        self.assertEqual(repr(sections), original)
+
+    def test_per_section_controls_and_layout_reuse(self):
+        app = AppTest.from_string("from utils.worksheet_ui import render_forces_worksheet\nrender_forces_worksheet()")
+        prefix = "forces_worksheet_"
+        app.session_state["nav_level"] = "advanced"
+        app.session_state[prefix + "activity"] = "Tension"
+        with patch("utils.worksheet_ui.libreoffice_path", return_value="soffice"), patch(
+            "utils.worksheet_ui.docx_to_pdf", return_value=b"fixture"
+        ), patch("utils.worksheet_ui.page_summary", return_value={"total": 1, "questions": 1, "answers": 0}), patch(
+            "utils.worksheet_ui.render_page", return_value=Image.new("RGB", (10, 10), "white")):
+            app.run()
+            app.button(key=prefix + "add").click().run()
+            second = prefix + "section_1_"
+            app.selectbox(key=second + "activity").select("Atwood Machines").run()
+            app.button(key=prefix + "generate").click().run()
+            original = repr(app.session_state[prefix + "result"]["sections"])
+            app.selectbox(key=second + "spacing").select("Extra writing space").run()
+            app.checkbox(key=second + "diagrams").check().run()
+            app.checkbox(key=second + "answer_boxes").uncheck().run()
+            app.checkbox(key=second + "organizing_help").check().run()
+            self.assertEqual(app.selectbox(key=prefix + "spacing").value, "Compact")
+            self.assertTrue(app.checkbox(key=prefix + "answer_boxes").value)
+            self.assertEqual(app.button(key=prefix + "generate").label, "Update layout")
+            app.button(key=prefix + "generate").click().run()
+            self.assertEqual(repr(app.session_state[prefix + "result"]["sections"]), original)
+            app.button(key=prefix + "remove_0").click().run()
+            self.assertEqual(app.selectbox(key=second + "spacing").value, "Extra writing space")
+            self.assertFalse(app.exception)
+
     def test_answer_boxes_are_optional(self):
         sections = generate_sections([("Tension", "Suspension", "Medium", "mixed", 3)])
         original = repr(sections)
@@ -294,7 +374,7 @@ class Worksheets(unittest.TestCase):
                     docx_to_pdf(b"docx", wait_timeout=0.01, on_stage=stages.append)
             finally:
                 _conversion_slot.release()
-            self.assertEqual(stages, ["Waiting for PDF conversionâ€¦"])
+            self.assertEqual(stages, ["Waiting for PDF conversion\u2026"])
             _conversion_slot.acquire()
             timer = threading.Timer(0.05, _conversion_slot.release)
             timer.start()
@@ -302,7 +382,7 @@ class Worksheets(unittest.TestCase):
                 timings = {}
                 docx_to_pdf(b"docx", on_stage=stages.append, timings=timings)
                 self.assertGreater(timings["wait"], 0)
-                self.assertEqual(stages[-1], "Creating your PDFâ€¦")
+                self.assertEqual(stages[-1], "Creating your PDF\u2026")
             finally:
                 timer.join()
 
@@ -430,7 +510,7 @@ class Worksheets(unittest.TestCase):
             app.run()
             app.button(key=PREFIX + "generate").click().run()
             original = app.session_state[PREFIX + "result"]["sections"]
-            app.selectbox(key=PREFIX + "spacing").select("Compact").run()
+            app.selectbox(key=PREFIX + "spacing").select("Extra writing space").run()
             self.assertEqual(app.button(key=PREFIX + "generate").label, "Update layout")
             app.button(key=PREFIX + "generate").click().run()
             self.assertEqual(app.session_state[PREFIX + "result"]["sections"], original)

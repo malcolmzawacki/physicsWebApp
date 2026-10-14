@@ -1,5 +1,6 @@
 from random import randint as ri
 from utils.generators.base_generator import BaseGenerator
+from utils.thermal_organizer import thermal_payload, displayable_case
 from utils.word_lists import random_noun
 from utils.generators.energy.energy_basics import EnergyBasicsGenerator
 EBG = EnergyBasicsGenerator()
@@ -72,6 +73,7 @@ class ThermalLossGenerator(BaseGenerator):
     # # # T H E R M A L    E N E R G Y   L 0 S S   P R 0 B L E M S # # # 
 
 
+    @displayable_case
     def grav_to_kin_thermal_q(self,difficulty, *, variant=None):
         mass, height, velocity, thermal = self.grav_to_kin_thermal_nums()
         flip = ri(0,2) if variant is None else variant
@@ -80,25 +82,20 @@ class ThermalLossGenerator(BaseGenerator):
             # just find the difference
             question = f"""A {mass:.2f} kg {noun} is released from rest and slides down a {height:.2f} meter tall ramp.
             \n If the {noun}'s velocity at the bottom is {velocity:.2f} m/s, how much energy was lost as heat?"""
-            answer = thermal
-            unit = "Work done by Friction (Joules)"
         elif flip == 1:
             # give the initial and the loss, find final info
             question = f"""A {mass:.2f} kg {noun} is released from rest and slides down a {height:.2f} meter tall ramp.
             \n If the {noun} loses {thermal} Joules due to friction / heat along the way, 
             what will its velocity be when it reaches the bottom?"""
-            answer = velocity
-            unit = "Velocity (m/s)"
         elif flip == 2:
             # give the final and the loss, find initial info
             question = f"""A {mass:.2f} kg {noun} is released from rest and slides down a ramp,
             losing {thermal} Joules due to friction / heat along the way. 
             \n If the {noun} reaches the bottom moving at 
             {velocity:.2f} m/s, what was the original height of the ramp?"""
-            answer = height
-            unit = "Height (meters)"
-        return {"question": question, "answers": [answer], "units": [unit]}
+        return thermal_payload("grav_to_kin", {"m": mass, "h": height, "v": velocity, "T": thermal}, ("T", "v", "h")[0 if difficulty == "Easy" else flip], question)
     
+    @displayable_case
     def kin_to_grav_thermal_q(self,difficulty, *, variant=None):
         flip = ri(0,2) if variant is None else variant
         noun = random_noun()
@@ -108,15 +105,11 @@ class ThermalLossGenerator(BaseGenerator):
             question = f"""A {mass:.2f} kg {noun} is initially moving with a velocity of {velocity:.2f} m/s.
             \n The {noun} slides up a ramp, reaching a height of {height:.2f} meters.
             \n How much energy was lost as heat?"""
-            answer = thermal
-            unit = "Work done by Friction (Joules)"
         elif flip == 1:
             # give the initial and the loss, find final info
             question = f"""A {mass:.2f} kg {noun} slides {height:.2f} meters up a ramp.
             \n If the {noun} lost {thermal} Joules due to friction / heat along the way, 
             what was its velocity at the bottom of the ramp?"""
-            answer = velocity
-            unit = "Velocity (m/s)"
         elif flip == 2:
             # give the final and the loss, find initial info
             question = f"""A {mass:.2f} kg {noun} slides up a ramp,
@@ -124,9 +117,7 @@ class ThermalLossGenerator(BaseGenerator):
             \n If the {noun} was moving at 
             {velocity:.2f} m/s at the bottom of the ramp,
                 how high up the ramp does it reach?"""
-            answer = height
-            unit = "Height (meters)"
-        return {"question": question, "answers": [answer], "units": [unit]}
+        return thermal_payload("kin_to_grav", {"m": mass, "h": height, "v": velocity, "T": thermal}, ("T", "v", "h")[0 if difficulty == "Easy" else flip], question)
    
     
     def grav_kin_thermal(self, difficulty):
@@ -138,6 +129,7 @@ class ThermalLossGenerator(BaseGenerator):
 
 
 
+    @displayable_case
     def grav_to_elastic_thermal_q(self,difficulty, *, variant=None):
         noun = random_noun()
         flip = ri(0,4) if variant is None else variant
@@ -147,42 +139,33 @@ class ThermalLossGenerator(BaseGenerator):
             question = f"""A {mass:.2f} kg {noun} is released from rest and slides down a {height:.2f} meter tall ramp.
             \n It collides with a spring of strength {spring_constant:.2f} N/m, which compresses {compression:.2f} meters before coming to rest.
             \n How much energy was lost as heat?"""
-            answer = thermal
-            unit = "Work done by Friction (Joules)"
         elif flip == 1:
             # give the initial and the loss, find final info
             question = f"""A {mass:.2f} kg {noun} is released from rest and slides down a {height:.2f} meter tall ramp.
             \n The {noun} loses {thermal} Joules due to friction / heat along the way, and ends up compressing the spring at the bottom by
             {compression:.2f} meters. 
             \n How strong is the spring?"""
-            answer = spring_constant
-            unit = "Spring Strength (N/m)"
         elif flip == 2:
             # give the initial and the loss, find final info
             question = f"""A {mass:.2f} kg {noun} is released from rest and slides down a {height:.2f} meter tall ramp.
             \n The {noun} loses {thermal} Joules due to friction / heat along the way, and ends up compressing a
             spring that has a strength of {spring_constant:.2f} N/m. 
             \n How much does the spring compress?"""
-            answer = compression
-            unit = "Compression Distance (meters)"
         elif flip == 3:
             # give final and loss, find initial
             question = f"""A {noun} is released from rest and slides down a {height:.2f} meter tall ramp.
         \n The {noun} loses {thermal} Joules due to friction / heat along the way, and ends up compressing a
             spring that has a strength of {spring_constant:.2f} N/m by {compression:.2f} meters. 
             \n How much mass does the {noun} have?"""
-            answer = mass
-            unit = "Mass (kilograms)"
         elif flip == 4:
             question = f"""A {mass:.2f} kg {noun} is released from rest and slides down a ramp.
             \n The {noun} loses {thermal} Joules due to friction / heat along the way, and ends up compressing a
             spring that has a strength of {spring_constant:.2f} N/m by {compression:.2f} meters. 
             \n How tall is the ramp?"""
-            answer = height
-            unit = "Ramp Height (meters)"
-        return {"question": question, "answers": [answer], "units": [unit]}
+        return thermal_payload("grav_to_elastic", {"m": mass, "h": height, "k": spring_constant, "x": compression, "T": thermal}, ("T", "k", "x", "m", "h")[0 if difficulty == "Easy" else flip], question)
 
 
+    @displayable_case
     def elastic_to_grav_thermal_q(self,difficulty, *, variant=None):
         noun = random_noun()
         flip = ri(0,4) if variant is None else variant
@@ -193,16 +176,12 @@ class ThermalLossGenerator(BaseGenerator):
             {spring_constant:.2f} N/m by {compression:.2f} meters.
             \n It slides up a ramp to a height of {height:.2f} meters.
             \n How much energy was lost as heat?"""
-            answer = thermal
-            unit = "Work done by Friction (Joules)"
         elif flip == 1:
             # give the initial and the loss, find final info
             question = f"""A {mass:.2f} kg {noun} slides up to the top of a {height:.2f} meter tall ramp.
             \n The {noun} loses {thermal} Joules due to friction / heat along the way. 
             \n If the {noun} was launched up the ramp by a spring that was compressed by
             {compression:.2f} meters, how strong is the spring?"""
-            answer = spring_constant
-            unit = "Spring Strength (N/m)"
         elif flip == 2:
             # give the initial and the loss, find final info
             question = f"""A {mass:.2f} kg {noun} is launched up a ramp by a spring
@@ -210,8 +189,6 @@ class ThermalLossGenerator(BaseGenerator):
             \n The {noun} loses {thermal} Joules due to friction / heat along the way, 
             and reaches a height of {height:.2f} meters.
             \n How much was the spring compressed?"""
-            answer = compression
-            unit = "Compression Distance (meters)"
         elif flip == 3:
             # give final and loss, find initial
             question = f"""A {noun} is launched up a ramp to a height of {height:.2f} meters.
@@ -219,17 +196,13 @@ class ThermalLossGenerator(BaseGenerator):
             \n It was launched by a spring that has a strength of {spring_constant:.2f} N/m, 
             and was compressed by {compression:.2f} meters. 
             \n How much mass does the {noun} have?"""
-            answer = mass
-            unit = "Mass (kilograms)"
         elif flip == 4:
             question = f"""A {mass:.2f} kg {noun} sits at rest, compressing a
             spring that has a strength of {spring_constant:.2f} N/m by {compression:.2f} meters.
             \n The {noun} is released and launched up a ramp, but loses {thermal} Joules 
             due to friction / heat along the way.  
             \n What height up the ramp does the {noun} reach?"""
-            answer = height
-            unit = "Ramp Height (meters)"
-        return {"question": question, "answers": [answer], "units": [unit]}
+        return thermal_payload("elastic_to_grav", {"m": mass, "h": height, "k": spring_constant, "x": compression, "T": thermal}, ("T", "k", "x", "m", "h")[0 if difficulty == "Easy" else flip], question)
 
 
     def grav_elastic_thermal(self, difficulty):
@@ -240,6 +213,7 @@ class ThermalLossGenerator(BaseGenerator):
             return self.elastic_to_grav_thermal_q(difficulty)
 
 
+    @displayable_case
     def kinetic_to_elastic_thermal_q(self,difficulty, *, variant=None):
         noun = random_noun()
         flip = ri(0,4) if variant is None else variant
@@ -248,41 +222,32 @@ class ThermalLossGenerator(BaseGenerator):
             # just find the difference
             question = f"""A {mass:.2f} kg {noun} is moving at {velocity:.2f} m/s when it collides with a spring of strength {spring_constant:.2f} N/m.
             \n If the spring compresses {compression:.2f} meters before coming to rest, how much energy was lost as heat?"""
-            answer = thermal
-            unit = "Work done by Friction (Joules)"
         elif flip == 1:
             # give the initial and the loss, find final info
             question = f"""A {mass:.2f} kg {noun} is moving at {velocity:.2f} m/s when it collides with a spring, and ends up 
             compressing the spring at the bottom by {compression:.2f} meters.
             \n The {noun} lost {thermal} Joules due to friction / heat along the way. 
             \n How strong is the spring?"""
-            answer = spring_constant
-            unit = "Spring Strength (N/m)"
         elif flip == 2:
             # give the initial and the loss, find final info
             question = f"""A {mass:.2f} kg {noun} is moving at {velocity:.2f} m/s when it collides with a spring 
             that has a strength of {spring_constant:.2f} N/m.
             \n The {noun} lost {thermal} Joules due to friction / heat along the way. 
             \n How much does the spring compress?"""
-            answer = compression
-            unit = "Compression Distance (meters)"
         elif flip == 3:
             # give final and loss, find initial
             question = f"""A {noun} is moving at {velocity:.2f} m/s, and ends up compressing a
             spring that has a strength of {spring_constant:.2f} N/m by {compression:.2f} meters.
             \n The {noun} loses {thermal} Joules due to friction / heat along the way. 
             \n How much mass does the {noun} have?"""
-            answer = mass
-            unit = "Mass (kilograms)"
         elif flip == 4:
             question = f"""A {mass:.2f} kg {noun} collides with a spring that has a strength of {spring_constant:.2f} N/m,
             compressing it by {compression:.2f} meters.
             \n The {noun} loses {thermal} Joules due to friction / heat along the way. 
             \n How fast was it moving?"""
-            answer = velocity
-            unit = "Velocity (m/s)"
-        return  {"question": question, "answers": [answer], "units": [unit]}
+        return thermal_payload("kinetic_to_elastic", {"m": mass, "v": velocity, "k": spring_constant, "x": compression, "T": thermal}, ("T", "k", "x", "m", "v")[0 if difficulty == "Easy" else flip], question)
     
+    @displayable_case
     def elastic_to_kinetic_thermal_q(self,difficulty, *, variant=None):
         noun = random_noun()
         flip = ri(0,4) if variant is None else variant
@@ -293,24 +258,18 @@ class ThermalLossGenerator(BaseGenerator):
             after being pushed by a spring of strength {spring_constant:.2f} N/m.
             \n If the spring was originally compressed by {compression:.2f} meters, 
             how much energy has been lost as heat?"""
-            answer = thermal
-            unit = "Work done by Friction (Joules)"
         elif flip == 1:
             # give the initial and the loss, find final info
             question = f"""A {mass:.2f} kg {noun} is moving at {velocity:.2f} m/s 
             after being pushed by a spring originally compressed by {compression:.2f} meters.
             \n If the {noun} lost {thermal} Joules due to friction / heat along the way, 
             how strong is the spring?"""
-            answer = spring_constant
-            unit = "Spring Strength (N/m)"
         elif flip == 2:
             # give the initial and the loss, find final info
             question = f"""A {mass:.2f} kg {noun} is moving at {velocity:.2f} m/s 
             after being pushed by a spring that has a strength of {spring_constant:.2f} N/m.
             \n The {noun} was lost {thermal} Joules due to friction / heat. 
             \n How much was the spring compressed?"""
-            answer = compression
-            unit = "Compression Distance (meters)"
         elif flip == 3:
             # give final and loss, find initial
             question = f"""A {noun} is moving at {velocity:.2f} m/s 
@@ -318,17 +277,13 @@ class ThermalLossGenerator(BaseGenerator):
             \n If the spring was compressed by {compression:.2f} meters, and 
             the {noun} has lost {thermal} Joules due to friction / heat,  
             how much mass does the {noun} have?"""
-            answer = mass
-            unit = "Mass (kilograms)"
         elif flip == 4:
             question = f"""A {mass:.2f} kg {noun} was accelerated by a spring that has 
             a strength of {spring_constant:.2f} N/m,
             and was compressed by {compression:.2f} meters.
             \n If the {noun} has lost {thermal} Joules due to friction / heat, 
             how fast is it currently moving?"""
-            answer = velocity
-            unit = "Velocity (m/s)"
-        return {"question": question, "answers": [answer], "units": [unit]}
+        return thermal_payload("elastic_to_kinetic", {"m": mass, "v": velocity, "k": spring_constant, "x": compression, "T": thermal}, ("T", "k", "x", "m", "v")[0 if difficulty == "Easy" else flip], question)
 
     def kinetic_elastic_thermal(self,difficulty):
         dirn = ri(0,1)
@@ -344,7 +299,9 @@ class ThermalLossGenerator(BaseGenerator):
 
   # # # I N T E R F A C E  W I T H   R E N D E R E R # # # 
     def choose_problem_dict(self,problem_type, difficulty):
-
+        if problem_type == "Mixed":
+            return (self.kinetic_elastic_thermal, self.grav_kin_thermal,
+                    self.grav_elastic_thermal)[ri(0, 2)](difficulty)
         if problem_type == "Elastic <--> Kinetic":
             return self.kinetic_elastic_thermal(difficulty)
         elif problem_type == "Gravitational <--> Kinetic":
@@ -358,16 +315,21 @@ class ThermalLossGenerator(BaseGenerator):
     def stored_metadata(self) -> dict[str, dict]:
         """Return metadata mapping for this generator."""
         return {
+            "Mixed": {
+                "id": "thermal-loss.mixed", "aliases": ["Mixed"],
+                "honors": r"E_i = E_f + E_{\mathrm{thermal}}",
+                "conceptual": r"KE = \frac{1}{2}mv^2 \quad,\quad GPE = mgh \quad,\quad EPE = \frac{1}{2}k(\Delta x)^2 \quad,\quad W_f = -E_{\mathrm{thermal}}",
+            },
             "Elastic <--> Kinetic": {
                 "id": "thermal-loss.elastic-kinetic",
                 "aliases": ["Elastic <--> Kinetic"],
-                "honors": r"""\Delta E = W_f
+                "honors": r"""E_{\mathrm{thermal}} = E_i - E_f \quad,\quad W_f = -E_{\mathrm{thermal}}
                 \newline ~ \newline ~ \newline
                 EPE = \frac{1}{2} k \Delta x^2 \quad ,
                 \quad KE = \frac{1}{2} m v^2
                 """,
 
-                "conceptual": r"""W_f = E_f - E_i
+                "conceptual": r"""E_{\mathrm{thermal}} = E_i - E_f \quad,\quad W_f = -E_{\mathrm{thermal}}
                 \newline ~ \newline ~ \newline
                 EPE = \frac{1}{2} k \Delta x^2 \;\; , 
                 \;\; k = \frac{2 \cdot EPE}{\Delta x^2} \;\; , 
@@ -381,13 +343,13 @@ class ThermalLossGenerator(BaseGenerator):
             "Gravitational <--> Kinetic": {
                 "id": "thermal-loss.gravitational-kinetic",
                 "aliases": ["Gravitational <--> Kinetic"],
-                "honors": r"""\Delta E = W_f
+                "honors": r"""E_{\mathrm{thermal}} = E_i - E_f \quad,\quad W_f = -E_{\mathrm{thermal}}
                 \newline ~ \newline ~ \newline
                 GPE = mgh \quad ,
                 \quad KE = \frac{1}{2} m v^2
                 """,
 
-                "conceptual": r"""W_f = E_f - E_i
+                "conceptual": r"""E_{\mathrm{thermal}} = E_i - E_f \quad,\quad W_f = -E_{\mathrm{thermal}}
                 \newline ~ \newline ~ \newline
                 GPE = mgh\;\; ,
                 \;\; m = \frac{GPE}{gh} \;\; ,
@@ -401,12 +363,12 @@ class ThermalLossGenerator(BaseGenerator):
             "Gravitational <--> Elastic" : {
                 "id": "thermal-loss.gravitational-elastic",
                 "aliases": ["Gravitational <--> Elastic"],
-                "honors": r"""\Delta E = W_f
+                "honors": r"""E_{\mathrm{thermal}} = E_i - E_f \quad,\quad W_f = -E_{\mathrm{thermal}}
                 \newline ~ \newline ~ \newline
                 GPE = mgh \quad , \quad
                 EPE = \frac{1}{2} k \Delta x^2
                 """,
-                "conceptual": r"""W_f = E_f - E_i
+                "conceptual": r"""E_{\mathrm{thermal}} = E_i - E_f \quad,\quad W_f = -E_{\mathrm{thermal}}
                 \newline ~ \newline ~ \newline
                 GPE = mgh\;\; ,
                 \;\; m = \frac{GPE}{gh} \;\; ,

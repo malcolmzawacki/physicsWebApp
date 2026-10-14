@@ -17,11 +17,15 @@ def circuit_payload(case):
     from utils.circuit_diagrams import circuit_figure
     from utils.grading import CIRCUIT_POLICY
     question = case["prompt"] + "\n\n" + "\n".join(f"- {label}: {value}" for label, value in case["givens"])
-    result = dict(question=question, answers=[case["answer"]],
-        units=[f"{case['answer_label']} ({case['unit']})"],
+    answers = case["answers"] if "answers" in case else [case["answer"]]
+    labels = case["answer_labels"] if "answer_labels" in case else [case["answer_label"]]
+    result = dict(question=question, answers=answers,
+        units=[f"{label} ({case['unit']})" for label in labels],
         problem_type=case["problem_type"], difficulty=case["difficulty"],
         diagram_data=case["diagram"], diagram_renderer=circuit_figure,
         explanation=case["explanation"], grading=dict(CIRCUIT_POLICY))
+    if "setup" in case:
+        result["extras"] = {"setup": case["setup"]}
     payload_from_dict(result)
     return result
 

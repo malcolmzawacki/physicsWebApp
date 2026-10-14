@@ -14,6 +14,13 @@ correct feedback and any worked solution have been rendered. The caller supplies
 the question replacement callback, including its selected options and rerun.
 No generator, payload schema, scoring rule, or page layout is assumed.
 
+The two circuit pages use a five-second correct-answer countdown with Cancel Next
+Question as of 2026-10-12. Their shared `ui_components.render_calculation_feedback`
+shows incorrect worked feedback directly and offers correct calculations in a
+collapsed expander. Wrong answers wait for New Question (Circuit); paused correct answers
+also offer New Question (Circuit). Custom messages are chosen once at grading and retained
+across reruns. Scoring remains one attempt per question.
+
 The timer deadline survives reruns. Cancellation is keyed by activity and question,
 so it does not carry into another question or another page. If cancellation is
 removed after the deadline, advancement is immediate. The callback fires at most

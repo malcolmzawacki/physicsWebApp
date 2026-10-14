@@ -1,5 +1,7 @@
 from random import randint as ri
 from utils.generators.base_generator import BaseGenerator
+from utils.quantities import PROFILES, QUANTITIES, equation
+from utils.setup_schema import make_setup
 
 class WaveGenerator(BaseGenerator):
     def __init__(self):
@@ -26,16 +28,19 @@ class WaveGenerator(BaseGenerator):
             "Wave Properties": {
                 "id": "wave.wave-properties",
                 "aliases": ["Wave Properties"],
-                "honors": r"""v \;=\; \lambda f
-                \quad , \quad T \;=\; \frac{1}{f}""",
-
-                "conceptual": r"""v \;=\; \lambda f \quad , \quad
-                \lambda \;=\; \frac{v}{f} \quad , \quad
-                f \;=\; \frac{v}{\lambda}
-                \newline ~ \newline
-                T \;=\; \frac{1}{f}
-                \quad , \quad f \;=\; \frac{1}{T}
-                """},
+                "honors": equation("wave_properties", r"""${v} = ${wavelength} ${f}
+                    \quad , \quad ${T} = \frac{1}{${f}}
+                    \quad , \quad ${v} = \frac{${wavelength}}{${T}}"""),
+                "conceptual": equation("wave_properties", r"""
+                    \begin{gathered}
+                    ${v} = ${wavelength} ${f} \quad , \quad
+                    ${wavelength} = \frac{${v}}{${f}} \quad , \quad
+                    ${f} = \frac{${v}}{${wavelength}} \\
+                    ${T} = \frac{1}{${f}} \quad , \quad ${f} = \frac{1}{${T}} \\
+                    ${v} = \frac{${wavelength}}{${T}} \quad , \quad
+                    ${wavelength} = ${v}${T} \quad , \quad
+                    ${T} = \frac{${wavelength}}{${v}}
+                    \end{gathered}""")},
             "String Harmonics": {
                 "id": "wave.string-harmonics",
                 "aliases": ["String Harmonics"],
@@ -114,29 +119,50 @@ class WaveGenerator(BaseGenerator):
 
     
     def properties_of_waves(self, difficulty, *, variant=None):
+        """Eight independent given/target forms; difficulty is compatibility-only.
+
+        Mixed practice samples each form equally. Given periods are rounded to
+        three decimal places *before* calculating an answer, so the displayed
+        information is sufficient and the organizer checks the printed number.
+        """
+        if variant is not None and (type(variant) is not int or not 0 <= variant < 8):
+            raise ValueError("Wave Properties variant must be an integer from 0 to 7")
         frequency = ri(2,100)
         wavelength = ri(2,100)
         speed = wavelength*frequency
-        q_type = ri(0,2) if variant is None else variant
+        period = round(1 / frequency, 3)
+        q_type = ri(0,7) if variant is None else variant
+        values = {"v": speed, "wavelength": wavelength, "f": frequency, "T": period}
         if q_type == 0:
-            question = f"""A wave has a frequency of {frequency} Hz
-            and a wavelength of {wavelength} meters. \n\n How fast is it moving?"""
-            answer = speed
-            unit = "Wave Speed (m/s)"
+            given, target, answer = ("f", "wavelength"), "v", wavelength * frequency
         elif q_type == 1:
-            # find wavelength
-            question = f"""A wave moving at {speed} m/s has a frequency of {frequency} Hz. 
-            \n\n What is its wavelength?"""
-            answer = wavelength
-            unit = "Wavelength (meters/cycle)"
+            given, target, answer = ("v", "f"), "wavelength", speed / frequency
+        elif q_type == 2:
+            given, target, answer = ("v", "wavelength"), "f", speed / wavelength
+        elif q_type == 3:
+            given, target, answer = ("T", "wavelength"), "v", wavelength / period
+        elif q_type == 4:
+            given, target, answer = ("v", "T"), "wavelength", speed * period
+        elif q_type == 5:
+            given, target, answer = ("v", "wavelength"), "T", wavelength / speed
+        elif q_type == 6:
+            given, target, answer = ("f",), "T", 1 / frequency
         else:
-            # find frequency
-            question = f"""A wave is moving at {speed} m/s, and has a wavelength of 
-            {wavelength} meters. \n\n What is the frequency of the wave?"""
-            answer = frequency
-            unit = "Frequency (Hz)"
-    
-        return {"question": question, "answers": [answer], "units": [unit]}
+            given, target, answer = ("T",), "f", 1 / period
+
+        roles = PROFILES["wave_properties"]
+        def label(key):
+            return roles[key].name.lower()
+        def unit(key):
+            return QUANTITIES[roles[key].quantity].unit
+        def displayed(key):
+            return f"{values[key]:.3f}".rstrip("0").rstrip(".") if key == "T" else str(values[key])
+        facts = [f"a {label(key)} of {displayed(key)} {unit(key)}" for key in given]
+        question = "A wave has " + " and ".join(facts) + f".\n\nWhat is its {label(target)}?"
+        setup = make_setup("wave_properties", values, given, [target])
+        return {"question": question, "answers": [answer],
+                "units": [f"{roles[target].name} ({unit(target)})"],
+                "extras": {"setup": setup, "wave_variant": q_type}}
     
     def string_harmonics(self,difficulty, *, variant=None):
         fundamental_frequency = ri(20,5000)

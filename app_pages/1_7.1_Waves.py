@@ -1,20 +1,7 @@
 from utils.ui import interface
 
 def wave_properties():
-        
-    problem_type_dict = {
-        "Wave Properties": {
-                "honors": r"""v \;=\; \lambda f
-                \quad , \quad T \;=\; \frac{1}{f}""",
-
-                "conceptual": r"""v \;=\; \lambda f \quad , \quad
-                \lambda \;=\; \frac{v}{f} \quad , \quad
-                f \;=\; \frac{v}{\lambda}
-                \newline ~ \newline
-                T \;=\; \frac{1}{f}
-                \quad , \quad f \;=\; \frac{1}{T}
-                """},
-        }
+    problem_type_dict = ["Wave Properties"]
     
     difficulties = ["Easy"]
 
@@ -23,7 +10,7 @@ def wave_properties():
     prefix = "wave_properties"
     ui = interface(prefix,title,WaveGenerator(),
                     problem_type_dict,difficulties,True)
-    ui.unified_smart_layout()
+    ui.unified_smart_layout(setup_workspace=True)
 
 
 def Harmonics():

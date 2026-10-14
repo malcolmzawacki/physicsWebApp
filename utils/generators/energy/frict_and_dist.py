@@ -1,5 +1,6 @@
 from random import randint as ri
 from utils.generators.base_generator import BaseGenerator
+from utils.friction_organizer import friction_payload, displayable_friction_case
 from utils.word_lists import random_noun
 from utils.generators.energy.thermal_loss import ThermalLossGenerator
 TLG = ThermalLossGenerator()
@@ -10,6 +11,7 @@ class ThermalWithFrictionGenerator(BaseGenerator):
 
 
     # # # F R I C T I 0 N   A N D   D I S T A N C E   P R 0 B L E M S # # # 
+    @displayable_friction_case
     def grav_to_kinetic_friction_distance_q(self, difficulty, *, variant=None):
         
         mass, height, velocity, thermal = TLG.grav_to_kin_thermal_nums()
@@ -89,8 +91,9 @@ class ThermalWithFrictionGenerator(BaseGenerator):
                 \n If the ramp is {distance:.2f} meters long, how strong was the force of friction?"""
                 answer = [friction]
                 unit = ["Force of Friction (Newtons)"]
-        return {"question": question, "answers": answer, "units": unit}
+        return friction_payload("grav_to_kin", {"m": mass, "h": height, "v": velocity, "T": thermal, "F": friction, "d": distance}, question, unit)
         
+    @displayable_friction_case
     def kinetic_to_grav_friction_distance_q(self, difficulty, *, variant=None):
         
         mass, height, velocity, thermal = TLG.kin_to_grav_thermal_nums()
@@ -170,8 +173,9 @@ class ThermalWithFrictionGenerator(BaseGenerator):
                 \n If the ramp is {distance:.2f} meters long, how strong was the force of friction?"""
                 answer = [friction]
                 unit = ["Force of Friction (Newtons)"]
-        return {"question": question, "answers": answer, "units": unit}
+        return friction_payload("kin_to_grav", {"m": mass, "h": height, "v": velocity, "T": thermal, "F": friction, "d": distance}, question, unit)
 
+    @displayable_friction_case
     def grav_to_elastic_friction_distance_q(self, difficulty, *, variant=None):
         mass, height, spring_constant, compression, thermal = TLG.grav_to_elastic_thermal_nums()        
         distance = height + ri(int(height//2 + 1), int(2*height + 1))
@@ -275,8 +279,9 @@ class ThermalWithFrictionGenerator(BaseGenerator):
                 \n If the ramp is {distance:.2f} meters long, how strong was the force of friction?"""
                 answer = [friction]
                 unit = ["Force of Friction (Newtons)"]
-        return {"question": question, "answers": answer, "units": unit}
+        return friction_payload("grav_to_elastic", {"m": mass, "h": height, "k": spring_constant, "x": compression, "T": thermal, "F": friction, "d": distance}, question, unit)
 
+    @displayable_friction_case
     def elastic_to_grav_friction_distance_q(self, difficulty, *, variant=None):
         mass, height, spring_constant, compression, thermal = TLG.elastic_to_grav_thermal_nums()        
         distance = height + ri(int(height//2 + 1), int(2*height + 1))
@@ -373,8 +378,9 @@ class ThermalWithFrictionGenerator(BaseGenerator):
                 \n If the ramp is {distance:.2f} meters long, how strong was the force of friction?"""
                 answer = [friction]
                 unit = ["Force of Friction (Newtons)"]
-        return {"question": question, "answers": answer, "units": unit}
+        return friction_payload("elastic_to_grav", {"m": mass, "h": height, "k": spring_constant, "x": compression, "T": thermal, "F": friction, "d": distance}, question, unit)
 
+    @displayable_friction_case
     def kinetic_to_elastic_friction_distance_q(self, difficulty, *, variant=None):
         mass, velocity, spring_constant, compression, thermal = TLG.kinetic_to_elastic_thermal_nums()
         distance = ri(int(velocity*2), int(velocity*4))  # Reasonable distance range
@@ -478,8 +484,9 @@ class ThermalWithFrictionGenerator(BaseGenerator):
                 \n What was the force of friction?"""
                 answer = [friction]
                 unit = ["Force of Friction (Newtons)"]
-        return {"question": question, "answers": answer, "units": unit}
+        return friction_payload("kinetic_to_elastic", {"m": mass, "v": velocity, "k": spring_constant, "x": compression, "T": thermal, "F": friction, "d": distance}, question, unit)
 
+    @displayable_friction_case
     def elastic_to_kinetic_friction_distance_q(self, difficulty, *, variant=None):
         mass, velocity, spring_constant, compression, thermal = TLG.elastic_to_kinetic_thermal_nums()
         distance = ri(int(velocity*2), int(velocity*4))  # Reasonable distance range
@@ -578,7 +585,7 @@ class ThermalWithFrictionGenerator(BaseGenerator):
                 \n What was the force of friction experienced by the {noun}?"""
                 answer = [friction]
                 unit = ["Force of Friction (Newtons)"]
-        return {"question": question, "answers": answer, "units": unit}
+        return friction_payload("elastic_to_kinetic", {"m": mass, "v": velocity, "k": spring_constant, "x": compression, "T": thermal, "F": friction, "d": distance}, question, unit)
 
 
 
@@ -611,15 +618,15 @@ class ThermalWithFrictionGenerator(BaseGenerator):
             "Elastic <--> Kinetic": {
                 "id": "thermal-with-friction.elastic-kinetic",
                 "aliases": ["Elastic <--> Kinetic"],
-                "honors": r"""W_f = F_f \; x
+                "honors": r"""E_{\mathrm{thermal}} = F_f d \quad,\quad W_f = -E_{\mathrm{thermal}}
                 \newline ~ \newline ~ \newline
                 EPE = \frac{1}{2} k \Delta x^2 \quad ,
                 \quad KE = \frac{1}{2} m v^2
                 """,
 
-                "conceptual": r"""W_f = F_f \; x \;\;,
-                 \;\ x = \frac{W_f}{F_f} \;\;
-                 \;\; F_f = \frac{W_f}{x}
+                "conceptual": r"""E_{\mathrm{thermal}} = F_f d \quad,\quad W_f = -E_{\mathrm{thermal}} \;\;,
+                 \;\ d = \frac{E_{\mathrm{thermal}}}{F_f} \;\;
+                 \;\; F_f = \frac{E_{\mathrm{thermal}}}{d}
                 \newline ~ \newline ~ \newline
                 EPE = \frac{1}{2} k \Delta x^2 \;\; , 
                 \;\; k = \frac{2 \cdot EPE}{\Delta x^2} \;\; , 
@@ -633,15 +640,15 @@ class ThermalWithFrictionGenerator(BaseGenerator):
             "Gravitational <--> Kinetic": {
                 "id": "thermal-with-friction.gravitational-kinetic",
                 "aliases": ["Gravitational <--> Kinetic"],
-                "honors": r"""W_f = F_f \; x
+                "honors": r"""E_{\mathrm{thermal}} = F_f d \quad,\quad W_f = -E_{\mathrm{thermal}}
                 \newline ~ \newline ~ \newline
                 GPE = mgh \quad ,
                 \quad KE = \frac{1}{2} m v^2
                 """,
 
-                "conceptual": r"""W_f = F_f \; x \;\;,
-                 \;\ x = \frac{W_f}{F_f} \;\;
-                 \;\; F_f = \frac{W_f}{x}
+                "conceptual": r"""E_{\mathrm{thermal}} = F_f d \quad,\quad W_f = -E_{\mathrm{thermal}} \;\;,
+                 \;\ d = \frac{E_{\mathrm{thermal}}}{F_f} \;\;
+                 \;\; F_f = \frac{E_{\mathrm{thermal}}}{d}
                 \newline ~ \newline ~ \newline
                 GPE = mgh\;\; ,
                 \;\; m = \frac{GPE}{gh} \;\; ,
@@ -655,14 +662,14 @@ class ThermalWithFrictionGenerator(BaseGenerator):
             "Gravitational <--> Elastic" : {
                 "id": "thermal-with-friction.gravitational-elastic",
                 "aliases": ["Gravitational <--> Elastic"],
-                "honors": r"""W_f = F_f \; x
+                "honors": r"""E_{\mathrm{thermal}} = F_f d \quad,\quad W_f = -E_{\mathrm{thermal}}
                 \newline ~ \newline ~ \newline
                 GPE = mgh \quad , \quad
                 EPE = \frac{1}{2} k \Delta x^2
                 """,
-                "conceptual": r"""W_f = F_f \; x \;\;,
-                 \;\ x = \frac{W_f}{F_f} \;\;
-                 \;\; F_f = \frac{W_f}{x}
+                "conceptual": r"""E_{\mathrm{thermal}} = F_f d \quad,\quad W_f = -E_{\mathrm{thermal}} \;\;,
+                 \;\ d = \frac{E_{\mathrm{thermal}}}{F_f} \;\;
+                 \;\; F_f = \frac{E_{\mathrm{thermal}}}{d}
                 \newline ~ \newline ~ \newline
                 GPE = mgh\;\; ,
                 \;\; m = \frac{GPE}{gh} \;\; ,

@@ -272,7 +272,14 @@ def create_answer_table(target, problem_units, problem_number, compact=False):
         for i, cell in enumerate(row.cells):
             cell.width = column_width
 
-    table.rows[1].height = Inches(0.5)
+    table.rows[1].height = Inches(0.32 if compact else 0.5)
+    if compact:
+        for row in table.rows:
+            for cell in row.cells:
+                for paragraph in cell.paragraphs:
+                    paragraph.paragraph_format.space_before = Pt(0)
+                    paragraph.paragraph_format.space_after = Pt(0)
+                    paragraph.paragraph_format.line_spacing = 1
 
     _prepare_table_block(table)
 
@@ -349,6 +356,7 @@ def create_doc(title: str, question_generator, number_of_docs: int, tables: bool
       section_num = 1
 
       for section in questions:
+         section_tables = section.get("answer_boxes", tables)
          heading = section["heading"]
          section_heading = doc.add_heading(f"Section {section_num}: {heading}", level=2)
          section_heading.paragraph_format.keep_with_next = True
@@ -421,9 +429,12 @@ def create_doc(title: str, question_generator, number_of_docs: int, tables: bool
                     paragraph.paragraph_format.keep_with_next = False
             else:
                 last_question_para = add_question(container_cell, text, problem_number)
-            last_question_para.paragraph_format.keep_with_next = bool(graph_data is not None or tables or spaces)
+            last_question_para.paragraph_format.keep_with_next = bool(graph_data is not None or section_tables or spaces)
             if not include_graphs and raw_graph is not None:
                 container_cell.add_paragraph("Diagram omitted for this export.")
+            if section.get("organizing_help"):
+                from xtrct_docs.print_organizer import add_print_organizer
+                add_print_organizer(container_cell, problem)
             if side_by_side_layout:
                 _create_side_by_side_graph_layout(container_cell, graph_data, button_options, problem.get("units", []), problem.get("graph_doc_width"))
             elif button_options:
@@ -433,8 +444,8 @@ def create_doc(title: str, question_generator, number_of_docs: int, tables: bool
                         _add_button_group(container_cell, unit, choices, total_width_inches=5.5)
                     else:
                         container_cell.add_paragraph(f"{unit}: ____________________")
-            elif problem_is_multi and tables:
-                create_answer_table(container_cell, problem["units"], problem_number, compact=inset_layout)
+            elif problem_is_multi and section_tables:
+                create_answer_table(container_cell, problem["units"], problem_number, compact=bool(inset_layout or section.get("compact_answer_boxes")))
 
             if problem_is_multi:
                 answers = problem["answers"]

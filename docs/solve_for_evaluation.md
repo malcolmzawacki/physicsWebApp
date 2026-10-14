@@ -4,6 +4,10 @@ All 39 routed activities in `Home.py` were evaluated, including custom layouts,
 chemistry, labs, and the three charging-by-friction modes. This change exposes
 existing, identifiable targets; it does not redesign difficulty or invent inverses.
 
+That count describes the original evaluation. The current router has 41 routes
+(39 practice activities and two worksheet builders). Wave Properties was expanded
+to eight reviewed forms on 2026-10-12; see its linked family review.
+
 **Implemented** means browser controls and `DocumentGenerator.question()` use the
 same declared target catalog. **Implemented partly** means only the clear subtypes
 were changed. Fixed-task pages keep their current controls. Deferred decisions are
@@ -49,9 +53,9 @@ of public numeric link indices. See [the readable target list](solve_for_targets
 | Charging by Friction | Deferred | Evaluated all modes: Explorer changes materials; Comparison predicts charge signs; Ranking orders materials from clues. Selecting which inference to ask needs a pedagogical choice. | [charging_by_friction_page](../app_pages/1_3.1_Static_Electricity.py) |
 | Charging by Conduction | Fixed task | Final charge signs, mechanism, and level-dependent amounts form the existing task. No inverse initial-charge branches exist. | [charging_by_conduction_page](../app_pages/1_3.2_Static_Electricity_Conduction.py) |
 | Charging by Induction | Deferred | Signs/mechanism/amounts depend on the classroom charge-chunk model and event sequence. Inverse starting states may be nonunique; do not expose invented inverses. | [charging_by_induction_page](../app_pages/1_3.3_Static_Electricity_Induction.py) |
-| Circuit Ohm's Law | Implemented partly | Single Resistor: voltage, current, resistance; same masked schematic for browser/export. Series Current and Voltage Drop remain their fixed existing tasks. | [current_electricity_circuits_page](../app_pages/1_3.4_Current_Electricity_Circuits.py) |
+| Circuit Fundamentals | Implemented partly | Single Resistor: voltage, current, resistance; same masked schematic for browser/export. Series Current and Voltage and Parallel Current and Voltage are fixed paired tasks: two component answers using a given shared current/voltage. Full Series Voltage Drop is on Series and Parallel Circuits. | [current_electricity_circuits_page](../app_pages/1_3.4_Current_Electricity_Circuits.py) |
 | Series and Parallel Circuits | Fixed task | Problem Type already selects equivalent resistance, total current, or branch current. Inverse component/source values are not implemented. | [current_electricity_series_parallel_page](../app_pages/1_3.5_Current_Electricity_Series_Parallel.py) |
-| Wave Properties | Implemented | Wave speed, wavelength, frequency from the existing three branches. | [wave_properties](../app_pages/1_7.1_Waves.py) |
+| Wave Properties | Implemented | Wave speed, wavelength, frequency, and period across eight forms; [coverage and precision policy](wave_properties_review.md). | [wave_properties](../app_pages/1_7.1_Waves.py) |
 | Harmonics | Implemented | Existing fundamental wavelength/frequency/length, higher-level harmonic sets and paired inverse answers for strings/open/closed columns. Required answer sets are retained. | [Harmonics](../app_pages/1_7.1_Waves.py) |
 | deciBel Scale | Deferred | Reachable questions solve sound level. A distance-ratio else branch is unreachable and has unclear/incorrect answer semantics; it is not exposed. | [deciBel_practice](../app_pages/1_7.1_Waves.py) |
 | Compound Names Practice | Fixed task | Formula-to-name only; compound-family selection differs from target selection. Name-to-formula needs a formula-aware grading contract. | [practice_quiz_page](../app_pages/1_Chem-_Compound_Names.py) |

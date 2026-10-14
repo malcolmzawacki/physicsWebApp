@@ -13,7 +13,7 @@ class OhmsLawTargets:
     @staticmethod
     def _payload(case):
         payload = circuit_payload(case)
-        payload["extras"] = {"case": case}
+        payload["extras"] = {**payload.get("extras", {}), "case": case}
         return payload
 
     def generate_diagram(self, diagram_data, problem_type, difficulty):

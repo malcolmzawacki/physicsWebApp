@@ -10,7 +10,7 @@ def energy_basics_page():
     generator = EnergyBasicsGenerator()
     metadata = generator.stored_metadata()
     ui = interface(prefix, title, generator, metadata, difficulties)
-    ui.unified_smart_layout()
+    ui.unified_smart_layout(setup_workspace=True)
 
 
 def energy_conserv_page():
@@ -22,7 +22,7 @@ def energy_conserv_page():
     metadata = generator.stored_metadata()
     difficulties = ["Easy","Medium","Hard"]
     ui = interface(prefix, title, generator, metadata, difficulties)
-    ui.unified_smart_layout()
+    ui.unified_smart_layout(setup_workspace=True)
 
 
 def thermal_energy_page():
@@ -34,7 +34,7 @@ def thermal_energy_page():
     metadata = generator.stored_metadata()
     difficulties = ["Easy","Medium","Hard"]
     ui = interface(prefix, title, generator, metadata, difficulties)
-    ui.unified_smart_layout()
+    ui.unified_smart_layout(setup_workspace=True)
 
 
 def friction_distance_page():
@@ -46,5 +46,5 @@ def friction_distance_page():
     metadata = generator.stored_metadata()
     difficulties = ["Easy","Medium","Hard"]
     ui = interface(prefix, title, generator, metadata, difficulties)
-    ui.unified_smart_layout()
+    ui.unified_smart_layout(setup_workspace=True)
 

@@ -3,14 +3,19 @@ import math
 import random
 
 from utils.generators.base_generator import BaseGenerator
+from utils.projectile_organizer import projectile_payload
 
 #from base_generator import BaseGenerator
-from utils.word_lists import random_noun, random_proj_verb # does not need 
+from utils.word_lists import random_noun, random_proj_verb # does not need
 
 
 class ProjectileGenerator(BaseGenerator):
     def __init__(self):
         super().__init__(state_prefix="proj_")
+
+    def generate_diagram(self, diagram_data, problem_type, difficulty):
+        from utils.projectile_diagrams import projectile_figure
+        return projectile_figure(diagram_data)
 
 
 
@@ -24,95 +29,25 @@ class ProjectileGenerator(BaseGenerator):
             return self._generate_type3_question(difficulty)
 
     def stored_metadata(self) -> dict[str, dict]:
-        """Return metadata mapping for this generator."""
-        return {
-            "Type 1": {
-                "id": "projectile.type-1",
-                "aliases": ["Type 1"],
-                "honors": r"""
-                v_{yi} \; = \; 0
-                \newline ~ \newline ~ \newline
-                x \; = \; v_x \cdot t   
-                \newline ~ \newline ~ \newline
-                v_{yf}^2 = v_{yi}^2 + 2gy \quad ,
-                \quad v_{yf} = v_{yi} +gt  \quad ,
-                \quad y = \frac{v_{yf} + v_{yi}}{2} t  \quad ,
-                \quad y = v_{yi} t + \frac{1}{2} gt^2
-                """,
-
-                "conceptual": r"""
-                x \;=\; v_x \cdot t \quad , \quad v_x \;=\; \frac{x}{t} \quad , \quad t\;=\; \frac{x}{v_x}
-                \newline ~ \newline ~ \newline
-                y\;=\; \frac{1}{2} gt^2 \quad , \quad v_{y0} \;=\; 0 \quad , \quad  
-                v_{yf} \;=\; gt \quad , \quad t \;=\; \sqrt{\frac{2y}{g}}
-                \newline ~ \newline ~ \newline
-                v_f \;=\; \sqrt{v_x^2 \;+\; v_{yf}^2} \quad , \quad \theta \;=\; \tan^{-1} \Bigl( \frac{v_{yf}}{v_x} \Bigr)
-                """},
-        "Type 2": {
-            "id": "projectile.type-2",
-            "aliases": ["Type 2"],
-            "honors" : r"""
-                v_{yf} \; = \; - v_{yi}
-                \newline ~ \newline ~ \newline
-                x \; = \; v_x \cdot t   
-                \newline ~ \newline ~ \newline
-                v_{yf}^2 = v_{yi}^2 + 2gy \quad ,
-                \quad v_{yf} = v_{yi} +gt  \quad ,
-                \quad y = \frac{v_{yf} + v_{yi}}{2} t  \quad ,
-                \quad y = v_{yi} t + \frac{1}{2} gt^2
-                """, 
-            "conceptual": r"""
-                x \;=\; v_x \cdot t \quad , \quad  
-                y_{max} \;=\; \frac{v_{yi}^2}{2g} \quad \textrm{or} \quad \frac{1}{8}g t^2
-                \newline ~ \newline ~ \newline
-
-                v_x \;=\; \frac{x}{t} \quad \textrm{or} \quad v \cdot \cos(\theta)
-                \quad , \quad v_{yi} \;=\;  
-                v \cdot \sin(\theta) \quad \textrm{or} \quad \frac{1}{2} gt
-                \quad , \quad v_{yf} \;=\; - v_{yi}
-                \newline ~ \newline ~ \newline
-
-                t\;=\; \frac{x}{v_x} \;\; \textrm{or} 
-                \;\; 2 \sqrt{\frac{2y}{g}} \quad \textrm{or} \quad 
-                \frac{2v_{yi}}{g}
-                \newline ~ \newline ~ \newline
-
-                v_f \;=\; \sqrt{v_x^2 \;+\; v_{yf}^2} \quad \textrm{or} \quad
-                \frac{v_{yf}}{\sin(\theta)} \quad \textrm{or} \quad
-                \frac{v_x}{\cos(\theta)}
-                \newline ~ \newline ~ \newline
-                \theta \;=\; \tan^{-1} \Bigl( \frac{v_{yf}}{v_x} \Bigr) \quad \textrm{or} \quad
-                \sin^{-1} \Bigl( \frac{v_{yf}}{v_f} \Bigr) \quad \textrm{or} \quad
-                \cos^{-1} \Bigl( \frac{v_x}{v_f} \Bigr)
-
-            """
-            },
-        "Type 3": {
-            "id": "projectile.type-3",
-            "aliases": ["Type 3"],
-            "honors": r"""
-            x \; = \; v_x \cdot t   
-            \newline ~ \newline ~ \newline
-            v_{yf}^2 = v_{yi}^2 + 2gy \quad ,
-            \quad v_{yf} = v_{yi} +gt  \quad ,
-            \quad y = \frac{v_{yf} + v_{yi}}{2} t  \quad ,
-            \quad y = v_{yi} t + \frac{1}{2} gt^2
-                """,
-            "conceptual": r"""
-            \textrm{There are no simplifying tricks here, sorry!}
-            \newline ~ \newline ~ \newline
-            x \; = \; v_x \cdot t   
-            \newline ~ \newline ~ \newline
-            v_{yf}^2 = v_{yi}^2 + 2gy \quad ,
-            \quad v_{yf} = v_{yi} +gt  \quad ,
-            \quad y = \frac{v_{yf} + v_{yi}}{2} t  \quad ,
-            \quad y = v_{yi} t + \frac{1}{2} gt^2
-                """
-            }
+        equations = r"""
+        a_x=0 \quad , \quad a_y=-g \quad , \quad g=10\,\mathrm{m/s^2}
+        \newline ~ \newline
+        \Delta x=v_xt \quad , \quad v_x=v_i\cos\theta \quad , \quad v_{yi}=v_i\sin\theta
+        \newline ~ \newline
+        v_{yf}=v_{yi}+a_yt \quad , \quad \Delta y=v_{yi}t+\frac12a_yt^2
+        \newline ~ \newline
+        v_{yf}^2=v_{yi}^2+2a_y\Delta y \quad , \quad v_f=\sqrt{v_x^2+v_{yf}^2}
+        """
+        extra = {
+            "Type 1": r"v_{yi}=0 \quad , \quad \Delta y=-h",
+            "Type 2": r"\Delta y=0 \quad , \quad t_{flight}=2v_{yi}/g \quad , \quad h_{max}=v_{yi}^2/(2g)",
+            "Type 3": r"\Delta y=y_f-y_i \quad , \quad t_{peak}=v_{yi}/g",
         }
+        return {name: {"id": f"projectile.type-{i}", "aliases": [name],
+                       "honors": equations,
+                       "conceptual": equations + r"\newline ~ \newline" + relation}
+                for i, (name, relation) in enumerate(extra.items(), 1)}
 
-    
-     
     def m_n_array(self, max_val):
         m = 5
         n = 1
@@ -165,30 +100,30 @@ class ProjectileGenerator(BaseGenerator):
         d_x = v_x*v_y_i / 5
         d_y = v_y_i**2 / 20
         return v_r, theta, d_x, d_y
-    
+
     def calculate_type3_low_high_values(self,difficulty):
         t_1 = random.randint(1,self.get_difficulty_range(difficulty))
         n = random.randint(1,self.get_difficulty_range(difficulty))
         m = 2*n - 1
         t_2 = t_1 + 5*m
-        v_y_i = 5*(2*t_1 + t_2)
-        v_x = 2*(t_1*t_2 + 25*(n-1))
+        v_y_i = 5*(t_1 + t_2)
+        v_x = (v_y_i**2 - 625) / 50
         v_r = v_x + 25
         theta_i = round(math.degrees(math.atan(v_y_i / v_x)), 4)
         d_y = 5*t_1*t_2
-        
+
         if difficulty == "Hard":
             t_x = random.randint(t_1,t_2) # time to base of cliff, must be after reaching height first time but before second time
         else: # easy, no setback
             t_x = t_2 #as close as possible to not landing on cliff
-        
+
         d_x = v_x*t_x
         x_back = v_x*(t_2 - t_x) # distance from edge of cliff the object lands
-        v_y_f = 5*(2*t_1 - t_2)
+        v_y_f = 5*(t_1 - t_2)
         theta_f = abs(round(math.degrees(math.atan(v_y_f / v_x)), 4))
         v_f = round(((v_x**2 + v_y_f**2)**(0.5)),4)
         return t_1, t_2, v_x, v_y_i, v_r, theta_i, d_y, t_x, d_x, x_back, v_y_f, v_f, theta_f
-    
+
 
     def calculate_type3_high_low_values(self,difficulty):
         m_n_list = self.m_n_array(self.get_difficulty_range(difficulty))
@@ -226,11 +161,11 @@ class ProjectileGenerator(BaseGenerator):
         Medium or hard targets: v_i and h, v_f and theta, v_f and x
         to-do targets: must be based on steps needed. possible overhaul of logic tbh, easier to score difficulty by givens than unknowns
         """
-        
+
         v_x, v_r, theta, d_x, d_y = self.calculate_type1_values(difficulty)
         object_name = random_noun()
         verb = random_proj_verb()
-        
+
         if difficulty == "Easy":
             if solve_for == None:
                 solve_for = random.choice(["x","h","v_i"])
@@ -266,8 +201,8 @@ class ProjectileGenerator(BaseGenerator):
                 answers = [v_r, d_x]
                 units = ["Overall Final Velocity (m/s)","Horizontal Distance (m)"]
 
-        
-        return {"question": question, "answers": answers, "units": units}
+
+        return projectile_payload(1, difficulty, choice, locals(), question, units)
 
     def _generate_type2_question(self, difficulty, solve_for = None):
         """
@@ -277,7 +212,7 @@ class ProjectileGenerator(BaseGenerator):
         v_r, theta, d_x, d_y = self.calculate_type2_values(difficulty)
         object_name = random_noun()
         verb = random_proj_verb()
-        
+
         if difficulty == "Easy":
             question = f"If a {object_name} is {verb} at {v_r:.2f} m/s at an angle of {theta:.2f} degrees, how far away does it land, and what is its maximum height?"
             answer = d_x
@@ -306,10 +241,8 @@ class ProjectileGenerator(BaseGenerator):
                 unit = "Launch Angle (degrees)"
                 answer2 = d_x
                 unit2 = "Horizontal Distance (m)"
-        
-        return {"question": question, 
-                "answers": [answer, answer2], 
-                "units": [unit, unit2]}
+
+        return projectile_payload(2, difficulty, "x and y_max" if difficulty == "Easy" else choice, locals(), question, [unit, unit2])
 
     def _generate_type3_question(self, difficulty, *, direction=None, variant=None):
 
@@ -322,8 +255,8 @@ class ProjectileGenerator(BaseGenerator):
             if difficulty == "Easy": # no setback from cliff edge
                 choice = 1 if variant is None else variant #random.randint(1,3) # room for more variations
                 if choice == 1:
-                    question = f"""A {object_name} is {verb} off a {d_y} m high cliff at a {theta_i} degree angle 
-                    at {v_r} m/s. How far away from the base of the cliff does this {object_name} land, 
+                    question = f"""A {object_name} is {verb} off a {d_y} m high cliff at a {theta_i} degree angle
+                    at {v_r} m/s. How far away from the base of the cliff does this {object_name} land,
                     and how fast is it moving when it hits the ground?"""
                     answer = d_x
                     unit = "Horizontal Distance (m)"
@@ -332,9 +265,9 @@ class ProjectileGenerator(BaseGenerator):
             else: # hard: setback, add more options later
                 choice = 1 if variant is None else variant #random.randint(1,3) # room for more variations
                 if choice == 1:
-                    question = f"""A {object_name} is {verb} off a {d_y} m high cliff at {v_r} m/s at a {theta_i} 
-                    degree angle. It lands {d_x} m away from the base of the cliff. 
-                    How far back from the cliff's edge was it {verb}, 
+                    question = f"""A {object_name} is {verb} from level ground behind the edge of a {d_y} m high cliff at {v_r} m/s at a {theta_i}
+                    degree angle. It lands {d_x} m away from the base of the cliff.
+                    How far back from the cliff's edge was it {verb},
                     and at what time after it was launched was it again at the height of the cliff?"""
                     answer = x_back
                     unit = "Launch-to-cliff Distance (m)"
@@ -347,18 +280,18 @@ class ProjectileGenerator(BaseGenerator):
             if difficulty == "Easy":
                 choice = random.randint(1,2) if variant is None else variant # room for more variations
                 if choice == 1: # give height velocity and angle, ask for distance and final angle
-                    question = f"""A group of people are trying to get a {object_name} to land 
-                    on top a {d_y} m high cliff. They {verb} it at {v_r} m/s at a {theta_i} degree angle. It 
-                    just barely lands on the edge of the cliff. How far away from the base of the cliff was it 
+                    question = f"""A group of people are trying to get a {object_name} to land
+                    on top a {d_y} m high cliff. They {verb} it at {v_r} m/s at a {theta_i} degree angle. It
+                    just barely lands on the edge of the cliff. How far away from the base of the cliff was it
                     launched from, and at what angle does it land?"""
                     answer = d_x
                     unit = "Horizontal Distance to cliff (m)"
                     answer2 = theta_f
                     unit2 = "Landing Angle (degrees)"
                 elif choice == 2: # give distance velocity and angle, ask for height and final velocity
-                    question = f"""A group of people are trying to get a {object_name} to land 
-                    on top a cliff. They {verb} it at {v_r} m/s at a {theta_i} degree angle, {d_x} m from the 
-                    base of the cliff. It just barely lands on the cliff's edge. 
+                    question = f"""A group of people are trying to get a {object_name} to land
+                    on top a cliff. They {verb} it at {v_r} m/s at a {theta_i} degree angle, {d_x} m from the
+                    base of the cliff. It just barely lands on the cliff's edge.
                     How high up is the cliff, and what is its velocity when it lands?"""
                     answer = d_y
                     unit = "Cliff Height (m)"
@@ -367,7 +300,7 @@ class ProjectileGenerator(BaseGenerator):
             else: # hard, setback, doesn't land on edge
                 choice = 1 if variant is None else variant #random.randint(1,2) # more room for variations
                 if choice == 1: # gives t_1 height and v_r to find angle, dist from edge to find dist from base
-                    question = f"""A {object_name} is {verb} to get it on top of a {d_y} m cliff. 
+                    question = f"""A {object_name} is {verb} to get it on top of a {d_y} m cliff.
                     It was initially {verb} at {v_r} m/s, and first reaches the cliff height after {t_1} seconds.
                     It safely lands up top, {x_back} m from the edge of the cliff.
                     What angle was it launched at, and from how far from the base of the cliff?"""
@@ -375,9 +308,7 @@ class ProjectileGenerator(BaseGenerator):
                     unit = "Launch Angle (degrees)"
                     answer2 = d_x
                     unit2 = "Horizontal distance from launch site to cliff face (m)"
-        
-        return {"question": question, 
-                "answers": [answer, answer2], 
-                "units": [unit, unit2]}
-    
+
+        return projectile_payload(3, difficulty, choice, locals(), question, [unit, unit2])
+
 

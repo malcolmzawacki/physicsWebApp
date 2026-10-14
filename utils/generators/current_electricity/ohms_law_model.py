@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import random
+from utils.quantities import PROFILES, QUANTITIES, equation
+from utils.setup_schema import make_setup
+from utils.circuit_organizer import circuit_plan
 
 
 PROBLEM_TYPES: tuple[str, ...] = (
     "Single Resistor",
-    "Series Current",
-    "Voltage Drop",
+    "Series Current and Voltage",
+    "Parallel Current and Voltage",
 )
 
 
@@ -17,35 +20,24 @@ CIRCUIT_MODEL_NOTES = {
     "current": (
         "In a simple series circuit, the same current passes through each resistor."
     ),
-    "series": (
-        "For series circuits, total resistance is the sum of the resistor values."
+    "parallel": (
+        "In parallel, each resistor has the source voltage across it."
     ),
 }
 
 
 CIRCUIT_EQUATION_METADATA = {
     "Single Resistor": {
-        "honors": r"V = IR",
-        "conceptual": r"V = IR \quad,\quad I = \frac{V}{R} \quad,\quad R = \frac{V}{I}",
+        "honors": equation("single_resistor", r"${V} = ${I}${R}"),
+        "conceptual": equation("single_resistor", r"${V} = ${I}${R} \quad,\quad ${I} = \frac{${V}}{${R}} \quad,\quad ${R} = \frac{${V}}{${I}}"),
     },
-    "Series Current": {
-        "honors": r"R_{\text{total}} = R_1 + R_2 \quad,\quad I = \frac{V}{R_{\text{total}}}",
-        "conceptual": (
-            r"R_{\text{total}} = R_1 + R_2 \quad,\quad "
-            r"I = \frac{V}{R_{\text{total}}} \quad,\quad "
-            r"V = I R_{\text{total}} \quad,\quad "
-            r"R_{\text{total}} = \frac{V}{I}"
-        ),
+    "Series Current and Voltage": {
+        "honors": r"I_1 = I_2 = I \quad,\quad V_1 = IR_1 \quad,\quad V_2 = IR_2",
+        "conceptual": r"I_1 = I_2 = I \quad,\quad V_1 = IR_1 \quad,\quad V_2 = IR_2",
     },
-    "Voltage Drop": {
-        "honors": r"R_{\text{total}} = R_1 + R_2 \quad,\quad I = \frac{V_{\text{source}}}{R_{\text{total}}} \quad,\quad V_{\text{drop}} = IR",
-        "conceptual": (
-            r"R_{\text{total}} = R_1 + R_2 \quad,\quad "
-            r"I = \frac{V_{\text{source}}}{R_{\text{total}}} \quad,\quad "
-            r"V_{\text{drop}} = IR \quad,\quad "
-            r"R = \frac{V}{I} \quad,\quad "
-            r"I = \frac{V}{R}"
-        ),
+    "Parallel Current and Voltage": {
+        "honors": r"V_1 = V_2 = V \quad,\quad I_1 = \frac{V}{R_1} \quad,\quad I_2 = \frac{V}{R_2}",
+        "conceptual": r"V_1 = V_2 = V \quad,\quad I_1 = \frac{V}{R_1} \quad,\quad I_2 = \frac{V}{R_2}",
     },
 }
 
@@ -73,20 +65,28 @@ def _build_single_resistor_case(difficulty: str, solve_for=None) -> dict:
     if solve_for not in ("Voltage", "Current", "Resistance"):
         raise ValueError(f"Unsupported single-resistor target: {solve_for}")
 
+    roles = PROFILES["single_resistor"]
+    target = {"Voltage": "V", "Current": "I", "Resistance": "R"}[solve_for]
+    # Normalize at the display boundary; checking and calculations use exactly
+    # the same values supplied by the diagram and Givens panel.
+    values = {key: float(format_answer_value(value)) for key, value in
+              {"V": voltage, "I": current, "R": resistance}.items()}
+    shown = {key: f"{format_answer_value(value)} {QUANTITIES[roles[key].quantity].unit}"
+             for key, value in values.items()}
     diagram = {
         "kind": "single",
-        "source_label": f"{format_answer_value(voltage)} V" if solve_for != "Voltage" else "? V",
-        "resistor_labels": [f"{format_answer_value(resistance)} ohms" if solve_for != "Resistance" else "? ohms"],
-        "wire_label": f"I = {format_answer_value(current)} A" if solve_for != "Current" else "I = ? A",
+        "source_label": shown["V"] if target != "V" else f"? {QUANTITIES[roles['V'].quantity].unit}",
+        "resistor_labels": [shown["R"] if target != "R" else f"? {QUANTITIES[roles['R'].quantity].unit}"],
+        "wire_label": f"{roles['I'].symbol} = " + (shown["I"] if target != "I" else f"? {QUANTITIES[roles['I'].quantity].unit}"),
     }
 
     if solve_for == "Voltage":
         prompt = "Use Ohm's law to calculate the battery voltage."
-        answer = voltage
-        unit = "V"
+        answer = values["I"] * values["R"]
+        unit = QUANTITIES[roles["V"].quantity].unit
         givens = (
-            ("Resistance", f"{format_answer_value(resistance)} ohms"),
-            ("Current", f"{format_answer_value(current)} A"),
+            (roles["R"].name, shown["R"]),
+            (roles["I"].name, shown["I"]),
         )
         explanation = (
             f"Use V = IR. With I = {format_answer_value(current)} A and "
@@ -94,11 +94,11 @@ def _build_single_resistor_case(difficulty: str, solve_for=None) -> dict:
         )
     elif solve_for == "Current":
         prompt = "Use Ohm's law to calculate the current in the circuit."
-        answer = current
-        unit = "A"
+        answer = values["V"] / values["R"]
+        unit = QUANTITIES[roles["I"].quantity].unit
         givens = (
-            ("Battery voltage", f"{format_answer_value(voltage)} V"),
-            ("Resistance", f"{format_answer_value(resistance)} ohms"),
+            (roles["V"].name, shown["V"]),
+            (roles["R"].name, shown["R"]),
         )
         explanation = (
             f"Use I = V / R. With V = {format_answer_value(voltage)} V and "
@@ -106,11 +106,11 @@ def _build_single_resistor_case(difficulty: str, solve_for=None) -> dict:
         )
     else:
         prompt = "Use Ohm's law to calculate the resistance of the resistor."
-        answer = resistance
-        unit = "ohms"
+        answer = values["V"] / values["I"]
+        unit = QUANTITIES[roles["R"].quantity].unit
         givens = (
-            ("Battery voltage", f"{format_answer_value(voltage)} V"),
-            ("Current", f"{format_answer_value(current)} A"),
+            (roles["V"].name, shown["V"]),
+            (roles["I"].name, shown["I"]),
         )
         explanation = (
             f"Use R = V / I. With V = {format_answer_value(voltage)} V and "
@@ -127,112 +127,67 @@ def _build_single_resistor_case(difficulty: str, solve_for=None) -> dict:
         "diagram": diagram,
         "answer_label": solve_for,
         "explanation": explanation,
+        "setup": make_setup("single_resistor", values, set(values) - {target}, [target]),
     }
 
 
-def _build_series_current_case(difficulty: str) -> dict:
+def _build_relationship_case(problem_type: str, difficulty: str) -> dict:
     if difficulty == "Easy":
-        resistance_pairs = ((2, 4), (3, 5), (4, 6), (5, 7), (6, 8))
-        current = random.randint(1, 4)
-    elif difficulty == "Medium":
-        resistance_pairs = ((3, 9), (4, 8), (5, 10), (6, 12), (8, 16))
-        current = random.choice((0.5, 1.0, 1.5, 2.0, 2.5))
-    else:
-        resistance_pairs = ((2.5, 7.5), (4.0, 10.0), (5.0, 15.0), (6.0, 18.0))
-        current = random.choice((0.6, 0.8, 1.2, 1.5, 2.4))
-
-    r1, r2 = random.choice(resistance_pairs)
-    total_resistance = r1 + r2
-    source_voltage = total_resistance * current
-    ask_total_resistance = difficulty == "Easy"
-
-    if ask_total_resistance:
-        prompt = "Find the total resistance of the series circuit."
-        answer = total_resistance
-        unit = "ohms"
-        wire_label = f"I = {format_answer_value(current)} A"
-        source_label = f"{format_answer_value(source_voltage)} V"
-        explanation = (
-            f"In series, resistances add: R_total = R1 + R2 = "
-            f"{format_answer_value(r1)} ohms + {format_answer_value(r2)} ohms = {format_answer_value(total_resistance)} ohms."
-        )
-    else:
-        prompt = "Find the current in the series circuit."
-        answer = current
-        unit = "A"
-        wire_label = "I = ? A"
-        source_label = f"{format_answer_value(source_voltage)} V"
-        explanation = (
-            f"First add the resistors: R_total = {format_answer_value(r1)} ohms + {format_answer_value(r2)} ohms = "
-            f"{format_answer_value(total_resistance)} ohms. Then use I = V / R_total = "
-            f"{format_answer_value(source_voltage)} V / {format_answer_value(total_resistance)} ohms = {format_answer_value(current)} A."
-        )
-
-    return {
-        "problem_type": "Series Current",
-        "difficulty": difficulty,
-        "prompt": prompt,
-        "answer": answer,
-        "unit": unit,
-        "givens": (
-            ("R1", f"{format_answer_value(r1)} ohms"),
-            ("R2", f"{format_answer_value(r2)} ohms"),
-            ("Battery voltage", f"{format_answer_value(source_voltage)} V"),
-        ),
-        "diagram": {
-            "kind": "series",
-            "source_label": source_label,
-            "resistor_labels": [f"R1 = {format_answer_value(r1)} ohms", f"R2 = {format_answer_value(r2)} ohms"],
-            "wire_label": wire_label,
-        },
-        "answer_label": "Total resistance" if ask_total_resistance else "Current",
-        "explanation": explanation,
-    }
-
-
-def _build_voltage_drop_case(difficulty: str) -> dict:
-    if difficulty == "Easy":
-        resistance_pairs = ((2, 4), (3, 6), (4, 8), (5, 10))
+        r1, r2 = random.choice(((2, 4), (3, 6), (4, 8), (5, 10)))
         current = random.randint(1, 3)
     elif difficulty == "Medium":
-        resistance_pairs = ((3, 9), (4, 12), (5, 15), (6, 18))
+        r1, r2 = random.choice(((3, 9), (4, 12), (5, 15), (6, 18)))
         current = random.choice((0.5, 1.0, 1.5, 2.0))
     else:
-        resistance_pairs = ((2.5, 7.5), (4.0, 12.0), (5.0, 10.0), (6.0, 15.0))
+        r1, r2 = random.choice(((2.5, 7.5), (4.0, 12.0), (5.0, 10.0), (6.0, 15.0)))
         current = random.choice((0.6, 0.8, 1.2, 1.5, 2.4))
-
-    r1, r2 = random.choice(resistance_pairs)
-    source_voltage = (r1 + r2) * current
-    target_index = random.choice((0, 1))
-    target_name = f"R{target_index + 1}"
-    target_resistance = (r1, r2)[target_index]
-    answer = current * target_resistance
-
-    return {
-        "problem_type": "Voltage Drop",
-        "difficulty": difficulty,
-        "prompt": f"Find the voltage drop across {target_name}.",
-        "answer": answer,
-        "unit": "V",
-        "givens": (
-            ("Battery voltage", f"{format_answer_value(source_voltage)} V"),
-            ("R1", f"{format_answer_value(r1)} ohms"),
-            ("R2", f"{format_answer_value(r2)} ohms"),
-        ),
-        "diagram": {
-            "kind": "series",
-            "source_label": f"{format_answer_value(source_voltage)} V",
-            "resistor_labels": [f"R1 = {format_answer_value(r1)} ohms", f"R2 = {format_answer_value(r2)} ohms"],
-            "wire_label": "",
-        },
-        "answer_label": f"Voltage across {target_name}",
-        "explanation": (
-            f"First find the series current: I = V / R_total = {format_answer_value(source_voltage)} V / "
-            f"{format_answer_value(r1 + r2)} ohms = {format_answer_value(current)} A. "
-            f"Then use V = IR for {target_name}: {format_answer_value(current)} A x "
-            f"{format_answer_value(target_resistance)} ohms = {format_answer_value(answer)} V."
-        ),
+    fmt = format_answer_value
+    diagram = {
+        "kind": "series", "source_label": "",
+        "resistor_labels": [f"R1 = {fmt(r1)} ohms", f"R2 = {fmt(r2)} ohms"],
+        "wire_label": "",
     }
+    resistances = (("R1", f"{fmt(r1)} ohms"), ("R2", f"{fmt(r2)} ohms"))
+    if problem_type == "Series Current and Voltage":
+        answers, unit = [current * r1, current * r2], "V"
+        labels = ["Voltage across R1", "Voltage across R2"]
+        prompt = "The shared series current is given. Find the voltage across each resistor."
+        relationship = "One path: the given current passes through both R1 and R2. Use each resistor's own resistance to find its voltage."
+        givens = (("Shared current", f"{fmt(current)} A"), *resistances)
+        diagram["wire_label"] = f"I = {fmt(current)} A"
+        explanation = (
+            f"The same {fmt(current)} A passes through each resistor. "
+            f"V1 = I x R1 = {fmt(current)} A x {fmt(r1)} ohms = {fmt(answers[0])} V. "
+            f"V2 = I x R2 = {fmt(current)} A x {fmt(r2)} ohms = {fmt(answers[1])} V. "
+            "With the same current, the larger resistor has the larger voltage drop. "
+            "No equivalent resistance or source-voltage calculation is needed."
+        )
+    else:
+        if difficulty == "Easy":
+            source = random.choice((6, 12, 18))
+        elif difficulty == "Medium":
+            source = random.choice((9, 12, 15, 18, 20))
+        else:
+            source = random.choice((7.5, 12, 16, 18, 24))
+        answers, unit = [source / r1, source / r2], "A"
+        labels = ["Current through R1", "Current through R2"]
+        diagram.update(kind="parallel", source_label=f"{fmt(source)} V")
+        prompt = "The source voltage is given. Find the current through each parallel resistor."
+        relationship = "Both branches span the source terminals: each resistor has the full source voltage. Use each branch's own resistance to find its current."
+        givens = (("Source voltage", f"{fmt(source)} V"), *resistances)
+        explanation = (
+            f"Each resistor has the full {fmt(source)} V across it. "
+            f"I1 = V / R1 = {fmt(source)} V / {fmt(r1)} ohms = {fmt(answers[0])} A. "
+            f"I2 = V / R2 = {fmt(source)} V / {fmt(r2)} ohms = {fmt(answers[1])} A. "
+            "With the same voltage, the larger resistor draws less current. "
+            "No equivalent resistance or total-current calculation is needed."
+        )
+    return dict(problem_type=problem_type, difficulty=difficulty, prompt=prompt,
+                answers=answers, answer_labels=labels, unit=unit, givens=givens,
+                diagram=diagram, relationship=relationship, explanation=explanation,
+                organizer=circuit_plan("Circuit current (A)" if problem_type == "Series Current and Voltage" else "Source voltage (V)",
+                                       current if problem_type == "Series Current and Voltage" else source,
+                                       r1, r2, series=problem_type == "Series Current and Voltage"))
 
 
 def build_circuit_case(problem_type: str, difficulty: str, solve_for=None) -> dict:
@@ -240,8 +195,6 @@ def build_circuit_case(problem_type: str, difficulty: str, solve_for=None) -> di
         raise ValueError("Explicit targets are only supported for Single Resistor")
     if problem_type == "Single Resistor":
         return _build_single_resistor_case(difficulty, solve_for)
-    if problem_type == "Series Current":
-        return _build_series_current_case(difficulty)
-    if problem_type == "Voltage Drop":
-        return _build_voltage_drop_case(difficulty)
+    if problem_type in PROBLEM_TYPES:
+        return _build_relationship_case(problem_type, difficulty)
     raise ValueError(f"Unsupported circuit problem type: {problem_type}")

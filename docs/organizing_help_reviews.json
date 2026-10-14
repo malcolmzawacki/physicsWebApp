@@ -26,5 +26,117 @@
   "Momentum / Momentum / Momentum": {
     "status": "Migrated; enabled",
     "notes": "Momentum, mass, velocity profile and equation symbols connected; all three targets checked against prompt facts and page flow. Existing positive one-object values and Ns notation retained. No initial/final hint for ordinary velocity. Reviewed 2026-10-03."
+  },
+  "Waves / Wave Properties / Wave Properties": {
+    "status": "Migrated; enabled; teacher checked",
+    "notes": "Eight given/target forms and four solve-for targets cover speed, wavelength, frequency, and period. Three-decimal displayed period givens drive answers; shared roles, units, equations, and setup metadata connected. 2,376 displayed-value cases and routed form/feedback/reset checks passed. Teacher confirmed new period problems and Tab/Enter work on 2026-10-12. Easy page only; harmonics/decibels and export organizers excluded. See wave_properties_review.md."
+  },
+  "⚡Electricity⚡ / Current Electricity / Circuit Fundamentals / Single Resistor": {
+    "status": "Migrated; enabled; teacher review pending",
+    "notes": "Voltage/current/resistance targets at all three difficulties reviewed; 507 curated cases match displayed givens, diagram, units, setup, and answers. Shared three-role profile and custom-page payload/question-ID adapter enabled; separate forms, scoring, feedback, resets, cancellable automatic progression, and unsupported subtype checks passed. Custom messages persist across reruns. Correct calculation is optional with a five-second cancellable countdown; wrong calculation stays visible until New Question (Circuit) or settings change. Other focused relationship tasks, circuit networks, and export organizers explicitly deferred. Route renamed Circuit Fundamentals; Single Resistor scope is unchanged. See current_electricity_ohms_law.md. Updated 2026-10-12."
+  },
+  "Dynamics / Newton's Second Law / Newton's Second Law": {
+    "status": "Enabled; Easy only; teacher checked",
+    "notes": "Net force/mass/acceleration organizer enabled for all three Easy targets and Mixed. All 300 integer mass/acceleration/target combinations match displayed facts and answers; target bindings, exports, independent forms, scoring, progression, and Medium/Hard exclusions checked. Friction branches require applied/net-force roles, explicit surface/direction/gravity assumptions, and a separate review. See current_state.md#newtons-second-law-easy-review. Reviewed 2026-10-12. Teacher confirmed intended behavior on 2026-10-12."
+  },
+  "Energy / Types of Energy / Elastic Potential Energy": {
+    "status": "Enabled; teacher checked for current scope",
+    "notes": "Shared roles, equations, target bindings, and setup metadata enabled for every existing difficulty/target branch and Mixed. Four-family review covers 11,820 sampled-value cases and 28 target/level branches, explicit assumptions, displayed precision, independent forms, feedback, resets, scoring, progression, and exports. Easy retains energy/work targets only. Intermediate-value planning and other energy activities excluded. See current_state.md#energy-basics-review. Reviewed 2026-10-12. Teacher accepted the completed Energy organizer rollout on 2026-10-13. Broader content, difficulty progression, and printed organizers remain separate work."
+  },
+  "Energy / Types of Energy / Kinetic Energy": {
+    "status": "Enabled; teacher checked for current scope",
+    "notes": "Shared roles, equations, target bindings, and setup metadata enabled for every existing difficulty/target branch and Mixed. Four-family review covers 11,820 sampled-value cases and 28 target/level branches, explicit assumptions, displayed precision, independent forms, feedback, resets, scoring, progression, and exports. Easy retains energy/work targets only. Intermediate-value planning and other energy activities excluded. See current_state.md#energy-basics-review. Reviewed 2026-10-12. Teacher accepted the completed Energy organizer rollout on 2026-10-13. Broader content, difficulty progression, and printed organizers remain separate work."
+  },
+  "Energy / Types of Energy / Gravitational Potential Energy": {
+    "status": "Enabled; teacher checked for current scope",
+    "notes": "Shared roles, equations, target bindings, and setup metadata enabled for every existing difficulty/target branch and Mixed. Four-family review covers 11,820 sampled-value cases and 28 target/level branches, explicit assumptions, displayed precision, independent forms, feedback, resets, scoring, progression, and exports. Easy retains energy/work targets only. Intermediate-value planning and other energy activities excluded. See current_state.md#energy-basics-review. Reviewed 2026-10-12. Teacher accepted the completed Energy organizer rollout on 2026-10-13. Broader content, difficulty progression, and printed organizers remain separate work."
+  },
+  "Energy / Types of Energy / Work": {
+    "status": "Enabled; teacher checked for current scope",
+    "notes": "Shared roles, equations, target bindings, and setup metadata enabled for every existing difficulty/target branch and Mixed. Four-family review covers 11,820 sampled-value cases and 28 target/level branches, explicit assumptions, displayed precision, independent forms, feedback, resets, scoring, progression, and exports. Easy retains energy/work targets only. Intermediate-value planning and other energy activities excluded. See current_state.md#energy-basics-review. Reviewed 2026-10-12. Teacher accepted the completed Energy organizer rollout on 2026-10-13. Broader content, difficulty progression, and printed organizers remain separate work."
+  },
+  "⚡Electricity⚡ / Current Electricity / Circuit Fundamentals / Series Current and Voltage": {
+    "status": "Enabled; teacher checked",
+    "notes": "Component-owned givens grouped by Whole circuit/R1/R2. Series Voltage Drop adds equivalent resistance and circuit current as possible in-between calculations; paired Fundamentals tasks need no intermediate section. Separate checks, feedback, reset, and final submission isolation passed at all difficulties; 720 sampled cases across the three tasks. Other network activities excluded. See current_electricity_ohms_law.md#component-organizer-preview. Reviewed 2026-10-12."
+  },
+  "⚡Electricity⚡ / Current Electricity / Circuit Fundamentals / Parallel Current and Voltage": {
+    "status": "Enabled; teacher checked",
+    "notes": "Component-owned givens grouped by Whole circuit/R1/R2. Series Voltage Drop adds equivalent resistance and circuit current as possible in-between calculations; paired Fundamentals tasks need no intermediate section. Separate checks, feedback, reset, and final submission isolation passed at all difficulties; 720 sampled cases across the three tasks. Other network activities excluded. See current_electricity_ohms_law.md#component-organizer-preview. Reviewed 2026-10-12."
+  },
+  "⚡Electricity⚡ / Current Electricity / Series and Parallel Circuits / Series Voltage Drop": {
+    "status": "Enabled; teacher checked",
+    "notes": "Component-owned givens grouped by Whole circuit/R1/R2. Series Voltage Drop adds equivalent resistance and circuit current as possible in-between calculations; paired Fundamentals tasks need no intermediate section. Separate checks, feedback, reset, and final submission isolation passed at all difficulties; 720 sampled cases across the three tasks. Other network activities excluded. See current_electricity_ohms_law.md#component-organizer-preview. Reviewed 2026-10-12."
+  },
+  "⚡Electricity⚡ / Current Electricity / Series and Parallel Circuits / Series Equivalent Resistance": {
+    "status": "Enabled; teacher review pending",
+    "notes": "Component-grouped givens and optional help at all three difficulties. Series Total Current offers equivalent resistance as an intermediate; equivalent-resistance and branch-current tasks have no unnecessary intermediate section. Seven-activity suite passes 1,680 sampled cases, 21 routed branches, independent checks, feedback, resets, and live-session recovery. Single Resistor covered separately. Broader difficulty variety and components deferred. See current_electricity_series_parallel.md. Reviewed 2026-10-12."
+  },
+  "⚡Electricity⚡ / Current Electricity / Series and Parallel Circuits / Parallel Equivalent Resistance": {
+    "status": "Enabled; teacher review pending",
+    "notes": "Component-grouped givens and optional help at all three difficulties. Series Total Current offers equivalent resistance as an intermediate; equivalent-resistance and branch-current tasks have no unnecessary intermediate section. Seven-activity suite passes 1,680 sampled cases, 21 routed branches, independent checks, feedback, resets, and live-session recovery. Single Resistor covered separately. Broader difficulty variety and components deferred. See current_electricity_series_parallel.md. Reviewed 2026-10-12."
+  },
+  "⚡Electricity⚡ / Current Electricity / Series and Parallel Circuits / Series Total Current": {
+    "status": "Enabled; teacher review pending",
+    "notes": "Component-grouped givens and optional help at all three difficulties. Series Total Current offers equivalent resistance as an intermediate; equivalent-resistance and branch-current tasks have no unnecessary intermediate section. Seven-activity suite passes 1,680 sampled cases, 21 routed branches, independent checks, feedback, resets, and live-session recovery. Single Resistor covered separately. Broader difficulty variety and components deferred. See current_electricity_series_parallel.md. Reviewed 2026-10-12."
+  },
+  "⚡Electricity⚡ / Current Electricity / Series and Parallel Circuits / Parallel Branch Current": {
+    "status": "Enabled; teacher review pending",
+    "notes": "Component-grouped givens and optional help at all three difficulties. Series Total Current offers equivalent resistance as an intermediate; equivalent-resistance and branch-current tasks have no unnecessary intermediate section. Seven-activity suite passes 1,680 sampled cases, 21 routed branches, independent checks, feedback, resets, and live-session recovery. Single Resistor covered separately. Broader difficulty variety and components deferred. See current_electricity_series_parallel.md. Reviewed 2026-10-12."
+  },
+  "Energy / Conservation of Energy / Gravitational <--> Kinetic": {
+    "status": "Enabled; teacher checked for current scope",
+    "notes": "Stage-grouped givens and optional intermediate energy calculation for all difficulties, existing targets, Mixed, and both directions. 3,600 displayed-value cases cover all 60 scenario/level branches across the three families, independent physics equations, metadata, exports, checks, feedback, reset, and submission isolation. Answers use displayed facts; total vertical change includes spring compression/expansion. Thermal/friction-distance and printed organizers excluded. See current_state.md#conservation-of-energy-organizer-review. Reviewed 2026-10-12. Teacher accepted the completed Energy organizer rollout on 2026-10-13. Broader content, difficulty progression, and printed organizers remain separate work."
+  },
+  "Energy / Conservation of Energy / Elastic <--> Kinetic": {
+    "status": "Enabled; teacher checked for current scope",
+    "notes": "Stage-grouped givens and optional intermediate energy calculation for all difficulties, existing targets, Mixed, and both directions. 3,600 displayed-value cases cover all 60 scenario/level branches across the three families, independent physics equations, metadata, exports, checks, feedback, reset, and submission isolation. Answers use displayed facts; total vertical change includes spring compression/expansion. Thermal/friction-distance and printed organizers excluded. See current_state.md#conservation-of-energy-organizer-review. Reviewed 2026-10-12. Teacher accepted the completed Energy organizer rollout on 2026-10-13. Broader content, difficulty progression, and printed organizers remain separate work."
+  },
+  "Energy / Conservation of Energy / Gravitational <--> Elastic": {
+    "status": "Enabled; teacher checked for current scope",
+    "notes": "Stage-grouped givens and optional intermediate energy calculation for all difficulties, existing targets, Mixed, and both directions. 3,600 displayed-value cases cover all 60 scenario/level branches across the three families, independent physics equations, metadata, exports, checks, feedback, reset, and submission isolation. Answers use displayed facts; total vertical change includes spring compression/expansion. Thermal/friction-distance and printed organizers excluded. See current_state.md#conservation-of-energy-organizer-review. Reviewed 2026-10-12. Teacher accepted the completed Energy organizer rollout on 2026-10-13. Broader content, difficulty progression, and printed organizers remain separate work."
+  },
+  "Energy / Conservation of Energy / Mixed": {
+    "status": "Enabled; teacher checked for current scope",
+    "notes": "Equal family sampling across all three conservation conversions, followed by existing direction/target sampling. General optional equation reference; no family title or Solve for control in Mixed mode. Stage organizer retained. 360 seeded cases cover six family/direction combinations at every difficulty; exports, selector resets and final submission checked. See current_state.md#conservation-of-energy-organizer-review. Reviewed 2026-10-12. Teacher accepted the completed Energy organizer rollout on 2026-10-13. Broader content, difficulty progression, and printed organizers remain separate work."
+  },
+  "Energy / Thermal Energy / Gravitational <--> Kinetic": {
+    "status": "Enabled; teacher checked for current scope",
+    "notes": "Optional stage-grouped givens and starting/ending mechanical-energy calculations; page-specific thermal/sign/model help. Positive thermal-energy labels replace misleading positive friction-work labels; IDs stable. All 58 reachable direction/target/level branches reviewed across the three families; 3,480 displayed-value cases, independent physics, explicit/Mixed target and export payloads, feedback, reset, isolated checking and final scoring passed. Invalid rounded cases resample; shared raw samplers unchanged. Friction/Distance and printed organizers excluded. See current_state.md#thermal-energy-organizer-review. Reviewed 2026-10-12. Teacher accepted the completed Energy organizer rollout on 2026-10-13. Broader content, difficulty progression, and printed organizers remain separate work."
+  },
+  "Energy / Thermal Energy / Elastic <--> Kinetic": {
+    "status": "Enabled; teacher checked for current scope",
+    "notes": "Optional stage-grouped givens and starting/ending mechanical-energy calculations; page-specific thermal/sign/model help. Positive thermal-energy labels replace misleading positive friction-work labels; IDs stable. All 58 reachable direction/target/level branches reviewed across the three families; 3,480 displayed-value cases, independent physics, explicit/Mixed target and export payloads, feedback, reset, isolated checking and final scoring passed. Invalid rounded cases resample; shared raw samplers unchanged. Friction/Distance and printed organizers excluded. See current_state.md#thermal-energy-organizer-review. Reviewed 2026-10-12. Teacher accepted the completed Energy organizer rollout on 2026-10-13. Broader content, difficulty progression, and printed organizers remain separate work."
+  },
+  "Energy / Thermal Energy / Gravitational <--> Elastic": {
+    "status": "Enabled; teacher checked for current scope",
+    "notes": "Optional stage-grouped givens and starting/ending mechanical-energy calculations; page-specific thermal/sign/model help. Positive thermal-energy labels replace misleading positive friction-work labels; IDs stable. All 58 reachable direction/target/level branches reviewed across the three families; 3,480 displayed-value cases, independent physics, explicit/Mixed target and export payloads, feedback, reset, isolated checking and final scoring passed. Invalid rounded cases resample; shared raw samplers unchanged. Friction/Distance and printed organizers excluded. See current_state.md#thermal-energy-organizer-review. Reviewed 2026-10-12. Teacher accepted the completed Energy organizer rollout on 2026-10-13. Broader content, difficulty progression, and printed organizers remain separate work."
+  },
+  "Energy / Thermal Energy / Mixed": {
+    "status": "Enabled; teacher checked for current scope",
+    "notes": "Equal sampling of three families with existing direction/target sampling. Easy retains thermal-only questions. General optional equations; Solve for hidden. Stage organizer retained. 360 seeded cases cover all six directions at each difficulty, with Mixed exports and routed checks. See current_state.md#thermal-energy-organizer-review. Reviewed 2026-10-12. Teacher accepted the completed Energy organizer rollout on 2026-10-13. Broader content, difficulty progression, and printed organizers remain separate work."
+  },
+  "Energy / Friction and Distance / Gravitational <--> Kinetic": {
+    "status": "Enabled; teacher checked for current scope",
+    "notes": "Stage/path-grouped givens and optional thermal/starting/ending energy calculations. Easy thermal-plus-target and Medium/Hard single-target branches retained. All 90 direction/target/level branches reviewed across three families; 3,600 displayed-fact cases, independent balances/Fd, positive domains, ramp geometry, exports, isolated checks, feedback, reset, final scoring passed. Rounded invalid candidates resample; calculated thermal precision retained. Printed organizers and wider content expansion excluded. See current_state.md#friction-and-distance-organizer-review. Reviewed 2026-10-12. Teacher accepted the completed Energy organizer rollout on 2026-10-13. Broader content, difficulty progression, and printed organizers remain separate work."
+  },
+  "Energy / Friction and Distance / Elastic <--> Kinetic": {
+    "status": "Enabled; teacher checked for current scope",
+    "notes": "Stage/path-grouped givens and optional thermal/starting/ending energy calculations. Easy thermal-plus-target and Medium/Hard single-target branches retained. All 90 direction/target/level branches reviewed across three families; 3,600 displayed-fact cases, independent balances/Fd, positive domains, ramp geometry, exports, isolated checks, feedback, reset, final scoring passed. Rounded invalid candidates resample; calculated thermal precision retained. Printed organizers and wider content expansion excluded. See current_state.md#friction-and-distance-organizer-review. Reviewed 2026-10-12. Teacher accepted the completed Energy organizer rollout on 2026-10-13. Broader content, difficulty progression, and printed organizers remain separate work."
+  },
+  "Energy / Friction and Distance / Gravitational <--> Elastic": {
+    "status": "Enabled; teacher checked for current scope",
+    "notes": "Stage/path-grouped givens and optional thermal/starting/ending energy calculations. Easy thermal-plus-target and Medium/Hard single-target branches retained. All 90 direction/target/level branches reviewed across three families; 3,600 displayed-fact cases, independent balances/Fd, positive domains, ramp geometry, exports, isolated checks, feedback, reset, final scoring passed. Rounded invalid candidates resample; calculated thermal precision retained. Printed organizers and wider content expansion excluded. See current_state.md#friction-and-distance-organizer-review. Reviewed 2026-10-12. Teacher accepted the completed Energy organizer rollout on 2026-10-13. Broader content, difficulty progression, and printed organizers remain separate work."
+  },
+  "Kinematics / Projectiles / Type 1": {
+    "status": "Enabled; first-pass teacher preview pending",
+    "notes": "Horizontal/vertical organizer with separate speed/angle givens and time row; optional hints, context-specific vertical displacement, and given versus intermediate separation. Existing names and target IDs retained. Answers follow printed givens. Type 3 elevated-landing crossing formula corrected; descending landing and same-height Type 2 geometry clarified. 1,860 sampled target cases, worksheet exports, independent forms and resets checked. Laptop height/readability review pending; diagrams are a separate teacher-directed effort. See current_state.md#projectile-organizer-first-pass. Updated 2026-10-13."
+  },
+  "Kinematics / Projectiles / Type 2": {
+    "status": "Enabled; first-pass teacher preview pending",
+    "notes": "Horizontal/vertical organizer with separate speed/angle givens and time row; optional hints, context-specific vertical displacement, and given versus intermediate separation. Existing names and target IDs retained. Answers follow printed givens. Type 3 elevated-landing crossing formula corrected; descending landing and same-height Type 2 geometry clarified. 1,860 sampled target cases, worksheet exports, independent forms and resets checked. Laptop height/readability review pending; diagrams are a separate teacher-directed effort. See current_state.md#projectile-organizer-first-pass. Updated 2026-10-13."
+  },
+  "Kinematics / Projectiles / Type 3": {
+    "status": "Enabled; first-pass teacher preview pending",
+    "notes": "Horizontal/vertical organizer with separate speed/angle givens and time row; optional hints, context-specific vertical displacement, and given versus intermediate separation. Existing names and target IDs retained. Answers follow printed givens. Type 3 elevated-landing crossing formula corrected; descending landing and same-height Type 2 geometry clarified. 1,860 sampled target cases, worksheet exports, independent forms and resets checked. Laptop height/readability review pending; diagrams are a separate teacher-directed effort. See current_state.md#projectile-organizer-first-pass. Updated 2026-10-13."
   }
 }

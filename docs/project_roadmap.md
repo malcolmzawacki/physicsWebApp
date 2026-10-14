@@ -1,98 +1,289 @@
 # Project Roadmap & Backlog
 
-_Last updated: 2026-02-17_
+_Direction and near-term rollout status updated: 2026-10-12_
 
-## Recently Completed
-- **Correctness Regression Guardrail (2026-02-17)**: Added recurring guardrail scripts (`tools/validate_payloads.py`, `tools/check_prompt_answer_consistency.py`), documented maintainer runbook, and CI enforcement via `.github/workflows/correctness-guardrails.yml`.
-- **Critical Correctness Bugs (2026-02-17)**: Patched known logic/content bugs in active paths (roulette planner rate calculation, Atwood acceleration prompt mismatch, invalid `solve_for` usage in doc question builders), plus adjacent payload/runtime correctness issues found during audit.
-- **Streamlit Navigation**: Router rollout complete; next steps are refining activity groupings and course-level filters (minimum level set to High School; remove Middle School tier; keep Regular High School + Advanced).
-- Reorganized navigation: added a "Rotation (Advanced)" main area, moved vectors/displacement into Foundations, and updated advanced-only activity filters.
-- Moved kinematics generators into `utils/generators/kinematics/` and updated imports/paths across the app.
-- Migrated activity modules to `State`-based session handling and removed legacy multipage/tab scaffolding.
-- Introduced a generic diagram-matching layout (`utils/layouts/diagram_match_layout.py`) with auto-advance timing and first-question autoload.
-- Extracted motion graph matching into a dedicated payload generator (`utils/generators/kinematics/motion_graph_matching_generator.py`) and wired the motion page to the generic layout.
-- Removed legacy tuple payload support and standardized generators on dict payloads.
-- `utils/generators/kinematics/projectile_generator.py` now supports explicit `solve_for` overrides while keeping question narratives coherent.
-- `xtrct_docs/document_creator.py` has an `include_graphs` parameter to add flexibility when diagrams are helpful but not needed
-- Created and then moved additional force tab generators to `forces/` folder for better organization, includes `atwood_generator.py`, `tension_generator.py`, and `incline_generator.py`
-- Rotational kinematics generator and Streamlit page are in place (`utils/generators/rotational_motion_generator.py`, `app_pages/1_1.1.2_Rotational_Motion.py`).
-- Linear motion generator refactor is complete (centralized phrasing, unified variable selection).
-- Center of mass generator wording and diagram tweaks are complete.
+Implemented behavior belongs in [current_state.md](current_state.md). This roadmap
+orders future work; it does not mark an activity ready merely because its neighbor
+works. Use the [rollout process](site_update_process.md), [inventory](organizing_help_inventory.md),
+and review ledger for execution and evidence.
 
-## In Progress / Short-Term Targets
-- **Correctness Regression Guardrail Expansion**: Extend guardrail coverage with additional generator-specific invariants and regression cases as modules expand.
-- **Validation Pipeline Repair**: Make `tools/validate_payloads.py` runnable from the documented command path and align problem-type mappings with current generator metadata.
-- **Dependency Baseline Fixes**: Update `requirements.txt` to include runtime packages used by UI/dataframe/doc export modules (e.g., pandas, python-docx) and verify clean-environment startup.
-- **Payload Contract Audit**: Enforce strict payload-key consistency (`units`/feature keys), fix unfinished generators that violate the contract, and add smoke checks for contract regressions.
-- **UI Runtime Responsiveness**: Replace blocking sleep-based auto-advance loops with rerun-safe timing/state patterns and normalize timer/time-limit handling.
-- **Shared Submission Flow Redesign**: Refactor `utils/ui.py` answer submission so custom feedback/stars can coexist with retryable attempts and an explicit `Show Answer` path instead of immediate forced reveal on first miss.
-- **Nested Activity Lazy Loading**: Standardize selector-driven nested activities (radio/selectbox plus per-mode lazy imports) as the replacement for eager `st.tabs` rendering so multi-mode pages load only the selected activity with one click.
-- **Graph & Image Quality**: Carry the print-friendly theming back into Streamlit views and add regression checks for mixed graph/standard sections.
-- **Encoding & Content Cleanup**: Remove garbled Unicode artifacts, standardize symbol formatting strategy (Unicode vs LaTeX), and correct chemistry data inconsistencies.
-- **Rotational Dynamics Extension**: Plan torque and moment of inertia extensions for the rotational unit (new page sections and generator updates).
+## Product direction: broader entry points and growing independence
 
-## Backlog
+Help students with a wider range of starting abilities participate meaningfully
+in physics and chemistry, then develop greater independence. Practice should
+exercise reading, identifying quantities, interpreting representations, choosing
+relationships, predicting, and evaluating results as well as algebra and
+arithmetic. A student's algebra fluency should not be the only way they can enter
+an activity or demonstrate physical understanding.
 
-### Testing & Tooling
-- Expand payload validation into a lightweight smoke-test suite covering representative generators.
-- Add unit tests for core generators, plus Streamlit snapshot tests for UI flows and document creation regression tests.
-- Improve setup docs (README) and consider optional pre-commit hooks for linting/formatting.
-- Develop validation for qualitative/conceptual problem payloads
-- Create test suite for multi-representation translation problems
-- Add snapshot tests for explanation evaluation logic
+The intended student journey is: identify a need, find suitable practice, choose
+support and a medium, commit to an attempt, use feedback, and decide what to try
+next. A coherent release completes that journey for a reviewed scope of content;
+the site can continue growing in response to classroom experience. There is no
+fixed final feature list.
 
-### Problem Generators & Data Model
-- Add physics/unit validation: dimensional checks, difficulty monotonicity, and sanity bounds for generated values.
-- Add optional reproducible seeding so documents/tests can generate deterministic problem sets.
-- Surface generator metadata (equations, tags) through a formal hook that UI pages can consume uniformly.
-- Extend `solve_for` support (and related phrasing helpers) to other physics generators for consistent behavior.
-- Add qualitative problem variants to existing generators (comparison, ranking, prediction tasks)
-- Create error-embedded worked examples for each major concept
-- Build estimation problem generators with order-of-magnitude targets
-- Design multi-concept synthesis problem templates
+This is the direction for incremental development, not a separate rewrite
+project. The current organizer rollout is the first foundation. Future work
+should support these principles:
 
-### UI Layer & State Management
-- State migration complete; keep new code on `State` and audit for regressions.
-- Explore author tooling in the UI (e.g., expose solve-for overrides, seeds) for rapid debugging.
+- **Separate challenge, support, and presentation.** Physics complexity, available
+  scaffolds, and browser/paper delivery are independent choices. Easy/Medium/Hard
+  labels alone do not describe a student's needs. Avoid adding every possible
+  control to the interface; expose choices when they help the learning task.
+- **Practice individual decisions and reconnect them.** Allow bounded practice
+  of reading givens, identifying a target, selecting a relationship, interpreting
+  a graph, or predicting a sign, then return to complete problems. A numerical
+  organizer is one scaffold, not the universal activity format.
+- **Use support to build independence.** Let students move from a worked example
+  or guided attempt to a related problem with less help and then an unfamiliar
+  context. Make support available again when needed; do not automatically remove
+  it after a correct answer or equate supported success with independent mastery.
+- **Preserve student agency.** Keep explicit commitment before feedback, useful
+  retries, and clear distinctions between checking a setup, checking an answer,
+  and revealing a solution. Feedback should address observable work without
+  claiming to know the student's reasoning from a number alone.
+- **Connect paper and browser practice.** Reuse the same underlying problems and
+  instructional definitions, with layouts and supports suited to each medium.
+  Changing presentation should not silently change the question set.
 
-### Document Generation Pipeline
-- Refactor `xtrct_docs/document_creator.py` to separate data extraction, markdown cleaning, table rendering, and answer-key assembly.
-- Modify `xtrct_docs/document_creator.py` and `xtrct_docs/question_generator.py` parameter passing to capture context (`include_graphs=False`, `tables=True`) rather than passing them as separate, whole document arguments.
-- Allow generator callbacks used for documents to receive contextual metadata (version index, seed) for reproducibility.
-- Replace `os.startfile` with a platform-aware opener and wrap temp image creation in context managers for safer cleanup.
-- Enhance `xtrct_docs/document_creator.py` answer type recognition to truncate float vals in answer key.
+## Architectural direction supporting that journey
 
-### Content & UX Polish
-- Track per-activity and per-problem-type evaluation in the [full organizing-help inventory](organizing_help_inventory.md). Blank review cells mean unevaluated; source discovery and broad regression checks do not count as a scaffolding review.
-- Organizing-help architecture foundation is implemented for Accelerated Motion and Constant Speed metadata. See [the contract and page readiness matrix](organizing_help_architecture.md) for remaining per-family work; Accelerated Motion and Constant Speed are enabled in the student UI.
-- Centralize quantity IDs, display names, symbols, and units in one shared catalog used by generators, equations, organizing help, and exports. The Accelerated Motion organizing-help pilot uses displacement `x` and velocities `v_i` / `v_f`; preserve these conventions until deliberately revised. Keep the unused-value marker `x` distinct from the displacement quantity ID.
-- Expand organizing help gradually: per-quantity checks now use generator-provided givens, requested (`?`), and absent (`x`) metadata. Feedback stays adjacent to and names its input, uses text as well as color, and distinguishes blanks from incorrect entries. Review narrow-screen and assistive-technology behavior before broader rollout. Detailed misconception feedback and external reporting remain future work; this pilot stores only session-local entries.
-- Fix encoding glitches (e.g., garbled `Home.py` title, inconsistent m/sÂ² symbols) and adopt a consistent Unicode/LaTeX strategy.
-- Audit wording for direction reversals across all generators; align on shared helpers similar to the new linear-motion implementation.
-- Centralize copy for equations, hints, and feedback strings; consider LaTeX helpers for formatting parity across UI and docs.
-- Create "reasonableness check" helper prompts for each problem type
-- Design diagram annotation interfaces for force arrows, vectors, energy transformations
-- Add pre-solve prediction prompts and post-solve reflection questions
-- Integrate confidence sliders or self-assessment checkboxes
+Extend existing foundations as reviewed families require them:
 
-## Strategic Initiatives (Streamlit-Compatible)
-- **Declarative Generator Framework**: Separate physics "engines" from presentation, and allow generators to be described via metadata/schema files that the runtime composes into the existing payload contract.
-- **Structured Solutions & Hints**: Extend generators to emit stepwise explanations (concept + equation + substitution + result) so both UI hints and answer keys stay consistent.
-- **Context & Scenario Library**: Define reusable context packs (nouns, verbs, realistic value ranges, diagram assets) that generators can pull from for authentic problem statements.
-- **Authoring Workspace**: Build an author-mode dashboard inside Streamlit for seed controls, curated problem sets, previewing DOCX exports, and managing context packs.
-- **Learning Objectives & Analytics**: Tag problems with objectives/standards, log anonymized attempts to a lightweight datastore, and surface mastery dashboards for teachers.
-- **Adaptive Practice Layer**: Use the collected performance data to bias future question selection (difficulty, solve_for, context) for individualized practice sequences.
-- **Conceptual Understanding Layer**: Extend generators to emit qualitative reasoning problems alongside calculations, comparison questions ("Which has more energy?"), prediction tasks ("What happens if we double the mass?"), and scenario analysis without numerical computation. Include qualitative button-based responses and short text explanations.
-- **Multi-Representation Practice**: Build problem variants that require translating between representations (graph -> equation -> verbal description -> diagram). Extend graph generators to include sketching/prediction modes where students select expected graph shapes before seeing calculations. Add diagram annotation tools for labeling forces, energy flow, or motion paths.
-- **Error Analysis & Reasoning Problems**: Create a problem type that presents worked solutions (correct or with deliberate errors) and asks students to identify mistakes, explain reasoning, or verify reasonableness. Include "debugging" mode where students diagnose why a calculation went wrong or why an answer is physically impossible.
-- **Estimation & Reasonableness Checks**: Add pre-solve estimation prompts ("Should this be closer to 10 or 1000?") and post-solve verification questions ("Does your answer make sense? Why?"). Integrate order-of-magnitude checking and dimensional analysis as explicit practice types.
-- **Multi-Step Synthesis Problems**: Design problem chains that combine multiple concepts (e.g., projectile motion -> collision -> energy conservation) requiring students to plan solution strategies across 3-5 connected steps. Include scaffolded versions with planning prompts and strategy hints.
-- **Free-Response & Explanation Engine**: Add text input options for conceptual explanations alongside numerical answers. Implement keyword-based or LLM-assisted evaluation for open-ended responses like "Explain why momentum is conserved" or "Describe what happens to kinetic energy."
-- **Partial Credit & Process Tracking**: Extend answer checking to award partial credit for correct approach with calculation errors. Track solution steps for multi-part problems and provide targeted feedback on which stage went wrong (setup vs. algebra vs. units).
-- **Metacognitive Scaffolding**: Integrate reflection prompts into the UI flow - strategy selection before solving ("Which approach will you use?"), confidence ratings during submission, and post-problem reflection ("What was challenging? What would you check?"). Log these for future adaptive practice.
-- **Accessibility & Localization Upgrades**: Improve contrast/readability, offer dyslexia-friendly modes, and plan for multilingual prompts using a centralized copy system.
+1. **Describe the meaning of a problem explicitly.** Build on quantity roles and
+   setup metadata to represent givens, implied facts, actual targets, assumptions,
+   units, displayed precision, and relevant object/axis/stage context. Prompts,
+   diagrams, checking, hints, and exports should consume shared definitions.
+   Authored equations and solutions remain appropriate; a universal algebra
+   engine is not a prerequisite.
+2. **Separate the problem from the attempt and its presentation.** Keep generated
+   content distinct from student entries, submitted checks, revealed help,
+   scoring/progression, and document layout. Share lifecycle behavior where it
+   fits while retaining task-specific interactions for explorers and matching.
+3. **Consolidate activity capabilities incrementally.** Build toward stable
+   activity descriptions used by navigation, solve-for, and worksheet selection.
+   Record supported capabilities separately from reviewed/enabled scope; retain
+   the review ledger as evidence rather than treating registration as readiness.
+4. **Keep instructional logic reusable outside a particular UI.** Separate
+   generation, checking, and document rendering from Streamlit display/state
+   handling where those boundaries are touched. No frontend replacement is
+   scheduled. Consider one only against concrete interaction requirements.
+5. **Verify the student's actual experience.** Coverage matrices and tests should
+   check intended branches, displayed givens and precision, feedback, state
+   transitions, and applicable representations. A valid payload or one successful
+   branch is insufficient evidence for a whole family.
 
-## Notes & References
-- Legacy `unit1_practice_doc` still returns a fully-evaluated list; refactor to match callable generator usage.
-- Home page Unicode issue persists and is tracked above under Content & UX.
-- Prior architectural docs (`docs/architecture.md`, `docs/ui.md`) should be refreshed once major UI refactors land.
+Use a simple numerical family, a grouped-quantity family, and a nonnumeric
+activity to test these boundaries during their scheduled work. Extend the model
+from those concrete requirements before attempting a universal migration.
+
+## Active initiative: systematic content and scaffolding rollout
+
+Expand organizing help through bounded problem-family work packages. Each package
+first evaluates content coverage, then connects shared definitions and metadata,
+adds feedback, verifies behavior, and enables only its reviewed scope. Preserve
+explicit student commitment before feedback, independent final-answer submission,
+and consistent Enter/Tab behavior. Missing content is a separate deliverable and
+must not disappear from view when the next family is selected.
+
+The shared foundation is implemented and enabled for Accelerated Motion, Constant
+Speed, Momentum, Wave Properties, Single Resistor, Easy Newton's Second Law, and Energy Basics.
+Wave Properties' period problems and keyboard behavior are teacher-confirmed;
+Easy Newton's Second Law is teacher-confirmed; Energy Basics is the current teacher preview checkpoint. This is
+partial site coverage, not completion of a universal schema migration.
+
+## Ordered near-term queue
+
+Teacher checkpoint (2026-10-13): all four Energy pages are accepted for the current organizing-help scope, including Thermal Mixed. Energy content/difficulty expansion and printed organizers remain later work. The next priority is Projectiles, ahead of the generic rollout order, to support first-time physics students in the accelerated ECE UConn course before their upcoming kinematics exam. Review all three existing projectile families for horizontal/vertical roles, shared versus event-specific times, optional component calculations, sign conventions, displayed-value consistency, and explicit launch/landing geometry. Keep givens distinct from inferred or calculated values and keep explanatory help optional.
+
+Circuit organizing help is now enabled for the two paired Fundamentals activities
+and all five Series and Parallel activities, completing current-electricity
+coverage with Single Resistor. The first component preview is teacher-approved;
+the teacher-approved for the current scope. Broader content/difficulty
+variety and additional circuit components remain later work.
+
+Current teacher preview: Newton's Second Law Medium/Hard now has a first-pass
+multi-step organizer, requested as the concrete experiment for the intermediate-
+values decision. It separates copied givens from calculated supporting values and
+marks net force when it also serves as a final answer. Easy retains its existing
+organizer. Review this prototype before generalizing the pattern to energy or
+circuits; the earlier Easy-only review remains evidence for that bounded scope.
+
+| Order | Work package | Current position | Completion evidence |
+|---|---|---|---|
+| 1 | Establish the rollout process and inventory maintenance | Established; applied to Wave Properties | Existing family review now records eight-form scope, sampling, precision, exclusions, checks, and remaining teacher review; ledger and generated inventory updated |
+| 2 | Wave Properties content completion | Implemented; automated checks passed | Eight forms, four targets, displayed-given precision policy, consistent units/equations; 2,376 displayed-value cases passed |
+| 3 | Wave Properties organizing help | Completed for reviewed scope; teacher checked | Teacher confirmed new period problems and Tab/Enter behavior on 2026-10-12; automated content/interaction checks passed |
+| 4 | Single Resistor review and rollout | Enabled; teacher/browser review pending | All nine target/difficulty branches and 507 curated cases reviewed; shared profile, custom-page lifecycle, diagram/givens agreement, feedback and export checks passed |
+| 5 | Circuit task coherence | Accepted as viable baseline; equation reference completed | Circuit Fundamentals provides Single Resistor plus paired series/parallel current-and-voltage practice; standalone copy-the-given tasks retired; both component answers checked once with individual feedback; duplicate Series Current retired, full Series Voltage Drop moved to Series and Parallel; current/voltage support distinguishes learning focus; old-session recovery and regressions checked. Duplicate Givens panels removed, diagrams widened/spaced, footer controls aligned with standard pages. Additional circuit organizers queued separately; see current_electricity_ohms_law.md |
+| 6 | Simple Newton's Second Law review | Enabled on Easy; teacher checked | Teacher confirmed intended behavior on 2026-10-12. Net force/mass/acceleration organizer for all three targets and Mixed; 300 combinations and routed forms/scoring/transitions checked. Medium/Hard friction branches explicitly excluded; see current_state.md#newtons-second-law-easy-review |
+| 7 | Energy Basics organizing help | Enabled; teacher preview pending | Elastic, kinetic, gravitational energy and work; all 28 available target/level branches, Mixed, 11,820 sampled-value cases, forms, progression, and exports checked. Explicit gravity/reference-height assumptions and flat-ground work prompts; see current_state.md#energy-basics-review |
+| 8 | Intermediate-values design decision | Working pattern established through Forces and circuits | Decide how organizing help distinguishes a value that is not supplied but useful to calculate from one that is irrelevant. Clarify quantity identification versus solution planning, the meaning of the x marker, and any separate intermediate-step support before implementing multi-step families. The current pattern separates Given information from Possible in-between calculations, keeps help optional, and excludes the last requested calculation from the intermediate section. Generalize through subsequent family reviews. |
+| 9 | Circuit organizing help | Enabled throughout Current Electricity; teacher-approved for the current scope | All eight activities covered. Component grouping and optional help retained; intermediate fields only where needed. Seven-activity component suite checks 1,680 cases and 21 routed branches; Single Resistor has separate 507-case coverage. Initial paired/Voltage Drop preview teacher-approved. See current_electricity_series_parallel.md |
+| 10 | Conservation of Energy organizing help | Enabled; teacher preview pending | All three families, both directions, existing targets and all difficulties; additional Mixed problem type samples conversions as well as targets. Stage-grouped givens and optional energy intermediates; 3,600 displayed-value cases across 60 scenario/level branches. Precision and vertical-change wording corrected; see current_state.md#conservation-of-energy-organizer-review |
+| 11 | Thermal Energy organizing help | Enabled; teacher preview pending | Three families, six directions, all 58 existing direction/target/level branches. Optional stage givens and mechanical-energy intermediates; positive thermal/sign labels and displayed-fact answers aligned. 3,480 sampled cases and page/export checks passed. Friction and Distance is next after review; see current_state.md#thermal-energy-organizer-review |
+| 12 | Friction and Distance plus Thermal Mixed | Enabled; teacher preview pending | All 90 Friction/Distance direction/target/level branches, 3,600 displayed-fact cases, stage/path roles and energy intermediates. Thermal Mixed samples all three families/six directions; 360 seeded cases and exports checked. All four Energy pages now have optional organizing help; see current_state.md#friction-and-distance-organizer-review |
+| Later review | Circuit difficulty progression and content variety | Documented; no current expansion | Current levels mainly change curated values/decimal arithmetic, not topology or reasoning. Review varied givens/targets, ratios, conceptual tasks, and configurations separately from organizing help; see current_electricity_series_parallel.md. Teacher accepts the present activities as a viable baseline. |
+| Parallel maintenance | Make organizer regressions mandatory | CI configured; local checks passed | Schema, organizer, Constant Speed, Momentum, Waves, Single Resistor, and inventory checks added; route assertion reconciled to 41; remote CI result pending |
+
+A queue position is not an assessment. Complete each family's intended scope or
+document an explicit, visible exclusion before enabling it; do not invent inverses
+just to make a table symmetric. Wave Properties now supplies the first worked
+example of the rollout process. The initial preference for Newton's Second Law
+was based on scalar-organizer implementation complexity. The teacher's circuit
+review now prioritizes instructional coherence within the current unit: review
+the overlapping tasks. That bounded content split is now implemented. Additional
+relationship/network organizers have an explicit follow-up package in the queue;
+full circuit analysis remains future work. The
+Easy Newton's Second Law package is now teacher-confirmed. Energy Basics is enabled
+for teacher preview; Forces and circuits now provide a working intermediate-values pattern. Conservation of Energy is now enabled for teacher preview; Thermal Energy is also enabled for teacher preview; Friction and Distance is now also enabled for teacher preview.
+
+The later forces review must distinguish applied and net force in Medium/Hard,
+state the horizontal/friction/gravity assumptions used by the solver and equations,
+and assess the numeric-only difficulty progression. It is separate from the
+completed Easy scalar scope and is not silently enabled by that organizer.
+
+## Subsequent rollout waves
+
+1. **Single-object scalar relations:** energy/work, numerical impulse, rotational
+   motion, and simple torque. Define conversions, sign conventions, constants,
+   displayed precision, and difficulty-dependent outputs before migration.
+2. **Grouped quantities:** average/combined journeys, projectiles, relative motion,
+   collisions, and multi-force systems. Build object/axis/stage roles and layouts
+   once a reviewed family supplies concrete requirements.
+3. **Networks and species:** circuit branches/components and stoichiometry need
+   topology/species context and custom-page adapters.
+4. **Other representations:** graphs, rankings, compound naming, algebra, and
+   explorers require a scaffold suited to their learning task. They remain in the
+   inventory; numerical tables are not the default completion criterion.
+5. **Worksheet assistance:** decide independently whether/how organizers belong in
+   printable worksheets and answer keys. Practice support does not imply export
+   support.
+
+## Shared architecture and feedback work
+
+- **Conceptual circuit progression:** later explore building circuits and judging
+  whether depicted circuits provide a closed conducting path. Use clear, deliberate
+  open terminals and junctions; unintended wire tails must not look like branches.
+  Current introductory resistor activities depict complete source/component loops.
+  Extend this teaching model explicitly when additional components require it.
+
+- **Dyslexia accessibility:** reduce unnecessary reading and keep labels concise.
+  Put optional explanations in accessible help controls; preserve essential
+  problem information and review readability and compact layouts on student laptops.
+
+- Extend quantity definitions and role-specific notation incrementally. Preserve
+  displacement x and v_i/v_f conventions; distinguish quantity IDs from x markers.
+- Connect prompt wording, equation symbols, answer labels, units, and target roles
+  to shared definitions. Remove duplicate page equation references during migration.
+- Treat prompt-given values as the source for setup checking; hidden calculated
+  values remain distinct. Include implied facts and actual targets for Mixed cases.
+- Add narrow, testable feedback rules with stable categories and counterexamples.
+  Separate unit/quantity mistakes from initial/final, object, sign, and stage errors.
+  Keep a useful fallback; never claim to infer reasoning solely from a number.
+- Establish displayed precision and per-field unit contracts before reciprocal or
+  converted values expand. Future context-sensitive number generation is separate.
+- Review tab order, Enter behavior, text/icon cues, narrow-screen layouts, and
+  assistive-technology usability on each new layout. Automated tests do not certify
+  accessibility.
+
+## Privacy-preserving feedback-gap reporting: deferred
+
+No collection or notification service is active. A later design may capture only
+unclassified feedback gaps, aggregate repeated patterns, and notify once per new
+pattern. It must use a strict field allowlist, exclude identity/session/device/IP
+and raw free text, set retention, and separate immediate storage from scheduled
+notification. Personal-email routing, hosting logs, service selection, and applicable
+school requirements need an explicit review before implementation. Do not add
+learner tracking as an incidental part of the scaffolding rollout.
+
+## Other continuing initiatives
+
+- **Realistic values and contexts:** subject-appropriate ranges, units, and reusable
+  scenario packs; consistent conversion and precision policies.
+- **Structured solutions and hints:** one source for conceptual steps, substitution,
+  and answers across UI and exports. Circuit incorrect answers retain the worked
+  calculation until explicit progression. Correct answers offer an optional
+  calculation and a five-second cancellable countdown, preserving rapid practice. Next, design staged wrong-answer support
+  (physical relationship, equation choice, substitution, calculation) with useful
+  opportunities to revise before revealing the full solution; do not infer a
+  specific misconception from a numerical answer alone.
+- **Final-answer interaction:** retryable attempts and an explicit Show Answer
+  pathway; keep separate from organizer feedback and current scoring behavior.
+- **Worksheet/export quality:** mixed activity sections, diagrams, physical writing
+  space, pagination, PDF preview, and conversion reliability; preserve reusable
+  question sets when only layout changes.
+- **Correctness and compatibility:** branch-aware physics invariants, unsupported
+  argument checks, custom-layout lifecycle coverage, dependency/startup verification,
+  and Markdown/equation formatting parity.
+- **Performance and maintenance:** rerun-safe timing, lazy nested activity loading,
+  document-rendering separation, portable file handling, and encoding cleanup where
+  verified by a focused review.
+
+## Longer-term proposals (not current implementation commitments)
+
+The direction above is agreed; these implementations remain candidates rather
+than additions to the immediate queue. Promote one bounded pilot at a time after
+its prerequisite content and metadata are ready.
+
+| Candidate | Instructional purpose / implementation boundary |
+|---|---|
+| Focused skill practice | Isolate reading, quantities/units, relationship choice, sign, graph interpretation, or estimation; reconnect the skill to a complete problem. |
+| Supported-to-independent practice pilot | In one reviewed family, offer a guided attempt followed by a related problem with less help available by choice. Review whether students can proceed and explain their next step; completion alone is not mastery evidence. Can begin session-locally without learner accounts. |
+| Deliberately related problems | Vary one condition, the requested quantity, the context, or the representation intentionally; distinguish numerical repetition from transfer to a new situation. |
+| Worked-error analysis and reasonableness | Let students inspect a plausible solution, identify an error, predict a result, or evaluate units and physical bounds before calculating. |
+| Paper/browser problem references | Reopen the exact printed problem for support or discussion. Requires a versioned reproducibility strategy; a seed alone is insufficient when generator behavior changes. |
+| Teacher-curated practice recipes | Describe a skill focus, problem mix, support options, and length, then reuse the recipe with fresh problems across supported media. |
+| Author inspection tools | Preview branches, roles, displayed numbers, and browser/export output together; surface content gaps and reproduce questionable cases. Build on the inventory and author mode. |
+
+The independence pilot does not require completing the site-wide organizer
+migration. Select a ready family, define the specific skill and intended support
+transition, and use teacher/student review before expanding. Record findings in
+that family's existing review rather than introducing a separate strategy file.
+
+Other candidates: reusable context packs, dimensional checks, multi-step problems,
+diagram annotation, partial credit, and localization. Mastery analytics, automatic
+adaptation, persistent learner history, reflection logging, and free-response
+evaluation require separate pedagogical/privacy decisions. They are not implied
+by student-selected support or session-local practice sequences.
+
+## Completed foundations / historical references
+
+Shared route navigation, dict payloads, State helpers, supported-target solve-for
+catalog, stable progress IDs, correctness guardrails, DOCX equations/Markdown,
+student PDF worksheet tooling, and the five-family organizer foundation are in
+place. Earlier detailed fix records remain linked from current_state. Claims that
+validation still needs its original path repair, solve-for is universally absent,
+or all pages share one lifecycle are obsolete; new gaps should be recorded with
+specific evidence and scope.
+
+## Precision-aware numerical grading (future iteration; 2026-10-13)
+
+- Record displayed givens and their rounding precision alongside full-precision
+  values. Evaluate how those rounded inputs affect each requested answer, rather
+  than choosing a tolerance from the answer magnitude alone.
+- Build per-answer tolerances from propagated input-rounding uncertainty, with
+  an explicit policy for student answer rounding. Retain an absolute tolerance
+  near zero, where relative error alone is unsuitable. Keep measurement/rounding
+  allowances distinct from any pedagogical allowance for mistakes.
+- Begin with an Atwood audit: independently solve every target and prompt variant
+  using only the displayed givens; compare with stored answers at the proposed
+  three-decimal display precision. Cover near-balanced forces, small acceleration,
+  inverse mass calculations, and multipart outputs. If rounding makes a case
+  ambiguous or unstable, retain more precision or adjust generation rather than
+  silently granting a very large tolerance.
+- This is deferred work, not an implemented grading change. Current Atwood givens
+  remain at four decimal places until the calculation audit is complete. A full
+  variant audit requires explicit mappings of displayed givens and independent
+  inverse calculations; do not treat a few random examples as sufficient evidence.
+
+### Projectile preview checkpoint (2026-10-13)
+
+The first organizer pass is enabled across Type 1/2/3 and all current targets and
+levels. Preserve these teaching categories; diagrams will provide reminders in a
+separate effort. Horizontal/vertical columns, vector givens and a shared time row
+are ready for teacher review. Screen height on small laptops is the next explicit
+layout decision. Optional hints and distinct given/intermediate values remain the
+established pattern. Displayed-fact calculations and elevated-landing crossing
+consistency were corrected as part of the rollout; see
+[current state](current_state.md#projectile-organizer-first-pass).

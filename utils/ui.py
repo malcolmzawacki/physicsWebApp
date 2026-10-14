@@ -324,6 +324,8 @@ class Interface:
     def question_ui_dict(self, timer: float = 3.0, big_font: bool = False) -> None:
         """Render the free-response form and enforce numeric validation with tolerance."""
         q = self.state.get("current_question")
+        # Plain Markdown does not interpret caret notation as a superscript.
+        q = q.replace("m/s^2", "m/s²").replace("m/s2", "m/s²") if isinstance(q, str) else q
         st.title(q) if big_font else st.write(q)
         if getattr(self, "setup_workspace", False):
             from utils.setup_workspace import render_setup_workspace

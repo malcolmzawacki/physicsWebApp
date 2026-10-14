@@ -129,7 +129,7 @@ ACTIVITIES = {
         "Current Electricity": {
             "min_level": "high",
             "items": {
-                "Circuit Ohm's Law": {
+                "Circuit Fundamentals": {
                     "handler": "file:app_pages/1_3.4_Current_Electricity_Circuits.py::current_electricity_circuits_page",
                     "min_level": "high",
                 },
@@ -174,6 +174,9 @@ if "router_section" not in st.session_state:
     st.session_state.router_section = "root"
 if "router_activity" not in st.session_state:
     st.session_state.router_activity = None
+# Preserve navigation for sessions opened before the activity was renamed.
+if st.session_state.router_activity == "Circuit Ohm's Law":
+    st.session_state.router_activity = "Circuit Fundamentals"
 if "router_group" not in st.session_state:
     st.session_state.router_group = None
 

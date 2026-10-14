@@ -3,11 +3,13 @@ from __future__ import annotations
 import random
 
 from .ohms_law_model import format_answer_value
+from utils.circuit_organizer import circuit_plan, plan_from_case
 
 
 SERIES_PARALLEL_PROBLEM_TYPES: tuple[str, ...] = (
     "Series Equivalent Resistance",
     "Series Total Current",
+    "Series Voltage Drop",
     "Parallel Equivalent Resistance",
     "Parallel Branch Current",
 )
@@ -34,6 +36,10 @@ SERIES_PARALLEL_EQUATION_METADATA = {
             r"R_{\text{total}} = \frac{V}{I}"
         ),
     },
+    "Series Voltage Drop": {
+        "honors": r"R_{\text{total}} = R_1 + R_2 \quad,\quad I = \frac{V_{\text{source}}}{R_{\text{total}}} \quad,\quad V_{\text{component}} = I R_{\text{component}}",
+        "conceptual": r"R_{\text{total}} = R_1 + R_2 \quad,\quad I = \frac{V_{\text{source}}}{R_{\text{total}}} \quad,\quad V_{\text{component}} = I R_{\text{component}}",
+    },
     "Parallel Equivalent Resistance": {
         "honors": r"\frac{1}{R_{\text{eq}}} = \frac{1}{R_1} + \frac{1}{R_2}",
         "conceptual": (
@@ -42,12 +48,17 @@ SERIES_PARALLEL_EQUATION_METADATA = {
         ),
     },
     "Parallel Branch Current": {
-        "honors": r"V_{\text{branch}} = V_{\text{source}} \quad,\quad I = \frac{V}{R}",
+        "honors": (
+            r"\frac{1}{R_{\text{eq}}} = \frac{1}{R_1} + \frac{1}{R_2} \newline",
+            r"V_{\text{branch}} = V_{\text{source}} \quad,\quad I = \frac{V}{R}",
+        ),
         "conceptual": (
-            r"V_{\text{branch}} = V_{\text{source}} \quad,\quad "
+            r"""\frac{1}{R_{\text{eq}}} = \frac{1}{R_1} + \frac{1}{R_2} \quad , \quad
+            R_{\text{eq}} = \frac{R_1 R_2}{R_1 + R_2} \newline""",
+            r"V_{\text{branch}} = V_{\text{source}} \newline",
             r"I = \frac{V}{R} \quad,\quad "
             r"V = IR \quad,\quad "
-            r"R = \frac{V}{I}"
+            r"R = \frac{V}{I}",
         ),
     },
 }
@@ -84,7 +95,7 @@ def _build_series_equivalent_case(difficulty: str) -> dict:
         ),
         "diagram": {
             "kind": "series",
-            "source_label": "? V",
+            "source_label": "",
             "resistor_labels": [f"R1 = {format_answer_value(r1)} ohms", f"R2 = {format_answer_value(r2)} ohms"],
             "wire_label": "",
         },
@@ -150,7 +161,7 @@ def _build_parallel_equivalent_case(difficulty: str) -> dict:
         ),
         "diagram": {
             "kind": "parallel",
-            "source_label": "? V",
+            "source_label": "",
             "resistor_labels": [f"R1 = {format_answer_value(r1)} ohms", f"R2 = {format_answer_value(r2)} ohms"],
             "wire_label": "",
         },
@@ -193,7 +204,8 @@ def _build_parallel_branch_current_case(difficulty: str) -> dict:
             "wire_label": "",
         },
         "answer_label": f"Current through {target_name}",
-        "equations": ("`V_branch = V_source`", "`I = V / R`"),
+        "equations": ("`1 / R_eq = 1 / R1 + 1 / R2`", "`R_eq = R1 R2 / (R1 + R2)`",
+                      "`V_branch = V_source`", "`I = V / R`"),
         "explanation": (
             f"In parallel, each branch gets the full source voltage, so {target_name} has "
             f"{format_answer_value(source_voltage)} V across it. Then use I = V / R: "
@@ -203,13 +215,65 @@ def _build_parallel_branch_current_case(difficulty: str) -> dict:
     }
 
 
+def build_series_voltage_drop_case(difficulty: str) -> dict:
+    if difficulty == "Easy":
+        resistance_pairs = ((2, 4), (3, 6), (4, 8), (5, 10))
+        current = random.randint(1, 3)
+    elif difficulty == "Medium":
+        resistance_pairs = ((3, 9), (4, 12), (5, 15), (6, 18))
+        current = random.choice((0.5, 1.0, 1.5, 2.0))
+    else:
+        resistance_pairs = ((2.5, 7.5), (4.0, 12.0), (5.0, 10.0), (6.0, 15.0))
+        current = random.choice((0.6, 0.8, 1.2, 1.5, 2.4))
+
+    r1, r2 = random.choice(resistance_pairs)
+    source_voltage = (r1 + r2) * current
+    target_index = random.choice((0, 1))
+    target_name = f"R{target_index + 1}"
+    target_resistance = (r1, r2)[target_index]
+    answer = current * target_resistance
+
+    return {
+        "problem_type": "Series Voltage Drop",
+        "organizer": circuit_plan("Source voltage (V)", source_voltage, r1, r2, series=True, steps=(
+            {"id": "Req", "label": "Equivalent resistance (ohms)", "value": r1 + r2, "help": "In series: add R1 and R2."},
+            {"id": "I", "label": "Circuit current (A)", "value": current, "help": "Source voltage ÷ equivalent resistance. This current passes through both resistors."},
+        )),
+        "difficulty": difficulty,
+        "prompt": f"Find the voltage drop across {target_name}.",
+        "answer": answer,
+        "unit": "V",
+        "givens": (
+            ("Battery voltage", f"{format_answer_value(source_voltage)} V"),
+            ("R1", f"{format_answer_value(r1)} ohms"),
+            ("R2", f"{format_answer_value(r2)} ohms"),
+        ),
+        "diagram": {
+            "kind": "series",
+            "source_label": f"{format_answer_value(source_voltage)} V",
+            "resistor_labels": [f"R1 = {format_answer_value(r1)} ohms", f"R2 = {format_answer_value(r2)} ohms"],
+            "wire_label": "",
+        },
+        "answer_label": f"Voltage across {target_name}",
+        "explanation": (
+            f"First find the series current: I = V / R_total = {format_answer_value(source_voltage)} V / "
+            f"{format_answer_value(r1 + r2)} ohms = {format_answer_value(current)} A. "
+            f"Then use V = IR for {target_name}: {format_answer_value(current)} A x "
+            f"{format_answer_value(target_resistance)} ohms = {format_answer_value(answer)} V."
+        ),
+    }
+
+
 def build_series_parallel_case(problem_type: str, difficulty: str) -> dict:
-    if problem_type == "Series Equivalent Resistance":
-        return _build_series_equivalent_case(difficulty)
-    if problem_type == "Series Total Current":
-        return _build_series_total_current_case(difficulty)
-    if problem_type == "Parallel Equivalent Resistance":
-        return _build_parallel_equivalent_case(difficulty)
-    if problem_type == "Parallel Branch Current":
-        return _build_parallel_branch_current_case(difficulty)
-    raise ValueError(f"Unsupported series/parallel problem type: {problem_type}")
+    builders = {
+        "Series Equivalent Resistance": _build_series_equivalent_case,
+        "Series Voltage Drop": build_series_voltage_drop_case,
+        "Series Total Current": _build_series_total_current_case,
+        "Parallel Equivalent Resistance": _build_parallel_equivalent_case,
+        "Parallel Branch Current": _build_parallel_branch_current_case,
+    }
+    if problem_type not in builders:
+        raise ValueError(f"Unsupported series/parallel problem type: {problem_type}")
+    case = builders[problem_type](difficulty)
+    case["organizer"] = plan_from_case(case)
+    return case

@@ -169,12 +169,14 @@ ui.performance_dropdown()
         from xtrct_docs.question_organizer import Org
         from xtrct_docs.document_creator import create_doc
         from utils.problem_adapters import circuit_payload, matching_payload
-        from utils.generators.current_electricity import build_series_parallel_case
+        from utils.generators.current_electricity import build_series_parallel_case, build_circuit_case
         from utils.generators.kinematics.motion_graph_matching_generator import generate_motion_graph_match_payload
         org = Org()
         problems = [org.TG.suspension_question("Hard"), org.AWG.static_half_atwood(),
                     org.DDG.distance_and_displacement_1D("Easy"),
                     circuit_payload(build_series_parallel_case("Parallel Branch Current", "Hard")),
+                    circuit_payload(build_circuit_case("Series Current and Voltage", "Hard")),
+                    circuit_payload(build_circuit_case("Parallel Current and Voltage", "Hard")),
                     matching_payload(generate_motion_graph_match_payload("Position-Time First")),
                     {"question": "Find **speed**.\n\n- Distance: 10 m\n- Time: 2 s\n\nUse $v=\\frac{d}{t}$.",
                      "answers": [5, "East"], "units": ["m/s", "Direction"], "button_options": {1: ["East", "West"]}}]
@@ -183,7 +185,7 @@ ui.performance_dropdown()
         create_doc("Diagram regression", factory, 1, output_path=output, open_document=False)
         output.seek(0)
         doc = Document(output)
-        self.assertGreaterEqual(len(doc.inline_shapes), 5)
+        self.assertGreaterEqual(len(doc.inline_shapes), 7)
         self.assertTrue(doc.element.xpath("//m:oMath/m:f"))
         last = doc.tables[-1].cell(0, 0)
         texts = [p.text for p in last.paragraphs]
@@ -195,11 +197,12 @@ ui.performance_dropdown()
         app = page("Kinematics", "Constant Motion")
         prefix = "const_motion_"
         qid = app.session_state[prefix + "_question_id"]
-        app.text_input[0].set_value("nan")
+        next(i for i in app.text_input if "setup_input" not in i.key).set_value("nan")
         next(b for b in app.button if b.label == "Submit").click().run()
         self.assertFalse(app.session_state[prefix + "_submitted"])
         app.session_state[f"{prefix}_cancel_next_{qid}"] = True
-        for field, answer in zip(app.text_input, app.session_state[prefix + "_correct_answers"]):
+        final_inputs = [i for i in app.text_input if "setup_input" not in i.key]
+        for field, answer in zip(final_inputs, app.session_state[prefix + "_correct_answers"]):
             field.set_value(str(answer))
         next(b for b in app.button if b.label == "Submit").click().run()
         self.assertTrue(app.success)
@@ -286,22 +289,191 @@ ui.unified_smart_layout()
         app.checkbox(key="mixed_cancel_next_1").uncheck().run()
         self.assertEqual(app.session_state["mixed_question_id"], 2)
 
-    def test_circuit_attempts_and_cancellation(self):
-        for activity, prefix in (("Circuit Ohm's Law", "current_electricity"),
+    def test_circuit_learning_focus_cases(self):
+        from utils.generators.current_electricity import (
+            PROBLEM_TYPES, SERIES_PARALLEL_PROBLEM_TYPES,
+            build_circuit_case, build_series_parallel_case,
+        )
+        from utils.problem_adapters import circuit_payload
+        self.assertNotIn("Series Current", PROBLEM_TYPES)
+        self.assertNotIn("Voltage Drop", PROBLEM_TYPES)
+        self.assertIn("Series Voltage Drop", SERIES_PARALLEL_PROBLEM_TYPES)
+        for difficulty in ("Easy", "Medium", "Hard"):
+            for seed in range(120):
+                for kind in PROBLEM_TYPES[1:]:
+                    random.seed(seed)
+                    case = build_circuit_case(kind, difficulty)
+                    givens = dict(case["givens"])
+                    r1, r2 = (float(givens[k].split()[0]) for k in ("R1", "R2"))
+                    if kind == "Series Current and Voltage":
+                        current = float(givens["Shared current"].split()[0])
+                        expected = [current * r1, current * r2]
+                        self.assertNotIn("Battery voltage", givens)
+                        self.assertEqual(case["unit"], "V")
+                    else:
+                        voltage = float(givens["Source voltage"].split()[0])
+                        expected = [voltage / r1, voltage / r2]
+                        self.assertEqual(case["diagram"]["kind"], "parallel")
+                        self.assertEqual(case["unit"], "A")
+                    self.assertEqual(len(case["answer_labels"]), 2)
+                    for answer, value in zip(case["answers"], expected):
+                        self.assertAlmostEqual(answer, value)
+                    self.assertNotIn("setup", case)
+                    payload = payload_from_dict(circuit_payload(case))
+                    self.assertEqual(list(payload.answers), expected)
+                    for resistance, label in zip((r1, r2), case["diagram"]["resistor_labels"]):
+                        self.assertEqual(float(label.split("=")[1].split()[0]), resistance)
+                random.seed(seed)
+                case = build_series_parallel_case("Series Voltage Drop", difficulty)
+                givens = dict(case["givens"])
+                r1, r2 = (float(givens[k].split()[0]) for k in ("R1", "R2"))
+                source = float(givens["Battery voltage"].split()[0])
+                target = case["answer_label"].split()[-1]
+                expected = source / (r1 + r2) * float(givens[target].split()[0])
+                self.assertAlmostEqual(case["answer"], expected)
+                self.assertNotIn("Shared current", givens)
+                self.assertEqual(case["diagram"]["wire_label"], "")
+                payload_from_dict(circuit_payload(case))
+                for kind in ("Series Equivalent Resistance", "Parallel Equivalent Resistance"):
+                    self.assertNotIn("?", build_series_parallel_case(kind, difficulty)["diagram"]["source_label"])
+
+    def test_circuit_focus_routes_and_retired_selection(self):
+        app = page("⚡Electricity⚡", "Circuit Ohm's Law", "Current Electricity")
+        self.assertFalse(app.exception)
+        self.assertEqual(app.session_state["router_activity"], "Circuit Fundamentals")
+        prefix = "current_electricity"
+        app = AppTest.from_file(str(ROOT / "Home.py"), default_timeout=25)
+        app.session_state["nav_level"] = "advanced"
+        app.session_state["router_section"] = "⚡Electricity⚡"
+        app.session_state["router_group"] = "Current Electricity"
+        app.session_state["router_activity"] = "Circuit Fundamentals"
+        app.session_state[prefix + "_problem_type"] = "Series Current"
+        app.session_state[prefix + "_problem_type_select"] = "Series Current"
+        old_qid = 4
+        app.session_state[prefix + "_question_number"] = old_qid
+        app.run()
+        self.assertFalse(app.exception)
+        self.assertEqual(app.session_state[prefix + "_case"]["problem_type"], "Single Resistor")
+        self.assertEqual(app.session_state[prefix + "_question_number"], old_qid + 1)
+        for kind in ("Series Current and Voltage", "Parallel Current and Voltage"):
+            app.selectbox(key=prefix + "_fundamentals_practice_select").select(kind).run()
+            for difficulty in ("Easy", "Medium", "Hard"):
+                app.selectbox(key=prefix + "_difficulty_select").select(difficulty).run()
+                self.assertFalse(app.exception)
+                case = app.session_state[prefix + "_case"]
+                self.assertEqual(case["problem_type"], kind)
+                self.assertTrue(any(e.label == "Organizing help" for e in app.expander))
+                fields = [i for i in app.text_input if "setup_input" not in i.key]
+                self.assertEqual([i.label for i in fields], [f"{label} ({case['unit']})" for label in case["answer_labels"]])
+                before = app.session_state[prefix + "_attempt_count"]
+                next(b for b in app.button if b.label == "Check Answer").click().run()
+                self.assertEqual(app.session_state[prefix + "_attempt_count"], before)
+                self.assertFalse(app.session_state[prefix + "_submitted"])
+                fields = [i for i in app.text_input if "setup_input" not in i.key]
+                fields[0].set_value(str(case["answers"][0]))
+                fields[1].set_value("inf")
+                next(b for b in app.button if b.label == "Check Answer").click().run()
+                self.assertEqual(app.session_state[prefix + "_attempt_count"], before)
+                self.assertFalse(app.session_state[prefix + "_submitted"])
+                app.text_input(key=fields[1].key).set_value("-1")
+                expected_results = [True, False]
+                if difficulty == "Medium":
+                    app.text_input(key=fields[0].key).set_value("-1")
+                    app.text_input(key=fields[1].key).set_value(str(case["answers"][1]))
+                    expected_results = [False, True]
+                next(b for b in app.button if b.label == "Check Answer").click().run()
+                self.assertEqual(app.session_state[prefix + "_last_result"]["field_results"], expected_results)
+                self.assertTrue(app.error)
+                self.assertTrue(all(i.disabled for i in app.text_input if "setup_input" not in i.key))
+                self.assertFalse(any(c.label == "Cancel Next Question" for c in app.checkbox))
+                self.assertTrue(any(i.value == case["explanation"] for i in app.info))
+                app.run()
+                self.assertEqual(app.session_state[prefix + "_attempt_count"], before + 1)
+                next(b for b in app.button if b.label == "New Question (Circuit)").click().run()
+                qid = app.session_state[prefix + "_question_number"]
+                app.session_state[f"{prefix}_cancel_next_{qid}"] = True
+                case = app.session_state[prefix + "_case"]
+                fields = [i for i in app.text_input if "setup_input" not in i.key]
+                self.assertTrue(all(not i.value for i in fields))
+                for field, answer in zip(fields, case["answers"]):
+                    field.set_value(str(round(answer, 2)))
+                correct_before = app.session_state[prefix + "_correct_count"]
+                next(b for b in app.button if b.label == "Check Answer").click().run()
+                self.assertFalse(app.exception)
+                self.assertTrue(app.success)
+                self.assertEqual(app.session_state[prefix + "_last_result"]["field_results"], [True, True])
+                self.assertEqual(app.session_state[prefix + "_attempt_count"], before + 2)
+                self.assertEqual(app.session_state[prefix + "_correct_count"], correct_before + 1)
+                app.run()
+                self.assertEqual(app.session_state[prefix + "_attempt_count"], before + 2)
+                self.assertEqual(app.session_state[prefix + "_question_number"], qid)
+                app.session_state[prefix + "_advance_deadline"] = 0.0
+                app.checkbox(key=f"{prefix}_cancel_next_{qid}").uncheck().run()
+                self.assertEqual(app.session_state[prefix + "_question_number"], qid + 1)
+                self.assertFalse(app.session_state[prefix + "_submitted"])
+                app.run()
+        app = page("⚡Electricity⚡", "Series and Parallel Circuits", "Current Electricity")
+        prefix = "current_electricity_series_parallel"
+        app.selectbox(key=prefix + "_problem_type_select").select("Series Voltage Drop").run()
+        for difficulty in ("Easy", "Medium", "Hard"):
+            app.selectbox(key=prefix + "_difficulty_select").select(difficulty).run()
+            qid = app.session_state[prefix + "_question_number"]
+            app.session_state[f"{prefix}_cancel_next_{qid}"] = True
+            next(i for i in app.text_input if "setup_input" not in i.key).set_value(str(app.session_state[prefix + "_case"]["answer"]))
+            next(b for b in app.button if b.label == "Check Answer").click().run()
+            self.assertFalse(app.exception)
+            self.assertTrue(app.success)
+            self.assertEqual(app.session_state[prefix + "_question_number"], qid)
+
+    def test_circuit_attempts_and_persistent_feedback(self):
+        for activity, prefix in (("Circuit Fundamentals", "current_electricity"),
                 ("Series and Parallel Circuits", "current_electricity_series_parallel")):
             app = page("⚡Electricity⚡", activity, "Current Electricity")
+            self.assertFalse(any("#### Givens" in m.value for m in app.markdown))
+            self.assertTrue(app.get("imgs"))
+            self.assertEqual(sum(b.label == "New Question (Circuit)" for b in app.button), 1)
+            self.assertFalse(any(b.label in ("New Circuit", "Next Circuit") for b in app.button))
+            self.assertTrue(any(e.label == "Your Performance" for e in app.expander))
             qid = app.session_state[prefix + "_question_number"]
-            app.text_input[0].set_value("inf")
+            next(i for i in app.text_input if "setup_input" not in i.key).set_value("inf")
             next(b for b in app.button if b.label == "Check Answer").click().run()
             self.assertEqual(app.session_state[prefix + "_attempt_count"], 0)
             app.session_state[f"{prefix}_cancel_next_{qid}"] = True
-            app.text_input[0].set_value(str(app.session_state[prefix + "_case"]["answer"]))
+            next(i for i in app.text_input if "setup_input" not in i.key).set_value(str(app.session_state[prefix + "_case"]["answer"]))
             next(b for b in app.button if b.label == "Check Answer").click().run()
             app.run()
             self.assertEqual(app.session_state[prefix + "_attempt_count"], 1)
             self.assertTrue(app.success)
+            self.assertEqual(app.session_state[prefix + "_question_number"], qid)
+            calculation = next(e for e in app.expander if e.label == "View calculation")
+            self.assertFalse(calculation.proto.expanded)
+            self.assertTrue(any(app.session_state[prefix + "_case"]["explanation"] == i.value for i in app.info))
+            self.assertTrue(app.checkbox(key=f"{prefix}_cancel_next_{qid}").value)
+            message = app.session_state[prefix + "_last_result"]["message"]
+            self.assertTrue(any(i.value == message for i in app.success))
+            app.run()
+            self.assertEqual(app.session_state[prefix + "_last_result"]["message"], message)
+            app.session_state[prefix + "_advance_deadline"] = 0.0
             app.checkbox(key=f"{prefix}_cancel_next_{qid}").uncheck().run()
             self.assertEqual(app.session_state[prefix + "_question_number"], qid + 1)
+            app.run()
+            self.assertFalse(any(e.label == "View calculation" for e in app.expander))
+            qid += 1
+            next(i for i in app.text_input if "setup_input" not in i.key).set_value("-1")
+            next(b for b in app.button if b.label == "Check Answer").click().run()
+            from utils.word_lists import error_messages
+            self.assertIn(app.session_state[prefix + "_last_result"]["message"], error_messages)
+            self.assertFalse(any(c.label == "Cancel Next Question" for c in app.checkbox))
+            explanation = app.session_state[prefix + "_case"]["explanation"]
+            self.assertTrue(any(i.value == explanation for i in app.info))
+            self.assertFalse(any(e.label == "View calculation" for e in app.expander))
+            app.run()
+            self.assertEqual(app.session_state[prefix + "_question_number"], qid)
+            self.assertEqual(app.session_state[prefix + "_attempt_count"], 2)
+            self.assertTrue(any(i.value == explanation for i in app.info))
+            next(b for b in app.button if b.label == "New Question (Circuit)").click().run()
+            self.assertEqual(app.session_state[prefix + "_question_number"], qid + 1)
+            self.assertFalse(any(i.value == explanation for i in app.info))
 
 
 if __name__ == "__main__":

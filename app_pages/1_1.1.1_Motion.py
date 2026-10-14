@@ -94,4 +94,4 @@ def projectiles():
     title = "Projectiles"
     prefix = "projectiles"
     ui = interface(prefix, title, generator, metadata, difficulties)
-    ui.unified_smart_layout()
+    ui.unified_smart_layout(setup_workspace=True)

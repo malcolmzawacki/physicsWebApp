@@ -60,7 +60,7 @@ def inventory():
     from utils.generators.current_electricity.ohms_law_model import PROBLEM_TYPES
     from utils.generators.current_electricity.series_parallel_model import SERIES_PARALLEL_PROBLEM_TYPES
     from utils.worksheet_ui import UNIT_ACTIVITIES, ACTIVITIES
-    custom = {**CUSTOM, "Circuit Ohm's Law": list(PROBLEM_TYPES),
+    custom = {**CUSTOM, "Circuit Fundamentals": list(PROBLEM_TYPES),
               "Series and Parallel Circuits": list(SERIES_PARALLEL_PROBLEM_TYPES)}
     rows = []
     for trail, entry in routes():

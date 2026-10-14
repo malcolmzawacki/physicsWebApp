@@ -103,6 +103,24 @@ def equation_controls(generator, problem_type, state, checkbox_key, fallback_dic
         show_equations_expander(generator, problem_type, level, fallback_dict, expanded)
 
 
+def render_calculation_feedback(explanation: str, answer: str, unit: str, *, is_correct: bool,
+                                message: str | None = None) -> None:
+    """Keep worked feedback readable; correct answers show it only on request.
+
+    The caller owns scoring and progression. This renderer neither
+    starts a timer nor records an attempt when the result is rendered again.
+    """
+    if is_correct:
+        st.success(message or "Correct.")
+        with st.expander("View calculation", expanded=False):
+            st.info(explanation)
+            st.caption(f"Expected answer: {answer} {unit}")
+    else:
+        st.error(message or "Not quite.")
+        st.info(explanation)
+        st.caption(f"Expected answer: {answer} {unit}")
+
+
 def show_equations_expander(
     generator: object,
     problem_type: str,

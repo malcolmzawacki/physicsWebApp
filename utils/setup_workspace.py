@@ -12,6 +12,18 @@ def render_setup_workspace(state):
         state.set("setup_submission", None)
         state.set("setup_draft", None)
     payload = state.get("payload")
+    if payload and payload.extras.get("projectile_plan"):
+        from utils.projectile_workspace import render_projectile_workspace
+        render_projectile_workspace(state, payload.extras["projectile_plan"], question_id)
+        return
+    if payload and payload.extras.get("energy_plan"):
+        from utils.energy_workspace import render_energy_workspace
+        render_energy_workspace(state, payload.extras["energy_plan"], question_id)
+        return
+    if payload and payload.extras.get("force_plan"):
+        from utils.force_plan_workspace import render_force_plan
+        render_force_plan(state, payload.extras["force_plan"], question_id)
+        return
     setup = payload.extras.get("setup") if payload else None
     if setup is None:
         return

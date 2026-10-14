@@ -1,9 +1,11 @@
-# utils/generators/collision_generator.py
+# Newton's second law: scalar net-force cases and legacy friction branches.
 import random
 
 from utils.generators.base_generator import BaseGenerator
 
 from utils.word_lists import random_noun
+from utils.quantities import PROFILES, QUANTITIES, equation
+from utils.setup_schema import make_setup
 
 class ForceGenerator(BaseGenerator):
     def __init__(self):
@@ -27,28 +29,32 @@ class ForceGenerator(BaseGenerator):
         m, a, netForce, mu, appliedForce = self.numbers(range)
         object1 = random_noun()
         if difficulty == "Easy":
-
-            flip = random.randint(1,3) if variant is None else variant
-            if flip == 1: # find acceleration
-                 question = f"""A net force of {netForce:.2f} Newtons accelerates a {m:.2f} kg {object1}.
-                 What is the resulting acceleration?"""
-                 answer = [a]
-                 unit = [f"{object1} acceleration (m/s2)"]
-            elif flip == 2: # find net force
-                question = f"""A {m:.2f} kg {object1} accelerates at {a:.2f} m/s2.
-                What net Force caused this?"""
-                answer = [netForce]
-                unit = [f"Net Force on {object1} (N)"]
-            else: #flip = 3, find mass
-                question = f"""A net force of {netForce:.2f} Newtons accelerates a {object1} at {a:.2f} m/s2.
-                What is the mass of the {object1}?"""
-                answer = [m]
-                unit = [f"{object1} mass (kg)"]
+            flip = random.randint(1, 3) if variant is None else variant
+            if flip not in (1, 2, 3):
+                raise ValueError("Newton's Second Law requires variant 1, 2, or 3")
+            target = {1: "a", 2: "Fnet", 3: "m"}[flip]
+            roles = PROFILES["newtons_second_law"]
+            values = {"Fnet": netForce, "m": m, "a": a}
+            units = {key: QUANTITIES[role.quantity].unit for key, role in roles.items()}
+            if target == "a":
+                question = (f"A net force of {netForce:.2f} {units['Fnet']} acts on a {m:.2f} {units['m']} {object1}. "
+                            "What is the resulting acceleration?")
+            elif target == "Fnet":
+                question = (f"A {m:.2f} {units['m']} {object1} accelerates at {a:.2f} {units['a']}. "
+                            "What is the net force on it?")
+            else:
+                question = (f"A net force of {netForce:.2f} {units['Fnet']} accelerates a {object1} at {a:.2f} {units['a']}. "
+                            f"What is the mass of the {object1}?")
+            return {
+                "question": question, "answers": [values[target]],
+                "units": [f"{roles[target].name} ({units[target]})"],
+                "extras": {"setup": make_setup("newtons_second_law", values, set(values) - {target}, [target])},
+            }
 
         else:
             flip = random.randint(1,3) if variant is None else variant
             if flip == 1: # find friction, mu
-                question = f"""A {appliedForce:.2f} Newton force accelerates a {m:.2f} kg {object1} at {a:.2f} m/s2.
+                question = f"""A {appliedForce:.2f} Newton force accelerates a {m:.2f} kg {object1} at {a:.2f} m/s².
                 What is the net force on {object1}? What is the coefficient of friction?"""
                 answer = [netForce, mu]
                 unit = [f"Net Force (N)",f"coefficient of friction"]
@@ -58,17 +64,28 @@ class ForceGenerator(BaseGenerator):
                  coefficient of friction of {mu:.2f} .
                 What is the net force on {object1}? What is the resulting acceleration?"""
                 answer = [netForce, a]
-                unit = [f"Net Force (N)",f"acceleration (m/s2)"]
+                unit = [f"Net Force (N)",f"acceleration (m/s²)"]
 
             else: # flip == 3, find applied force
-                question = f"""A {m:.2f} kg {object1} accelerates at {a:.2f} m/s2 
+                question = f"""A {m:.2f} kg {object1} accelerates at {a:.2f} m/s²
                 over a surface with a coefficient of friction of {mu:.2f} .
                 What is the net force on {object1}? What applied force produced this acceleration?"""
                 answer = [netForce, appliedForce]
                 unit = [f"Net Force (N)",f"Applied Force (N)"]
 
     
-        return {"question": question, "answers": answer, "units": unit}
+        question += " The object slides on level ground, with a horizontal applied force in the direction of motion."
+        given = {"Mass (kg)": m, "Applied force (N)": appliedForce, "Acceleration (m/s²)": a} if flip == 1 else {"Mass (kg)": m, "Applied force (N)": appliedForce, "Coefficient of friction": mu} if flip == 2 else {"Mass (kg)": m, "Acceleration (m/s²)": a, "Coefficient of friction": mu}
+        steps = [{"label": "Normal force (N)", "hint": "Level ground: normal force = mass × g.", "answer": m * 10}]
+        if flip == 1:
+            steps.append({"label": "Net force (N)", "hint": "Use mass × acceleration. This is also your first final answer.", "answer": netForce})
+            steps.append({"label": "Friction force (N)", "hint": "Applied force − net force.", "answer": appliedForce - netForce})
+        else:
+            steps.append({"label": "Friction force (N)", "hint": "Coefficient of friction × normal force.", "answer": appliedForce - netForce})
+            if flip == 3:
+                steps.append({"label": "Net force (N)", "hint": "Use mass × acceleration. This is also your first final answer.", "answer": netForce})
+        return {"question": question, "answers": answer, "units": unit,
+                "extras": {"force_plan": {"given": given, "steps": steps, "targets": unit}}}
         
 
         
@@ -82,8 +99,7 @@ class ForceGenerator(BaseGenerator):
             "Newton's Second Law": {
                       "id": "force.newton-s-second-law",
                       "aliases": ["Newton's Second Law"],
-                      "honors": r"""
-                      \Sigma F \;=\; ma""",
+                      "honors": equation("newtons_second_law", r"${Fnet} \;=\; ${m}${a}"),
 
                       "conceptual": r""" 
                       \Sigma F \;=\; m \cdot a \quad , \quad 

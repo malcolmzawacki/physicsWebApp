@@ -306,3 +306,53 @@ use tight image cropping, which would undo these physical size constraints.
 tables and their labels while preserving diagrams, chosen writing space, and
 the optional answer key. It is a layout-only setting: Update layout reuses the
 same generated questions. Graph multiple-choice options are unaffected.
+
+## Atwood insets
+
+**Include compact diagrams** now applies to both Tension and Atwood Machines.
+Atwood uses the same fixed print canvas and layout-only update behavior.
+The generator supplies `worksheet_diagram_data` separately from practice
+`diagram_data`: only values explicitly present in the chosen prompt may be
+numeric in the worksheet diagram. Undisclosed masses and friction coefficients
+use symbols. Frictionless prompts can omit a non-target mass; the selected
+authored template determines which masses are disclosed. Do not substitute the
+full practice diagram data, since that would reveal additional givens/answers.
+The inset shows a horizontal table, pulley, string and hanging mass. All three
+current half-Atwood problem types are supported.
+
+## Compact section controls (2026-10-13)
+
+Each section uses two three-column rows: Activity / Problem type / Difficulty,
+then Solve for / Question count / Writing space. A short options row contains
+answer boxes, optional diagrams where supported, and Remove section. Required
+motion graphs remain included. A worksheet outline above the sections shows
+activities, types, counts and the total against the shared 20-question cap.
+Answer key remains document-wide.
+
+Layout settings are stored separately from question requests and paired with
+sections only at render time. Changing any section's spacing, diagrams or answer
+boxes uses Update layout with the existing questions. Section IDs preserve each
+remaining section's controls when another is removed. `render_document` retains
+its legacy document-wide defaults for direct callers and accepts an optional
+`section_layouts` sequence; the exporter uses section `answer_boxes` overrides.
+
+The builder now offers **Less writing space** (default, 0.25 inches) and **More
+writing space** (1 inch). The old Standard spacing remains supported by direct
+export callers, but is not offered in the student UI. The final-answer support
+is labeled **Show labeled boxes for final answers**, explained alongside the
+control, and remains enabled by default.
+
+## Printable organizing help
+
+Each section offers **Include organizing help**, off by default. This is a
+layout-only option; it reuses generated questions. Quantity organizers read the
+same setup profiles used in browser practice. Projectile/energy and force plans
+reuse their field and intermediate-step labels. Only blank fields are printed:
+no givens, role statuses, solved values, or feedback are filled in. Activities
+without dedicated metadata use a general Known information / Find /
+Relationship-plan grid, identified in the checkbox help text.
+
+Paper grids use three compact columns, nine-point labels and single-line blanks.
+Student final-answer rows shrink from 0.5 to 0.32 inches with paragraph spacing
+removed. These remain independent options from the answer key and writing space.
+The instructor exporter keeps its legacy default table spacing.

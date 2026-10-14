@@ -1,27 +1,33 @@
 """Shared circuit geometry for interactive and printable diagrams."""
 
 def draw_series(drawing, elm, diagram: dict) -> None:
+    drawing.config(fontsize=11)
     battery_cls = getattr(elm, "BatteryCell", getattr(elm, "Battery", None))
     if battery_cls is None:
         raise RuntimeError("schemdraw battery element was not available")
-    battery = drawing.add(battery_cls().up().label(diagram["source_label"], loc="left"))
-    top_wire = elm.Line().right().length(0.9)
+    source_label = diagram["source_label"]
+    battery = drawing.add(battery_cls().up().label("" if source_label == "Ideal source" else source_label, loc="left"))
+    # Keep the current annotation on its own lead, away from resistor labels.
+    top_wire = elm.Line().right().length(2.4)
     if diagram["wire_label"]:
         top_wire = top_wire.label(diagram["wire_label"], loc="top")
     drawing.add(top_wire)
     for resistor_label in diagram["resistor_labels"]:
         drawing.add(elm.Resistor().right().label(resistor_label))
-        drawing.add(elm.Line().right().length(0.9))
-    drawing.add(elm.Line().down().length(2.0))
-    drawing.add(elm.Line().tox(battery.start))
-    drawing.add(elm.Line().toy(battery.start))
+        drawing.add(elm.Line().right().length(1.2))
+    # Return at the source terminal's height, rather than joining its lead
+    # partway up and leaving a misleading dead-end tail below the junction.
+    drawing.add(elm.Line().down().toy(battery.start))
+    drawing.add(elm.Line().to(battery.start))
 
 
 def draw_parallel(drawing, elm, diagram: dict) -> None:
+    drawing.config(fontsize=11)
     battery_cls = getattr(elm, "BatteryCell", getattr(elm, "Battery", None))
     if battery_cls is None:
         raise RuntimeError("schemdraw battery element was not available")
-    battery = drawing.add(battery_cls().up().label(diagram["source_label"], loc="left"))
+    source_label = diagram["source_label"]
+    battery = drawing.add(battery_cls().up().label("" if source_label == "Ideal source" else source_label, loc="left"))
     drawing.add(elm.Line().right().length(2.6))
     drawing.push()
     r1 = drawing.add(elm.Resistor().down().label(diagram["resistor_labels"][0], loc="left"))

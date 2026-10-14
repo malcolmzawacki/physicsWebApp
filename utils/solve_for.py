@@ -2,7 +2,7 @@
 
 The checked-in catalog describes existing question branches, not inferred algebra.
 Target IDs are permanent within a generator/problem type. Unsupported targets fail
-before generation; selecting mixed preserves the legacy sampling distribution.
+before generation; selecting mixed uses the family's declared sampling policy.
 """
 import json
 import random
@@ -58,4 +58,4 @@ def select_target(generator, problem_type, difficulty, state, *, key="solve_for_
     if st.session_state.get(widget_key) not in labels:
         st.session_state[widget_key] = MIXED
     return st.selectbox("Solve for", list(labels), format_func=labels.get, key=widget_key,
-                        help="Available targets follow this problem type and difficulty.")
+                        help="Choose which quantity to find. Leave Mixed practice selected to vary it. Available quantities depend on the problem type and difficulty.")

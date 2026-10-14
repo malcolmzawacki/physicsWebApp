@@ -6,7 +6,12 @@ Generator-based activities declare the same id/aliases fields in stored_metadata
 CUSTOM_PROGRESS = {
     "electricity.ohm.single-resistor": {"label": "Single Resistor", "aliases": ["Single Resistor"]},
     "electricity.ohm.series-current": {"label": "Series Current", "aliases": ["Series Current"]},
-    "electricity.ohm.voltage-drop": {"label": "Voltage Drop", "aliases": ["Voltage Drop"]},
+    "electricity.ohm.voltage-drop": {"label": "Series Voltage Drop", "aliases": ["Voltage Drop", "Series Voltage Drop"]},
+    "electricity.fundamentals.shared-current": {"label": "Shared Current (Series)", "aliases": []},
+    "electricity.fundamentals.component-voltage": {"label": "Component Voltage (Series)", "aliases": []},
+    "electricity.fundamentals.branch-voltage": {"label": "Branch Voltage (Parallel)", "aliases": []},
+    "electricity.fundamentals.series-current-voltage": {"label": "Series Current and Voltage", "aliases": []},
+    "electricity.fundamentals.parallel-current-voltage": {"label": "Parallel Current and Voltage", "aliases": []},
     "electricity.series.resistance": {"label": "Series Equivalent Resistance", "aliases": ["Series Equivalent Resistance"]},
     "electricity.series.current": {"label": "Series Total Current", "aliases": ["Series Total Current"]},
     "electricity.parallel.resistance": {"label": "Parallel Equivalent Resistance", "aliases": ["Parallel Equivalent Resistance"]},

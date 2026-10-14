@@ -3,6 +3,8 @@ from random import randint as ri
 from utils.generators.base_generator import BaseGenerator
 
 from utils.word_lists import random_noun
+from utils.quantities import PROFILES, QUANTITIES, equation
+from utils.setup_schema import make_setup
 
 class EnergyBasicsGenerator(BaseGenerator):
   def __init__(self):
@@ -52,93 +54,81 @@ class EnergyBasicsGenerator(BaseGenerator):
       return force, distance, force*distance
 
 
-  # # # B A S I C    E N E R G Y    P R 0 B L E M S # # # 
-  def elastic_problem(self,difficulty, *, variant=None):
-      spring_constant, compression, elastic_e = self.elastic_potential_energy(difficulty)
-      q_type = ri(0,2) if variant is None else variant
-      dirn = ri(0,1)
-      dirn_string = "compressed" if dirn == 0 else "stretched"
-      if q_type == 0 or difficulty == "Easy":
-          question = f"""A spring with strength {spring_constant:.2f} N/m is {dirn_string} by {compression:.2f} meters.
-          \n What is the amount of elastic potential energy held in the spring?"""
-          answer = elastic_e
-          unit = "Elastic Potential Energy (Joules)"
-      elif q_type == 1:
-          question = f"""A spring with strength {spring_constant:.2f} N/m contains {elastic_e} Joules of elastic potential energy.
-          \n How much was this spring {dirn_string}?"""
-          answer = compression
-          unit = "Compression Distance (meters)"
-      else:
-          question = f"""A spring is {dirn_string} by {compression:.2f} meters, and contains {elastic_e} Joules of elastic potential energy.
-          \n What is the strength of the spring constant?"""
-          answer = spring_constant
-          unit = "Spring Strength (N/m)"
+  @staticmethod
+  def _target(difficulty, variant, targets):
+      choice = ri(0, 2) if variant is None else variant
+      if choice not in (0, 1, 2):
+          raise ValueError("Energy Basics requires variant 0, 1, or 2")
+      return targets[0 if difficulty == "Easy" else choice]
 
-      return {"question": question, "answers": [answer], "units": [unit]}
-  
-  def kinetic_problem(self,difficulty, *, variant=None):
-      mass, velocity, kinetic_e = self.kinetic_energy(difficulty)
-      q_type = ri(0,2) if variant is None else variant
+  @staticmethod
+  def _shown(profile, values):
+      return {key: f"{value:.2f} {QUANTITIES[PROFILES[profile][key].quantity].unit}"
+              for key, value in values.items()}
+
+  @staticmethod
+  def _payload(profile, values, target, question):
+      role = PROFILES[profile][target]
+      return {"question": question, "answers": [values[target]],
+              "units": [f"{role.name} ({QUANTITIES[role.quantity].unit})"],
+              "extras": {"setup": make_setup(profile, values, set(values) - {target}, [target])}}
+
+  def elastic_problem(self, difficulty, *, variant=None):
+      k, x, energy = self.elastic_potential_energy(difficulty)
+      values = {"E": energy, "k": k, "x": x}
+      target = self._target(difficulty, variant, ("E", "x", "k"))
+      direction = "compressed" if ri(0, 1) == 0 else "stretched"
+      shown = self._shown("elastic_energy", values)
+      if target == "E":
+          question = f"An ideal spring with spring constant {shown['k']} is {direction} by {shown['x']} from its relaxed length. How much elastic potential energy does it store?"
+      elif target == "x":
+          question = f"An ideal spring with spring constant {shown['k']} stores {shown['E']} of elastic potential energy. How far is it {direction} from its relaxed length?"
+      else:
+          question = f"An ideal spring is {direction} by {shown['x']} from its relaxed length and stores {shown['E']} of elastic potential energy. What is its spring constant?"
+      return self._payload("elastic_energy", values, target, question)
+
+  def kinetic_problem(self, difficulty, *, variant=None):
+      mass, speed, energy = self.kinetic_energy(difficulty)
+      values = {"E": energy, "m": mass, "v": speed}
+      target = self._target(difficulty, variant, ("E", "v", "m"))
       noun = random_noun()
-      if q_type == 0 or difficulty == "Easy":
-          question = f"""How much kinetic energy does a {mass:.2f} kg {noun} moving at {velocity:.2f} m/s have?"""
-          answer = kinetic_e
-          unit = "Kinetic Energy (Joules)"
-      elif q_type == 1:
-          question = f"""How fast would a {mass:.2f} kg {noun} have to move to have {kinetic_e} Joules of kinetic energy?"""
-          answer = velocity
-          unit = "Velocity (m/s)"
+      shown = self._shown("kinetic_energy", values)
+      if target == "E":
+          question = f"A {shown['m']} {noun} moves at a speed of {shown['v']}. What is its kinetic energy?"
+      elif target == "v":
+          question = f"A {shown['m']} {noun} has {shown['E']} of kinetic energy. What is its speed?"
       else:
-          question = f"""How much mass would a {noun} moving at {velocity:.2f} m/s need to have to contain {kinetic_e} Joules of kinetic energy?"""
-          answer = mass
-          unit = "Mass (kilograms)"
+          question = f"A {noun} moves at a speed of {shown['v']} and has {shown['E']} of kinetic energy. What is its mass?"
+      return self._payload("kinetic_energy", values, target, question)
 
-      return {"question": question, "answers": [answer], "units": [unit]}
-  
-  def gravitational_problem(self,difficulty, *, variant=None):
-      mass, height, gravit_e = self.gravitational_potential_energy(difficulty)
-      q_type = ri(0,2) if variant is None else variant
+  def gravitational_problem(self, difficulty, *, variant=None):
+      mass, height, energy = self.gravitational_potential_energy(difficulty)
+      values = {"E": energy, "m": mass, "g": 10, "h": height}
+      target = self._target(difficulty, variant, ("E", "h", "m"))
       noun = random_noun()
-      if q_type == 0 or difficulty == "Easy":
-          question = f"""How much gravitational potential energy does a {mass:.2f} kg {noun} 
-          held {height:.2f} meters above the ground have?"""
-          answer = gravit_e
-          unit = "Gravitational Potential Energy (Joules)"
-      elif q_type == 1:
-          question = f"""How high up would a {mass:.2f} kg {noun} have to be to have 
-          {gravit_e} Joules of gravitational potential energy?"""
-          answer = height
-          unit = "Height (meters)"
+      shown = self._shown("gravitational_energy", values)
+      if target == "E":
+          question = f"A {shown['m']} {noun} is {shown['h']} above the ground. What is its gravitational potential energy?"
+      elif target == "h":
+          question = f"A {shown['m']} {noun} has {shown['E']} of gravitational potential energy. How high is it above the ground?"
       else:
-          question = f"""How much mass would a {noun} at a height of {height:.2f} meters need to have 
-          to contain {gravit_e} Joules of gravitational potential energy?"""
-          answer = mass
-          unit = "Mass (kilograms)"
+          question = f"A {noun} is {shown['h']} above the ground and has {shown['E']} of gravitational potential energy. What is its mass?"
+      question += f" Use g = {shown['g']} and take gravitational potential energy to be zero at ground level."
+      return self._payload("gravitational_energy", values, target, question)
 
-      return {"question": question, "answers": [answer], "units": [unit]}
-  
-  def work_problem(self,difficulty, *, variant=None):
+  def work_problem(self, difficulty, *, variant=None):
       force, distance, work = self.work(difficulty)
-      q_type = ri(0,2) if variant is None else variant
+      values = {"W": work, "F": force, "d": distance}
+      target = self._target(difficulty, variant, ("W", "d", "F"))
       noun = random_noun()
-      if q_type == 0 or difficulty == "Easy":
-          question = f"""A {noun} is moved {distance:.2f} meters by a {force} Newton force. 
-          \n How much work was done?"""
-          answer = work
-          unit = "Work (Joules)"
-      elif q_type == 1:
-          question = f"""Over how much distance would a {force} Newton force 
-          have to push a {noun} before it did {work} Joules of work?"""
-          answer = distance
-          unit = "Distance (meters)"
+      shown = self._shown("work", values)
+      if target == "W":
+          question = f"A constant {shown['F']} force moves a {noun} {shown['d']} across flat ground. How much work does this force do?"
+      elif target == "d":
+          question = f"A constant {shown['F']} force does {shown['W']} of work moving a {noun} across flat ground. How far does it move?"
       else:
-          question = f"""{work} Joules of work are done on a {noun} over a distance of {distance:.2f} meters.
-          \n How much force was applied?"""
-          answer = force
-          unit = "Force (Newtons)"
-
-      return {"question": question, "answers": [answer], "units": [unit]}
-  
+          question = f"A constant force does {shown['W']} of work moving a {noun} {shown['d']} across flat ground. What is the force?"
+      return self._payload("work", values, target, question)
 
   # # # I N T E R F A C E  W I T H   R E N D E R E R # # # 
   def choose_problem_dict(self,problem_type, difficulty):
@@ -153,38 +143,19 @@ class EnergyBasicsGenerator(BaseGenerator):
       
   
   def stored_metadata(self) -> dict[str, dict]:
-        """Return metadata mapping for this generator."""
-        return {
-           "Elastic Potential Energy": {
-                "id": "energy-basics.elastic-potential-energy",
-                "aliases": ["Elastic Potential Energy"],
-                "honors" : r"EPE = \frac{1}{2} k \Delta x^2", 
-                "conceptual": r"""EPE = \frac{1}{2} k \Delta x^2 \;\; , 
-                \;\; k = \frac{2 \cdot EPE}{\Delta x^2} \;\; , 
-                \;\; \Delta x = \sqrt{\frac{2 \cdot EPE}{k}}"""
-                },
-            "Kinetic Energy": {
-                "id": "energy-basics.kinetic-energy",
-                "aliases": ["Kinetic Energy"],
-                "honors": r"KE = \frac{1}{2} m v^2",
-                "conceptual": r"""KE = \frac{1}{2} m v^2\;\; ,
-                \;\; m = \frac{2KE}{v^2} \;\; ,
-                \;\; v = \sqrt{\frac{2KE}{m}}"""
-            },               
-            "Gravitational Potential Energy" : {
-                "id": "energy-basics.gravitational-potential-energy",
-                "aliases": ["Gravitational Potential Energy"],
-                "honors": r"GPE = mgh",
-                "conceptual": r"""GPE = mgh\;\; ,
-                \;\; m = \frac{GPE}{gh} \;\; ,
-                \;\; h = \frac{GPE}{mg}"""
-            },
-            "Work": {
-                "id": "energy-basics.work",
-                "aliases": ["Work"],
-                "honors": r"W = Fd",
-                "conceptual": r"""W = Fd\;\; ,
-                \;\; F = \frac{W}{d} \;\; ,
-                \;\; d = \frac{W}{F}"""
-            },
-        }
+      definitions = (
+          ("Elastic Potential Energy", "elastic-potential-energy", "elastic_energy",
+           r"${E} = \frac{1}{2}${k}${x}^2",
+           r"${E} = \frac{1}{2}${k}${x}^2 \quad,\quad ${k} = \frac{2${E}}{${x}^2} \quad,\quad ${x} = \sqrt{\frac{2${E}}{${k}}}"),
+          ("Kinetic Energy", "kinetic-energy", "kinetic_energy",
+           r"${E} = \frac{1}{2}${m}${v}^2",
+           r"${E} = \frac{1}{2}${m}${v}^2 \quad,\quad ${m} = \frac{2${E}}{${v}^2} \quad,\quad ${v} = \sqrt{\frac{2${E}}{${m}}}"),
+          ("Gravitational Potential Energy", "gravitational-potential-energy", "gravitational_energy",
+           r"${E} = ${m}${g}${h}",
+           r"${E} = ${m}${g}${h} \quad,\quad ${m} = \frac{${E}}{${g}${h}} \quad,\quad ${h} = \frac{${E}}{${m}${g}}"),
+          ("Work", "work", "work", r"${W} = ${F}${d}",
+           r"${W} = ${F}${d} \quad,\quad ${F} = \frac{${W}}{${d}} \quad,\quad ${d} = \frac{${W}}{${F}}"),
+      )
+      return {name: {"id": "energy-basics." + identity, "aliases": [name],
+                     "honors": equation(profile, main), "conceptual": equation(profile, expanded)}
+              for name, identity, profile, main, expanded in definitions}

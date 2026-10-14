@@ -80,7 +80,7 @@ class SolveForTests(unittest.TestCase):
             (ForceGenerator(), "Newton's Second Law", 'Hard', 'numbers', (4, 3, 12, .2, 20),
              {'Net Force and coefficient of friction': [12, .2], 'Net Force and acceleration': [12, 3], 'Net Force and Applied Force': [12, 20]}),
             (EnergyBasicsGenerator(), 'Kinetic Energy', 'Hard', 'kinetic_energy', (4, 5, 50),
-             {'Kinetic Energy': [50], 'Velocity': [5], 'Mass': [4]}),
+             {'Kinetic Energy': [50], 'Speed': [5], 'Mass': [4]}),
         ]
         for generator, kind, level, method, values, expected in cases:
             with patch.object(generator, method, return_value=values):
@@ -90,7 +90,7 @@ class SolveForTests(unittest.TestCase):
         for option in target_options(generator, 'Wave Properties', 'Easy'):
             with patch('utils.generators.waves_generator.ri', side_effect=[4, 5]):
                 result = generate_selected(generator, 'Wave Properties', 'Easy', option['id'])
-            self.assertEqual(result['answers'], [{'Wave Speed':20, 'Wavelength':5, 'Frequency':4}[option['label']]])
+            self.assertEqual(result['answers'], [{'Wave Speed':20, 'Wavelength':5, 'Frequency':4, 'Period':.25}[option['label']]])
 
     def test_custom_stoichiometry_targets_and_export(self):
         import runpy
@@ -151,19 +151,19 @@ Interface('target_test','Energy',EnergyBasicsGenerator(),None,['Easy','Medium','
         self.assertFalse(any(w.label == 'Solve for' for w in app.selectbox))
         app.selectbox(key='target_test_difficulty_select_unified').select('Hard').run()
         from utils.generators.energy.energy_basics import EnergyBasicsGenerator
-        option = next(o for o in target_options(EnergyBasicsGenerator(), 'Elastic Potential Energy', 'Hard') if o['label'] == 'Spring Strength')
+        option = next(o for o in target_options(EnergyBasicsGenerator(), 'Elastic Potential Energy', 'Hard') if o['label'] == 'Spring constant')
         app.selectbox(key='target_test_solve_for_select').select(option['id']).run()
         self.assertFalse(app.exception)
-        self.assertIn('Spring Strength', app.session_state['target_test_units'][0])
+        self.assertIn('Spring constant', app.session_state['target_test_units'][0])
         question_id = app.session_state['target_test_question_id']
         app.run()
         self.assertEqual(question_id, app.session_state['target_test_question_id'])
         next(b for b in app.button if b.label == 'New Question').click().run()
         self.assertGreater(app.session_state['target_test_question_id'], question_id)
-        self.assertIn('Spring Strength', app.session_state['target_test_units'][0])
+        self.assertIn('Spring constant', app.session_state['target_test_units'][0])
         app.selectbox(key='target_test_difficulty_select_unified').select('Easy').run()
         self.assertFalse(app.exception)
-        self.assertIn('Elastic Potential Energy', app.session_state['target_test_units'][0])
+        self.assertIn('Elastic potential energy', app.session_state['target_test_units'][0])
         self.assertFalse(app.session_state['target_test_submitted'])
 
     def test_inventory_covers_every_route(self):
@@ -177,7 +177,7 @@ Interface('target_test','Energy',EnergyBasicsGenerator(),None,['Easy','Medium','
         for items in routes.values():
             walk(items)
         report = (ROOT/'docs/solve_for_evaluation.md').read_text(encoding='utf-8')
-        self.assertEqual(len(names), 40)  # 39 practice routes plus the shared worksheet builder
+        self.assertEqual(len(names), 41)  # 39 practice routes plus Kinematics and Dynamics worksheet builders
         for name in names:
             self.assertIn('| '+name+' |', report)
 
@@ -186,7 +186,7 @@ Interface('target_test','Energy',EnergyBasicsGenerator(),None,['Easy','Medium','
         app.session_state['nav_level'] = 'advanced'
         app.session_state['router_section'] = '⚡Electricity⚡'
         app.session_state['router_group'] = 'Current Electricity'
-        app.session_state['router_activity'] = "Circuit Ohm's Law"
+        app.session_state['router_activity'] = "Circuit Fundamentals"
         app.run()
         self.assertFalse(app.exception)
         selector = next(w for w in app.selectbox if w.label == 'Solve for')

@@ -220,15 +220,15 @@ Reference for the checked-in catalog. Target IDs are scoped to generator and pro
 | Target | ID | Levels |
 |---|---|---|
 | Elastic Potential Energy | `elastic-problem.elastic-potential-energy` | Easy, Medium, Hard |
-| Compression Distance | `elastic-problem.compression-distance` | Medium, Hard |
-| Spring Strength | `elastic-problem.spring-strength` | Medium, Hard |
+| Deformation | `elastic-problem.compression-distance` | Medium, Hard |
+| Spring constant | `elastic-problem.spring-strength` | Medium, Hard |
 
 ### Kinetic Energy
 
 | Target | ID | Levels |
 |---|---|---|
 | Kinetic Energy | `kinetic-problem.kinetic-energy` | Easy, Medium, Hard |
-| Velocity | `kinetic-problem.velocity` | Medium, Hard |
+| Speed | `kinetic-problem.velocity` | Medium, Hard |
 | Mass | `kinetic-problem.mass` | Medium, Hard |
 
 ### Gravitational Potential Energy
@@ -253,7 +253,7 @@ Reference for the checked-in catalog. Target IDs are scoped to generator and pro
 
 | Target | ID | Levels |
 |---|---|---|
-| Velocity | `kinetic-gravitational-problem.velocity` | Easy, Medium, Hard |
+| Speed | `kinetic-gravitational-problem.velocity` | Easy, Medium, Hard |
 | Height | `kinetic-gravitational-problem.height` | Easy, Medium, Hard |
 
 ### Gravitational <--> Elastic
@@ -270,7 +270,7 @@ Reference for the checked-in catalog. Target IDs are scoped to generator and pro
 | Target | ID | Levels |
 |---|---|---|
 | Spring Strength | `elastic-kinetic-problem.spring-strength` | Easy, Medium, Hard |
-| Velocity | `elastic-kinetic-problem.velocity` | Easy, Medium, Hard |
+| Speed | `elastic-kinetic-problem.velocity` | Easy, Medium, Hard |
 | Compression Distance | `elastic-kinetic-problem.compression-distance` | Easy, Medium, Hard |
 | Mass | `elastic-kinetic-problem.mass` | Easy, Medium, Hard |
 
@@ -280,24 +280,24 @@ Reference for the checked-in catalog. Target IDs are scoped to generator and pro
 
 | Target | ID | Levels |
 |---|---|---|
-| Work done by Friction (gravitational to kinetic) | `grav-to-kin-thermal-q.work-done-by-friction-grav-to-kin` | Easy, Medium, Hard |
-| Velocity (gravitational to kinetic) | `grav-to-kin-thermal-q.velocity-grav-to-kin` | Medium, Hard |
+| Thermal energy (gravitational to kinetic) | `grav-to-kin-thermal-q.work-done-by-friction-grav-to-kin` | Easy, Medium, Hard |
+| Speed (gravitational to kinetic) | `grav-to-kin-thermal-q.velocity-grav-to-kin` | Medium, Hard |
 | Height (gravitational to kinetic) | `grav-to-kin-thermal-q.height-grav-to-kin` | Medium, Hard |
-| Work done by Friction (kinetic to gravitational) | `kin-to-grav-thermal-q.work-done-by-friction-kin-to-grav` | Easy, Medium, Hard |
-| Velocity (kinetic to gravitational) | `kin-to-grav-thermal-q.velocity-kin-to-grav` | Medium, Hard |
+| Thermal energy (kinetic to gravitational) | `kin-to-grav-thermal-q.work-done-by-friction-kin-to-grav` | Easy, Medium, Hard |
+| Speed (kinetic to gravitational) | `kin-to-grav-thermal-q.velocity-kin-to-grav` | Medium, Hard |
 | Height (kinetic to gravitational) | `kin-to-grav-thermal-q.height-kin-to-grav` | Medium, Hard |
 
 ### Gravitational <--> Elastic
 
 | Target | ID | Levels |
 |---|---|---|
-| Work done by Friction (gravitational to elastic) | `grav-to-elastic-thermal-q.work-done-by-friction-grav-to-elastic` | Easy, Medium, Hard |
-| Spring Strength (gravitational to elastic) | `grav-to-elastic-thermal-q.spring-strength-grav-to-elastic` | Medium, Hard |
+| Thermal energy (gravitational to elastic) | `grav-to-elastic-thermal-q.work-done-by-friction-grav-to-elastic` | Easy, Medium, Hard |
+| Spring constant (gravitational to elastic) | `grav-to-elastic-thermal-q.spring-strength-grav-to-elastic` | Medium, Hard |
 | Compression Distance (gravitational to elastic) | `grav-to-elastic-thermal-q.compression-distance-grav-to-elastic` | Medium, Hard |
 | Mass (gravitational to elastic) | `grav-to-elastic-thermal-q.mass-grav-to-elastic` | Medium, Hard |
 | Ramp Height (gravitational to elastic) | `grav-to-elastic-thermal-q.ramp-height-grav-to-elastic` | Medium, Hard |
-| Work done by Friction (elastic to gravitational) | `elastic-to-grav-thermal-q.work-done-by-friction-elastic-to-grav` | Easy, Medium, Hard |
-| Spring Strength (elastic to gravitational) | `elastic-to-grav-thermal-q.spring-strength-elastic-to-grav` | Medium, Hard |
+| Thermal energy (elastic to gravitational) | `elastic-to-grav-thermal-q.work-done-by-friction-elastic-to-grav` | Easy, Medium, Hard |
+| Spring constant (elastic to gravitational) | `elastic-to-grav-thermal-q.spring-strength-elastic-to-grav` | Medium, Hard |
 | Compression Distance (elastic to gravitational) | `elastic-to-grav-thermal-q.compression-distance-elastic-to-grav` | Medium, Hard |
 | Mass (elastic to gravitational) | `elastic-to-grav-thermal-q.mass-elastic-to-grav` | Medium, Hard |
 | Ramp Height (elastic to gravitational) | `elastic-to-grav-thermal-q.ramp-height-elastic-to-grav` | Medium, Hard |
@@ -306,16 +306,16 @@ Reference for the checked-in catalog. Target IDs are scoped to generator and pro
 
 | Target | ID | Levels |
 |---|---|---|
-| Work done by Friction (kinetic to elastic) | `kinetic-to-elastic-thermal-q.work-done-by-friction-kinetic-to-elastic` | Easy, Medium, Hard |
-| Spring Strength (kinetic to elastic) | `kinetic-to-elastic-thermal-q.spring-strength-kinetic-to-elastic` | Medium, Hard |
+| Thermal energy (kinetic to elastic) | `kinetic-to-elastic-thermal-q.work-done-by-friction-kinetic-to-elastic` | Easy, Medium, Hard |
+| Spring constant (kinetic to elastic) | `kinetic-to-elastic-thermal-q.spring-strength-kinetic-to-elastic` | Medium, Hard |
 | Compression Distance (kinetic to elastic) | `kinetic-to-elastic-thermal-q.compression-distance-kinetic-to-elastic` | Medium, Hard |
 | Mass (kinetic to elastic) | `kinetic-to-elastic-thermal-q.mass-kinetic-to-elastic` | Medium, Hard |
-| Velocity (kinetic to elastic) | `kinetic-to-elastic-thermal-q.velocity-kinetic-to-elastic` | Medium, Hard |
-| Work done by Friction (elastic to kinetic) | `elastic-to-kinetic-thermal-q.work-done-by-friction-elastic-to-kinetic` | Easy, Medium, Hard |
-| Spring Strength (elastic to kinetic) | `elastic-to-kinetic-thermal-q.spring-strength-elastic-to-kinetic` | Medium, Hard |
+| Speed (kinetic to elastic) | `kinetic-to-elastic-thermal-q.velocity-kinetic-to-elastic` | Medium, Hard |
+| Thermal energy (elastic to kinetic) | `elastic-to-kinetic-thermal-q.work-done-by-friction-elastic-to-kinetic` | Easy, Medium, Hard |
+| Spring constant (elastic to kinetic) | `elastic-to-kinetic-thermal-q.spring-strength-elastic-to-kinetic` | Medium, Hard |
 | Compression Distance (elastic to kinetic) | `elastic-to-kinetic-thermal-q.compression-distance-elastic-to-kinetic` | Medium, Hard |
 | Mass (elastic to kinetic) | `elastic-to-kinetic-thermal-q.mass-elastic-to-kinetic` | Medium, Hard |
-| Velocity (elastic to kinetic) | `elastic-to-kinetic-thermal-q.velocity-elastic-to-kinetic` | Medium, Hard |
+| Speed (elastic to kinetic) | `elastic-to-kinetic-thermal-q.velocity-elastic-to-kinetic` | Medium, Hard |
 
 ## ThermalWithFrictionGenerator
 
@@ -399,6 +399,11 @@ Reference for the checked-in catalog. Target IDs are scoped to generator and pro
 | Wave Speed | `properties-of-waves.wave-speed` | Easy, Medium, Hard |
 | Wavelength | `properties-of-waves.wavelength` | Easy, Medium, Hard |
 | Frequency | `properties-of-waves.frequency` | Easy, Medium, Hard |
+| Period | `properties-of-waves.period` | Easy, Medium, Hard |
+
+The Wave Properties page exposes Easy only. Each target samples two reviewed
+given/target forms; Mixed samples all eight equally. See the
+[coverage and precision policy](wave_properties_review.md).
 
 ### String Harmonics
 
