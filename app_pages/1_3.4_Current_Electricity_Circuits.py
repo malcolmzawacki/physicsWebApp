@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from utils.activity_flow import next_question_countdown
+from utils.session_progress import record_answer, format_answers
 from utils.word_lists import random_correct_message, random_error_message
 
 from utils.grading import parse_number, answer_matches, CIRCUIT_POLICY
@@ -202,6 +203,10 @@ def current_electricity_circuits_page() -> None:
             else:
                 field_results = [_answer_is_correct(value, expected) for value, expected in zip(user_values, answers)]
                 is_correct = all(field_results)
+                record_answer("Circuit Fundamentals", {"Question": case["prompt"], "Givens": dict(case["givens"])},
+                              format_answers(user_values, [case["unit"]] * len(answers)),
+                              format_answers(answers, [case["unit"]] * len(answers)),
+                              is_correct, difficulty=difficulty, explanation=case["explanation"])
                 state.inc("attempt_count")
                 if is_correct:
                     state.inc("correct_count")

@@ -27,7 +27,11 @@ def selected_index(event, question_id, count):
     return index if type(index) is int and 0 <= index < count else None
 
 
-def graph_cards(images, labels, question_id, selection, locked, layout, key, correct_index=None):
+def graph_cards(images, labels, question_id, selection, locked, layout, key, correct_index=None,
+                has_reference=True, option_name="Graph", check_label="Check Match", descriptions=None):
     return _board(images=images, labels=labels, question_id=question_id,
                   selection=selection, locked=locked, layout=layout,
-                  correct_index=correct_index if locked else None, key=key, default=None)
+                  correct_index=correct_index if locked else None,
+                  has_reference=has_reference, option_name=option_name,
+                  check_label=check_label, descriptions=descriptions,
+                  key=key, default=None)

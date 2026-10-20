@@ -10,6 +10,7 @@ def relative_motion():
     from utils.ui_components import equation_controls
     from utils.layout_config import question_columns
     from utils.activity_flow import next_question_countdown
+    from utils.session_progress import record_answer, format_answers
     from utils.word_lists import random_correct_message, random_error_message
 
     if st.session_state.get("nav_level") != "advanced":
@@ -59,6 +60,10 @@ def relative_motion():
                 st.error("Enter a finite number, including a minus sign when needed.")
             else:
                 correct = answer_matches(value, payload["answers"][0])
+                record_answer("Relative Motion", payload["question"],
+                              format_answers([raw], payload["units"]), format_answers(payload["answers"], payload["units"]),
+                              correct, difficulty=difficulty, explanation=payload["extras"]["explanation"],
+                              equations=payload["extras"]["solution_equations"])
                 ui.update_performance(kind, difficulty, correct)
                 if correct:
                     state.inc("stars", ui.give_stars(difficulty, kind))

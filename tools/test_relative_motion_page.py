@@ -13,7 +13,7 @@ from utils.generators.kinematics.relative_motion_generator import RelativeMotion
 def main():
     at = AppTest.from_file(str(ROOT / "Home.py"), default_timeout=20).run()
     assert not at.exception
-    at.sidebar.button[1].click().run()  # Kinematics
+    next(b for b in at.sidebar.button if b.label == "Kinematics").click().run()
     assert "Relative Motion" not in [b.label for b in at.sidebar.button]
     at.selectbox(key="nav_level").select("advanced").run()
     next(b for b in at.sidebar.button if b.label == "Relative Motion").click().run()

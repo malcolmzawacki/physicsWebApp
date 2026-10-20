@@ -2,6 +2,7 @@
 from typing import Callable, Dict, Optional
 import streamlit as st
 from utils.activity_flow import next_question_countdown
+from utils.session_progress import record_answer
 from utils.ui_components import render_header, init_performance, record_performance, build_performance_table, performance_expander
 from utils.ui_state import State
 from utils.word_lists import random_correct_message, random_error_message
@@ -65,6 +66,9 @@ def render_diagram_match_layout(title: str, prefix: str,
             st.error("Choose a graph before checking.")
         else:
             correct = choice == payload["correct_index"]
+            record_answer(title, payload.get("prompt", "Select the matching diagram:"),
+                          labels[choice], labels[payload["correct_index"]], correct,
+                          diagrams=dict(zip(["Reference", *labels], state.get("card_images"))))
             state.set("submitted", True)
             state.set("last_result", correct)
             state.set("feedback", random_correct_message() if correct else random_error_message())

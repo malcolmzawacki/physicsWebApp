@@ -34,7 +34,10 @@ jobs:
       - name: Check activity interactions
         run: |
           python tools/test_activity_flow.py
+          python tools/test_session_progress.py
           python tools/test_relative_motion_page.py
+          python tools/test_recognizing_forces.py
+          python tools/test_force_diagram_match.py
           python tools/test_audit_regressions.py
           python tools/test_progress_and_formatting.py
           python tools/test_solve_for.py

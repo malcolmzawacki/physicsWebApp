@@ -570,6 +570,7 @@ def initialize_stoichiometry_session_state(state: State):
     state.ensure("show_solution", False)
 
 def stoichiometry_practice_page():
+    from utils.session_progress import record_answer
     """Create a Streamlit page for stoichiometry practice problems"""
     st.title("Stoichiometry Practice")
 
@@ -640,6 +641,10 @@ def stoichiometry_practice_page():
                 correct_answer = state.get("answer")
                 tolerance = correct_answer * 0.05  # 5% tolerance
                 
+                record_answer("Stoichiometry Practice", state.get("question"),
+                              f"{user_answer} {state.get('units')}", f"{correct_answer} {state.get('units')}",
+                              abs(user_answer - correct_answer) <= tolerance, difficulty=difficulty,
+                              explanation=state.get("details")["explanation"])
                 if abs(user_answer - correct_answer) <= tolerance:
                     st.success("Correct! Well done.")
                 else:

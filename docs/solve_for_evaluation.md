@@ -4,8 +4,8 @@ All 39 routed activities in `Home.py` were evaluated, including custom layouts,
 chemistry, labs, and the three charging-by-friction modes. This change exposes
 existing, identifiable targets; it does not redesign difficulty or invent inverses.
 
-That count describes the original evaluation. The current router has 41 routes
-(39 practice activities and two worksheet builders). Wave Properties was expanded
+That count describes the original evaluation. The current router has 43 routes
+(41 practice activities and two worksheet builders). Wave Properties was expanded
 to eight reviewed forms on 2026-10-12; see its linked family review.
 
 **Implemented** means browser controls and `DocumentGenerator.question()` use the
@@ -23,6 +23,8 @@ of public numeric link indices. See [the readable target list](solve_for_targets
 
 | Activity | Status | Current code and scope | Route source |
 |---|---|---|---|
+| Recognizing Forces | Fixed conceptual task | Select all force types acting on a named object. Context filters select original scenarios; no numerical unknown or inverse target applies. | [render_recognizing_forces](../utils/recognizing_forces_ui.py) |
+| Match the Free-Body Diagram | Fixed conceptual task | Select one diagram by force identity, direction, and relative size on each axis. Ten original cases; context selection is not a numerical solve-for target. | [render_force_diagram_match](../utils/force_diagram_match_ui.py) |
 | Create a worksheet | Shared builder | Constant and accelerated motion sections use the existing per-type target catalog; this is an export route rather than a practice activity. | [render_kinematics_worksheet](../utils/worksheet_ui.py) |
 
 | Algebra | Deferred | A randomly named symbol is isolated step by step. Choosing a symbol would mostly rename the exercise; inverse target semantics and worksheet representation need a decision. | [algebra.main](../app_pages/1_0.1.1_Math_Skills.py) |

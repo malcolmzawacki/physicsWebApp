@@ -12,6 +12,7 @@ from utils.word_lists import random_correct_message, random_error_message
 from utils.ui_state import State
 from utils.ui_components import (render_header, build_performance_table, performance_expander, draw_answer_inputs, render_button_options, render_dropdown_options, render_hints, init_performance, record_performance, show_equations_expander)
 from utils.problem_payload import payload_from_dict, ProblemPayload, ProblemPayloadError
+from utils.session_progress import record_answer, format_answers
 
 
 class Interface:
@@ -225,6 +226,7 @@ class Interface:
         self.state.set("user_answers_selected", [None] * len(payload.answers))
         self.state.pop("answer_options")
         self.state.pop("last_result")
+        self.state.pop("submitted_answers")
         self.state.pop("feedback_message")
         features = {**payload.extras, "diagram_data": payload.diagram_data,
                     "hints": payload.hints, "button_options": payload.button_options}
@@ -410,6 +412,12 @@ class Interface:
         correct = all(results)
         difficulty, problem_type = self.state.get("difficulty"), self.state.get("problem_type")
         self.update_performance(problem_type, difficulty, correct)
+        self.state.set("submitted_answers", format_answers(user_answers, self.state.get("units", [])))
+        record_answer(self.title, self.state.get("current_question"),
+                      format_answers(user_answers, self.state.get("units", [])),
+                      format_answers(expected, self.state.get("units", [])), correct,
+                      difficulty=difficulty, explanation=self.state.get("explanation") or "",
+                      equations=self.state.get("solution_equations"))
         self.state.set("submitted", True)
         self.state.set("last_result", correct)
         self.state.set("feedback_message", random_correct_message() if correct else random_error_message())
@@ -420,6 +428,7 @@ class Interface:
         """Render saved feedback and pending advancement on every rerun."""
         if not self.state.get("submitted"):
             return
+        st.write(f"Your answer: {self.state.get('submitted_answers', '')}")
         if self.state.get("last_result"):
             st.success(self.state.get("feedback_message"))
         else:

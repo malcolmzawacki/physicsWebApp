@@ -9,6 +9,18 @@ and review ledger for execution and evidence.
 
 ## Product direction: broader entry points and growing independence
 
+The [Newton's Laws activity aspirations](newtons_laws_aspirations.md) assess the
+eight Interactives and thirteen Concept Builders in that reference unit and
+propose a phased implementation sequence. This is a scoped future candidate,
+excluding the separate Forces in Two Dimensions unit; it does not reorder the
+active rollout queue. C4 Recognizing Forces is now implemented as a bounded
+teacher-preview pilot (2026-10-19); see current state and the aspiration's C4
+implementation record. After the C4 interaction review, C5 Match the Free-Body
+Diagram is now enabled for teacher preview (2026-10-20), covering ten original
+cases with diagram selection, direction/size feedback, and the same progression.
+Review this bounded pilot before implementing I2 diagram construction or C2
+force-to-motion matching; the rest of the unit remains aspirational.
+
 Help students with a wider range of starting abilities participate meaningfully
 in physics and chemistry, then develop greater independence. Practice should
 exercise reading, identifying quantities, interpreting representations, choosing

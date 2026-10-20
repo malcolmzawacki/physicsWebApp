@@ -76,6 +76,9 @@ an old finding as an outstanding bug.
   ```
 - **Static checks** - the project currently relies on manual review; add `pydocstyle`, `flake8`, or similar as needed for your workflow.
 - **Interaction and export regressions** — run `python tools/test_activity_flow.py`, `python tools/test_relative_motion_page.py`, `python tools/test_audit_regressions.py`, `python tools/test_progress_and_formatting.py`, and `python tools/test_solve_for.py`. CI also runs student worksheet and organizing-help checks listed in [current state](docs/current_state.md). Payload validation discovers generators automatically.
+- **Recognizing Forces pilot** — Dynamics > Recognizing Forces; run `python tools/test_recognizing_forces.py` for conceptual content and routed interaction checks.
+- **Force diagram matching pilot** — Dynamics > Match the Free-Body Diagram; run `python tools/test_force_diagram_match.py` for physics, unique choices, artwork, and interaction checks.
+- **Session pacing and review** — the shared sidebar checkbox controls automatic loading after correct answers on all practice activities. My Current Session Progress shows answer checks, submitted/correct answers, explanations where available, and matching graphs. History and preferences live only in Streamlit session memory and reset on browser refresh; no persistent student identifier or storage is added. Run `python tools/test_session_progress.py` for routed pacing, history, navigation, and new-session regressions.
 - **Stable progress IDs and Word formatting** — see the [implementation notes and manual review checklist](docs/implementation_fixes_2026-09-15.md).
 
 ## Contributing Notes

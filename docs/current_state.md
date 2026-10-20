@@ -9,20 +9,73 @@ useful evidence but are not current completion claims.
 
 ## Site scope and tracking
 
-The current route inventory contains **41 activities and 141 problem-type/mode
+The current route inventory contains **43 activities and 151 problem-type/mode
 rows**, including Advanced routes, custom pages, explorers, labs, and two worksheet
 builders. The [organizing-help inventory](organizing_help_inventory.md) is generated
 from routes and metadata with explicit custom-page adapters. Blank review cells
 mean unevaluated. It does not yet enumerate every difficulty, target, and random
 scenario combination; those require a per-family coverage matrix during review.
 
-There are **32 recorded organizing-help reviews**, all migrated/enabled rows;
+There are **45 recorded organizing-help reviews**, including ten Recognizing
+Forces / diagram matching context rows with conceptual scaffolds instead of numerical organizers;
 Friction and Distance and Thermal Mixed are the newest teacher-preview packages; per-family records track
 other review status and evidence limits. These are counts
 of inventory rows rather than page counts. Decisions are recorded in
 [organizing_help_reviews.json](organizing_help_reviews.json).
 
 ## Organizing help: implemented
+
+### Match the Free-Body Diagram pilot (2026-10-20)
+
+**Dynamics > Match the Free-Body Diagram** is available at both course levels.
+Ten original cases extend Recognizing Forces into reading force identity,
+direction, and relative sizes. Four shuffled, labeled PNG cards are clickable
+buttons using the same component as motion matching. Clicking, tapping, or using
+Enter/Space selects a card with a visible border without submitting it. Optional text
+descriptions communicate the same arrows and relative lengths. Explicit Check
+diagram is the primary action beside the hint. Missing selection is unscored;
+incorrect choices allow revision with specific feedback; success awards one star
+in the standard upper-right header and starts the five-second cancellable countdown.
+The shared automatic-loading preference is respected. Context filters, related
+cases, Skip question, Next question, session performance, and reset mirror C4.
+Current Session Progress saves checked diagrams and explanations as snapshots.
+
+Case assumptions make direction and balance determinate, including the upward
+speeding-up bucket and a spring anchored to the left. Comparisons concern opposing
+forces on each axis, not exact ratios or comparisons between axes. Diagram
+construction, inclines, two-axis acceleration, numerical answers, and exports
+remain excluded. See the [C5 coverage and verification record](newtons_laws_aspirations.md#c5-pilot-implementation-record).
+Automated physics, rendering, and routed interaction checks passed, including
+the existing motion-card regressions. The live browser confirmed image-click and
+Enter-key selection, the selected border, and selection without submission.
+Touch, narrow-screen/accessibility, and teacher review remain pending.
+
+### Recognizing Forces conceptual pilot (2026-10-19)
+
+**Dynamics > Recognizing Forces** is available at both course levels. Twelve
+original cases cover gravity, normal force, friction, tension, direct applied
+force, spring force, drag, and a force-free idealized space probe. Students select
+all forces on a named object, explicitly check, revise, request an interaction
+hint, and choose a fresh or related case. Context filters select surfaces, ropes,
+springs, flight, or all contexts. Assumptions are stated; no case requires guessing
+whether an unspecified contact or air force exists.
+
+One star is awarded per completed case, displayed prominently at the upper right
+using the same title-and-stars header as Newton's Second Law. Session-local records distinguish first
+try without help, correction after feedback, and completion with an explicit hint;
+skipped cases remain visible. Identical repeated checks and reruns do not add
+attempts or stars. Reset clears this activity's practice records. These are not
+durable history or mastery claims. This presence-only activity intentionally uses
+interaction hints and discrete answer sets instead of equations, numeric
+difficulty levels, or the numerical organizer. Correct answers now advance after
+a five-second cancellable countdown; incorrect answers stay available for revision.
+The form ends with side-by-side hint and primary Check forces actions, with Check
+forces first for Enter submission. Skip question moves past an unfinished case;
+Next question advances immediately after success. Try a related case is retained.
+
+See the [C4 coverage and verification record](newtons_laws_aspirations.md#c4-pilot-implementation-record).
+Teacher review, actual keyboard behavior, and narrow-screen visual review remain
+pending; the local browser preview could not connect during implementation.
 
 Enabled for Accelerated Motion (four omitted-variable types plus Mixed), Constant
 Motion's Constant Speed subtype, Momentum, Wave Properties, and Circuit

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from utils.activity_flow import next_question_countdown
+from utils.session_progress import record_answer, format_answers
 from utils.circuit_workspace import render_circuit_workspace
 from utils.word_lists import random_correct_message, random_error_message
 
@@ -176,6 +177,10 @@ def current_electricity_series_parallel_page() -> None:
                 st.error("Enter a finite numeric value before checking the answer.")
             else:
                 is_correct = _answer_is_correct(user_value, case["answer"])
+                record_answer("Series and Parallel Circuits", {"Question": case["prompt"], "Givens": dict(case["givens"])},
+                              format_answers([user_value], [case["unit"]]),
+                              format_answers([case["answer"]], [case["unit"]]),
+                              is_correct, difficulty=difficulty, explanation=case["explanation"])
                 state.inc("attempt_count")
                 if is_correct:
                     state.inc("correct_count")

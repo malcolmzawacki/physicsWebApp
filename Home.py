@@ -4,6 +4,7 @@ from pathlib import Path
 import streamlit as st
 
 from config import AUTHOR_MODE
+from utils.session_progress import render_session_controls, render_session_progress
 st.set_page_config(page_title="Physics Practice", layout="wide")
 
 COURSE_LEVELS = (
@@ -83,6 +84,8 @@ ACTIVITIES = {
     },
     "Dynamics": {
         "Create a worksheet": {"handler": "utils.worksheet_ui:render_forces_worksheet", "min_level": "high"},
+        "Recognizing Forces": {"handler": "utils.recognizing_forces_ui:render_recognizing_forces", "min_level": "high"},
+        "Match the Free-Body Diagram": {"handler": "utils.force_diagram_match_ui:render_force_diagram_match", "min_level": "high"},
         "Newton's Second Law": {"handler": "file:app_pages/1_2.1_Forces.py::newtons_2nd", "min_level": "high"},
         "Center of Mass": {"handler": "file:app_pages/1_2.1_Forces.py::center_of_mass", "min_level": "advanced"},
         "Tension": {"handler": "file:app_pages/1_2.1_Forces.py::tension", "min_level": "advanced"},
@@ -182,17 +185,20 @@ if "router_group" not in st.session_state:
 
 
 def set_section(section: str) -> None:
+    st.session_state["show_session_progress"] = False
     st.session_state.router_section = section
     st.session_state.router_group = None
     st.session_state.router_activity = None
 
 
 def set_group(group: str | None) -> None:
+    st.session_state["show_session_progress"] = False
     st.session_state.router_group = group
     st.session_state.router_activity = None
 
 
 def set_activity(activity: str) -> None:
+    st.session_state["show_session_progress"] = False
     st.session_state.router_activity = activity
 
 
@@ -289,6 +295,14 @@ def validate_activity_handlers() -> list[str]:
 
 with st.sidebar:
     st.header("Directory")
+    render_session_controls()
+    if st.button("My Current Session Progress", use_container_width=True):
+        st.session_state["show_session_progress"] = True
+        st.rerun()
+    if st.session_state.get("show_session_progress"):
+        if st.button("Back to practice", use_container_width=True):
+            st.session_state["show_session_progress"] = False
+            st.rerun()
     level_options = [key for key, _, _ in COURSE_LEVELS]
     if st.session_state.get("nav_level") not in level_options:
         st.session_state["nav_level"] = level_options[0]
@@ -348,7 +362,9 @@ section = st.session_state.router_section
 group = st.session_state.router_group
 activity = st.session_state.router_activity
 
-if section == "root":
+if st.session_state.get("show_session_progress"):
+    render_session_progress()
+elif section == "root":
     st.title("Physics Practice")
     st.write("Choose a main area from the sidebar to get started.")
     st.write(

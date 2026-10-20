@@ -1,4 +1,5 @@
-import time
+from utils.activity_flow import next_question_countdown
+from utils.session_progress import record_answer
 
 import streamlit as st
 
@@ -225,12 +226,13 @@ def charging_by_conduction_page() -> None:
     with check_col:
         check_clicked = st.button(
             "Check Answer",
+            disabled=bool(result and result["is_correct"]),
             key=state.key("check_answer"),
             type="primary",
             use_container_width=True,
         )
 
-    if check_clicked:
+    if check_clicked and not (result and result["is_correct"]):
         expected_sign = sign_label(case["final_sign"])
         is_correct = final_a == expected_sign and final_b == expected_sign
         if difficulty in ("Medium", "Hard"):
@@ -242,6 +244,20 @@ def charging_by_conduction_page() -> None:
                 and amount_b == case["final_chunks"]
             )
 
+        submitted_answer = {"Box A": final_a, "Box B": final_b}
+        expected_answer = {"Box A": expected_sign, "Box B": expected_sign}
+        if difficulty in ("Medium", "Hard"):
+            submitted_answer["Mechanism"] = mechanism
+            expected_answer["Mechanism"] = case["mechanism_answer"]
+        if difficulty == "Hard":
+            submitted_answer.update({"Amount A": amount_a, "Amount B": amount_b})
+            expected_answer.update({"Amount A": case["final_chunks"], "Amount B": case["final_chunks"]})
+        question = "Predict the final charges after contact. Before contact: " + "; ".join(
+            f"Box {box}: {charge_count_label(data['sign'], data['chunks'])} ({data['note']})"
+            for box, data in case["before_states"].items())
+        record_answer("Charging by Conduction", question,
+                      submitted_answer, expected_answer, is_correct, difficulty=difficulty,
+                      explanation=case["explanation"])
         state.inc("attempt_count")
         if is_correct:
             state.inc("correct_count")
@@ -268,9 +284,9 @@ def charging_by_conduction_page() -> None:
         else:
             st.error("Not quite.")
         if result["is_correct"]:
-            st.caption("Loading the next conduction scenario...")
-            time.sleep(AUTO_ADVANCE_DELAY_SECONDS)
-            _reset_conduction_question(state, difficulty)
-            st.rerun()
+            def advance():
+                _reset_conduction_question(state, difficulty)
+                st.rerun()
+            next_question_countdown(state, question_number, advance, seconds=AUTO_ADVANCE_DELAY_SECONDS)
 
     _render_conduction_performance(state)

@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import random
-import time
+from utils.activity_flow import next_question_countdown
+from utils.session_progress import record_answer
 
 import streamlit as st
 
@@ -33,6 +34,7 @@ def _comparison_answer_options(left_key: str, right_key: str) -> tuple[str, ...]
 
 
 def _reset_comparison_question(state: State) -> None:
+    state.inc("question_number")
     state.set("case", _build_comparison_case())
     state.set("submitted", False)
     state.set("last_result", None)
@@ -40,6 +42,7 @@ def _reset_comparison_question(state: State) -> None:
 
 def render() -> None:
     state = State("friction_compare")
+    state.ensure("question_number", 0)
     state.ensure("correct_count", 0)
     state.ensure("attempt_count", 0)
     state.ensure_lazy("case", _build_comparison_case)
@@ -77,7 +80,8 @@ def render() -> None:
             _reset_comparison_question(state)
             st.rerun()
 
-    if st.button("Check Answer", key=state.key("check_answer"), type="primary", use_container_width=True):
+    if st.button("Check Answer", key=state.key("check_answer"), type="primary", use_container_width=True,
+                 disabled=bool((state.get("last_result") or {}).get("is_correct"))):
         expected_positive = get_material(left_key if compare_materials(left_key, right_key) > 0 else right_key).label
         expected_negative = get_material(right_key if compare_materials(left_key, right_key) > 0 else left_key).label
         if compare_materials(left_key, right_key) == 0:
@@ -87,6 +91,11 @@ def render() -> None:
         is_valid = positive_choice != negative_choice or positive_choice == "Neither / no reliable net charge difference"
         is_correct = is_valid and positive_choice == expected_positive and negative_choice == expected_negative
 
+        record_answer("Charging by Friction: Comparison Practice",
+                      f"When {left.label} is rubbed with {right.label}, which becomes positive and which becomes negative?",
+                      {"Positive": positive_choice, "Negative": negative_choice},
+                      {"Positive": expected_positive, "Negative": expected_negative}, is_correct,
+                      difficulty=difficulty, explanation=outcome["summary"] + " " + outcome["electron_flow"])
         state.inc("attempt_count")
         if is_correct:
             state.inc("correct_count")
@@ -117,9 +126,9 @@ def render() -> None:
         st.caption(f"Correct response: positive = {result['expected_positive']}; negative = {result['expected_negative']}.")
         st.caption(f"The two materials are {format_rank_gap(left_key, right_key)} on the simplified triboelectric list.")
         if result["is_correct"]:
-            st.caption("Loading the next comparison...")
-            time.sleep(0.8)
-            _reset_comparison_question(state)
-            st.rerun()
+            def advance():
+                _reset_comparison_question(state)
+                st.rerun()
+            next_question_countdown(state, state.get("question_number"), advance, seconds=0.8)
 
     performance_expander(build_performance_table(state.get("performance"), ["Easy", "Medium", "Hard"]))

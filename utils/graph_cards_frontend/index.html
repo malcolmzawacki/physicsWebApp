@@ -45,9 +45,10 @@ function paintSelection() {
   card.querySelector('.status').textContent=args.locked && index===args.correct_index
    ? (index===selected ? 'Selected · Correct' : 'Correct answer') : index===selected ? 'Selected' : 'Choose';
  });
+ const noun=args.option_name || 'Graph', check=args.check_label || 'Check Match';
  live.textContent=args.locked ? 'Answer submitted. Choices are locked for this set.'
-  : selected===null ? 'Click a graph to select it, then press Check Match.'
-  : `Graph ${args.labels[selected]} selected. Press Check Match when ready.`;
+  : selected===null ? `Click a ${noun.toLowerCase()} to select it, then press ${check}.`
+  : `${noun} ${args.labels[selected]} selected. Press ${check} when ready.`;
  resize();
 }
 function render(message) {
@@ -61,20 +62,23 @@ function render(message) {
  board.className=args.layout==='Options in a column' ? 'column' : '';
  if(rebuild) {
   board.replaceChildren();
+  const hasReference=args.has_reference!==false, noun=args.option_name || 'Graph';
+  board.setAttribute('aria-label',hasReference ? 'Reference graph and answer choices' : `${noun} answer choices`);
   args.images.forEach((src,i)=>{
-   const card=document.createElement(i===0 ? 'div' : 'button');
-   card.className='card'+(i===0 ? ' reference' : '');
+   const reference=hasReference && i===0, index=hasReference ? i-1 : i;
+   const card=document.createElement(reference ? 'div' : 'button');
+   card.className='card'+(reference ? ' reference' : '');
    const heading=document.createElement('div'); heading.className='heading';
-   const title=document.createElement('strong'); title.textContent=i===0 ? 'Reference graph' : `Graph ${args.labels[i-1]}`;
+   const title=document.createElement('strong'); title.textContent=reference ? 'Reference graph' : `${noun} ${args.labels[index]}`;
    const status=document.createElement('span'); status.className='status'; heading.append(title,status);
    const img=document.createElement('img'); img.src=src;
-   img.alt=i===0 ? 'Reference motion graph' : `Motion graph option ${args.labels[i-1]}`;
+   img.alt=reference ? 'Reference motion graph' : (args.descriptions?.[index] || `${noun} option ${args.labels[index]}`);
    img.onload=resize; card.append(heading,img);
-   if(i>0) {
-    card.type='button'; card.setAttribute('aria-label',`Select graph ${args.labels[i-1]}`);
+   if(!reference) {
+    card.type='button'; card.setAttribute('aria-label',`Select ${noun.toLowerCase()} ${args.labels[index]}`);
     card.addEventListener('click',()=>{
      if(args.locked) return;
-     selected=i-1; paintSelection();
+     selected=index; paintSelection();
      send('streamlit:setComponentValue',{dataType:'json',value:{question_id:args.question_id,index:selected}});
     });
    }

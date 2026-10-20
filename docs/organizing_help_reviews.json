@@ -138,5 +138,45 @@
   "Kinematics / Projectiles / Type 3": {
     "status": "Enabled; first-pass teacher preview pending",
     "notes": "Horizontal/vertical organizer with separate speed/angle givens and time row; optional hints, context-specific vertical displacement, and given versus intermediate separation. Existing names and target IDs retained. Answers follow printed givens. Type 3 elevated-landing crossing formula corrected; descending landing and same-height Type 2 geometry clarified. 1,860 sampled target cases, worksheet exports, independent forms and resets checked. Laptop height/readability review pending; diagrams are a separate teacher-directed effort. See current_state.md#projectile-organizer-first-pass. Updated 2026-10-13."
+  },
+  "Dynamics / Recognizing Forces / All contexts": {
+    "status": "Enabled; conceptual scaffold; teacher preview pending",
+    "notes": "Presence-only original C4 pilot with explicit named objects and assumptions, interaction hints, multi-selection checking, revision, related cases, five-second cancellable correct-answer progression, primary Check forces beside the hint, Skip question, and session-local completion records. Numerical organizers/equations and difficulty levels are inapplicable. Twelve cases, 1,536 answer sets and routed AppTest lifecycle checked. Visual/keyboard and teacher review pending. See newtons_laws_aspirations.md#c4-pilot-implementation-record. Updated 2026-10-19."
+  },
+  "Dynamics / Recognizing Forces / Surfaces": {
+    "status": "Enabled; conceptual scaffold; teacher preview pending",
+    "notes": "Presence-only original C4 pilot with explicit named objects and assumptions, interaction hints, multi-selection checking, revision, related cases, five-second cancellable correct-answer progression, primary Check forces beside the hint, Skip question, and session-local completion records. Numerical organizers/equations and difficulty levels are inapplicable. Twelve cases, 1,536 answer sets and routed AppTest lifecycle checked. Visual/keyboard and teacher review pending. See newtons_laws_aspirations.md#c4-pilot-implementation-record. Updated 2026-10-19."
+  },
+  "Dynamics / Recognizing Forces / Ropes": {
+    "status": "Enabled; conceptual scaffold; teacher preview pending",
+    "notes": "Presence-only original C4 pilot with explicit named objects and assumptions, interaction hints, multi-selection checking, revision, related cases, five-second cancellable correct-answer progression, primary Check forces beside the hint, Skip question, and session-local completion records. Numerical organizers/equations and difficulty levels are inapplicable. Twelve cases, 1,536 answer sets and routed AppTest lifecycle checked. Visual/keyboard and teacher review pending. See newtons_laws_aspirations.md#c4-pilot-implementation-record. Updated 2026-10-19."
+  },
+  "Dynamics / Recognizing Forces / Springs": {
+    "status": "Enabled; conceptual scaffold; teacher preview pending",
+    "notes": "Presence-only original C4 pilot with explicit named objects and assumptions, interaction hints, multi-selection checking, revision, related cases, five-second cancellable correct-answer progression, primary Check forces beside the hint, Skip question, and session-local completion records. Numerical organizers/equations and difficulty levels are inapplicable. Twelve cases, 1,536 answer sets and routed AppTest lifecycle checked. Visual/keyboard and teacher review pending. See newtons_laws_aspirations.md#c4-pilot-implementation-record. Updated 2026-10-19."
+  },
+  "Dynamics / Recognizing Forces / Flight": {
+    "status": "Enabled; conceptual scaffold; teacher preview pending",
+    "notes": "Presence-only original C4 pilot with explicit named objects and assumptions, interaction hints, multi-selection checking, revision, related cases, five-second cancellable correct-answer progression, primary Check forces beside the hint, Skip question, and session-local completion records. Numerical organizers/equations and difficulty levels are inapplicable. Twelve cases, 1,536 answer sets and routed AppTest lifecycle checked. Visual/keyboard and teacher review pending. See newtons_laws_aspirations.md#c4-pilot-implementation-record. Updated 2026-10-19."
+  },
+  "Dynamics / Match the Free-Body Diagram / All contexts": {
+    "status": "Enabled; conceptual scaffold; teacher preview pending",
+    "notes": "C5: ten original cases, four shuffled diagrams, clickable image selection using the shared motion-card component; single-choice checking by force identity/direction and qualitative size on each axis, hints, revision, upper-right stars, cancellable progression, session history with diagrams. 500 shuffled boards, 40 rendered diagrams and routed lifecycle checked. Numerical organizer, drawing and exports excluded. Live mouse/Enter selection and selected borders checked; no submission on selection. Motion-card regressions pass. Touch/accessibility and teacher review pending. See newtons_laws_aspirations.md#c5-pilot-implementation-record. Updated 2026-10-20."
+  },
+  "Dynamics / Match the Free-Body Diagram / Surfaces": {
+    "status": "Enabled; conceptual scaffold; teacher preview pending",
+    "notes": "C5: ten original cases, four shuffled diagrams, clickable image selection using the shared motion-card component; single-choice checking by force identity/direction and qualitative size on each axis, hints, revision, upper-right stars, cancellable progression, session history with diagrams. 500 shuffled boards, 40 rendered diagrams and routed lifecycle checked. Numerical organizer, drawing and exports excluded. Live mouse/Enter selection and selected borders checked; no submission on selection. Motion-card regressions pass. Touch/accessibility and teacher review pending. See newtons_laws_aspirations.md#c5-pilot-implementation-record. Updated 2026-10-20."
+  },
+  "Dynamics / Match the Free-Body Diagram / Ropes": {
+    "status": "Enabled; conceptual scaffold; teacher preview pending",
+    "notes": "C5: ten original cases, four shuffled diagrams, clickable image selection using the shared motion-card component; single-choice checking by force identity/direction and qualitative size on each axis, hints, revision, upper-right stars, cancellable progression, session history with diagrams. 500 shuffled boards, 40 rendered diagrams and routed lifecycle checked. Numerical organizer, drawing and exports excluded. Live mouse/Enter selection and selected borders checked; no submission on selection. Motion-card regressions pass. Touch/accessibility and teacher review pending. See newtons_laws_aspirations.md#c5-pilot-implementation-record. Updated 2026-10-20."
+  },
+  "Dynamics / Match the Free-Body Diagram / Springs": {
+    "status": "Enabled; conceptual scaffold; teacher preview pending",
+    "notes": "C5: ten original cases, four shuffled diagrams, clickable image selection using the shared motion-card component; single-choice checking by force identity/direction and qualitative size on each axis, hints, revision, upper-right stars, cancellable progression, session history with diagrams. 500 shuffled boards, 40 rendered diagrams and routed lifecycle checked. Numerical organizer, drawing and exports excluded. Live mouse/Enter selection and selected borders checked; no submission on selection. Motion-card regressions pass. Touch/accessibility and teacher review pending. See newtons_laws_aspirations.md#c5-pilot-implementation-record. Updated 2026-10-20."
+  },
+  "Dynamics / Match the Free-Body Diagram / Flight": {
+    "status": "Enabled; conceptual scaffold; teacher preview pending",
+    "notes": "C5: ten original cases, four shuffled diagrams, clickable image selection using the shared motion-card component; single-choice checking by force identity/direction and qualitative size on each axis, hints, revision, upper-right stars, cancellable progression, session history with diagrams. 500 shuffled boards, 40 rendered diagrams and routed lifecycle checked. Numerical organizer, drawing and exports excluded. Live mouse/Enter selection and selected borders checked; no submission on selection. Motion-card regressions pass. Touch/accessibility and teacher review pending. See newtons_laws_aspirations.md#c5-pilot-implementation-record. Updated 2026-10-20."
   }
 }

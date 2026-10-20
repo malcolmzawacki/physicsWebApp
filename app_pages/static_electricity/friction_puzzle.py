@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import random
-import time
+from utils.activity_flow import next_question_countdown
+from utils.session_progress import record_answer
 from string import ascii_uppercase
 
 import streamlit as st
@@ -131,12 +132,6 @@ def render() -> None:
             st.caption(f"Correct ranking: {' > '.join(hidden_order)}")
             st.caption("Read the order from left to right as most likely to become positive through most likely to become negative.")
 
-            if result["is_correct"]:
-                st.caption("Loading the next puzzle...")
-                time.sleep(0.8)
-                _reset_logic_puzzle(state, difficulty)
-                st.rerun()
-
         performance_expander(build_performance_table(state.get("performance"), ["Easy", "Medium", "Hard"]))
 
     with ranking_col:
@@ -160,7 +155,8 @@ def render() -> None:
     with new_col:
         new_puzzle_clicked = st.button("New Puzzle", key=state.key("new_puzzle"), type="secondary", use_container_width=True)
     with check_col:
-        check_clicked = st.button("Check Puzzle", key=state.key("check_puzzle"), type="primary", use_container_width=True)
+        check_clicked = st.button("Check Puzzle", key=state.key("check_puzzle"), type="primary", use_container_width=True,
+                                  disabled=bool((state.get("last_result") or {}).get("is_correct")))
 
     if new_puzzle_clicked:
         _reset_logic_puzzle(state, difficulty)
@@ -175,6 +171,9 @@ def render() -> None:
         is_correct = not incomplete and not has_duplicates and normalized_order == tuple(hidden_order)
 
         if not incomplete and not has_duplicates:
+            record_answer("Charging by Friction: Ranking Logic Puzzle",
+                          "Rank from most likely positive to most likely negative. " + " ".join(clue["text"] for clue in case["clues"]),
+                          " > ".join(selected_order), " > ".join(hidden_order), is_correct, difficulty=difficulty)
             performance = state.get("performance")
             state.set("performance", record_performance(performance, "Ranking Logic Puzzle", difficulty, is_correct))
         state.set("submitted", True)
@@ -188,3 +187,10 @@ def render() -> None:
             },
         )
         st.rerun()
+
+    result = state.get("last_result")
+    if state.get("submitted") and result and result["is_correct"]:
+        def advance():
+            _reset_logic_puzzle(state, difficulty)
+            st.rerun()
+        next_question_countdown(state, question_number, advance, seconds=0.8)

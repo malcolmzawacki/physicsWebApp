@@ -4,6 +4,7 @@ import math
 import sympy as sp
 import re
 from utils.ui import interface
+from utils.session_progress import record_answer
 
 
 
@@ -590,6 +591,9 @@ class algebra:
                             # Check if solved
                             if algebra.is_truly_solved(new_eq, algebra_state.problem['target_var']):
                                 algebra_state.solved = True
+                                record_answer("Algebra", f"Solve for {algebra_state.problem['target_var']}: {algebra_state.problem['original_equation']}",
+                                              str(new_eq), str(new_eq), True,
+                                              explanation="; ".join(step['display'] for step in algebra_state.problem['steps_taken']))
                             
                             st.rerun()
                         else:
@@ -814,6 +818,10 @@ class sci_notate:
                         if user_input2 is not None:
                             sci_state.user_answer2 = user_input2
                             correct_answer2 = sci_state.ans2
+                            record_answer("Scientific Notation", "$" + sci_state.sci_problem + "$",
+                                          f"{user_input1} × 10^{user_input2}", f"{correct_answer} × 10^{correct_answer2}",
+                                          user_input1 == correct_answer and user_input2 == correct_answer2,
+                                          difficulty=sci_state.difficulty)
                             if (user_input1 == correct_answer) and (user_input2 == correct_answer2):
                                 st.success("Correct!")
                             elif ((user_input1 * 10**user_input2) == (correct_answer * 10**correct_answer2)):

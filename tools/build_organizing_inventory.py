@@ -26,6 +26,8 @@ GENERATORS = {
     "Wave Properties": "WaveGenerator", "Harmonics": "WaveGenerator", "deciBel Scale": "WaveGenerator",
 }
 CUSTOM = {
+    "Match the Free-Body Diagram": ["All contexts", "Surfaces", "Ropes", "Springs", "Flight"],
+    "Recognizing Forces": ["All contexts", "Surfaces", "Ropes", "Springs", "Flight"],
     "Algebra": ["Step-by-step equation rearrangement (easy / medium / hard / extra_hard)"],
     "Scientific Notation": ["Scientific-notation expressions (easy / medium / hard)"],
     "Matching Motion Graphs": ["Position-Time First", "Velocity-Time First"],

@@ -1,4 +1,5 @@
-import time
+from utils.activity_flow import next_question_countdown
+from utils.session_progress import record_answer
 
 import streamlit as st
 
@@ -212,12 +213,13 @@ def charging_by_induction_page() -> None:
     with check_col:
         check_clicked = st.button(
             "Check Answer",
+            disabled=bool(result and result["is_correct"]),
             key=state.key("check_answer"),
             type="primary",
             use_container_width=True,
         )
 
-    if check_clicked:
+    if check_clicked and not (result and result["is_correct"]):
         is_correct = True
         for obj in case["asked_objects"]:
             is_correct = is_correct and sign_answers[obj] == case["expected_signs"][obj]
@@ -227,6 +229,20 @@ def charging_by_induction_page() -> None:
             for obj in case["asked_objects"]:
                 is_correct = is_correct and amount_answers[obj] == case["expected_amounts"][obj]
 
+        submitted_answer = dict(sign_answers)
+        expected_answer = {obj: case["expected_signs"][obj] for obj in case["asked_objects"]}
+        if difficulty in ("Medium", "Hard"):
+            submitted_answer["Mechanism"] = mechanism
+            expected_answer["Mechanism"] = case["mechanism_answer"]
+        if difficulty == "Hard":
+            submitted_answer["Amounts"] = dict(amount_answers)
+            expected_answer["Amounts"] = {obj: case["expected_amounts"][obj] for obj in case["asked_objects"]}
+        question = case["title"] + ". " + case["diagram_note_before"] + " " + case["diagram_note_after"] + " Before: " + "; ".join(
+            f"{data['label']}: {charge_count_label(data['sign'], data['chunks'])} ({data['note']})"
+            for data in case["before_states"].values())
+        record_answer("Charging by Induction", question,
+                      submitted_answer, expected_answer, is_correct, difficulty=difficulty,
+                      explanation=case["explanation"])
         state.inc("attempt_count")
         if is_correct:
             state.inc("correct_count")
@@ -254,9 +270,9 @@ def charging_by_induction_page() -> None:
             st.error("Not quite.")
 
         if result["is_correct"]:
-            st.caption("Loading the next induction scenario...")
-            time.sleep(AUTO_ADVANCE_DELAY_SECONDS)
-            _reset_induction_question(state, difficulty)
-            st.rerun()
+            def advance():
+                _reset_induction_question(state, difficulty)
+                st.rerun()
+            next_question_countdown(state, question_number, advance, seconds=AUTO_ADVANCE_DELAY_SECONDS)
 
     _render_induction_performance(state)

@@ -4,6 +4,7 @@ import random
 
 
 from utils.state_proxy import StateProxy
+from utils.session_progress import record_answer
 
 
 cn_state = StateProxy("compound_names")
@@ -289,11 +290,13 @@ def on_checkbox_change():
 
 def check_answer():
     cn_state.submitted = True
-    user_input = cn_state.user_input  # Get input from the text_input widget
+    user_input = st.session_state.get("user_input")  # Match the text-input widget key.
     if user_input and user_input.strip():
         # Clean input
         user_input_clean = user_input.strip().lower().replace(' ','').replace('-','')
         correct_name_clean = cn_state.correct_name.strip().lower().replace(' ','').replace('-','')
+        record_answer("Compound Names Practice", f"Name this compound: {cn_state.formula}",
+                      user_input, cn_state.correct_name, user_input_clean == correct_name_clean)
         if user_input_clean == correct_name_clean:
             cn_state.feedback = "Correct!"
         else:

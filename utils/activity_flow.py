@@ -5,6 +5,7 @@ from collections.abc import Callable
 
 import streamlit as st
 from utils.ui_state import State
+from utils.session_progress import AUTO_LOAD_KEY
 
 
 def next_question_countdown(
@@ -19,6 +20,11 @@ def next_question_countdown(
     """
     if not math.isfinite(seconds) or seconds < 0:
         raise ValueError("Countdown seconds must be finite and nonnegative")
+    if not st.session_state.get(AUTO_LOAD_KEY, True):
+        # Restart the full countdown if automatic loading is enabled later.
+        state.pop("advance_question_id")
+        st.caption("Automatic loading is off. Review your answer, then use the new-question button when ready.")
+        return
     if state.get("advance_question_id") != question_id:
         state.set("advance_question_id", question_id)
         state.set("advance_deadline", time.monotonic() + seconds)
