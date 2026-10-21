@@ -1,6 +1,6 @@
 # Newton's Laws: activity aspirations and feasibility
 
-_Research and repository review: 2026-10-19. C4 and C5 pilots implemented for teacher preview;
+_Research and repository review: 2026-10-19. C4, C5, I2, C2, C3, and C10 pilots implemented for teacher preview;
 the remaining activities are proposals._
 
 ## Purpose and boundary
@@ -13,7 +13,7 @@ would use original questions, explanations, artwork, and implementation.
 This document assesses every entry found in TPC's Newton's Laws catalogs:
 **8 Physics Interactives and 13 Concept Builders**. It proposes educational
 equivalents, not exact copies or a promise of matching every original feature.
-The C4/C5 implementation records below describe the bounded pilots; the phases do not reorder the
+The implementation records below describe the bounded pilots; the phases do not reorder the
 active work in [the project roadmap](project_roadmap.md).
 
 The separate **Forces in Two Dimensions** catalogs are excluded, along with
@@ -359,3 +359,243 @@ diagram construction, exact force values/ratios, inclines/angled forces, two-axi
 acceleration, printable output, persistent progress, and claims of TPC parity.
 Review this pilot before the next phase-2 package (I2 construction or C2
 force-to-motion matching); sharing the renderer does not complete those activities.
+
+## I2 builder implementation record
+
+Implemented 2026-10-20 as **Dynamics > Free-Body Diagram Builder**, at both course
+levels. Model, typed checker, and box/arrow renderer:
+`utils/force_diagram_builder.py`; workspace:
+`utils/force_diagram_builder_ui.py`. The case matrix is the same ten situations
+listed in the C5 record above, with the same named objects and explicit physical
+assumptions. C4/C5 retain their identification/selection interactions.
+
+Students select any of the seven force types, then choose Up/Down/Left/Right and
+Short/Medium/Long independently for each. Directions begin unchosen. Editing
+updates the preview immediately without checking or scoring. A central box
+represents the target; W/N/f/T/P/S/D symbols have a visible force legend and an
+optional full text description. Arrow lengths are fixed by the selected category;
+the box expands only to separate parallel arrows and has no physical size meaning.
+All seven arrows can be displayed even when a student adds physically wrong ones.
+
+Check diagram separates missing/extra interactions, incorrect directions, and
+relative-size errors. Missing/wrong-direction arrows defer their size comparison.
+Only opposite expected forces on the same axis are compared: equality or the
+required larger/smaller relationship. Multiple valid constructions are accepted,
+including different overall scales and independently chosen horizontal/vertical
+scales. Single-force cases impose no size restriction. There are no exact numeric
+force ratios, angled arrows, or two-axis acceleration tasks. Incomplete direction
+entries are unscored. No arrows is an explicit force-free attempt, rather than an
+invalid blank numeric answer; none of these ten Earth scenarios accepts it.
+
+The primary Check button and optional hint are side by side below the controls.
+The diagram remains beside them. Last-check feedback persists while editing;
+drafts survive navigation. Identical unchanged checks do not duplicate records.
+Success locks the editor, awards one upper-right star, and starts the shared
+five-second cancellable countdown, respecting the global automatic-loading
+preference. Skip/next, related cases, context filters, session performance and
+reset mirror C4/C5. Current Session Progress snapshots the student's submitted
+diagram and one valid example, labeled as an example rather than the only answer.
+
+`python tools/test_force_diagram_builder.py` independently checks **25,068 complete
+constructions** against expected force directions and net-force signs, plus all
+**1,280 force-presence sets**. Tests cover accepted alternate scales, separate
+feedback categories, invalid/repeated arrows, duplicate checking, all ten rendered
+solutions, empty diagrams and all-seven-arrow stress cases in every direction at
+each length. Routed AppTest covers live draft updates without scoring, incomplete
+directions, revision/hints, navigation, every case, locking, upper-right stars,
+session image history, context changes, skip/reset, auto-load off and countdown
+cancellation/resumption. Post-countdown dynamic-widget cleanup is reviewed in the
+live browser because AppTest retains obsolete editor widgets in its element tree
+after the automatic rerun. The check is part of CI. Integration checks passed for
+all 4,320 existing generator payloads, prompt/answer consistency, nine solve-for
+tests, C5, and inventory drift (44 routes, 156 rows, no unresolved adapters).
+
+Live browser review covers adding forces, choosing directions, preview updates,
+checking, and the correct-answer transition. Teacher review, touch and assistive
+technology testing remain pending. Drag manipulation, more original situations,
+the distinct I3 sequel, inclines/angled forces, two-axis acceleration, numerical
+equations, exports and durable learner history are excluded. C2 force-to-motion
+matching was subsequently implemented as the separate pilot below.
+
+## C2 force and motion implementation record
+
+Implemented 2026-10-20 as **Dynamics > Force and Motion Matching** at both course
+levels. Sources: `utils/force_motion_match.py`, `utils/force_motion_match_ui.py`,
+and the backward-compatible multiple-selection extension to `utils/graph_cards.py`
+and its frontend. Original constant-force cases avoid assuming that net force
+determines velocity. Four shuffled choices contain all three compatible motion
+types plus one incompatible distractor, selected from a nine-history library.
+
+| Case | Axis / net force | Accepted motion types |
+|---|---|---|
+| Smooth cart, no horizontal push | Horizontal / zero | Rest; constant speed right; constant speed left |
+| Smooth cart, steady right push | Horizontal / right | Speeding up right; slowing down left; starting from rest right |
+| Smooth cart, steady left push | Horizontal / left | Speeding up left; slowing down right; starting from rest left |
+| Cable tension equals weight | Vertical / zero | Rest; constant speed up; constant speed down |
+| Cable tension greater than weight | Vertical / up | Speeding up upward; slowing down downward; starting from rest upward |
+| Cable tension smaller than weight | Vertical / down | Speeding up downward; slowing down upward; starting from rest downward |
+| Gravity-only ball in flight | Vertical / down | Speeding up downward; slowing down upward; starting from rest downward |
+
+Initial velocity is explicitly unspecified. External forces remain constant over
+the shown interval, and there are no impacts or travel limits during that
+interval. The cable can move vertically with its load. Friction, drag and spring
+force constraints are deliberately excluded: those interactions can restrict
+velocity or vary with position and cannot silently inherit this answer rule.
+Only one axis accelerates. Constant acceleration is qualitative; absolute force,
+mass, and acceleration magnitudes are not provided. Histories admit a physically
+consistent choice of timescale/magnitude for each force case.
+
+Each motion definition gives its words, four numbered equal-time dots, and text
+positions from the same position function. Slowdown histories retain their initial
+direction throughout the displayed interval. Start-from-rest descriptions declare
+the initial condition explicitly. Dot spacing has a schematic scale within each
+card; exact distances are not compared between cards. Rest is shown as one point
+with all four times at that position.
+
+The same clickable card component now supports a multiple-selection mode without
+changing its single-answer defaults. Each card toggles its selected border and
+button state. Browser messages submit a full set with a question ID; malformed,
+duplicate-index, out-of-range and stale events are ignored. Selecting/deselecting
+does not score. Check motions grades exact sets; missing/extra choices receive
+explicit feedback and permit revision. Empty selection is an unscored request to
+choose at least one option. No partial set is marked complete or awarded a star.
+Hints, duplicate-check protection, one upper-right star per completed set, shared
+automatic-loading preference and cancellable countdown, related/skip/next,
+context filters, reset and session history snapshots follow the earlier pilots.
+
+Verification: `python tools/test_force_motion_match.py` passes seven independent
+net-force signs and **2,240 answer sets**, plus position/acceleration consistency,
+no reversal during slowdown, 18 rendered motion diagrams, invalid event checks,
+and routed multi-selection/deselection, hints, revisions, navigation, history,
+completion locking, stars, context/reset and countdown checks.
+`node tools/test_graph_cards_frontend.js` exercises the actual frontend script in
+a small mocked DOM: independent toggling, deselect-all, backend restoration,
+locking, hidden correctness before completion, and unchanged reference/single
+selection indexing. CI configures Node 22; no npm packages are needed. Existing
+C5 and motion-card lifecycle regressions, nine solve-for tests, 4,320 generator
+payloads, prompt/answer consistency and inventory drift also pass. Artwork was
+inspected internally; no live-browser/touch/accessibility certification is claimed.
+Teacher/layout review remains deferred at the user's request while at work.
+
+Excluded: simultaneous two-axis acceleration, reversals during a dot sequence,
+velocity-dependent friction/drag, changing forces, persistent history and exports.
+The next bounded candidate was C3 Change of State, subsequently implemented below;
+the user may review the diagram builder and these new pages together when home.
+
+## C3 Change of State implementation record
+
+Implemented 2026-10-20 as **Dynamics > Change of State**, available at both course
+levels. Typed force states and checking are in `utils/force_change.py`; the page
+is `utils/force_change_ui.py`. This is an original horizontal, same-cart pilot.
+It is a different decision from C2: the initial motion is known, and the student
+chooses how to change one interaction to produce a requested next motion.
+
+| Situation(s) | Initial right push / left rope pull | Requested initial motion after change |
+|---|---|---|
+| Start right / start left | 10 N / 10 N; cart at rest | Begin moving in the requested direction |
+| Add a push / add a rope pull | 0 N / 0 N; cart at rest | Begin moving right / left by adding one interaction |
+| Coast right / coast left | 20 N / 10 N or 10 N / 20 N; speeding up in that direction | Continue in the same direction at constant speed |
+| Slow right / slow left | 20 N / 10 N or 10 N / 20 N; speeding up in that direction | Slow down while still moving in that direction |
+| Increase acceleration right / left | 20 N / 10 N or 10 N / 20 N; speeding up in that direction | Speed up in that direction at a greater rate than before |
+
+All ten cases share a level, frictionless track and explicitly neglected air
+resistance. Mass, 20 N weight, and 20 N normal force stay unchanged. A direct hand
+push acts right and a winch-controlled rope pull acts left. Each interaction can
+be absent (0 N), 10 N, 20 N or 30 N. After each change, the forces stay constant.
+The request concerns the initial interval afterward, before stopping/reversal;
+a force change cannot instantaneously remove or reverse velocity.
+
+Each question offers four shuffled changes to exactly one interaction, keeping all valid changes and sampling the remaining distractors.
+These include adding/removing an interaction and increasing/reducing its force
+where applicable. Every case has two or three valid alternatives, all of which
+must be selected. A correct alternative can change the push or the opposing pull;
+the checker does not assume one uniquely preferred physical intervention.
+Exact net forces from the labeled values determine the appropriate acceleration
+direction, zero acceleration, or greater acceleration in the existing direction.
+Changing two interactions is rejected, even when it could meet the motion goal.
+Arrow lengths share a consistent N scale and the same force state produces the
+image, full description, change wording and answer decision. Zero-force arrows
+are omitted. No rounded numerical answer/tolerance is involved.
+
+The initial force diagram sits beside four clickable after-diagrams in a compact two-by-two grid. The known motion and request appear above the board. A text expander identifies what changed and describes all forces.
+The whole selected set is checked explicitly, with missing/extra alternatives
+and explanatory net-force feedback. Wrong sets remain revisable; unchanged checks
+do not duplicate attempts. Shared hints, upper-right stars, auto-load preference,
+cancellable countdown, related/skip/next, four context filters, session image
+history and reset follow C2. Selection and hints do not score or advance.
+
+`python tools/test_force_change.py` verifies all **160 case/state combinations**
+against an independent valid-change matrix, **4,800 answer sets** across shuffled
+boards, one-interaction constraints, all four change operations, all 16 possible
+rendered force diagrams, invalid states, exact-set retries and completion locking.
+Routed AppTest checks all ten cases, empty/partial submissions, selection and
+deselection, stale events, hints, navigation, single stars/history records,
+contexts/reset, auto-load off and countdown cancellation/resumption.
+The script is included in CI. C2 regressions, nine solve-for tests, 4,320 generator
+payloads, prompt/answer consistency and inventory drift also pass (46 routes,
+164 rows, no unresolved adapters). All 16 diagrams were inspected internally;
+teacher/layout, live-browser/touch and assistive-technology review remain deferred.
+
+Excluded: editable after-diagrams, more than one simultaneous interaction change,
+vertical/angled forces, friction/drag, changing mass, stop/reversal timing,
+continuous simulation, worksheet export and durable history. C6 Normal Force
+Card Sort is the next phase-3 candidate after this bounded pilot.
+
+## C10 Ranking implementation record
+
+Implemented 2026-10-20 at the user's request as **Dynamics > Net Force and
+Acceleration Ranking**. This takes priority over the proposed C6 card sort.
+The model is in `utils/force_ranking.py` and the page in
+`utils/force_ranking_ui.py`.
+
+Students rank four labeled carts using rank selectors, with 1 representing the
+greatest value. Equal values share a rank; both dense ranks and gaps after ties
+are accepted when every pair is ordered correctly. The 16 settings combinations
+cover net force or acceleration, magnitude or signed horizontal value, equal or
+different masses, and boards with or without ties. Fresh boards with ties have
+exactly one tied pair. Signed comparisons explicitly define right as positive;
+magnitude comparisons disregard direction.
+
+Each cart has a rightward hand push and leftward rope pull from 0 to 60 N in
+10 N steps, and mass from 1 to 4 kg. A horizontal frictionless track, negligible
+air resistance, balanced vertical forces and g = 10 N/kg are explicit. Diagrams
+share one force-arrow scale across the board, label forces and masses, and have
+full text descriptions. Net force is calculated from the same state that draws
+the diagram; acceleration uses exact rational arithmetic. No rounded-answer
+tolerance or velocity inference is involved.
+
+The primary Check ranking button gives revisable pairwise feedback and an
+expandable calculation reference. Incomplete submissions are unscored and
+unchanged checks do not duplicate attempts. Hints, upper-right stars, session
+image history, reset, skip/next and the shared cancellable auto-load countdown
+follow the earlier activities. Rank the same cases by the other quantity keeps
+the four physical cases while switching between force and acceleration; ties
+may therefore change, independently of the fresh-board tie setting.
+
+`python tools/test_force_ranking.py` checks **1,600 generated boards** and
+**20,480 complete rank assignments** against independently calculated values.
+It includes signed/magnitude counterexamples, force/acceleration order reversals,
+triple and all-cart ties, rank gaps, invalid submissions, and 36 diagram stress
+cases. Routed AppTest covers all 16 settings combinations, incomplete and repeated
+submissions, revisions, hints, stars/history, same-case comparisons, navigation,
+reset and countdown behavior. The script is included in CI. Integration checks
+cover the nine solve-for tests, 4,320 payloads, prompt/answer consistency, C3
+regressions and inventory drift (47 routes, 166 rows, no unresolved adapters).
+
+Internal diagram inspection is complete. Teacher/layout, live touch and
+assistive-technology review remain deferred until the user can review at home.
+Excluded: dragging to rank, angled forces, friction/drag, time-varying forces,
+worksheet export and durable history. C6 remains a later candidate.
+
+
+### C2/C3 layout revision (2026-10-21)
+
+Following teacher review, both pages now offer four choices in a two-by-two grid
+beside the initial force diagram. All compatible motions / valid changes remain
+included; remaining slots sample incompatible distractors. Cards use the images'
+natural proportions within a bounded board rather than stretching image panels
+across the page. Narrow phone layouts put the reference above the choices.
+Existing six-option drafts restart on the updated board. Automated model and
+routed UI checks pass (2,240 C2 and 4,800 C3 answer sets), and the shared frontend
+check covers four-choice reference indexing and selection. Builder and ranking
+interfaces are unchanged.

@@ -4,8 +4,8 @@ All 39 routed activities in `Home.py` were evaluated, including custom layouts,
 chemistry, labs, and the three charging-by-friction modes. This change exposes
 existing, identifiable targets; it does not redesign difficulty or invent inverses.
 
-That count describes the original evaluation. The current router has 43 routes
-(41 practice activities and two worksheet builders). Wave Properties was expanded
+That count describes the original evaluation. The current router has 47 routes
+(45 practice activities and two worksheet builders). Wave Properties was expanded
 to eight reviewed forms on 2026-10-12; see its linked family review.
 
 **Implemented** means browser controls and `DocumentGenerator.question()` use the
@@ -23,6 +23,10 @@ of public numeric link indices. See [the readable target list](solve_for_targets
 
 | Activity | Status | Current code and scope | Route source |
 |---|---|---|---|
+| Net Force and Acceleration Ranking | Fixed ranking task | Rank four cases by net force or acceleration, magnitude or signed horizontal value, with equal/varied masses and ties. Rank selectors grade ordering and ties rather than numerical unknowns. | [render_force_ranking](../utils/force_ranking_ui.py) |
+| Change of State | Fixed conceptual task | Select all one-interaction force changes that produce a requested change in motion; same cart/mass, numeric force labels and horizontal acceleration. No numerical solve-for target. | [render_force_change](../utils/force_change_ui.py) |
+| Force and Motion Matching | Fixed conceptual task | Select every compatible constant-acceleration motion from a fixed qualitative force diagram; initial velocity is not prescribed. Exact-set checking; no numerical solve-for target. | [render_force_motion_match](../utils/force_motion_match_ui.py) |
+| Free-Body Diagram Builder | Fixed conceptual task | Construct forces, cardinal directions, and qualitative arrow lengths for ten original cases. Multiple equivalent diagrams are accepted; no numerical inverse target. | [render_force_diagram_builder](../utils/force_diagram_builder_ui.py) |
 | Recognizing Forces | Fixed conceptual task | Select all force types acting on a named object. Context filters select original scenarios; no numerical unknown or inverse target applies. | [render_recognizing_forces](../utils/recognizing_forces_ui.py) |
 | Match the Free-Body Diagram | Fixed conceptual task | Select one diagram by force identity, direction, and relative size on each axis. Ten original cases; context selection is not a numerical solve-for target. | [render_force_diagram_match](../utils/force_diagram_match_ui.py) |
 | Create a worksheet | Shared builder | Constant and accelerated motion sections use the existing per-type target catalog; this is an export route rather than a practice activity. | [render_kinematics_worksheet](../utils/worksheet_ui.py) |

@@ -18,8 +18,24 @@ teacher-preview pilot (2026-10-19); see current state and the aspiration's C4
 implementation record. After the C4 interaction review, C5 Match the Free-Body
 Diagram is now enabled for teacher preview (2026-10-20), covering ten original
 cases with diagram selection, direction/size feedback, and the same progression.
-Review this bounded pilot before implementing I2 diagram construction or C2
-force-to-motion matching; the rest of the unit remains aspirational.
+I2 Free-Body Diagram Builder is now enabled for teacher preview (2026-10-20):
+ten shared situations, live widget-driven construction, and separate force,
+direction, and relative-size feedback. Review the editor before expanding to
+dragging or additional situations. C2 Force and Motion Matching is now enabled
+for teacher preview (2026-10-20): seven force cases, six motion cards, exact-set
+multi-selection, and explicit unknown initial velocity. Teacher/layout review of
+these pilots is deferred until the teacher is home; continue bounded implementation
+and automated verification without blocking on small layout decisions. Phase 2's
+initial selection/construction activities are implemented for preview; broader
+content and classroom readiness remain separate. C3 Change of State is now enabled
+for deferred teacher review (2026-10-20): ten before/after cases, add/remove/
+increase/reduce options, and exact-set matching to the requested motion change.
+Teacher priority changed to C10 Net Force and Acceleration Ranking, now enabled
+for deferred review (2026-10-20): four-case boards, separate net force/acceleration
+and magnitude/signed modes, controlled masses/ties, and same-case quantity
+comparison. C6 Normal Force Card Sort remains a later phase-3 candidate.
+Teacher/layout review of the recent pages remains deferred; the rest of the unit
+is aspirational.
 
 Help students with a wider range of starting abilities participate meaningfully
 in physics and chemistry, then develop greater independence. Practice should

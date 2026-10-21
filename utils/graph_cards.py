@@ -27,11 +27,26 @@ def selected_index(event, question_id, count):
     return index if type(index) is int and 0 <= index < count else None
 
 
+def selected_indices(event, question_id, count):
+    """A valid empty set means deselected; None means ignore a stale/bad event."""
+    if not isinstance(event, dict) or event.get("question_id") != question_id:
+        return None
+    indices = event.get("indices")
+    if not isinstance(indices, list) or any(type(i) is not int or not 0 <= i < count for i in indices):
+        return None
+    if len(indices) != len(set(indices)):
+        return None
+    return tuple(sorted(indices))
+
+
 def graph_cards(images, labels, question_id, selection, locked, layout, key, correct_index=None,
-                has_reference=True, option_name="Graph", check_label="Check Match", descriptions=None):
+                has_reference=True, option_name="Graph", check_label="Check Match", descriptions=None,
+                multi_select=False, correct_indices=None, reference_label="Reference graph"):
     return _board(images=images, labels=labels, question_id=question_id,
                   selection=selection, locked=locked, layout=layout,
                   correct_index=correct_index if locked else None,
                   has_reference=has_reference, option_name=option_name,
                   check_label=check_label, descriptions=descriptions,
+                  multi_select=multi_select, reference_label=reference_label,
+                  correct_indices=list(correct_indices) if locked and correct_indices is not None else None,
                   key=key, default=None)

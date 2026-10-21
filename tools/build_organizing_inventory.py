@@ -26,6 +26,10 @@ GENERATORS = {
     "Wave Properties": "WaveGenerator", "Harmonics": "WaveGenerator", "deciBel Scale": "WaveGenerator",
 }
 CUSTOM = {
+    "Net Force and Acceleration Ranking": ["Net force", "Acceleration"],
+    "Change of State": ["All situations", "Start moving", "Change speed", "Change acceleration"],
+    "Force and Motion Matching": ["All situations", "Balanced forces", "Horizontal net force", "Vertical net force"],
+    "Free-Body Diagram Builder": ["All contexts", "Surfaces", "Ropes", "Springs", "Flight"],
     "Match the Free-Body Diagram": ["All contexts", "Surfaces", "Ropes", "Springs", "Flight"],
     "Recognizing Forces": ["All contexts", "Surfaces", "Ropes", "Springs", "Flight"],
     "Algebra": ["Step-by-step equation rearrangement (easy / medium / hard / extra_hard)"],

@@ -19,6 +19,13 @@ img { display:block; width:100%; height:clamp(130px,20vw,180px); object-fit:cont
 #board.column .reference { grid-column:1; grid-row:1 / span 3; align-self:start; }
 #board.column button { grid-column:2; }
 #board.column button img, #board.column .reference img { height:auto; }
+#board.beside { grid-template-columns:repeat(3,minmax(0,1fr)); max-width:960px; margin-inline:auto; align-items:start; }
+#board.beside .reference { grid-column:1; grid-row:1 / span 2; align-self:center; }
+#board.beside img { height:auto; }
+@media(max-width:550px) {
+ #board.beside { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ #board.beside .reference { grid-column:1 / -1; grid-row:auto; width:50%; justify-self:center; }
+}
 @media(max-width:550px) {
  #board, #board.column { grid-template-columns:minmax(0,1fr); }
  #board.column .reference, #board.column button { grid-column:auto; grid-row:auto; }
@@ -31,7 +38,7 @@ img { display:block; width:100%; height:clamp(130px,20vw,180px); object-fit:cont
 <script>
 // Streamlit components-v1 message protocol. No remote scripts or styles.
 const board=document.getElementById('board'), live=document.getElementById('live');
-let args=null, selected=null, lastHeight=0;
+let args=null, selected=null, selectedMany=new Set(), lastHeight=0;
 function send(type,fields) { window.parent.postMessage({isStreamlitMessage:true,type,...fields},'*'); }
 function resize() {
  const height=Math.ceil(document.body.getBoundingClientRect().height);
@@ -39,27 +46,31 @@ function resize() {
 }
 function paintSelection() {
  [...board.querySelectorAll('button')].forEach((card,index)=>{
-  card.classList.toggle('selected',index===selected);
-  card.classList.toggle('correct',args.locked && index===args.correct_index);
-  card.setAttribute('aria-pressed',String(index===selected)); card.disabled=Boolean(args.locked);
-  card.querySelector('.status').textContent=args.locked && index===args.correct_index
-   ? (index===selected ? 'Selected · Correct' : 'Correct answer') : index===selected ? 'Selected' : 'Choose';
+  const chosen=args.multi_select ? selectedMany.has(index) : index===selected;
+  const correct=args.multi_select ? (args.correct_indices || []).includes(index) : index===args.correct_index;
+  card.classList.toggle('selected',chosen);
+  card.classList.toggle('correct',args.locked && correct);
+  card.setAttribute('aria-pressed',String(chosen)); card.disabled=Boolean(args.locked);
+  card.querySelector('.status').textContent=args.locked && correct
+   ? (chosen ? 'Selected · Correct' : 'Correct answer') : chosen ? 'Selected' : 'Choose';
  });
  const noun=args.option_name || 'Graph', check=args.check_label || 'Check Match';
  live.textContent=args.locked ? 'Answer submitted. Choices are locked for this set.'
+  : args.multi_select ? `${selectedMany.size} selected. Click cards to select or deselect, then press ${check}.`
   : selected===null ? `Click a ${noun.toLowerCase()} to select it, then press ${check}.`
   : `${noun} ${args.labels[selected]} selected. Press ${check} when ready.`;
  resize();
 }
 function render(message) {
- const next=message.args, rebuild=!args || next.question_id!==args.question_id;
+ const next=message.args, rebuild=!args || next.question_id!==args.question_id || next.multi_select!==args.multi_select;
  const focusIndex=[...board.querySelectorAll('button')].indexOf(document.activeElement);
  args=next; selected=Number.isInteger(args.selection) ? args.selection : null;
+ selectedMany=new Set(Array.isArray(args.selection) ? args.selection : []);
  const theme=message.theme || {};
  for(const [css,key] of [['--bg','backgroundColor'],['--text','textColor'],['--accent','primaryColor'],['--secondary','secondaryBackgroundColor']]) {
   if(theme[key]) document.documentElement.style.setProperty(css,theme[key]);
  }
- board.className=args.layout==='Options in a column' ? 'column' : '';
+ board.className=args.layout==='Reference beside options' ? 'beside' : args.layout==='Options in a column' ? 'column' : '';
  if(rebuild) {
   board.replaceChildren();
   const hasReference=args.has_reference!==false, noun=args.option_name || 'Graph';
@@ -69,17 +80,22 @@ function render(message) {
    const card=document.createElement(reference ? 'div' : 'button');
    card.className='card'+(reference ? ' reference' : '');
    const heading=document.createElement('div'); heading.className='heading';
-   const title=document.createElement('strong'); title.textContent=reference ? 'Reference graph' : `${noun} ${args.labels[index]}`;
+   const title=document.createElement('strong'); title.textContent=reference ? (args.reference_label || 'Reference graph') : `${noun} ${args.labels[index]}`;
    const status=document.createElement('span'); status.className='status'; heading.append(title,status);
    const img=document.createElement('img'); img.src=src;
-   img.alt=reference ? 'Reference motion graph' : (args.descriptions?.[index] || `${noun} option ${args.labels[index]}`);
+   img.alt=reference ? (args.reference_label || 'Reference motion graph') : (args.descriptions?.[index] || `${noun} option ${args.labels[index]}`);
    img.onload=resize; card.append(heading,img);
    if(!reference) {
     card.type='button'; card.setAttribute('aria-label',`Select ${noun.toLowerCase()} ${args.labels[index]}`);
     card.addEventListener('click',()=>{
      if(args.locked) return;
-     selected=index; paintSelection();
-     send('streamlit:setComponentValue',{dataType:'json',value:{question_id:args.question_id,index:selected}});
+     if(args.multi_select) {
+      if(selectedMany.has(index)) selectedMany.delete(index); else selectedMany.add(index);
+     } else selected=index;
+     paintSelection();
+     const value=args.multi_select ? {question_id:args.question_id,indices:[...selectedMany].sort((a,b)=>a-b)}
+      : {question_id:args.question_id,index:selected};
+     send('streamlit:setComponentValue',{dataType:'json',value});
     });
    }
    board.append(card);

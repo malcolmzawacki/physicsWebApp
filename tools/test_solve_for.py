@@ -177,7 +177,7 @@ Interface('target_test','Energy',EnergyBasicsGenerator(),None,['Easy','Medium','
         for items in routes.values():
             walk(items)
         report = (ROOT/'docs/solve_for_evaluation.md').read_text(encoding='utf-8')
-        self.assertEqual(len(names), 43)  # 41 practice routes plus Kinematics and Dynamics worksheet builders
+        self.assertEqual(len(names), 47)  # 45 practice routes plus Kinematics and Dynamics worksheet builders
         for name in names:
             self.assertIn('| '+name+' |', report)
 

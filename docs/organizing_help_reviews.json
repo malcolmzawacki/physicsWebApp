@@ -178,5 +178,65 @@
   "Dynamics / Match the Free-Body Diagram / Flight": {
     "status": "Enabled; conceptual scaffold; teacher preview pending",
     "notes": "C5: ten original cases, four shuffled diagrams, clickable image selection using the shared motion-card component; single-choice checking by force identity/direction and qualitative size on each axis, hints, revision, upper-right stars, cancellable progression, session history with diagrams. 500 shuffled boards, 40 rendered diagrams and routed lifecycle checked. Numerical organizer, drawing and exports excluded. Live mouse/Enter selection and selected borders checked; no submission on selection. Motion-card regressions pass. Touch/accessibility and teacher review pending. See newtons_laws_aspirations.md#c5-pilot-implementation-record. Updated 2026-10-20."
+  },
+  "Dynamics / Free-Body Diagram Builder / All contexts": {
+    "status": "Enabled; conceptual scaffold; teacher preview pending",
+    "notes": "I2: ten shared bounded situations; live force/direction/Short-Medium-Long editor and symbol-labeled preview. Separate presence/direction/size checks accept equivalent constructions. Hints, revisions, upper-right stars, shared cancellable progression, drafts, session snapshots and reset. 25,068 complete constructions, 1,280 force sets, rendering stress and routed lifecycle checked. Dragging, numerical equations, inclines, two-axis acceleration and exports excluded. See newtons_laws_aspirations.md#i2-builder-implementation-record. Updated 2026-10-20."
+  },
+  "Dynamics / Free-Body Diagram Builder / Surfaces": {
+    "status": "Enabled; conceptual scaffold; teacher preview pending",
+    "notes": "I2: ten shared bounded situations; live force/direction/Short-Medium-Long editor and symbol-labeled preview. Separate presence/direction/size checks accept equivalent constructions. Hints, revisions, upper-right stars, shared cancellable progression, drafts, session snapshots and reset. 25,068 complete constructions, 1,280 force sets, rendering stress and routed lifecycle checked. Dragging, numerical equations, inclines, two-axis acceleration and exports excluded. See newtons_laws_aspirations.md#i2-builder-implementation-record. Updated 2026-10-20."
+  },
+  "Dynamics / Free-Body Diagram Builder / Ropes": {
+    "status": "Enabled; conceptual scaffold; teacher preview pending",
+    "notes": "I2: ten shared bounded situations; live force/direction/Short-Medium-Long editor and symbol-labeled preview. Separate presence/direction/size checks accept equivalent constructions. Hints, revisions, upper-right stars, shared cancellable progression, drafts, session snapshots and reset. 25,068 complete constructions, 1,280 force sets, rendering stress and routed lifecycle checked. Dragging, numerical equations, inclines, two-axis acceleration and exports excluded. See newtons_laws_aspirations.md#i2-builder-implementation-record. Updated 2026-10-20."
+  },
+  "Dynamics / Free-Body Diagram Builder / Springs": {
+    "status": "Enabled; conceptual scaffold; teacher preview pending",
+    "notes": "I2: ten shared bounded situations; live force/direction/Short-Medium-Long editor and symbol-labeled preview. Separate presence/direction/size checks accept equivalent constructions. Hints, revisions, upper-right stars, shared cancellable progression, drafts, session snapshots and reset. 25,068 complete constructions, 1,280 force sets, rendering stress and routed lifecycle checked. Dragging, numerical equations, inclines, two-axis acceleration and exports excluded. See newtons_laws_aspirations.md#i2-builder-implementation-record. Updated 2026-10-20."
+  },
+  "Dynamics / Free-Body Diagram Builder / Flight": {
+    "status": "Enabled; conceptual scaffold; teacher preview pending",
+    "notes": "I2: ten shared bounded situations; live force/direction/Short-Medium-Long editor and symbol-labeled preview. Separate presence/direction/size checks accept equivalent constructions. Hints, revisions, upper-right stars, shared cancellable progression, drafts, session snapshots and reset. 25,068 complete constructions, 1,280 force sets, rendering stress and routed lifecycle checked. Dragging, numerical equations, inclines, two-axis acceleration and exports excluded. See newtons_laws_aspirations.md#i2-builder-implementation-record. Updated 2026-10-20."
+  },
+  "Dynamics / Force and Motion Matching / All situations": {
+    "status": "Enabled; conceptual scaffold; teacher/layout review deferred",
+    "notes": "C2: seven constant-force cases, four multi-select motion cards beside the initial diagram, nine synchronized motion histories. Initial velocity explicitly unknown; balanced forces admit rest and coasting both ways, unbalanced forces admit opposing initial directions. Exact-set missing/extra feedback, revisions, hints, stars, session images and cancellable progression. 2,240 answer sets and routed lifecycle checked. No velocity-dependent friction/drag or two-axis acceleration. Teacher/layout review deferred at user request. See newtons_laws_aspirations.md#c2-force-and-motion-implementation-record. Updated 2026-10-20."
+  },
+  "Dynamics / Force and Motion Matching / Balanced forces": {
+    "status": "Enabled; conceptual scaffold; teacher/layout review deferred",
+    "notes": "C2: seven constant-force cases, four multi-select motion cards beside the initial diagram, nine synchronized motion histories. Initial velocity explicitly unknown; balanced forces admit rest and coasting both ways, unbalanced forces admit opposing initial directions. Exact-set missing/extra feedback, revisions, hints, stars, session images and cancellable progression. 2,240 answer sets and routed lifecycle checked. No velocity-dependent friction/drag or two-axis acceleration. Teacher/layout review deferred at user request. See newtons_laws_aspirations.md#c2-force-and-motion-implementation-record. Updated 2026-10-20."
+  },
+  "Dynamics / Force and Motion Matching / Horizontal net force": {
+    "status": "Enabled; conceptual scaffold; teacher/layout review deferred",
+    "notes": "C2: seven constant-force cases, four multi-select motion cards beside the initial diagram, nine synchronized motion histories. Initial velocity explicitly unknown; balanced forces admit rest and coasting both ways, unbalanced forces admit opposing initial directions. Exact-set missing/extra feedback, revisions, hints, stars, session images and cancellable progression. 2,240 answer sets and routed lifecycle checked. No velocity-dependent friction/drag or two-axis acceleration. Teacher/layout review deferred at user request. See newtons_laws_aspirations.md#c2-force-and-motion-implementation-record. Updated 2026-10-20."
+  },
+  "Dynamics / Force and Motion Matching / Vertical net force": {
+    "status": "Enabled; conceptual scaffold; teacher/layout review deferred",
+    "notes": "C2: seven constant-force cases, four multi-select motion cards beside the initial diagram, nine synchronized motion histories. Initial velocity explicitly unknown; balanced forces admit rest and coasting both ways, unbalanced forces admit opposing initial directions. Exact-set missing/extra feedback, revisions, hints, stars, session images and cancellable progression. 2,240 answer sets and routed lifecycle checked. No velocity-dependent friction/drag or two-axis acceleration. Teacher/layout review deferred at user request. See newtons_laws_aspirations.md#c2-force-and-motion-implementation-record. Updated 2026-10-20."
+  },
+  "Dynamics / Change of State / All situations": {
+    "status": "Enabled; conceptual scaffold; teacher/layout review deferred",
+    "notes": "C3: ten before/after cart cases; four one-interaction changes beside the initial diagram, adding/removing/increasing/reducing horizontal pushes and rope pulls. Same mass and vertical equilibrium; explicit force magnitudes. Exact-set checking for requested acceleration/motion, hints/revisions/stars/session snapshots/cancellable progression. All 160 case/state combinations, 4,800 answer sets, 16 diagrams and routed lifecycle checked. Teacher/layout review deferred. See newtons_laws_aspirations.md#c3-change-of-state-implementation-record. Updated 2026-10-20."
+  },
+  "Dynamics / Change of State / Start moving": {
+    "status": "Enabled; conceptual scaffold; teacher/layout review deferred",
+    "notes": "C3: ten before/after cart cases; four one-interaction changes beside the initial diagram, adding/removing/increasing/reducing horizontal pushes and rope pulls. Same mass and vertical equilibrium; explicit force magnitudes. Exact-set checking for requested acceleration/motion, hints/revisions/stars/session snapshots/cancellable progression. All 160 case/state combinations, 4,800 answer sets, 16 diagrams and routed lifecycle checked. Teacher/layout review deferred. See newtons_laws_aspirations.md#c3-change-of-state-implementation-record. Updated 2026-10-20."
+  },
+  "Dynamics / Change of State / Change speed": {
+    "status": "Enabled; conceptual scaffold; teacher/layout review deferred",
+    "notes": "C3: ten before/after cart cases; four one-interaction changes beside the initial diagram, adding/removing/increasing/reducing horizontal pushes and rope pulls. Same mass and vertical equilibrium; explicit force magnitudes. Exact-set checking for requested acceleration/motion, hints/revisions/stars/session snapshots/cancellable progression. All 160 case/state combinations, 4,800 answer sets, 16 diagrams and routed lifecycle checked. Teacher/layout review deferred. See newtons_laws_aspirations.md#c3-change-of-state-implementation-record. Updated 2026-10-20."
+  },
+  "Dynamics / Change of State / Change acceleration": {
+    "status": "Enabled; conceptual scaffold; teacher/layout review deferred",
+    "notes": "C3: ten before/after cart cases; four one-interaction changes beside the initial diagram, adding/removing/increasing/reducing horizontal pushes and rope pulls. Same mass and vertical equilibrium; explicit force magnitudes. Exact-set checking for requested acceleration/motion, hints/revisions/stars/session snapshots/cancellable progression. All 160 case/state combinations, 4,800 answer sets, 16 diagrams and routed lifecycle checked. Teacher/layout review deferred. See newtons_laws_aspirations.md#c3-change-of-state-implementation-record. Updated 2026-10-20."
+  },
+  "Dynamics / Net Force and Acceleration Ranking / Net force": {
+    "status": "Enabled; ranking scaffold; teacher/layout review deferred",
+    "notes": "C10: four-case cart rankings; magnitude or signed horizontal components, equal/different masses, controlled ties. Exact rational values, pairwise ordering/tie checking, rank gaps accepted, explicit form submission, hints/revision/stars/history/shared countdown. Same-case comparison switches force and acceleration. 1,600 boards, 20,480 rank assignments, 36 diagrams and all 16 routed settings checked. Teacher/layout review deferred. See newtons_laws_aspirations.md#c10-ranking-implementation-record. Updated 2026-10-20."
+  },
+  "Dynamics / Net Force and Acceleration Ranking / Acceleration": {
+    "status": "Enabled; ranking scaffold; teacher/layout review deferred",
+    "notes": "C10: four-case cart rankings; magnitude or signed horizontal components, equal/different masses, controlled ties. Exact rational values, pairwise ordering/tie checking, rank gaps accepted, explicit form submission, hints/revision/stars/history/shared countdown. Same-case comparison switches force and acceleration. 1,600 boards, 20,480 rank assignments, 36 diagrams and all 16 routed settings checked. Teacher/layout review deferred. See newtons_laws_aspirations.md#c10-ranking-implementation-record. Updated 2026-10-20."
   }
 }

@@ -429,8 +429,17 @@ ui.unified_smart_layout()
         for activity, prefix in (("Circuit Fundamentals", "current_electricity"),
                 ("Series and Parallel Circuits", "current_electricity_series_parallel")):
             app = page("⚡Electricity⚡", activity, "Current Electricity")
+            self.assertFalse(app.exception)
             self.assertFalse(any("#### Givens" in m.value for m in app.markdown))
-            self.assertTrue(app.get("imgs"))
+            # AppTest now calls image-list elements "image"; older releases use
+            # the protobuf field name "imgs". Both expose the same SVG payload.
+            images = [*app.get("image"), *app.get("imgs")]
+            self.assertTrue(
+                any(img.url.startswith("data:image/svg+xml;base64,")
+                    for element in images for img in element.proto.imgs),
+                f"{activity} did not render its circuit SVG; warnings: "
+                f"{[warning.value for warning in app.warning]}",
+            )
             self.assertEqual(sum(b.label == "New Question (Circuit)" for b in app.button), 1)
             self.assertFalse(any(b.label in ("New Circuit", "Next Circuit") for b in app.button))
             self.assertTrue(any(e.label == "Your Performance" for e in app.expander))

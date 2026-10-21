@@ -21,6 +21,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Setup Node for card interaction checks
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
       - name: Validate payload contract
         env:
           PYTHONPATH: .
@@ -38,6 +43,11 @@ jobs:
           python tools/test_relative_motion_page.py
           python tools/test_recognizing_forces.py
           python tools/test_force_diagram_match.py
+          python tools/test_force_diagram_builder.py
+          python tools/test_force_motion_match.py
+          python tools/test_force_change.py
+          python tools/test_force_ranking.py
+          node tools/test_graph_cards_frontend.js
           python tools/test_audit_regressions.py
           python tools/test_progress_and_formatting.py
           python tools/test_solve_for.py

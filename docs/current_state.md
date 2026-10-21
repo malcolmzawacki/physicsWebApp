@@ -9,21 +9,122 @@ useful evidence but are not current completion claims.
 
 ## Site scope and tracking
 
-The current route inventory contains **43 activities and 151 problem-type/mode
+The current route inventory contains **47 activities and 166 problem-type/mode
 rows**, including Advanced routes, custom pages, explorers, labs, and two worksheet
 builders. The [organizing-help inventory](organizing_help_inventory.md) is generated
 from routes and metadata with explicit custom-page adapters. Blank review cells
 mean unevaluated. It does not yet enumerate every difficulty, target, and random
 scenario combination; those require a per-family coverage matrix during review.
 
-There are **45 recorded organizing-help reviews**, including ten Recognizing
-Forces / diagram matching context rows with conceptual scaffolds instead of numerical organizers;
+There are **60 recorded organizing-help reviews**, including twenty-five force
+identification / matching / construction context rows with conceptual scaffolds instead of numerical organizers;
 Friction and Distance and Thermal Mixed are the newest teacher-preview packages; per-family records track
 other review status and evidence limits. These are counts
 of inventory rows rather than page counts. Decisions are recorded in
 [organizing_help_reviews.json](organizing_help_reviews.json).
 
 ## Organizing help: implemented
+
+### Net Force and Acceleration Ranking pilot (2026-10-20)
+
+**Dynamics > Net Force and Acceleration Ranking** implements the user-prioritized
+C10 pilot. Four distinct cart diagrams display mass and horizontal force values.
+Students choose Net force or Acceleration, with an explicit Magnitude (size only)
+or Signed horizontal value comparison. Right is positive in signed mode; magnitude
+ignores direction and accepts opposite-sign ties. Optional settings choose equal
+or different masses and whether fresh boards include tied values. Generation
+guarantees each requested condition, with three distinct values when ties are on
+and four when off. All diagrams use a common force scale within the board.
+
+Rank 1 means greatest. Shared ranks express ties; gaps after ties are accepted.
+Check ranking compares the ordering/ties exactly, using rational acceleration
+values from displayed integer givens. Feedback identifies incorrect pairwise
+relationships. Incomplete ranks are unscored, unchanged checks do not duplicate
+records, and form entries persist after checks/hints and navigation. A related
+comparison retains the same physical carts while switching force versus
+acceleration; ties may then change regardless of the fresh-board tie preference.
+
+Upper-right stars, hints, optional equations, session history with diagrams,
+reset and the shared cancellable progression are retained. Tests cover 1,600
+controlled boards, 20,480 rank assignments, signed/magnitude and force/acceleration
+counterexamples, 36 rendered cases and all 16 setting combinations in the routed
+page. Teacher/layout/accessibility review remains deferred. See the
+[C10 implementation record](newtons_laws_aspirations.md#c10-ranking-implementation-record).
+
+### Change of State pilot (2026-10-20)
+
+**Dynamics > Change of State** adds C3 with ten original before/after situations.
+A frictionless cart has a rightward hand push and/or leftward winch-rope pull.
+The initial diagram sits beside a compact two-by-two grid of four choices.
+Four shuffled cards each change exactly one horizontal interaction: add, remove,
+increase or reduce it. Students select every change that satisfies the requested
+motion. Cases include starting from rest either way, changing from speeding up to
+constant velocity or slowing down, and increasing acceleration in either direction.
+Force values are explicitly labeled 0/10/20/30 N; 20 N normal force and weight,
+mass and vertical equilibrium remain unchanged. Zero means an interaction is absent.
+
+The task concerns the initial motion after the force change; velocity cannot
+instantly vanish or reverse. Each accepted set has multiple valid alternatives,
+with exact-set checking and missing/extra feedback. Selection/hints are unscored,
+wrong sets remain revisable, and unchanged checks do not duplicate records.
+The upper-right star, shared auto-load preference, cancellable countdown, context
+filters, related/skip/next, reset and session snapshots follow C2.
+
+Automated verification covers all 160 case/state combinations, 4,800 answer
+sets, four kinds of force change, all 16 diagrams and the routed page lifecycle.
+Teacher and layout/accessibility review remain deferred as requested.
+See the [C3 implementation record](newtons_laws_aspirations.md#c3-change-of-state-implementation-record).
+
+### Force and Motion Matching pilot (2026-10-20)
+
+**Dynamics > Force and Motion Matching** adds C2 with seven original constant-force
+situations and four selectable motion cards per question, arranged in a compact
+two-by-two grid beside the initial force diagram. Students select every
+compatible card, rather than a single answer. The cards toggle independently;
+Check motions submits the whole set. Missing and extra choices receive feedback,
+with revision until complete. The shared cards keep the earlier single-answer
+behavior on motion-graph and free-body-diagram matching.
+
+Force diagrams constrain acceleration, while unspecified initial velocity permits
+rest/coasting in balanced cases and opposite initial directions in unbalanced
+cases. Four numbered equal-time dots and a description come from one motion
+definition per card. Nine histories include rest, constant speed either way,
+speeding up, slowing without reversal, and starting from rest. All choices are
+qualitative; exact magnitudes and inter-card spatial scales are not compared.
+Horizontal pushes are frictionless; vertical cable pulls and gravity-only flight
+avoid velocity-dependent friction/drag assumptions. Forces stay constant over
+the interval and loads stay clear of travel limits.
+
+One star per completed set, explicit checking, optional hint, revision, context
+filters, related/skip/next, session history with diagrams, reset and the shared
+cancellable automatic progression are retained. Empty selection is unscored;
+duplicate checks and stale browser events do not inflate records. Automated
+model/interaction tests pass. Teacher and layout/accessibility review are deferred
+as requested. See the [C2 implementation record](newtons_laws_aspirations.md#c2-force-and-motion-implementation-record).
+
+### Free-Body Diagram Builder pilot (2026-10-20)
+
+**Dynamics > Free-Body Diagram Builder** is available at both course levels.
+It reuses the ten bounded C5 situations, with a multiselect for the seven force
+types, cardinal direction selectors, and Short/Medium/Long arrow controls.
+A side-by-side live preview updates during editing; no edits score an answer.
+The central box represents the named object. Symbols on arrows have an adjacent
+legend and a full text description is available. Same-direction arrows have
+separate attachment points so all seven force choices remain visible, even in
+an incorrect construction.
+
+Check diagram gives separate feedback for presence, direction, and relative
+sizes. Size comparisons only concern opposing forces on the same axis; exact
+ratios and comparisons between axes are not required. Missing directions do not
+score; unchanged checks do not duplicate attempts. Correct diagrams lock and
+award one star in the upper-right header, with the shared automatic-loading
+preference and five-second cancellable countdown. Optional hints, related cases,
+Skip question, session performance and history snapshots, and reset are retained.
+Drafts survive navigation. Numerical equations, dragging, inclines, two-axis
+acceleration, and exports are excluded from this pilot.
+
+See the [I2 implementation record](newtons_laws_aspirations.md#i2-builder-implementation-record)
+for coverage and verification. Teacher and full accessibility review remain pending.
 
 ### Match the Free-Body Diagram pilot (2026-10-20)
 
