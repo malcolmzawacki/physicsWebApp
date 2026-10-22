@@ -69,4 +69,15 @@ render({...multi,question_id:12,images:['reference','a','b','c','d'],labels:['A'
 assert.equal(board.className,'beside');
 assert.equal(buttons().length,4);
 click(3); assert.deepEqual(submitted().at(-1).value,{question_id:12,indices:[3]});
+render({...multi,question_id:13,images:['a','b','c','d'],labels:['A','B','C','D'],
+        has_reference:false,multi_select:false,selection:null,layout:'Large diagrams'});
+assert.equal(board.className,'large');
+assert.equal(buttons().length,4);
+click(1); assert.deepEqual(submitted().at(-1).value,{question_id:13,index:1});
+render({...multi,question_id:14,images:['a','b','c','d'],labels:['A','B','C','D'],
+        has_reference:false,layout:'Four across',captions:['P = 20 N →\nT = 10 N ←','Rest','Coast','Speed up']});
+assert.equal(board.className,'row');
+assert.equal(buttons().length,4);
+assert.equal(buttons()[0].querySelector('.caption').textContent,'P = 20 N →\nT = 10 N ←');
+click(3); assert.deepEqual(submitted().at(-1).value,{question_id:14,indices:[3]});
 console.log('Graph-card frontend passed: multi-select toggle/deselect, backend restoration, no premature correctness, locking, and default single-choice reference indexing.');

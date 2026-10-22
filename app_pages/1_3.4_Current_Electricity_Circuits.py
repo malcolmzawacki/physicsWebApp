@@ -192,7 +192,7 @@ def current_electricity_circuits_page() -> None:
                 # Keep the original single-resistor widget identity.
                 key = f"answer_{question_number}" if len(answers) == 1 else f"answer_{question_number}_{index}"
                 answer_texts.append(column.text_input(f"{label} ({case['unit']})", key=state.key(key), disabled=state.get("submitted")))
-            check_clicked = st.form_submit_button("Check Answer", type="primary", use_container_width=True,
+            check_clicked = st.form_submit_button("Check Answer", type="primary", width="stretch",
                 disabled=state.get("submitted"))
 
         if check_clicked and not state.get("submitted"):
@@ -249,6 +249,6 @@ def current_electricity_circuits_page() -> None:
     with new_col:
         st.button("New Question (Circuit)", key=state.key(f"new_circuit_{question_number}"),
                   on_click=_reset_question, args=(state, problem_type, difficulty),
-                  use_container_width=True)
+                  width="stretch")
     with performance_col:
         _render_performance(state)

@@ -64,6 +64,7 @@ def render_force_diagram_builder():
     draft_by_force = {item["force"]: item for item in attempt["draft"]}
     with controls:
         state.ensure(f"forces_{qid}", list(draft_by_force))
+        st.caption("Select all that apply when choosing forces on the object.")
         selected = st.multiselect("Forces on the object", list(FORCE_LABELS),
                                   format_func=FORCE_LABELS.get, key=state.key(f"forces_{qid}"),
                                   disabled=attempt["completed"], placeholder="Add a force…")
@@ -87,17 +88,17 @@ def render_force_diagram_builder():
         state.set("attempt", attempt)
         check_col, hint_col = st.columns(2)
         with check_col:
-            checked = st.button("Check diagram", type="primary", use_container_width=True,
+            checked = st.button("Check diagram", type="primary", width="stretch",
                                 key=state.key(f"check_{qid}"), disabled=attempt["completed"])
         with hint_col:
-            hinted = st.button("Show interaction hint", use_container_width=True,
+            hinted = st.button("Show interaction hint", width="stretch",
                                key=state.key(f"hint_{qid}"), disabled=attempt["completed"])
 
     arrows = tuple(ForceArrow(d["force"], d["direction"], d["size"]) for d in draft if d["direction"])
     incomplete = [d for d in draft if d["direction"] is None]
     with preview:
         st.markdown("**Your diagram**")
-        st.image(builder_image(arrows), use_container_width=True)
+        st.image(builder_image(arrows), width="stretch")
         st.caption("The box represents the named object. Its size has no physical meaning.")
         if selected:
             st.caption(" · ".join(f"{SYMBOLS[f]} = {FORCE_LABELS[f]}" for f in selected))
@@ -170,14 +171,14 @@ def render_force_diagram_builder():
     left, right = st.columns(2)
     with left:
         st.button("Next question" if attempt["completed"] else "Skip question",
-                  key=state.key(f"next_{qid}"), on_click=next_question, use_container_width=True)
+                  key=state.key(f"next_{qid}"), on_click=next_question, width="stretch")
     with right:
-        st.button("Try a related case", key=state.key(f"related_{qid}"), on_click=related, use_container_width=True)
+        st.button("Try a related case", key=state.key(f"related_{qid}"), on_click=related, width="stretch")
     with st.expander("Your Performance"):
         st.caption("This session only. One star per completed case. Draft edits and hints do not count as answer checks.")
         st.dataframe([{"Case": CASE_BY_ID[r["case_id"]].scenario.title, "Checks": len(r["checks"]),
                        "Hint used": r["hint_used"], "Result": r["outcome"] or ("In progress" if r is attempt else "Skipped")}
-                      for r in [*state.get("records"), attempt]], hide_index=True, use_container_width=True)
+                      for r in [*state.get("records"), attempt]], hide_index=True, width="stretch")
 
         def reset():
             state.set("records", [])

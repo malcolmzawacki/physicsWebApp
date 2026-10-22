@@ -55,7 +55,9 @@ def main():
     assert len(at.success) == 5
     assert at.session_state["accelerated_motion_question_id"] == qid
     assert not at.session_state["accelerated_motion_submitted"]
-    at.text_input(key=f"accelerated_motion_setup_input_{qid}_a").set_value("nonsense").run()
+    # Model an external rerun with a changed saved form value.
+    at.session_state[f"accelerated_motion_setup_input_{qid}_a"] = "nonsense"
+    at.run()
     assert len(at.success) == 4
     assert any("changed" in c.value for c in at.caption)
     next(b for b in at.button if b.label == "Check setup").click().run()

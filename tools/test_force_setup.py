@@ -75,7 +75,7 @@ def main():
         expected = expected_entries(app.session_state[prefix + "_payload"].extras["setup"])
         for key, value in expected.items():
             app.text_input(key=f"{prefix}_setup_input_{qid}_{key}").set_value(str(value))
-        app.run()
+        # Form edits are sent by the submit button, without an intervening rerun.
         assert not app.success
         next(b for b in app.button if b.label == "Check setup").click().run()
         assert not app.exception and len(app.success) == 3

@@ -346,7 +346,7 @@ def render_unit_worksheet(unit):
                         (last, "⏭", "Last page", last_page, page == last_page),
                     ):
                         column.button(label, key=prefix + name, help=name,
-                                      disabled=disabled, use_container_width=True,
+                                      disabled=disabled, width="stretch",
                                       on_click=_set_preview_page, args=(destination, prefix))
                     indicator.markdown(f"**Page {page + 1} of {summary['total']}**")
                     if result.get("preview_page") != page:

@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from utils.force_motion_match import (
     CASES, CASE_BY_ID, MOTIONS, PRACTICE_SETS, available_cases,
-    check_motion_set, compatible, make_options, new_attempt, render_motion, submit_attempt,
+    check_motion_set, compatible, explanation, make_options, new_attempt, render_motion, submit_attempt,
 )
 from utils.graph_cards import selected_indices
 
@@ -98,6 +98,10 @@ def ui_checks():
     assert not at.session_state["force_motion_match_attempt"]["checks"]
     click("Check motions")
     assert at.warning and not at.session_state["force_motion_match_attempt"]["completed"]
+    feedback = " ".join(m.value for m in at.markdown)
+    assert "other compatible motions" in feedback
+    assert "Also compatible:" not in feedback and "Not compatible:" not in feedback
+    assert explanation(CASE_BY_ID[at.session_state["force_motion_match_attempt"]["case_id"]]) not in feedback
     click("Check motions")
     assert len(at.session_state["practice_answer_history"]) == 1
     click("Show interaction hint")

@@ -9,6 +9,40 @@ useful evidence but are not current completion claims.
 
 ## Site scope and tracking
 
+The 2026-10-22 comparison-layout follow-up puts Match the Free-Body Diagram,
+Force and Motion Matching, and Change of State choices in one four-across row,
+wrapping to two columns on narrow screens. Motion/change reference diagrams sit
+beside their questions above the choices. Readable text below each choice carries
+force labels/values or the motion description. Ranking force values are now bold
+text below the image; saved diagram images retain larger two-line value labels.
+
+Classroom feedback applied 2026-10-22: Recognizing Forces highlights the question
+and retains the corrected checkbox submission while completion/countdown is shown.
+All force activities with multiple selections explicitly say to select/check all
+that apply. Force and Motion Matching gives missing/extra guidance without naming
+answer letters or showing its worked explanation until completion. Diagram matching
+uses sharper artwork; comparison boards now use the four-across layout described
+above. Ranking selectors and equation text are larger, with clearer
+selector borders. Regression checks cover corrected locked selections across reruns
+and non-revealing motion feedback; core grading/history behavior is unchanged.
+
+Current Session Progress opens with **Progress for [today's date]** and a compact
+table of checks, correct answers, and incorrect answers by activity. The summary
+is intended for a single screenshot of a typical class session; it groups checks
+instead of listing every question or diagram. Longer activity lists split into
+columns. Review answers shows one selected check at a time with its saved answers,
+explanation, and diagrams. Dates use America/New_York; dated checks from earlier
+days are excluded from today's view. Records from sessions opened before dates
+were added remain visible for compatibility. Everything remains session-local and
+resets on browser refresh. No download or persistent identification is added.
+The dated heading includes a random 16-digit session code, grouped for readability.
+It is created on the first answer check or progress-page visit, stays stable across
+activities and reruns, and resets with the session. It uses no device information
+and is not saved outside session memory. Matching codes can help spot reused
+screenshots; they do not authenticate a student or prevent edited screenshots.
+`tools/test_session_progress.py` covers summaries, date boundaries, review filters,
+session-code stability, session isolation, and existing question progression.
+
 The current route inventory contains **47 activities and 166 problem-type/mode
 rows**, including Advanced routes, custom pages, explorers, labs, and two worksheet
 builders. The [organizing-help inventory](organizing_help_inventory.md) is generated

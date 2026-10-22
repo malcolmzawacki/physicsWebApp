@@ -19,9 +19,18 @@ img { display:block; width:100%; height:clamp(130px,20vw,180px); object-fit:cont
 #board.column .reference { grid-column:1; grid-row:1 / span 3; align-self:start; }
 #board.column button { grid-column:2; }
 #board.column button img, #board.column .reference img { height:auto; }
-#board.beside { grid-template-columns:repeat(3,minmax(0,1fr)); max-width:960px; margin-inline:auto; align-items:start; }
+#board.large { max-width:1000px; margin-inline:auto; }
+#board.large img { height:auto; max-height:none; }
+#board.beside { grid-template-columns:repeat(3,minmax(0,1fr)); max-width:780px; margin-inline:auto; align-items:start; gap:6px; }
 #board.beside .reference { grid-column:1; grid-row:1 / span 2; align-self:center; }
 #board.beside img { height:auto; }
+#board.row { grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; align-items:stretch; }
+#board.row .card { display:flex; flex-direction:column; }
+#board.row img { height:auto; max-height:none; }
+.caption { margin-top:6px; font-size:15px; line-height:1.35; white-space:pre-line; }
+@media(max-width:550px) {
+ #board.row { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
 @media(max-width:550px) {
  #board.beside { grid-template-columns:repeat(2,minmax(0,1fr)); }
  #board.beside .reference { grid-column:1 / -1; grid-row:auto; width:50%; justify-self:center; }
@@ -62,7 +71,8 @@ function paintSelection() {
  resize();
 }
 function render(message) {
- const next=message.args, rebuild=!args || next.question_id!==args.question_id || next.multi_select!==args.multi_select;
+ const next=message.args, rebuild=!args || next.question_id!==args.question_id || next.multi_select!==args.multi_select
+  || next.has_reference!==args.has_reference || next.layout!==args.layout;
  const focusIndex=[...board.querySelectorAll('button')].indexOf(document.activeElement);
  args=next; selected=Number.isInteger(args.selection) ? args.selection : null;
  selectedMany=new Set(Array.isArray(args.selection) ? args.selection : []);
@@ -70,7 +80,7 @@ function render(message) {
  for(const [css,key] of [['--bg','backgroundColor'],['--text','textColor'],['--accent','primaryColor'],['--secondary','secondaryBackgroundColor']]) {
   if(theme[key]) document.documentElement.style.setProperty(css,theme[key]);
  }
- board.className=args.layout==='Reference beside options' ? 'beside' : args.layout==='Options in a column' ? 'column' : '';
+ board.className=args.layout==='Four across' ? 'row' : args.layout==='Reference beside options' ? 'beside' : args.layout==='Large diagrams' ? 'large' : args.layout==='Options in a column' ? 'column' : '';
  if(rebuild) {
   board.replaceChildren();
   const hasReference=args.has_reference!==false, noun=args.option_name || 'Graph';
@@ -85,6 +95,10 @@ function render(message) {
    const img=document.createElement('img'); img.src=src;
    img.alt=reference ? (args.reference_label || 'Reference motion graph') : (args.descriptions?.[index] || `${noun} option ${args.labels[index]}`);
    img.onload=resize; card.append(heading,img);
+   if(!reference && args.captions?.[index]) {
+    const caption=document.createElement('div'); caption.className='caption';
+    caption.textContent=args.captions[index]; card.append(caption);
+   }
    if(!reference) {
     card.type='button'; card.setAttribute('aria-label',`Select ${noun.toLowerCase()} ${args.labels[index]}`);
     card.addEventListener('click',()=>{

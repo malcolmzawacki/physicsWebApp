@@ -130,7 +130,7 @@ def verify_page():
                 "Wave speed", "Wavelength", "Frequency", "Period"]
             for key, value in expected.items():
                 at.text_input(key=f"{prefix}_setup_input_{qid}_{key}").set_value(str(value))
-            at.run()
+            # Form edits are sent by the submit button, without an intervening rerun.
             assert not at.success
             next(b for b in at.button if b.label == "Check setup").click().run()
             assert not at.exception and len(at.success) == 4
@@ -138,7 +138,9 @@ def verify_page():
             assert not at.session_state[prefix + "_submitted"]
             target = payload.extras["setup"]["target_roles"][0]
             given = next(v for v in expected.values() if not isinstance(v, str))
-            at.text_input(key=f"{prefix}_setup_input_{qid}_{target}").set_value(str(given)).run()
+            # Model an external rerun with a changed saved form value.
+            at.session_state[f"{prefix}_setup_input_{qid}_{target}"] = str(given)
+            at.run()
             assert any("changed" in c.value for c in at.caption)
             next(b for b in at.button if b.label == "Check setup").click().run()
             assert len(at.error) == 1

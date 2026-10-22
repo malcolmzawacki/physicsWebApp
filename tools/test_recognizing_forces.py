@@ -116,6 +116,13 @@ def ui_checks():
     at.session_state[f"recognizing_forces_cancel_next_{qid}"] = True
     click("Check forces")
     assert at.session_state["recognizing_forces_attempt"]["outcome"] == "Completed with help"
+    # The locked display must retain the corrected submission through countdown
+    # cancellation and later reruns, rather than restoring the first wrong set.
+    for _ in range(2):
+        for force in FORCE_LABELS:
+            box = next(box for box in at.checkbox if box.label == FORCE_LABELS[force])
+            assert box.disabled and box.value == (force in EXPECTED["ball_rise"])
+        at.run()
     click("Try a related case")
     assert at.session_state["recognizing_forces_attempt"]["scenario_id"] == "ball_drag"
     assert not at.success and not at.warning

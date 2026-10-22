@@ -153,9 +153,9 @@ def render() -> None:
 
     new_col, spacer_col, check_col = st.columns((1, 4, 1.2), gap="large")
     with new_col:
-        new_puzzle_clicked = st.button("New Puzzle", key=state.key("new_puzzle"), type="secondary", use_container_width=True)
+        new_puzzle_clicked = st.button("New Puzzle", key=state.key("new_puzzle"), type="secondary", width="stretch")
     with check_col:
-        check_clicked = st.button("Check Puzzle", key=state.key("check_puzzle"), type="primary", use_container_width=True,
+        check_clicked = st.button("Check Puzzle", key=state.key("check_puzzle"), type="primary", width="stretch",
                                   disabled=bool((state.get("last_result") or {}).get("is_correct")))
 
     if new_puzzle_clicked:

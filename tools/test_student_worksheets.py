@@ -8,7 +8,8 @@ import threading
 import time
 from unittest.mock import patch
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 from docx import Document
 from PIL import Image
 from streamlit.testing.v1 import AppTest
@@ -191,7 +192,7 @@ class Worksheets(unittest.TestCase):
                             self.assertIn("Forces Practice", "\n".join(p.text for p in document.paragraphs))
 
     def test_forces_navigation_and_isolation(self):
-        app = AppTest.from_file("Home.py", default_timeout=30).run()
+        app = AppTest.from_file(str(ROOT / "Home.py"), default_timeout=30).run()
         app.session_state["router_section"] = "Dynamics"
         app.session_state["router_activity"] = "Newton's Second Law"
         app.session_state[PREFIX + "count"] = 9
@@ -210,7 +211,7 @@ class Worksheets(unittest.TestCase):
         self.assertEqual(len(app.session_state["forces_worksheet_section_ids"]), 2)
 
     def test_graph_practice_fixed_full_set(self):
-        app = AppTest.from_file("Home.py", default_timeout=30).run()
+        app = AppTest.from_file(str(ROOT / "Home.py"), default_timeout=30).run()
         app.session_state["router_section"] = "Kinematics"
         app.session_state["router_activity"] = "Types of Motion Graphs"
         app.session_state["motion_graph_difficulty_select_unified"] = "Easy"
@@ -299,7 +300,7 @@ class Worksheets(unittest.TestCase):
             self.assertEqual([p["diagram_data"] for p in sections[0]["problems"]], specs)
         self.assertEqual(plt.get_fignums(), original_figures)
 
-    def test_new_text_activities_all_targets(self):
+    def test_new_activities_all_targets_and_diagrams(self):
         from utils.worksheet_ui import ACTIVITIES
         from utils.solve_for import target_options
         for activity in ("Distance & Displacement", "Projectiles", "Relative Motion"):
@@ -309,9 +310,14 @@ class Worksheets(unittest.TestCase):
                     for target in ["mixed"] + [o["id"] for o in target_options(generator, kind, level)]:
                         with self.subTest(activity=activity, kind=kind, level=level, target=target):
                             sections = generate_sections([(activity, kind, level, target, 1)])
-                            self.assertIsNone(sections[0]["problems"][0].get("diagram_data"))
+                            problem = sections[0]["problems"][0]
+                            if activity == "Projectiles":
+                                self.assertTrue(problem.get("diagram_data"))
+                                self.assertTrue(callable(problem.get("diagram_renderer")))
+                            else:
+                                self.assertIsNone(problem.get("diagram_data"))
                             document = Document(io.BytesIO(render_document(sections, "Standard", True)))
-                            self.assertEqual(len(document.inline_shapes), 0)
+                            self.assertEqual(len(document.inline_shapes), 1 if activity == "Projectiles" else 0)
                             self.assertNotIn("Diagram omitted", document.tables[0].cell(0, 0).text)
 
     def test_advanced_activity_filter(self):
@@ -337,7 +343,7 @@ class Worksheets(unittest.TestCase):
                 self.assertIn("Constant Motion", sections[0]["heading"])
 
     def test_activity_shortcut_routes_to_builder(self):
-        app = AppTest.from_file("Home.py", default_timeout=30).run()
+        app = AppTest.from_file(str(ROOT / "Home.py"), default_timeout=30).run()
         app.session_state["router_section"] = "Kinematics"
         app.session_state["router_activity"] = "Accelerated Motion"
         app.run()
@@ -460,7 +466,7 @@ class Worksheets(unittest.TestCase):
 
     @patch("utils.worksheet_ui.render_page", return_value=Image.new("RGB", (10, 10), "white"))
     def test_page_state_and_retry(self, preview_renderer):
-        app = AppTest.from_file("Home.py", default_timeout=30)
+        app = AppTest.from_file(str(ROOT / "Home.py"), default_timeout=30)
         with patch("utils.worksheet_ui.libreoffice_path", return_value="soffice"), patch(
             "utils.worksheet_ui.docx_to_pdf", side_effect=PdfConversionError("Please retry")
         ):

@@ -7,7 +7,7 @@ import streamlit as st
 from utils.activity_flow import next_question_countdown
 from utils.force_diagram_match import (
     CASE_BY_ID, available_cases, describe_diagram, diagram_matches,
-    make_options, render_force_diagram,
+    make_options, render_force_diagram, SHORT_LABELS,
 )
 from utils.recognizing_forces import PRACTICE_SETS
 from utils.graph_cards import graph_cards, selected_index
@@ -18,6 +18,7 @@ from utils.ui_state import State
 
 @st.cache_data(show_spinner=False)
 def diagram_image(arrows):
+    """Cache the larger, readable force-diagram artwork."""
     return render_force_diagram(arrows)
 
 
@@ -68,9 +69,12 @@ def render_force_diagram_match():
     correct_index = next(i for i, option in enumerate(attempt["options"])
                          if diagram_matches(case, option["arrows"]))
     event = graph_cards(images, list(letters), qid, attempt["selection"],
-                        attempt["completed"], "Compact grid", key=state.key(f"cards_{qid}"),
+                        attempt["completed"], "Four across", key=state.key(f"cards_{qid}"),
                         correct_index=correct_index, has_reference=False,
                         option_name="Diagram", check_label="Check diagram",
+                        captions=[" · ".join(SHORT_LABELS[a.force] + " " +
+                                  {"up":"↑", "down":"↓", "left":"←", "right":"→"}[a.direction]
+                                  for a in o["arrows"]) or "No forces" for o in attempt["options"]],
                         descriptions=[describe_diagram(o["arrows"]) for o in attempt["options"]])
     index = selected_index(event, qid, len(attempt["options"]))
     if not attempt["completed"] and index is not None and index != attempt["selection"]:
@@ -85,10 +89,10 @@ def render_force_diagram_match():
     with st.form(state.key(f"form_{qid}")):
         check_col, hint_col = st.columns(2)
         with check_col:
-            checked = st.form_submit_button("Check diagram", type="primary", use_container_width=True,
+            checked = st.form_submit_button("Check diagram", type="primary", width="stretch",
                                            disabled=attempt["completed"])
         with hint_col:
-            hinted = st.form_submit_button("Show interaction hint", use_container_width=True,
+            hinted = st.form_submit_button("Show interaction hint", width="stretch",
                                           disabled=attempt["completed"])
     if hinted:
         attempt["hint_used"] = True
@@ -139,15 +143,15 @@ def render_force_diagram_match():
     left, right = st.columns(2)
     with left:
         st.button("Next question" if attempt["completed"] else "Skip question",
-                  key=state.key(f"next_{qid}"), on_click=next_question, use_container_width=True)
+                  key=state.key(f"next_{qid}"), on_click=next_question, width="stretch")
     with right:
-        st.button("Try a related case", key=state.key(f"related_{qid}"), on_click=related, use_container_width=True)
+        st.button("Try a related case", key=state.key(f"related_{qid}"), on_click=related, width="stretch")
     with st.expander("Your Performance"):
         st.caption("This session only. One star per completed case; repeated checks of the same choice do not add attempts.")
         st.dataframe([{"Case": CASE_BY_ID[r["case_id"]].scenario.title,
                        "Checks": len(r["checks"]), "Hint used": r["hint_used"],
                        "Result": r["outcome"] or ("In progress" if r is attempt else "Skipped")}
-                      for r in [*state.get("records"), attempt]], hide_index=True, use_container_width=True)
+                      for r in [*state.get("records"), attempt]], hide_index=True, width="stretch")
 
         def reset():
             state.set("records", [])

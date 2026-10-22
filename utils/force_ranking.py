@@ -127,7 +127,7 @@ def submit_attempt(attempt, ranks):
     return True
 
 
-def render_rank_diagram(case, scale):
+def render_rank_diagram(case, scale, include_values=True):
     from matplotlib.figure import Figure
     from matplotlib.patches import Circle
     if scale < max(case.push,case.pull,10*case.mass) or scale <= 0:
@@ -146,9 +146,11 @@ def render_rank_diagram(case, scale):
             ax.text(x+.19*dx+(0 if dx else .15),y+.19*dy,symbol,
                     ha="left" if dx >= 0 else "right",va="center",fontsize=11,color="#173f56",weight="bold")
         ax.add_patch(Circle((0,0),.11,color="#173f56"))
-        fig.text(.5,.05,f"P = {case.push} N right     T = {case.pull} N left",ha="center",fontsize=9,color="#173f56")
-        fig.text(.5,.95,f"Mass: {case.mass} kg",ha="center",va="top",fontsize=12,color="#173f56")
-        fig.subplots_adjust(left=.02,right=.98,bottom=.17,top=.86)
+        if include_values:
+            fig.text(.5,.12,f"P = {case.push} N right",ha="center",fontsize=14,color="#173f56",weight="bold")
+            fig.text(.5,.035,f"T = {case.pull} N left",ha="center",fontsize=14,color="#173f56",weight="bold")
+            fig.text(.5,.95,f"Mass: {case.mass} kg",ha="center",va="top",fontsize=12,color="#173f56")
+        fig.subplots_adjust(left=.02,right=.98,bottom=.25 if include_values else .04,top=.86 if include_values else .98)
         buffer=BytesIO();fig.savefig(buffer,format="png",facecolor="white")
         return buffer.getvalue()
     finally:

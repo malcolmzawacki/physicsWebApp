@@ -71,12 +71,14 @@ def main():
             fields = p["fields"]+p["steps"]
             for f in fields:
                 app.text_input(key=f'{prefix}_projectile_setup_input_{qid}_{f["id"]}').set_value(str(f["value"]))
-            app.run()
+            # Form edits are sent by the submit button, without an intervening rerun.
             assert not app.success
             next(b for b in app.button if b.label=="Check organized work").click().run()
             assert not app.exception and len(app.success)==len(fields)
             assert not app.session_state[prefix+"_submitted"]
-            app.text_input(key=f'{prefix}_projectile_setup_input_{qid}_{fields[0]["id"]}').set_value("999999").run()
+            # Model an external rerun with a changed saved form value.
+            app.session_state[f'{prefix}_projectile_setup_input_{qid}_{fields[0]["id"]}'] = "999999"
+            app.run()
             assert any("changed" in c.value for c in app.caption)
             next(b for b in app.button if b.label=="Check organized work").click().run()
             assert len(app.error)==1

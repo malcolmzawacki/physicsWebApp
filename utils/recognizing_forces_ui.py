@@ -39,7 +39,7 @@ def render_recognizing_forces():
     header_records = [*state.get("records"), state.get("attempt", {})]
     stars = sum(bool(record.get("completed")) for record in header_records)
     render_header("Recognizing Forces", stars)
-    st.write("Identify the forces acting on one object. You can revise after checking.")
+    st.write("Identify the forces acting on one object. **Check all that apply.** You can revise after checking.")
     context = st.selectbox("Practice contexts", PRACTICE_SETS, key=state.key("context"))
     if state.get("active_context") != context or not state.has("attempt"):
         state.set("active_context", context)
@@ -53,9 +53,10 @@ def render_recognizing_forces():
     for key in list(st.session_state):
         if key.startswith(state.key("answer_")) and not key.startswith(state.key(f"answer_{question_id}_")):
             del st.session_state[key]
-    st.markdown(f"**{scenario.title}**")
-    st.write(scenario.situation)
-    st.info(f"Consider only forces acting on **{scenario.target}**.")
+    with st.container(border=True):
+        st.subheader(scenario.title)
+        st.markdown(f"**{scenario.situation}**")
+        st.info(f"Which forces act on **{scenario.target}**? Check all that apply.")
 
     with st.expander("Force labels and conventions"):
         st.write("Use one label per interaction. A rope gives tension; a spring gives spring force; a surface gives normal force and possibly friction. Applied force means a direct push or pull, not another name for these forces.")
@@ -64,23 +65,29 @@ def render_recognizing_forces():
         st.caption(scenario.hint)
 
     with st.form(state.key(f"form_{question_id}")):
-        st.write("Select every force present. Leave all boxes empty if no forces act in this model.")
+        st.write("**Check all that apply.** Leave all boxes empty if no forces act in this model.")
         columns = st.columns(2)
         selected = []
         for index, (force, label) in enumerate(FORCE_LABELS.items()):
             with columns[index % 2]:
-                state.ensure(f"answer_{question_id}_{force}", force in attempt["selection"])
-                if st.checkbox(label, key=state.key(f"answer_{question_id}_{force}"),
-                               disabled=attempt["completed"]):
+                if attempt["completed"]:
+                    # Switching an editable widget to disabled can restore an old
+                    # form value. Render the checked submission as a fresh snapshot.
+                    chosen = st.checkbox(label, value=force in attempt["selection"],
+                                         key=state.key(f"answer_{question_id}_{force}_completed"), disabled=True)
+                else:
+                    state.ensure(f"answer_{question_id}_{force}", force in attempt["selection"])
+                    chosen = st.checkbox(label, key=state.key(f"answer_{question_id}_{force}"))
+                if chosen:
                     selected.append(force)
         check_col, hint_col = st.columns(2)
         with check_col:
             checked = st.form_submit_button(
-                "Check forces", type="primary", use_container_width=True,
+                "Check forces", type="primary", width="stretch",
                 disabled=attempt["completed"])
         with hint_col:
             hint_requested = st.form_submit_button(
-                "Show interaction hint", use_container_width=True,
+                "Show interaction hint", width="stretch",
                 disabled=attempt["completed"])
     if hint_requested:
         attempt["hint_used"] = True
@@ -118,7 +125,7 @@ def render_recognizing_forces():
             if state.get("question_id") == question_id:
                 fresh(context)
         st.button("Next question" if attempt["completed"] else "Skip question",
-                  key=state.key(f"next_{question_id}"), use_container_width=True,
+                  key=state.key(f"next_{question_id}"), width="stretch",
                   on_click=next_question)
     with right:
         def related():
@@ -126,7 +133,7 @@ def render_recognizing_forces():
                 start(scenario.related)
                 state.set("seen", [*state.get("seen", []), scenario.related])
         st.button("Try a related case", key=state.key(f"related_{question_id}"),
-                  use_container_width=True, on_click=related)
+                  width="stretch", on_click=related)
 
     records = [*state.get("records"), attempt]
     completed = [r for r in records if r["completed"]]
@@ -139,7 +146,7 @@ def render_recognizing_forces():
              "Checks": len(r["checks"]), "Hint used": r["hint_used"],
              "Result": r["outcome"] or ("In progress" if r is attempt else "Skipped")}
             for r in records
-        ], hide_index=True, use_container_width=True)
+        ], hide_index=True, width="stretch")
         def reset():
             state.set("records", [])
             state.pop("attempt")

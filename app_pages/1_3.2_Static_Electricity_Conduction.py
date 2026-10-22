@@ -220,7 +220,7 @@ def charging_by_conduction_page() -> None:
         else:
             st.caption(f"Score: {correct}/{attempts}")
     with action_col:
-        if st.button("New Scenario", key=state.key("new_scenario"), type="secondary", use_container_width=True):
+        if st.button("New Scenario", key=state.key("new_scenario"), type="secondary", width="stretch"):
             _reset_conduction_question(state, difficulty)
             st.rerun()
     with check_col:
@@ -229,7 +229,7 @@ def charging_by_conduction_page() -> None:
             disabled=bool(result and result["is_correct"]),
             key=state.key("check_answer"),
             type="primary",
-            use_container_width=True,
+            width="stretch",
         )
 
     if check_clicked and not (result and result["is_correct"]):

@@ -167,7 +167,7 @@ def current_electricity_series_parallel_page() -> None:
                 f"{case['answer_label']} ({case['unit']})",
                 key=state.key(f"answer_{question_number}"),
             )
-            check_clicked = st.form_submit_button("Check Answer", type="primary", use_container_width=True,
+            check_clicked = st.form_submit_button("Check Answer", type="primary", width="stretch",
                 disabled=state.get("submitted"))
 
         if check_clicked and not state.get("submitted"):
@@ -217,6 +217,6 @@ def current_electricity_series_parallel_page() -> None:
     with new_col:
         st.button("New Question (Circuit)", key=state.key(f"new_circuit_{question_number}"),
                   on_click=_reset_question, args=(state, problem_type, difficulty),
-                  use_container_width=True)
+                  width="stretch")
     with performance_col:
         _render_performance(state)

@@ -72,14 +72,22 @@ def main():
                 attempts = app.session_state[prefix + "_attempt_count"]
                 for field in fields:
                     app.text_input(key=f"{prefix}_circuit_setup_input_{qid}_{field['id']}").set_value(str(field["value"]))
-                app.run()
+                # Form edits stay in the browser until its submit button is clicked.
                 assert not app.success
                 next(b for b in app.button if b.label == "Check organized work").click().run()
-                assert not app.exception and len(app.success) == len(fields)
+                assert not app.exception and len(app.success) == len(fields), (
+                    route, kind, difficulty, [e.message for e in app.exception],
+                    [i.value for i in app.text_input if "circuit_setup_input" in i.key],
+                    app.session_state[prefix + "_circuit_setup_submission"],
+                    [field["value"] for field in fields],
+                )
                 assert app.session_state[prefix + "_attempt_count"] == attempts
                 assert not app.session_state[prefix + "_submitted"]
-                app.text_input(key=f"{prefix}_circuit_setup_input_{qid}_R1").set_value("-100").run()
+                # Model an external rerun with a changed saved form value.
+                app.session_state[f"{prefix}_circuit_setup_input_{qid}_R1"] = "-100"
+                app.run()
                 assert any("Changed" in c.value for c in app.caption)
+                assert app.session_state[prefix + "_attempt_count"] == attempts
                 next(b for b in app.button if b.label == "Check organized work").click().run()
                 assert len(app.error) == 1
                 next(b for b in app.button if b.label == "New Question (Circuit)").click().run()

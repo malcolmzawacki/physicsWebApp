@@ -41,12 +41,12 @@ def selected_indices(event, question_id, count):
 
 def graph_cards(images, labels, question_id, selection, locked, layout, key, correct_index=None,
                 has_reference=True, option_name="Graph", check_label="Check Match", descriptions=None,
-                multi_select=False, correct_indices=None, reference_label="Reference graph"):
+                multi_select=False, correct_indices=None, reference_label="Reference graph", captions=None):
     return _board(images=images, labels=labels, question_id=question_id,
                   selection=selection, locked=locked, layout=layout,
                   correct_index=correct_index if locked else None,
                   has_reference=has_reference, option_name=option_name,
-                  check_label=check_label, descriptions=descriptions,
+                  check_label=check_label, descriptions=descriptions, captions=captions,
                   multi_select=multi_select, reference_label=reference_label,
                   correct_indices=list(correct_indices) if locked and correct_indices is not None else None,
                   key=key, default=None)

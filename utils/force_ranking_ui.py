@@ -13,8 +13,9 @@ from utils.ui_state import State
 
 
 @st.cache_data(show_spinner=False)
-def ranking_image(case,scale):
-    return render_rank_diagram(case,scale)
+def ranking_image(case,scale,include_values=True):
+    """Keep printable givens in saved images and use page text for live cards."""
+    return render_rank_diagram(case,scale,include_values=include_values)
 
 
 def render_force_ranking():
@@ -30,6 +31,21 @@ def render_force_ranking():
         state.pop("transferred")
 
     render_header("Net Force and Acceleration Ranking",sum(bool(r.get("completed")) for r in [*state.get("records"),state.get("attempt",{})]))
+    st.html("""<style>
+    [class*="st-key-force_ranking_"] [data-baseweb="select"] > div {
+        min-height:3rem; border:2px solid #7c8798;
+    }
+    [class*="st-key-force_ranking_"] [data-baseweb="select"] * {
+        font-size:1.15rem; font-weight:600;
+    }
+    [class*="st-key-force_ranking_rank_"] [data-testid="stWidgetLabel"] p {
+        font-size:1.05rem; font-weight:600;
+    }
+    body:has(.st-key-force_ranking_quantity) [role="option"] {
+        font-size:1.15rem;
+    }
+    .st-key-force_ranking_equations .katex { font-size:1.4em; }
+    </style>""")
     a,b=st.columns(2)
     with a:
         quantity=st.selectbox("Rank by",QUANTITIES,key=state.key("quantity"))
@@ -57,8 +73,9 @@ def render_force_ranking():
     for col,letter,case,image in zip(st.columns(4),"ABCD",cases,images):
         with col:
             with st.container(border=True):
-                st.markdown(f"**Case {letter}**")
-                st.image(image,use_container_width=True)
+                st.markdown(f"**Case {letter} · {case.mass} kg**")
+                st.image(ranking_image(case,scale,include_values=False),width="stretch")
+                st.markdown(f"**P = {case.push} N →**  \n**T = {case.pull} N ←**")
     with st.expander("Text descriptions of diagrams"):
         for letter,case in zip("ABCD",cases):
             st.write(f"**{letter}:** {case.description}")
@@ -69,12 +86,12 @@ def render_force_ranking():
                 state.ensure(f"rank_{qid}_{i}",attempt["draft"][i])
                 ranks.append(st.selectbox(f"Rank for {letter}",[None,1,2,3,4],
                              format_func=lambda r: "Choose rank" if r is None else str(r),
-                             key=state.key(f"rank_{qid}_{i}"),disabled=attempt["completed"]))
+                             placeholder="Rank…",key=state.key(f"rank_{qid}_{i}"),disabled=attempt["completed"]))
         a,b=st.columns(2)
         with a:
-            checked=st.form_submit_button("Check ranking",type="primary",disabled=attempt["completed"],use_container_width=True)
+            checked=st.form_submit_button("Check ranking",type="primary",disabled=attempt["completed"],width="stretch")
         with b:
-            hinted=st.form_submit_button("Show ranking hint",disabled=attempt["completed"],use_container_width=True)
+            hinted=st.form_submit_button("Show ranking hint",disabled=attempt["completed"],width="stretch")
     if hinted:
         attempt["hint_used"]=True
         attempt["draft"]=tuple(ranks)
@@ -105,11 +122,12 @@ def render_force_ranking():
             unit="N" if quantity == "Net force" else "m/s²"
             for letter,case in zip("ABCD",cases):
                 st.write(f"{letter}: Fₓ = {case.push} − {case.pull} = {case.net} N; m = {case.mass} kg; ranked value = {ranking_value(case,quantity,comparison)} {unit}.")
-    with st.expander("Equation reference"):
-        more=st.checkbox("More Equations",key=state.key("more_equations"))
-        st.latex(r"F_{\mathrm{net},x}=m a_x")
-        if more:
-            st.latex(r"F_{\mathrm{net},x}=P-T,\qquad a_x=\frac{P-T}{m}")
+    with st.container(key=state.key("equations")):
+        with st.expander("Equation reference"):
+            more=st.checkbox("More Equations",key=state.key("more_equations"))
+            st.latex(r"F_{\mathrm{net},x}=m a_x")
+            if more:
+                st.latex(r"F_{\mathrm{net},x}=P-T,\qquad a_x=\frac{P-T}{m}")
 
     def next_question():
         if state.get("question_id")==qid:
@@ -133,14 +151,14 @@ def render_force_ranking():
         st.caption("Related comparison: the same four carts, now ranked by the other quantity. Their ties may change.")
     a,b=st.columns(2)
     with a:
-        st.button("Next question" if attempt["completed"] else "Skip question",key=state.key(f"next_{qid}"),on_click=next_question,use_container_width=True)
+        st.button("Next question" if attempt["completed"] else "Skip question",key=state.key(f"next_{qid}"),on_click=next_question,width="stretch")
     with b:
-        st.button("Rank the same cases by the other quantity",key=state.key(f"related_{qid}"),on_click=related,use_container_width=True)
+        st.button("Rank the same cases by the other quantity",key=state.key(f"related_{qid}"),on_click=related,width="stretch")
     with st.expander("Your Performance"):
         st.caption("This session only. One star per completed board; duplicate checks do not add attempts. Ties and rank gaps are accepted when the ordering is correct.")
         st.dataframe([{"Quantity":r["settings"][0],"Comparison":r["settings"][1],"Checks":len(r["checks"]),
                        "Hint used":r["hint_used"],"Result":r["outcome"] or ("In progress" if r is attempt else "Skipped")}
-                      for r in [*state.get("records"),attempt]],hide_index=True,use_container_width=True)
+                      for r in [*state.get("records"),attempt]],hide_index=True,width="stretch")
 
         def reset():
             state.set("records",[])

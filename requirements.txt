@@ -1,4 +1,5 @@
-streamlit
+streamlit>=1.49
+tzdata
 matplotlib
 numpy
 sympy

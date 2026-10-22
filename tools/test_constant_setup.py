@@ -20,7 +20,7 @@ def main():
         expected=expected_entries(at.session_state['const_motion__payload'].extras['setup'])
         for key,value in expected.items():
             at.text_input(key=f'const_motion__setup_input_{qid}_{key}').set_value(str(value))
-        at.run()
+        # Form edits are sent by the submit button, without an intervening rerun.
         assert not at.success  # No correctness feedback until deliberate submission.
         next(b for b in at.button if b.label=='Check setup').click().run()
         assert not at.exception and len(at.success)==3
@@ -28,7 +28,9 @@ def main():
         assert not at.session_state['const_motion__submitted']
         numeric=[key for key,value in expected.items() if not isinstance(value,str)]
         target_key=next(key for key,value in expected.items() if value=='?')
-        at.text_input(key=f'const_motion__setup_input_{qid}_{target_key}').set_value(str(expected[numeric[0]])).run()
+        # Model an external rerun with a changed saved form value.
+        at.session_state[f'const_motion__setup_input_{qid}_{target_key}'] = str(expected[numeric[0]])
+        at.run()
         assert any('changed' in c.value for c in at.caption)
         next(b for b in at.button if b.label=='Check setup').click().run()
         assert len(at.error)==1

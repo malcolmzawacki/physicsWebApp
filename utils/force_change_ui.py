@@ -42,7 +42,7 @@ def render_force_change():
         start(case_id)
 
     render_header("Change of State", sum(bool(r.get("completed")) for r in [*state.get("records"), state.get("attempt", {})]))
-    st.write("Select **every** one-force change that produces the requested motion.")
+    st.write("**Check all that apply.** Select every one-force change that produces the requested motion.")
     context = st.selectbox("Practice situations", PRACTICE_SETS, key=state.key("context"))
     if state.get("active_context") != context or not state.has("attempt") or len(state.get("attempt", {}).get("options", [])) != 4:
         state.set("active_context", context)
@@ -51,11 +51,17 @@ def render_force_change():
     attempt = state.get("attempt")
     case = CASE_BY_ID[attempt["case_id"]]
     qid = state.get("question_id")
-    st.markdown(f"**{case.title}**")
-    st.write(case.motion)
-    st.info(case.request)
-    st.caption("The same cart stays on a level, frictionless track. Air resistance is neglected. Its mass, 20 N weight and 20 N normal force stay unchanged. A hand pushes right; a winch-controlled rope can pull left. Zero means no contact/pull. Each choice changes just one horizontal interaction and then holds its new force constant.")
-    st.caption("A force change does not instantly change velocity. Judge the motion immediately afterward, before the cart could stop or reverse.")
+    reference, question = st.columns([1, 3])
+    with reference:
+        st.markdown("**Before the change**")
+        st.image(change_image(case.initial), width="stretch")
+        st.markdown(f"**P = {case.initial.push * 10} N →**  \n**T = {case.initial.pull * 10} N ←**")
+    with question:
+        st.markdown(f"**{case.title}**")
+        st.write(case.motion)
+        st.info(case.request)
+        st.caption("The same cart stays on a level, frictionless track. Air resistance is neglected. Its mass, 20 N weight and 20 N normal force stay unchanged. A hand pushes right; a winch-controlled rope can pull left. Zero means no contact/pull. Each choice changes just one horizontal interaction and then holds its new force constant.")
+        st.caption("A force change does not instantly change velocity. Judge the motion immediately afterward, before the cart could stop or reverse.")
     if attempt["hint_used"]:
         st.info("Find the required acceleration first. Then compare the rightward push with the leftward rope pull. Balanced forces mean no acceleration; a force opposite the current velocity slows the cart.")
     letters = "ABCD"
@@ -63,9 +69,10 @@ def render_force_change():
     images = [data_url(change_image(after)) for after in attempt["options"]]
     expected = tuple(i for i, after in enumerate(attempt["options"]) if accepted(case, after))
     st.markdown("**Possible diagrams after the change**")
-    event = graph_cards([data_url(change_image(case.initial)), *images], list(letters), qid, list(attempt["selection"]), attempt["completed"],
-                        "Reference beside options", key=state.key(f"cards_{qid}"), reference_label="Before the change", multi_select=True,
+    event = graph_cards(images, list(letters), qid, list(attempt["selection"]), attempt["completed"],
+                        "Four across", key=state.key(f"cards_{qid}"), has_reference=False, multi_select=True,
                         option_name="Change", check_label="Check changes", correct_indices=expected,
+                        captions=[f"P = {after.push * 10} N →\nT = {after.pull * 10} N ←" for after in attempt["options"]],
                         descriptions=[d + " " + after.description for d, after in zip(descriptions, attempt["options"])])
     indices = selected_indices(event, qid, len(images))
     if not attempt["completed"] and indices is not None and indices != attempt["selection"]:
@@ -78,9 +85,9 @@ def render_force_change():
             st.write(f"**{letter}:** {description} {after.description}")
     a, b = st.columns(2)
     with a:
-        checked = st.button("Check changes", key=state.key(f"check_{qid}"), type="primary", disabled=attempt["completed"], use_container_width=True)
+        checked = st.button("Check changes", key=state.key(f"check_{qid}"), type="primary", disabled=attempt["completed"], width="stretch")
     with b:
-        hinted = st.button("Show interaction hint", key=state.key(f"hint_{qid}"), disabled=attempt["completed"], use_container_width=True)
+        hinted = st.button("Show interaction hint", key=state.key(f"hint_{qid}"), disabled=attempt["completed"], width="stretch")
     if hinted:
         attempt["hint_used"] = True
         state.set("attempt", attempt)
@@ -126,14 +133,14 @@ def render_force_change():
 
     a, b = st.columns(2)
     with a:
-        st.button("Next question" if attempt["completed"] else "Skip question", key=state.key(f"next_{qid}"), on_click=next_question, use_container_width=True)
+        st.button("Next question" if attempt["completed"] else "Skip question", key=state.key(f"next_{qid}"), on_click=next_question, width="stretch")
     with b:
-        st.button("Try a related case", key=state.key(f"related_{qid}"), on_click=related, use_container_width=True)
+        st.button("Try a related case", key=state.key(f"related_{qid}"), on_click=related, width="stretch")
     with st.expander("Your Performance"):
         st.caption("This session only. One star per completed set; partial sets are revisable and do not earn a star.")
         st.dataframe([{"Case": CASE_BY_ID[r["case_id"]].title, "Checks": len(r["checks"]), "Hint used": r["hint_used"],
                        "Result": r["outcome"] or ("In progress" if r is attempt else "Skipped")}
-                      for r in [*state.get("records"), attempt]], hide_index=True, use_container_width=True)
+                      for r in [*state.get("records"), attempt]], hide_index=True, width="stretch")
 
         def reset():
             state.set("records", [])

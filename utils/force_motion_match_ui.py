@@ -47,7 +47,7 @@ def render_force_motion_match():
         start(case_id)
 
     render_header("Force and Motion Matching", sum(bool(r.get("completed")) for r in [*state.get("records"), state.get("attempt", {})]))
-    st.write("Select **every** motion that could go with the force diagram. More than one answer can be correct.")
+    st.write("**Check all that apply.** Select every motion that could go with the force diagram. More than one answer can be correct.")
     context = st.selectbox("Practice situations", PRACTICE_SETS, key=state.key("context"))
     if state.get("active_context") != context or not state.has("attempt") or len(state.get("attempt", {}).get("options", [])) != 4:
         state.set("active_context", context)
@@ -56,20 +56,25 @@ def render_force_motion_match():
     attempt = state.get("attempt")
     case = CASE_BY_ID[attempt["case_id"]]
     qid = state.get("question_id")
-    st.markdown(f"**{case.title}**")
-    st.write(case.prompt)
-    st.caption("The shown forces stay constant throughout each possible motion. Consider the named object only. The diagrams are qualitative; exact force and acceleration magnitudes are not supplied.")
-    st.info(f"Compare {'horizontal' if case.axis == 'horizontal' else 'vertical'} motion. The initial direction of motion is unknown.")
+    reference, question = st.columns([1, 3])
+    with reference:
+        st.markdown("**Initial forces**")
+        st.image(diagram_image(case.arrows), width="stretch")
+    with question:
+        st.markdown(f"**{case.title}**")
+        st.write(case.prompt)
+        st.caption("The shown forces stay constant throughout each possible motion. Consider the named object only. The diagrams are qualitative; exact force and acceleration magnitudes are not supplied.")
+        st.info(f"Compare {'horizontal' if case.axis == 'horizontal' else 'vertical'} motion. The initial direction of motion is unknown.")
     if attempt["hint_used"]:
         st.info("First compare opposing forces. Net force determines acceleration; the velocity may point either way. Equal-time dot gaps grow when speed increases and shrink when speed decreases.")
     st.caption("Dots 1–4 mark equal time steps. Read them in numbered order. Each card has its own schematic scale; compare how gaps change within a card.")
     letters = "ABCD"
     images = [data_url(motion_image(m, case.axis)) for m in attempt["options"]]
     expected = tuple(i for i, m in enumerate(attempt["options"]) if compatible(case, m))
-    event = graph_cards([data_url(diagram_image(case.arrows)), *images], list(letters), qid, list(attempt["selection"]), attempt["completed"],
-                        "Reference beside options", key=state.key(f"cards_{qid}"), reference_label="Force diagram",
+    event = graph_cards(images, list(letters), qid, list(attempt["selection"]), attempt["completed"],
+                        "Four across", key=state.key(f"cards_{qid}"), has_reference=False,
                         option_name="Motion", check_label="Check motions", multi_select=True,
-                        correct_indices=expected, descriptions=[m.description(case.axis) for m in attempt["options"]])
+                        correct_indices=expected, captions=[m.description(case.axis) for m in attempt["options"]], descriptions=[m.description(case.axis) for m in attempt["options"]])
     indices = selected_indices(event, qid, len(images))
     if not attempt["completed"] and indices is not None and indices != attempt["selection"]:
         attempt["selection"] = indices
@@ -82,9 +87,9 @@ def render_force_motion_match():
             st.write(f"**{letter}:** {m.description(case.axis)}. Successive positions: {', '.join(str(p) for p in m.positions)} (schematic units, positive {'right' if case.axis == 'horizontal' else 'up'}).")
     checks_col, hints_col = st.columns(2)
     with checks_col:
-        checked = st.button("Check motions", type="primary", key=state.key(f"check_{qid}"), disabled=attempt["completed"], use_container_width=True)
+        checked = st.button("Check motions", type="primary", key=state.key(f"check_{qid}"), disabled=attempt["completed"], width="stretch")
     with hints_col:
-        hinted = st.button("Show interaction hint", key=state.key(f"hint_{qid}"), disabled=attempt["completed"], use_container_width=True)
+        hinted = st.button("Show interaction hint", key=state.key(f"hint_{qid}"), disabled=attempt["completed"], width="stretch")
     if hinted:
         attempt["hint_used"] = True
         state.set("attempt", attempt)
@@ -108,10 +113,11 @@ def render_force_motion_match():
         else:
             st.warning("Revise your set of motions and check again.")
             if last["missing"]:
-                st.write("Also compatible: " + ", ".join(letters[i] for i in last["missing"]) + ".")
+                st.write("There are other compatible motions you haven't selected. Check how each card's dot spacing changes.")
             if last["extra"]:
-                st.write("Not compatible: " + ", ".join(letters[i] for i in last["extra"]) + ".")
-        st.write(explanation(case))
+                st.write("At least one selected motion doesn't fit. Compare its acceleration with the net force.")
+        if last["correct"]:
+            st.write(explanation(case))
 
     def next_question():
         if state.get("question_id") == qid:
@@ -128,14 +134,14 @@ def render_force_motion_match():
 
     a, b = st.columns(2)
     with a:
-        st.button("Next question" if attempt["completed"] else "Skip question", key=state.key(f"next_{qid}"), on_click=next_question, use_container_width=True)
+        st.button("Next question" if attempt["completed"] else "Skip question", key=state.key(f"next_{qid}"), on_click=next_question, width="stretch")
     with b:
-        st.button("Try a related case", key=state.key(f"related_{qid}"), on_click=related, use_container_width=True)
+        st.button("Try a related case", key=state.key(f"related_{qid}"), on_click=related, width="stretch")
     with st.expander("Your Performance"):
         st.caption("This session only. One star per completed set. Choosing cards or requesting hints does not score an answer.")
         st.dataframe([{"Case": CASE_BY_ID[r["case_id"]].title, "Checks": len(r["checks"]), "Hint used": r["hint_used"],
                        "Result": r["outcome"] or ("In progress" if r is attempt else "Skipped")}
-                      for r in [*state.get("records"), attempt]], hide_index=True, use_container_width=True)
+                      for r in [*state.get("records"), attempt]], hide_index=True, width="stretch")
 
         def reset():
             state.set("records", [])

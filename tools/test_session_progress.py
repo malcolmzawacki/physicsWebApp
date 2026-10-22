@@ -1,5 +1,6 @@
 """Routed regression checks for temporary history and the shared pacing setting."""
 import logging
+from datetime import date, datetime, timezone
 from pathlib import Path
 import sys
 import unittest
@@ -8,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 logging.disable(logging.CRITICAL)
 from streamlit.testing.v1 import AppTest
-from utils.session_progress import AUTO_LOAD_KEY, HISTORY_KEY
+from utils.session_progress import AUTO_LOAD_KEY, HISTORY_KEY, SESSION_CODE_KEY, activity_summary, daily_history, progress_date
 
 
 def page(section, activity, group=None):
@@ -42,19 +43,40 @@ class SessionProgressTests(unittest.TestCase):
         self.assertEqual(app.session_state["const_motion__question_id"], qid)
         self.assertEqual(len(app.session_state[HISTORY_KEY]), 1)
         self.assertEqual(app.session_state[HISTORY_KEY][0]["Result"], "Correct")
+        code = app.session_state[SESSION_CODE_KEY]
+        self.assertRegex(code, r"^\d{4}-\d{4}-\d{4}-\d{4}$")
         click(app, "My Current Session Progress")
-        self.assertEqual(app.title[0].value, "My Current Session Progress")
-        self.assertEqual(len(app.expander), 1)
+        self.assertTrue(any(code in caption.value for caption in app.caption))
+        self.assertTrue(app.title[0].value.startswith("Progress for "))
+        self.assertEqual(len(app.table), 1)
+        self.assertEqual(len(app.expander), 0)
         click(app, "Back to practice")
         self.assertFalse(app.checkbox(key=AUTO_LOAD_KEY).value)
         self.assertEqual(app.session_state["const_motion__question_id"], qid)
         click(app, "New Question")
         self.assertEqual(app.session_state["const_motion__question_id"], qid + 1)
         self.assertEqual(len(app.session_state[HISTORY_KEY]), 1)
+        self.assertEqual(app.session_state[SESSION_CODE_KEY], code)
         # A second WebSocket session (also what a browser refresh creates) has no history.
         fresh = AppTest.from_file(str(ROOT / "Home.py")).run()
         self.assertTrue(fresh.checkbox(key=AUTO_LOAD_KEY).value)
         self.assertNotIn(HISTORY_KEY, fresh.session_state)
+        self.assertNotIn(SESSION_CODE_KEY, fresh.session_state)
+
+    def test_session_code_stays_stable_and_new_session_gets_another(self):
+        from unittest.mock import patch
+        with patch("utils.session_progress.secrets.randbelow", side_effect=[1234567890123456, 9876543210987654]) as random_number:
+            app = AppTest.from_file(str(ROOT / "Home.py")).run()
+            click(app, "My Current Session Progress")
+            self.assertEqual(app.session_state[SESSION_CODE_KEY], "1234-5678-9012-3456")
+            app.run()
+            click(app, "Back to practice")
+            click(app, "My Current Session Progress")
+            self.assertEqual(app.session_state[SESSION_CODE_KEY], "1234-5678-9012-3456")
+            fresh = AppTest.from_file(str(ROOT / "Home.py")).run()
+            click(fresh, "My Current Session Progress")
+            self.assertEqual(fresh.session_state[SESSION_CODE_KEY], "9876-5432-1098-7654")
+            self.assertEqual(random_number.call_count, 2)
 
     def test_toggle_back_on_advances_without_duplicate_history(self):
         app = page("Kinematics", "Constant Motion")
@@ -130,7 +152,7 @@ class SessionProgressTests(unittest.TestCase):
         self.assertEqual(app.session_state["friction_puzzle_question_number"], qid)
         self.assertEqual(len(app.session_state[HISTORY_KEY]), 2)
         click(app, "My Current Session Progress")
-        self.assertEqual(len(app.expander), 2)
+        self.assertEqual(len(app.table[0].value), 2)
 
     def test_matching_history_preserves_graphs(self):
         app = page("Kinematics", "Matching Motion Graphs")
@@ -144,6 +166,10 @@ class SessionProgressTests(unittest.TestCase):
         self.assertEqual(len(record["Diagrams"]), 1 + len(payload["option_diagrams"]))
         click(app, "My Current Session Progress")
         self.assertFalse(app.exception)
+        self.assertEqual(len(app.get("imgs")), 0)
+        app.radio(key="progress_view").set_value("Review answers").run()
+        self.assertFalse(app.exception)
+        self.assertEqual(len(app.selectbox(key="progress_answer_selection").options), 1)
 
     def test_other_practice_pages_record_results(self):
         app = page("Foundations", "Scientific Notation")
@@ -161,6 +187,48 @@ class SessionProgressTests(unittest.TestCase):
         self.assertEqual(app.session_state[HISTORY_KEY][0]["Result"], "Incorrect")
         click(app, "My Current Session Progress")
         self.assertFalse(app.exception)
+
+    def test_summary_counts_checks_and_uses_school_date(self):
+        day = date(2026, 10, 21)
+        history = [
+            {"Activity": "Motion", "Result": "Incorrect", "Date": "2026-10-21"},
+            {"Activity": "Motion", "Result": "Correct", "Date": "2026-10-21"},
+            {"Activity": "Forces", "Result": "Correct", "Date": "2026-10-21"},
+            {"Activity": "Motion", "Result": "Correct", "Date": "2026-10-20"},
+        ]
+        self.assertEqual(activity_summary(daily_history(history, day)), [
+            {"Activity": "Motion", "Checks": 2, "Correct": 1, "Incorrect": 1},
+            {"Activity": "Forces", "Checks": 1, "Correct": 1, "Incorrect": 0},
+        ])
+        # Midnight in UTC is still the previous school day in New York.
+        self.assertEqual(progress_date(datetime(2026, 10, 22, 1, tzinfo=timezone.utc)), day)
+
+    def test_many_answers_stay_compact_and_review_shows_one_record(self):
+        app = AppTest.from_file(str(ROOT / "Home.py"), default_timeout=25)
+        from unittest.mock import patch
+        records = []
+        for i in range(180):
+            records.append({"Activity": f"Activity {i % 12 + 1}", "Date": "2026-10-21",
+                            "Result": "Correct", "Question": f"Question {i}",
+                            "Your answer": "5 m/s", "Correct answer": "5 m/s",
+                            "Difficulty": "Easy", "Explanation": "Divide distance by time.",
+                            "Equations": [], "Diagrams": {}})
+        app.session_state[HISTORY_KEY] = records
+        app.session_state["show_session_progress"] = True
+        with patch("utils.session_progress.progress_date", return_value=date(2026, 10, 21)):
+            app.run()
+            self.assertFalse(app.exception)
+            self.assertEqual(app.title[0].value, "Progress for October 21, 2026")
+            self.assertEqual(len(app.table), 2)
+            self.assertEqual(sum(len(table.value) for table in app.table), 12)
+            self.assertEqual(len(app.expander), 0)
+            app.radio(key="progress_view").set_value("Review answers").run()
+            self.assertFalse(app.exception)
+            self.assertEqual(len(app.selectbox(key="progress_answer_selection").options), 180)
+            app.selectbox(key="progress_activity_filter").select("Activity 1").run()
+            self.assertFalse(app.exception)
+            self.assertEqual(len(app.selectbox(key="progress_answer_selection").options), 15)
+            self.assertEqual(len(app.expander), 0)
 
 
 if __name__ == "__main__":

@@ -195,7 +195,7 @@ def render_button_options(prefix: str, units: list[str], answer_options: Dict[in
                 user_answers = state.get("user_answers_selected")
                 is_selected = user_answers[i] == option
                 button_type = "primary" if is_selected else "secondary"
-                if st.button(option, key=f"{prefix}_option_{i}_{j}_{question_id}", type=button_type, use_container_width=True):
+                if st.button(option, key=f"{prefix}_option_{i}_{j}_{question_id}", type=button_type, width="stretch"):
                     user_answers[i] = option
                     state.set("user_answers_selected", user_answers)
                     st.rerun()

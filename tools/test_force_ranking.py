@@ -83,6 +83,11 @@ def ui_checks():
 
     click("Dynamics")
     click("Net Force and Acceleration Ranking")
+    # Numerical givens remain readable page text, independent of image scaling.
+    visible_text = "\n".join(item.value for item in at.markdown)
+    for case in at.session_state["force_ranking_attempt"]["cases"]:
+        assert f"P = {case.push} N" in visible_text
+        assert f"T = {case.pull} N" in visible_text
     assert next(b for b in at.button if b.label=="Check ranking").proto.type=="primary"
     click("Check ranking")
     assert at.warning and not at.session_state["force_ranking_attempt"]["checks"]
@@ -107,7 +112,7 @@ def ui_checks():
     assert at.session_state["force_ranking_attempt"]["draft"]==(None,)*4
     assert at.session_state["force_ranking_transferred"]
     click("Skip question")
-    assert not at.session_state.filtered_state.get("force_ranking_transferred")
+    assert "force_ranking_transferred" not in at.session_state
     for quantity,comparison,masses,ties in itertools.product(QUANTITIES,COMPARISONS,MASS_PATTERNS,(False,True)):
         at.selectbox(key="force_ranking_quantity").set_value(quantity).run()
         at.selectbox(key="force_ranking_comparison").set_value(comparison).run()

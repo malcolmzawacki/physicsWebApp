@@ -36,7 +36,7 @@ def main():
         expected=expected_entries(at.session_state['momentum_payload'].extras['setup'])
         for key,value in expected.items():
             at.text_input(key=f'momentum_setup_input_{qid}_{key}').set_value(str(value))
-        at.run()
+        # Form edits are sent by the submit button, without an intervening rerun.
         assert not at.success
         next(b for b in at.button if b.label=='Check setup').click().run()
         assert not at.exception and len(at.success)==3
@@ -44,7 +44,9 @@ def main():
         assert at.session_state['momentum_question_id']==qid
         target_key=next(key for key,value in expected.items() if value=='?')
         given=next(value for value in expected.values() if not isinstance(value,str))
-        at.text_input(key=f'momentum_setup_input_{qid}_{target_key}').set_value(str(given)).run()
+        # Model an external rerun with a changed saved form value.
+        at.session_state[f'momentum_setup_input_{qid}_{target_key}'] = str(given)
+        at.run()
         assert any('changed' in c.value for c in at.caption)
         next(b for b in at.button if b.label=='Check setup').click().run()
         assert len(at.error)==1

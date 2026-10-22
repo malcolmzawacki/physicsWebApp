@@ -76,11 +76,11 @@ def render() -> None:
         correct = state.get("correct_count", 0)
         st.caption("Score: 0/0" if attempts == 0 else f"Score: {correct}/{attempts}")
     with next_col:
-        if st.button("New Pair", key=state.key("new_pair"), type="secondary", use_container_width=True):
+        if st.button("New Pair", key=state.key("new_pair"), type="secondary", width="stretch"):
             _reset_comparison_question(state)
             st.rerun()
 
-    if st.button("Check Answer", key=state.key("check_answer"), type="primary", use_container_width=True,
+    if st.button("Check Answer", key=state.key("check_answer"), type="primary", width="stretch",
                  disabled=bool((state.get("last_result") or {}).get("is_correct"))):
         expected_positive = get_material(left_key if compare_materials(left_key, right_key) > 0 else right_key).label
         expected_negative = get_material(right_key if compare_materials(left_key, right_key) > 0 else left_key).label

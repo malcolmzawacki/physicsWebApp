@@ -300,11 +300,12 @@ def validate_activity_handlers() -> list[str]:
 with st.sidebar:
     st.header("Directory")
     render_session_controls()
-    if st.button("My Current Session Progress", use_container_width=True):
+    if st.button("My Current Session Progress", width="stretch"):
         st.session_state["show_session_progress"] = True
+        st.session_state["progress_view"] = "Summary"
         st.rerun()
     if st.session_state.get("show_session_progress"):
-        if st.button("Back to practice", use_container_width=True):
+        if st.button("Back to practice", width="stretch"):
             st.session_state["show_session_progress"] = False
             st.rerun()
     level_options = [key for key, _, _ in COURSE_LEVELS]
@@ -322,7 +323,7 @@ with st.sidebar:
     if st.session_state.router_section == "root":
         st.subheader("Main areas")
         for section in SECTIONS:
-            if st.button(section, use_container_width=True):
+            if st.button(section, width="stretch"):
                 set_section(section)
                 st.rerun()
     else:
@@ -331,12 +332,12 @@ with st.sidebar:
         group = st.session_state.router_group
 
         if group is None:
-            if st.button("Back to Main", use_container_width=True):
+            if st.button("Back to Main", width="stretch"):
                 set_section("root")
                 st.rerun()
         else:
             st.caption(group)
-            if st.button("Back to Section", use_container_width=True):
+            if st.button("Back to Section", width="stretch"):
                 set_group(None)
                 st.rerun()
 
@@ -347,11 +348,11 @@ with st.sidebar:
         for entry_name in visible:
             entry_meta = entries[entry_name]
             if entry_is_group(entry_meta):
-                if st.button(entry_name, use_container_width=True):
+                if st.button(entry_name, width="stretch"):
                     set_group(entry_name)
                     st.rerun()
             else:
-                if st.button(entry_name, use_container_width=True):
+                if st.button(entry_name, width="stretch"):
                     set_activity(entry_name)
                     st.rerun()
 

@@ -126,7 +126,7 @@ def render_force_diagram(arrows):
     """Return a closed, white-background PNG; no external image assets needed."""
     from matplotlib.figure import Figure
     from matplotlib.patches import Circle
-    fig = Figure(figsize=(3.2, 2.7), dpi=130)
+    fig = Figure(figsize=(3.2, 2.7), dpi=180)
     ax = fig.subplots()
     try:
         ax.set(xlim=(-2.6, 2.6), ylim=(-2.35, 2.35), aspect="equal")
@@ -141,10 +141,10 @@ def render_force_diagram(arrows):
             ax.annotate("", xy=(x, y), xytext=(ox, oy),
                         arrowprops={"arrowstyle": "-|>", "color": "#176b9b", "lw": 2.7, "mutation_scale": 17})
             if dx:
-                ax.text(x / 2, -.33, SHORT_LABELS[arrow.force], ha="center", va="top", fontsize=10, color="#152f41")
+                ax.text(x / 2, -.33, SHORT_LABELS[arrow.force], ha="center", va="top", fontsize=11, color="#152f41")
             else:
                 label_x = -.34 if ox < 0 else .34
-                ax.text(label_x, y, SHORT_LABELS[arrow.force], ha="right" if ox < 0 else "left", va="center", fontsize=10, color="#152f41")
+                ax.text(label_x, y, SHORT_LABELS[arrow.force], ha="right" if ox < 0 else "left", va="center", fontsize=11, color="#152f41")
         ax.add_patch(Circle((0, 0), .16, color="#152f41"))
         if not arrows:
             ax.text(0, -.55, "No forces", ha="center", fontsize=10, color="#152f41")

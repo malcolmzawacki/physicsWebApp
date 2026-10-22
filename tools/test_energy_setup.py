@@ -116,14 +116,16 @@ def main():
                 assert any(f.form_id == prefix + "_form" for f in forms)
                 for key, value in expected.items():
                     app.text_input(key=f"{prefix}_setup_input_{qid}_{key}").set_value(str(value))
-                app.run()
+                # Form edits are sent by the submit button, without an intervening rerun.
                 assert not app.success
                 next(b for b in app.button if b.label == "Check setup").click().run()
                 assert len(app.success) == len(expected) and not app.session_state[prefix + "_submitted"]
                 assert app.session_state[prefix + "_question_id"] == qid
                 requested = next(k for k, v in expected.items() if v == "?")
                 given = next(v for v in expected.values() if v != "?")
-                app.text_input(key=f"{prefix}_setup_input_{qid}_{requested}").set_value(str(given)).run()
+                # Model an external rerun with a changed saved form value.
+                app.session_state[f"{prefix}_setup_input_{qid}_{requested}"] = str(given)
+                app.run()
                 assert any("changed" in c.value for c in app.caption)
                 next(b for b in app.button if b.label == "Check setup").click().run()
                 assert len(app.error) == 1
