@@ -80,4 +80,10 @@ assert.equal(board.className,'row');
 assert.equal(buttons().length,4);
 assert.equal(buttons()[0].querySelector('.caption').textContent,'P = 20 N →\nT = 10 N ←');
 click(3); assert.deepEqual(submitted().at(-1).value,{question_id:14,indices:[3]});
+render({...multi,question_id:14,images:[null,null,null,null],labels:['A','B','C','D'],
+        has_reference:false,layout:'Four across',selection:[3],captions:['Rest','Coast right','Coast left','Speed up']});
+assert.equal(board.querySelectorAll('img').length,0);
+assert.equal(buttons()[3].attrs['aria-pressed'],'true');
+assert.equal(buttons()[0].querySelector('.caption').textContent,'Rest');
+click(0); assert.deepEqual(submitted().at(-1).value,{question_id:14,indices:[0,3]});
 console.log('Graph-card frontend passed: multi-select toggle/deselect, backend restoration, no premature correctness, locking, and default single-choice reference indexing.');

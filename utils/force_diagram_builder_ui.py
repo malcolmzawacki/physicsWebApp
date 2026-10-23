@@ -5,14 +5,15 @@ import random
 import streamlit as st
 
 from utils.activity_flow import next_question_countdown
+from utils.force_activity_ui import question_title, separate_assumptions
 from utils.force_diagram_builder import (
     SIZE_LABELS, SYMBOLS, describe_builder, new_builder_attempt,
     render_builder_diagram, submit_builder,
 )
-from utils.force_diagram_match import CASE_BY_ID, DIRECTIONS, ForceArrow, available_cases
+from utils.force_diagram_match import CASE_BY_ID, SHORT_LABELS, ForceArrow, available_cases
 from utils.recognizing_forces import FORCE_LABELS, PRACTICE_SETS
 from utils.session_progress import record_answer
-from utils.ui_components import render_header
+from utils.force_activity_ui import force_activity_header as render_header
 from utils.ui_state import State
 
 
@@ -44,8 +45,8 @@ def render_force_diagram_builder():
 
     records = [*state.get("records"), state.get("attempt", {})]
     render_header("Free-Body Diagram Builder", sum(bool(r.get("completed")) for r in records))
-    st.write("Build the forces on one object. Your diagram updates as you edit; checking is a separate step.")
-    context = st.selectbox("Practice contexts", PRACTICE_SETS, key=state.key("context"))
+    with st.sidebar.expander("Practice settings"):
+        context = st.selectbox("Practice contexts", PRACTICE_SETS, key=state.key("context"))
     if state.get("active_context") != context or not state.has("attempt"):
         state.set("active_context", context)
         state.set("seen", [])
@@ -53,39 +54,114 @@ def render_force_diagram_builder():
     attempt = state.get("attempt")
     case = CASE_BY_ID[attempt["case_id"]]
     qid = state.get("question_id")
-    st.markdown(f"**{case.scenario.title}**")
-    st.write(case.prompt)
-    st.info(f"Build only the forces acting on **{case.scenario.target}**.")
+    prompt, assumptions = separate_assumptions(case.prompt)
+    question_title(case.scenario.title,
+                   "Place each force where its arrow points. Select all that apply in each menu. Adding a force in a new position moves it from its old position.",
+                   "Short, Medium, and Long show relative strength. Compare opposing forces on the same axis; exact ratios are not required.",
+                   "Your diagram updates as you edit; use Check diagram to submit it.", assumptions)
+    st.write(prompt)
+    st.markdown(f"Build forces on **{case.scenario.target}**. **Select all that apply.**")
     if attempt["hint_used"]:
         st.info(case.scenario.hint + " Decide which interactions act on the object, their directions, and whether opposing forces balance.")
 
     editor = st.container(key=state.key(f"editor_{qid}"))
-    controls, preview = editor.columns([1.05, 1], gap="large")
+    st.markdown(f"""<style>
+        .st-key-{state.key(f"editor_{qid}")} [data-testid="stImage"] {{
+            max-width: 180px;
+        }}
+        .st-key-{state.key(f"editor_{qid}")} [data-testid="stFullScreenFrame"] {{
+            display: flex;
+            justify-content: center;
+        }}
+        .st-key-{state.key(f"editor_{qid}")} [data-testid="stVerticalBlock"] {{
+            gap: .4rem;
+        }}
+        .st-key-{state.key(f"editor_{qid}")} [class*="st-key-force_diagram_builder_position_panel_"] {{
+            padding: .5rem;
+        }}
+    </style>""", unsafe_allow_html=True)
     draft_by_force = {item["force"]: item for item in attempt["draft"]}
-    with controls:
-        state.ensure(f"forces_{qid}", list(draft_by_force))
-        st.caption("Select all that apply when choosing forces on the object.")
-        selected = st.multiselect("Forces on the object", list(FORCE_LABELS),
-                                  format_func=FORCE_LABELS.get, key=state.key(f"forces_{qid}"),
-                                  disabled=attempt["completed"], placeholder="Add a force…")
-        st.caption("Short, Medium, and Long show relative strength. Compare opposing forces on the same axis; exact ratios are not required.")
-        draft = []
-        for force in selected:
-            saved = draft_by_force.get(force, {})
-            st.markdown(f"**{SYMBOLS[force]} · {FORCE_LABELS[force]}**")
-            direction_col, length_col = st.columns(2)
-            state.ensure(f"direction_{qid}_{force}", saved.get("direction"))
-            state.ensure(f"size_{qid}_{force}", saved.get("size", 2))
-            with direction_col:
-                direction = st.selectbox("Direction", [None, *DIRECTIONS],
-                                         format_func=lambda d: d.capitalize() if d else "Choose direction",
-                                         key=state.key(f"direction_{qid}_{force}"), disabled=attempt["completed"])
-            with length_col:
-                size = st.select_slider("Arrow length", list(SIZE_LABELS), format_func=SIZE_LABELS.get,
-                                        key=state.key(f"size_{qid}_{force}"), disabled=attempt["completed"])
-            draft.append({"force": force, "direction": direction, "size": size})
+    positions = ("up", "left", "right", "down")
+    headings = {"up": "↑ Above", "left": "← Left", "right": "Right →", "down": "↓ Below"}
+    for direction in positions:
+        state.ensure(f"position_{qid}_{direction}",
+                     [force for force, item in draft_by_force.items() if item.get("direction") == direction])
+    lengths = attempt.setdefault("lengths", {force: draft_by_force.get(force, {}).get("size", 2)
+                                            for force in FORCE_LABELS})
+    for force in FORCE_LABELS:
+        state.set(f"size_{qid}_{force}", lengths[force])
+
+    def save_length(force):
+        current = state.get("attempt")
+        current["lengths"][force] = state.get(f"size_{qid}_{force}")
+        state.set("attempt", current)
+
+    def move_forces(direction):
+        # Callbacks run before widgets render, so a force can move between menus
+        # without duplicates or changes to already-created widget values.
+        moved = set(state.get(f"position_{qid}_{direction}", []))
+        for other in positions:
+            if other != direction:
+                state.set(f"position_{qid}_{other}",
+                          [force for force in state.get(f"position_{qid}_{other}", []) if force not in moved])
+
+    if attempt["completed"]:
+        draft = attempt["draft"]
+    else:
+        draft = [{"force": force, "direction": direction, "size": lengths[force]}
+                 for direction in positions for force in state.get(f"position_{qid}_{direction}", [])]
         attempt["draft"] = draft
         state.set("attempt", attempt)
+    arrows = tuple(ForceArrow(d["force"], d["direction"], d["size"]) for d in draft)
+
+    def position_panel(direction):
+        with st.container(border=True, key=state.key(f"position_panel_{direction}")):
+            st.markdown(f"**{headings[direction]}**")
+            selected = [d["force"] for d in draft if d["direction"] == direction]
+            menu, single_length = st.columns([1.4, 1]) if len(selected) == 1 else (st.container(), None)
+            with menu:
+                if attempt["completed"]:
+                    st.multiselect(f"Forces pointing {direction}", list(FORCE_LABELS), default=selected,
+                                   format_func=lambda force: f"{SYMBOLS[force]} · {SHORT_LABELS[force]}",
+                                   key=state.key(f"position_{qid}_{direction}_completed"), disabled=True,
+                                   label_visibility="collapsed", placeholder="Add forces…")
+                else:
+                    selected = st.multiselect(f"Forces pointing {direction}", list(FORCE_LABELS),
+                                              format_func=lambda force: f"{SYMBOLS[force]} · {SHORT_LABELS[force]}",
+                                              key=state.key(f"position_{qid}_{direction}"),
+                                              on_change=move_forces, args=(direction,),
+                                              label_visibility="collapsed", placeholder="Add forces…")
+            for force in selected:
+                if single_length is None:
+                    label, length = st.columns([1, 1.3])
+                    label.caption(f"{SYMBOLS[force]} · {SHORT_LABELS[force]}")
+                else:
+                    length = single_length
+                with length:
+                    if attempt["completed"]:
+                        size = next(d["size"] for d in draft if d["force"] == force)
+                        st.selectbox(f"{FORCE_LABELS[force]} arrow length", list(SIZE_LABELS), index=size - 1,
+                                     format_func=SIZE_LABELS.get, key=state.key(f"size_{qid}_{force}_completed"),
+                                     disabled=True, label_visibility="collapsed")
+                    else:
+                        st.selectbox(f"{FORCE_LABELS[force]} arrow length", list(SIZE_LABELS),
+                                     format_func=SIZE_LABELS.get, key=state.key(f"size_{qid}_{force}"),
+                                     on_change=save_length, args=(force,), label_visibility="collapsed")
+
+    with editor:
+        top = st.columns([1, 1.35, 1], gap="small")
+        with top[1]:
+            position_panel("up")
+        left, preview, right = st.columns([1, 1.35, 1], gap="small", vertical_alignment="center")
+        with left:
+            position_panel("left")
+        with preview:
+            st.image(builder_image(arrows), width="stretch")
+        with right:
+            position_panel("right")
+        bottom = st.columns([1, 1.35, 1], gap="small")
+        with bottom[1]:
+            position_panel("down")
         check_col, hint_col = st.columns(2)
         with check_col:
             checked = st.button("Check diagram", type="primary", width="stretch",
@@ -93,30 +169,16 @@ def render_force_diagram_builder():
         with hint_col:
             hinted = st.button("Show interaction hint", width="stretch",
                                key=state.key(f"hint_{qid}"), disabled=attempt["completed"])
-
-    arrows = tuple(ForceArrow(d["force"], d["direction"], d["size"]) for d in draft if d["direction"])
-    incomplete = [d for d in draft if d["direction"] is None]
-    with preview:
-        st.markdown("**Your diagram**")
-        st.image(builder_image(arrows), width="stretch")
-        st.caption("The box represents the named object. Its size has no physical meaning.")
-        if selected:
-            st.caption(" · ".join(f"{SYMBOLS[f]} = {FORCE_LABELS[f]}" for f in selected))
-        if incomplete:
-            st.caption("Choose a direction for each added force to show all arrows.")
         with st.expander("Text description of your diagram"):
             st.write(describe_builder(arrows))
-            for item in incomplete:
-                st.write(f"{FORCE_LABELS[item['force']]}: direction not chosen.")
+            st.caption("The box represents the named object. Its size has no physical meaning.")
 
     if hinted:
         attempt["hint_used"] = True
         state.set("attempt", attempt)
         st.rerun()
     if checked:
-        if incomplete:
-            st.warning("Choose a direction for each added force before checking. This has not counted as an attempt.")
-        elif submit_builder(attempt, arrows):
+        if submit_builder(attempt, arrows):
             result = attempt["checks"][-1]
             record_answer("Free-Body Diagram Builder", case.prompt + " Forces on: " + case.scenario.target,
                           describe_builder(arrows), describe_builder(case.arrows), result["correct"],

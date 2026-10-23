@@ -4,13 +4,14 @@ import random
 import streamlit as st
 
 from utils.activity_flow import next_question_countdown
+from utils.force_activity_ui import question_title
 from utils.session_progress import record_answer
 from utils.recognizing_forces import (
     FORCE_LABELS, PRACTICE_SETS, SCENARIO_BY_ID, available_scenarios,
     new_attempt, submit_attempt,
 )
 from utils.ui_state import State
-from utils.ui_components import render_header
+from utils.force_activity_ui import force_activity_header as render_header
 
 
 def render_recognizing_forces():
@@ -39,8 +40,8 @@ def render_recognizing_forces():
     header_records = [*state.get("records"), state.get("attempt", {})]
     stars = sum(bool(record.get("completed")) for record in header_records)
     render_header("Recognizing Forces", stars)
-    st.write("Identify the forces acting on one object. **Check all that apply.** You can revise after checking.")
-    context = st.selectbox("Practice contexts", PRACTICE_SETS, key=state.key("context"))
+    with st.sidebar.expander("Practice settings"):
+        context = st.selectbox("Practice contexts", PRACTICE_SETS, key=state.key("context"))
     if state.get("active_context") != context or not state.has("attempt"):
         state.set("active_context", context)
         state.set("seen", [])
@@ -54,18 +55,16 @@ def render_recognizing_forces():
         if key.startswith(state.key("answer_")) and not key.startswith(state.key(f"answer_{question_id}_")):
             del st.session_state[key]
     with st.container(border=True):
-        st.subheader(scenario.title)
+        question_title(scenario.title,
+                       "Use one label per interaction. A rope gives tension; a spring gives spring force; a surface gives normal force and possibly friction. Applied force means a direct push or pull, not another name for these forces.",
+                       "Select forces on the named object, not forces it exerts on other objects. Motion and net force are not additional force types. Leave all boxes empty if no forces act in this model. You can revise after checking.")
         st.markdown(f"**{scenario.situation}**")
-        st.info(f"Which forces act on **{scenario.target}**? Check all that apply.")
+        st.info(f"Which forces act on **{scenario.target}**? **Check all that apply.**")
 
-    with st.expander("Force labels and conventions"):
-        st.write("Use one label per interaction. A rope gives tension; a spring gives spring force; a surface gives normal force and possibly friction. Applied force means a direct push or pull, not another name for these forces.")
-        st.write("Select forces on the named object, not forces it exerts on other objects. Motion and net force are not additional force types.")
     if attempt["hint_used"]:
         st.caption(scenario.hint)
 
     with st.form(state.key(f"form_{question_id}")):
-        st.write("**Check all that apply.** Leave all boxes empty if no forces act in this model.")
         columns = st.columns(2)
         selected = []
         for index, (force, label) in enumerate(FORCE_LABELS.items()):

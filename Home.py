@@ -5,6 +5,7 @@ import streamlit as st
 
 from config import AUTHOR_MODE
 from utils.session_progress import render_session_controls, render_session_progress
+from utils.progress_storage import render_progress_storage
 st.set_page_config(page_title="Physics Practice", layout="wide")
 
 COURSE_LEVELS = (
@@ -84,12 +85,12 @@ ACTIVITIES = {
     },
     "Dynamics": {
         "Create a worksheet": {"handler": "utils.worksheet_ui:render_forces_worksheet", "min_level": "high"},
-        "Recognizing Forces": {"handler": "utils.recognizing_forces_ui:render_recognizing_forces", "min_level": "high"},
-        "Match the Free-Body Diagram": {"handler": "utils.force_diagram_match_ui:render_force_diagram_match", "min_level": "high"},
-        "Free-Body Diagram Builder": {"handler": "utils.force_diagram_builder_ui:render_force_diagram_builder", "min_level": "high"},
-        "Force and Motion Matching": {"handler": "utils.force_motion_match_ui:render_force_motion_match", "min_level": "high"},
-        "Change of State": {"handler": "utils.force_change_ui:render_force_change", "min_level": "high"},
-        "Net Force and Acceleration Ranking": {"handler": "utils.force_ranking_ui:render_force_ranking", "min_level": "high"},
+        "Recognizing Forces": {"handler": "utils.recognizing_forces_ui:render_recognizing_forces", "min_level": "high", "owns_title": True},
+        "Match the Free-Body Diagram": {"handler": "utils.force_diagram_match_ui:render_force_diagram_match", "min_level": "high", "owns_title": True},
+        "Free-Body Diagram Builder": {"handler": "utils.force_diagram_builder_ui:render_force_diagram_builder", "min_level": "high", "owns_title": True},
+        "Force and Motion Matching": {"handler": "utils.force_motion_match_ui:render_force_motion_match", "min_level": "high", "owns_title": True},
+        "Change of State": {"handler": "utils.force_change_ui:render_force_change", "min_level": "high", "owns_title": True},
+        "Net Force and Acceleration Ranking": {"handler": "utils.force_ranking_ui:render_force_ranking", "min_level": "high", "owns_title": True},
         "Newton's Second Law": {"handler": "file:app_pages/1_2.1_Forces.py::newtons_2nd", "min_level": "high"},
         "Center of Mass": {"handler": "file:app_pages/1_2.1_Forces.py::center_of_mass", "min_level": "advanced"},
         "Tension": {"handler": "file:app_pages/1_2.1_Forces.py::tension", "min_level": "advanced"},
@@ -376,10 +377,11 @@ elif section == "root":
         "Each area has its own sidebar menu so students see only the next level of options."
     )
 else:
-    st.title(section)
+    entries = get_current_entries(section, group)
+    if not entries.get(activity, {}).get("owns_title"):
+        st.title(section)
     if group is not None:
         st.subheader(group)
-    entries = get_current_entries(section, group)
     visible = get_visible_entry_names(entries, level_key)
     if activity is None:
         if not visible:
@@ -400,3 +402,8 @@ else:
                 st.error("Activity handler is missing.")
             else:
                 resolve_handler(handler)()
+
+# Mount after activity handlers so a newly checked answer is saved on this run.
+# The fragment also handles expiry and cross-tab changes while a page sits open.
+with st.sidebar:
+    render_progress_storage()

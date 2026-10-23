@@ -48,6 +48,9 @@ class SessionProgressTests(unittest.TestCase):
         click(app, "My Current Session Progress")
         self.assertTrue(any(code in caption.value for caption in app.caption))
         self.assertTrue(app.title[0].value.startswith("Progress for "))
+        self.assertEqual(next(m.value for m in app.metric if m.label == "Total stars in saved progress"), "⭐ 1")
+        app.run()
+        self.assertEqual(next(m.value for m in app.metric if m.label == "Total stars in saved progress"), "⭐ 1")
         self.assertEqual(len(app.table), 1)
         self.assertEqual(len(app.expander), 0)
         click(app, "Back to practice")
@@ -57,7 +60,7 @@ class SessionProgressTests(unittest.TestCase):
         self.assertEqual(app.session_state["const_motion__question_id"], qid + 1)
         self.assertEqual(len(app.session_state[HISTORY_KEY]), 1)
         self.assertEqual(app.session_state[SESSION_CODE_KEY], code)
-        # A second WebSocket session (also what a browser refresh creates) has no history.
+        # AppTest has no browser storage; a new simulated connection starts empty.
         fresh = AppTest.from_file(str(ROOT / "Home.py")).run()
         self.assertTrue(fresh.checkbox(key=AUTO_LOAD_KEY).value)
         self.assertNotIn(HISTORY_KEY, fresh.session_state)
@@ -197,9 +200,21 @@ class SessionProgressTests(unittest.TestCase):
             {"Activity": "Motion", "Result": "Correct", "Date": "2026-10-20"},
         ]
         self.assertEqual(activity_summary(daily_history(history, day)), [
-            {"Activity": "Motion", "Checks": 2, "Correct": 1, "Incorrect": 1},
-            {"Activity": "Forces", "Checks": 1, "Correct": 1, "Incorrect": 0},
+            {"Activity": "Motion", "Checks": 2, "Correct": 1, "Incorrect": 1, "Stars": 1},
+            {"Activity": "Forces", "Checks": 1, "Correct": 1, "Incorrect": 0, "Stars": 1},
         ])
+        # The daily table is filtered, but the running total spans this session.
+        from unittest.mock import patch
+        app = AppTest.from_string("from utils.session_progress import render_session_progress\nrender_session_progress()")
+        app.session_state[HISTORY_KEY] = history
+        with patch("utils.session_progress.progress_date", return_value=day):
+            app.run()
+        self.assertFalse(app.exception)
+        self.assertEqual(next(m.value for m in app.metric if m.label == "Total stars in saved progress"), "⭐ 3")
+        with patch("utils.session_progress.progress_date", return_value=day):
+            app.selectbox(key="progress_day").select("2026-10-20").run()
+        self.assertEqual(app.title[0].value, "Progress for October 20, 2026")
+        self.assertEqual(len(app.table[0].value), 1)
         # Midnight in UTC is still the previous school day in New York.
         self.assertEqual(progress_date(datetime(2026, 10, 22, 1, tzinfo=timezone.utc)), day)
 

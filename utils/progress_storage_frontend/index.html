@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<style>
+body { margin:0; font:12px system-ui,sans-serif; color:var(--text,#333); }
+p { margin:4px 0 8px; line-height:1.4; }
+button { font:inherit; padding:6px 9px; border:1px solid #888; border-radius:5px;
+ background:transparent; color:inherit; cursor:pointer; }
+button:focus-visible { outline:2px solid #2879df; outline-offset:2px; }
+</style></head><body>
+<p id="status" role="status" aria-live="polite">Loading saved progress…</p>
+<button id="clear" type="button">Delete saved progress and code</button>
+<script src="storage.js"></script>
+</body></html>

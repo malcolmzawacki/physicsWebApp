@@ -4,6 +4,7 @@ import random
 import streamlit as st
 
 from utils.activity_flow import next_question_countdown
+from utils.force_activity_ui import question_title
 from utils.force_change import (
     CASE_BY_ID, PRACTICE_SETS, accepted, available_cases, change_description,
     explanation, new_attempt, render_change_diagram, submit_attempt,
@@ -11,7 +12,7 @@ from utils.force_change import (
 from utils.force_motion_match_ui import data_url
 from utils.graph_cards import graph_cards, selected_indices
 from utils.session_progress import record_answer
-from utils.ui_components import render_header
+from utils.force_activity_ui import force_activity_header as render_header
 from utils.ui_state import State
 
 
@@ -42,8 +43,8 @@ def render_force_change():
         start(case_id)
 
     render_header("Change of State", sum(bool(r.get("completed")) for r in [*state.get("records"), state.get("attempt", {})]))
-    st.write("**Check all that apply.** Select every one-force change that produces the requested motion.")
-    context = st.selectbox("Practice situations", PRACTICE_SETS, key=state.key("context"))
+    with st.sidebar.expander("Practice settings"):
+        context = st.selectbox("Practice situations", PRACTICE_SETS, key=state.key("context"))
     if state.get("active_context") != context or not state.has("attempt") or len(state.get("attempt", {}).get("options", [])) != 4:
         state.set("active_context", context)
         state.set("seen", [])
@@ -51,17 +52,15 @@ def render_force_change():
     attempt = state.get("attempt")
     case = CASE_BY_ID[attempt["case_id"]]
     qid = state.get("question_id")
-    reference, question = st.columns([1, 3])
-    with reference:
+    reference, question = st.columns([1, 4])
+    with reference, st.container(key="force_activity_reference"):
         st.markdown("**Before the change**")
         st.image(change_image(case.initial), width="stretch")
-        st.markdown(f"**P = {case.initial.push * 10} N →**  \n**T = {case.initial.pull * 10} N ←**")
     with question:
-        st.markdown(f"**{case.title}**")
-        st.write(case.motion)
-        st.info(case.request)
-        st.caption("The same cart stays on a level, frictionless track. Air resistance is neglected. Its mass, 20 N weight and 20 N normal force stay unchanged. A hand pushes right; a winch-controlled rope can pull left. Zero means no contact/pull. Each choice changes just one horizontal interaction and then holds its new force constant.")
-        st.caption("A force change does not instantly change velocity. Judge the motion immediately afterward, before the cart could stop or reverse.")
+        question_title(case.title,
+                       "The same cart stays on a level, frictionless track. Air resistance is ignored. Its mass, 20 N weight and 20 N normal force stay unchanged. A hand pushes right; a winch-controlled rope can pull left. Zero means no contact/pull. Each choice changes just one horizontal interaction and then holds its new force constant.",
+                       "A force change does not instantly change velocity. Judge the motion immediately afterward, before the cart could stop or reverse.")
+        st.markdown(f"{case.motion}  \n**P = {case.initial.push * 10} N → · T = {case.initial.pull * 10} N ←**  \n{case.request} **Check all that apply.**")
     if attempt["hint_used"]:
         st.info("Find the required acceleration first. Then compare the rightward push with the leftward rope pull. Balanced forces mean no acceleration; a force opposite the current velocity slows the cart.")
     letters = "ABCD"
@@ -79,15 +78,15 @@ def render_force_change():
         attempt["selection"] = indices
         state.set("attempt", attempt)
         st.rerun()
-    with st.expander("What changed? / Text descriptions"):
-        st.write("**Before:** " + case.initial.description)
-        for letter, description, after in zip(letters, descriptions, attempt["options"]):
-            st.write(f"**{letter}:** {description} {after.description}")
     a, b = st.columns(2)
     with a:
         checked = st.button("Check changes", key=state.key(f"check_{qid}"), type="primary", disabled=attempt["completed"], width="stretch")
     with b:
         hinted = st.button("Show interaction hint", key=state.key(f"hint_{qid}"), disabled=attempt["completed"], width="stretch")
+    with st.expander("What changed? / Text descriptions"):
+        st.write("**Before:** " + case.initial.description)
+        for letter, description, after in zip(letters, descriptions, attempt["options"]):
+            st.write(f"**{letter}:** {description} {after.description}")
     if hinted:
         attempt["hint_used"] = True
         state.set("attempt", attempt)

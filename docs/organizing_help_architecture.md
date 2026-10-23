@@ -8,6 +8,13 @@ for execution order; dated rollout notes below are historical findings.
 
 ## Implemented contract
 
+Classroom layout principle (2026-10-22): aim to show the essential question,
+givens and answer controls together in one frame on roughly 2:1 Chromebook
+screens. Put secondary instructions, conventions and modeling explanations in
+hover help beside the scenario title. Keep target objects, necessary values,
+comparison modes and "check all that apply" visible. This is a practical design
+goal, not a reason to shrink important text or omit information.
+
 `utils/quantities.py` separates physical definitions (name, unit, dimension) from
 profile-local roles (quantity reference, display name, LaTeX symbol, phase).
 Distance and displacement, and speed and velocity, have distinct identities even

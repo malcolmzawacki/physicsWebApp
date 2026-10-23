@@ -1,12 +1,11 @@
-"""Temporary practice preferences and answer history, scoped to one connection.
+"""Existing answer history, mirrored to browser storage for a fixed 24 hours.
 
-Keep these in session_state only: no caches, files, cookies, or browser storage.
-A browser refresh starts a new Streamlit session and discards this history.
+Practice preferences and activity state remain scoped to the live connection.
 """
 from copy import deepcopy
 import base64
 import secrets
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from zoneinfo import ZoneInfo
 
 import streamlit as st
@@ -17,7 +16,7 @@ SESSION_CODE_KEY = "practice_session_code"
 
 
 def session_code():
-    """Generate an independent random label, kept only for this session."""
+    """Return the browser-restored label, or a temporary label before hydration."""
     if SESSION_CODE_KEY not in st.session_state:
         digits = f"{secrets.randbelow(10**16):016d}"
         st.session_state[SESSION_CODE_KEY] = "-".join(digits[i:i + 4] for i in range(0, 16, 4))
@@ -38,9 +37,10 @@ def activity_summary(history):
     """Count checks, not unique questions: several activities allow retries."""
     summary = {}
     for row in history:
-        stats = summary.setdefault(row["Activity"], {"Activity": row["Activity"], "Checks": 0, "Correct": 0, "Incorrect": 0})
+        stats = summary.setdefault(row["Activity"], {"Activity": row["Activity"], "Checks": 0, "Correct": 0, "Incorrect": 0, "Stars": 0})
         stats["Checks"] += 1
         stats[row["Result"]] += 1
+        stats["Stars"] += row["Result"] == "Correct"
     return list(summary.values())
 
 
@@ -68,16 +68,27 @@ def render_session_controls():
     """Render once in the shared sidebar, on every route."""
     st.checkbox("Automatically load next question", value=True, key=AUTO_LOAD_KEY,
                 help="After a correct answer, load the next question automatically. Turn off to review at your own pace.")
-    st.caption("Settings and progress last until you refresh or close this session.")
+    st.caption("Progress is saved on this browser for a fixed 24 hours. Your code stays until you delete it. Settings reset on refresh.")
 
 
 def render_session_progress():
-    day = progress_date()
+    today = progress_date()
+    session_history = st.session_state.get(HISTORY_KEY, [])
+    days = sorted({row.get("Date", today.isoformat()) for row in session_history} | {today.isoformat()}, reverse=True)
+    if st.session_state.get("progress_day") not in days:
+        st.session_state["progress_day"] = today.isoformat()
+    if len(days) > 1:
+        selected_day = st.selectbox("Progress date", days, key="progress_day",
+                                    format_func=lambda value: f"{value} (today)" if value == today.isoformat() else value)
+    else:
+        selected_day = today.isoformat()
+    day = date.fromisoformat(selected_day)
     st.title(f"Progress for {day.strftime('%B')} {day.day}, {day.year}")
     st.caption(f"Session code: **{session_code()}**")
-    history = daily_history(st.session_state.get(HISTORY_KEY, []), day)
+    st.metric("Total stars in saved progress", f"⭐ {sum(row['Result'] == 'Correct' for row in session_history)}")
+    history = daily_history(session_history, day)
     if not history:
-        st.info("No answers checked today in this session. Choose an activity to start practicing.")
+        st.info("No answers checked on this date. Choose an activity to start practicing.")
         return
     view = st.radio("Progress view", ["Summary", "Review answers"], horizontal=True,
                     key="progress_view", label_visibility="collapsed")
@@ -91,7 +102,7 @@ def render_session_progress():
         for index, column in enumerate(columns):
             with column:
                 st.table(rows[index * rows_per_column:(index + 1) * rows_per_column])
-        st.caption("This session only · Checks include retries. Refreshing clears your progress.")
+        st.caption("Selected date only · Checks include retries. Days change at midnight, New York time.")
         return
     render_answer_review(history)
 

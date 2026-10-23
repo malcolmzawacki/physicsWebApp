@@ -5,6 +5,7 @@ import random
 import streamlit as st
 
 from utils.activity_flow import next_question_countdown
+from utils.force_activity_ui import question_title, separate_assumptions
 from utils.force_diagram_match import (
     CASE_BY_ID, available_cases, describe_diagram, diagram_matches,
     make_options, render_force_diagram, SHORT_LABELS,
@@ -12,7 +13,7 @@ from utils.force_diagram_match import (
 from utils.recognizing_forces import PRACTICE_SETS
 from utils.graph_cards import graph_cards, selected_index
 from utils.session_progress import record_answer
-from utils.ui_components import render_header
+from utils.force_activity_ui import force_activity_header as render_header
 from utils.ui_state import State
 
 
@@ -47,8 +48,8 @@ def render_force_diagram_match():
 
     records = [*state.get("records"), state.get("attempt", {})]
     render_header("Match the Free-Body Diagram", sum(bool(r.get("completed")) for r in records))
-    st.write("Which diagram shows the forces acting on the named object?")
-    context = st.selectbox("Practice contexts", PRACTICE_SETS, key=state.key("context"))
+    with st.sidebar.expander("Practice settings"):
+        context = st.selectbox("Practice contexts", PRACTICE_SETS, key=state.key("context"))
     if state.get("active_context") != context or not state.has("attempt"):
         state.set("active_context", context)
         state.set("seen", [])
@@ -56,10 +57,12 @@ def render_force_diagram_match():
     attempt = state.get("attempt")
     case = CASE_BY_ID[attempt["case_id"]]
     qid = state.get("question_id")
-    st.markdown(f"**{case.scenario.title}**")
-    st.write(case.prompt)
-    st.info(f"Forces acting on **{case.scenario.target}** only.")
-    st.caption("Arrow direction shows force direction. Compare opposing lengths along the same axis; no exact numerical ratios are implied.")
+    prompt, assumptions = separate_assumptions(case.prompt)
+    question_title(case.scenario.title,
+                   "Arrow direction shows force direction. Compare opposing lengths along the same axis; no exact numerical ratios are implied.",
+                   "Select one diagram, then use Check diagram to submit it.", assumptions)
+    st.write(prompt)
+    st.markdown(f"Which diagram shows the forces on **{case.scenario.target}**?")
     if attempt["hint_used"]:
         st.info(case.scenario.hint + " Think about which way each interaction acts and whether opposing forces balance.")
 

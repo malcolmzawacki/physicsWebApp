@@ -2,13 +2,14 @@
 import streamlit as st
 
 from utils.activity_flow import next_question_countdown
+from utils.force_activity_ui import question_title
 from utils.force_motion_match_ui import data_url
 from utils.force_ranking import (
     COMPARISONS, MASS_PATTERNS, QUANTITIES, new_attempt, ranking_text,
     ranking_value, render_rank_diagram, submit_attempt,
 )
 from utils.session_progress import record_answer
-from utils.ui_components import render_header
+from utils.force_activity_ui import force_activity_header as render_header
 from utils.ui_state import State
 
 
@@ -60,12 +61,13 @@ def render_force_ranking():
     attempt=state.get("attempt")
     qid=state.get("question_id")
     cases=attempt["cases"]
-    st.write("Rank the four cases from **greatest to least**. **1 means greatest**; equal values receive the same rank. Gaps between ranks are fine.")
+    question_title("Rank the four cases",
+                   "Use rank 1 for the greatest value. Equal values receive the same rank. Gaps between ranks are fine.",
+                   "Each cart stays on a level, frictionless track. Air resistance is ignored. P is the rightward push; T is the leftward rope pull. N and W balance vertically. Use g = 10 m/s². All diagrams use one arrow scale.")
     if comparison == COMPARISONS[0]:
-        st.info(f"Compare {quantity.lower()} magnitudes: ignore left/right signs. Equal strengths in opposite directions tie.")
+        st.markdown(f"Rank **{quantity.lower()} magnitudes, greatest to least**. **1 = greatest; equal values tie.** Ignore left/right signs.")
     else:
-        st.info(f"Compare signed {quantity.lower()}: right is positive and left is negative. For example, −2 is greater than −6.")
-    st.caption("Each cart stays on a level, frictionless track. Air resistance is neglected. P is the rightward push; T is the leftward rope pull. N and W balance vertically. Use g = 10 m/s². All diagrams use one arrow scale.")
+        st.markdown(f"Rank **signed {quantity.lower()}, greatest to least**. **1 = greatest; equal values tie.** Right is positive; left is negative.")
     if attempt["hint_used"]:
         st.info("Subtract the leftward pull from the rightward push. For acceleration, divide each case's net force by its own mass. If ranking magnitudes, take absolute values before comparing. A larger net force does not always mean a larger acceleration when masses differ.")
     scale=max(max(c.push,c.pull,10*c.mass) for c in cases)

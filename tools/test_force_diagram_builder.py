@@ -73,10 +73,11 @@ def ui_checks():
 
     def build(case):
         qid = at.session_state["force_diagram_builder_question_id"]
-        at.multiselect(key=f"force_diagram_builder_forces_{qid}").set_value([a.force for a in case.arrows]).run()
+        for direction in ("up", "left", "right", "down"):
+            at.multiselect(key=f"force_diagram_builder_position_{qid}_{direction}").set_value(
+                [a.force for a in case.arrows if a.direction == direction]).run()
         for a in case.arrows:
-            at.selectbox(key=f"force_diagram_builder_direction_{qid}_{a.force}").set_value(a.direction)
-            at.select_slider(key=f"force_diagram_builder_size_{qid}_{a.force}").set_value(a.size)
+            at.selectbox(key=f"force_diagram_builder_size_{qid}_{a.force}").set_value(a.size)
         at.run()
         assert not at.exception
 
@@ -84,10 +85,16 @@ def ui_checks():
     click("Free-Body Diagram Builder")
     assert next(b for b in at.button if b.label == "Check diagram").proto.type == "primary"
     qid = at.session_state["force_diagram_builder_question_id"]
-    at.multiselect(key=f"force_diagram_builder_forces_{qid}").set_value(["gravity"]).run()
-    click("Check diagram")
-    assert at.warning and not at.session_state["force_diagram_builder_attempt"]["checks"]
-    at.selectbox(key=f"force_diagram_builder_direction_{qid}_gravity").set_value("up").run()
+    assert len(at.multiselect) == 4 and not at.select_slider
+    assert not any(box.label == "Direction" for box in at.selectbox)
+    at.multiselect(key=f"force_diagram_builder_position_{qid}_up").set_value(["gravity"]).run()
+    at.selectbox(key=f"force_diagram_builder_size_{qid}_gravity").set_value(3).run()
+    at.multiselect(key=f"force_diagram_builder_position_{qid}_down").set_value(["gravity"]).run()
+    assert at.multiselect(key=f"force_diagram_builder_position_{qid}_up").value == []
+    assert at.session_state["force_diagram_builder_attempt"]["draft"] == [
+        {"force": "gravity", "direction": "down", "size": 3}]
+    at.multiselect(key=f"force_diagram_builder_position_{qid}_up").set_value(["gravity"]).run()
+    assert at.multiselect(key=f"force_diagram_builder_position_{qid}_down").value == []
     assert not at.session_state["force_diagram_builder_attempt"]["checks"]
     click("Check diagram")
     assert len(at.session_state["force_diagram_builder_attempt"]["checks"]) == 1
@@ -97,7 +104,8 @@ def ui_checks():
     assert at.session_state["force_diagram_builder_attempt"]["hint_used"]
     click("Recognizing Forces")
     click("Free-Body Diagram Builder")
-    assert at.selectbox(key=f"force_diagram_builder_direction_{qid}_gravity").value == "up"
+    assert at.multiselect(key=f"force_diagram_builder_position_{qid}_up").value == ["gravity"]
+    assert at.selectbox(key=f"force_diagram_builder_size_{qid}_gravity").value == 3
     for case in CASES:
         at.session_state["force_diagram_builder_attempt"] = new_builder_attempt(case.id)
         at.session_state["force_diagram_builder_question_id"] += 1
@@ -107,7 +115,8 @@ def ui_checks():
         click("Check diagram")
         assert at.success and at.session_state["force_diagram_builder_attempt"]["completed"]
         assert any(t.value.startswith("⭐ x ") for t in at.title)
-        assert at.multiselect[0].disabled
+        assert all(box.disabled for box in at.multiselect)
+        assert sum(len(box.value) for box in at.multiselect) == len(case.arrows)
         assert next(b for b in at.button if b.label == "Check diagram").disabled
         before = len(at.session_state["practice_answer_history"])
         at.run()
@@ -133,7 +142,7 @@ def ui_checks():
     at.checkbox(key=f"force_diagram_builder_cancel_next_{qid}").uncheck().run()
     assert at.session_state["force_diagram_builder_question_id"] == qid + 1
     assert len(at.session_state["force_diagram_builder_records"]) == 1
-    print("Builder UI passed: live drafts, incomplete direction, explicit checking, retries, hints, navigation, all cases, stars, session images, contexts, reset, and countdown.")
+    print("Builder UI passed: spatial force placement, moving forces, length menus, explicit checking, retries, hints, navigation, all cases, stars, session images, contexts, reset, and countdown.")
 
 
 if __name__ == "__main__":

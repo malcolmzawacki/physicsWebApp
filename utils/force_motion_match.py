@@ -6,6 +6,8 @@ import random
 from utils.force_diagram_match import DIRECTIONS, ForceArrow
 
 PRACTICE_SETS = ("All situations", "Balanced forces", "Horizontal net force", "Vertical net force")
+MOTION_DISPLAYS = ("Written descriptions", "Dot diagrams", "Position–time graphs",
+                   "Velocity–time graphs", "Mixed graph types")
 
 
 @dataclass(frozen=True)
@@ -31,11 +33,11 @@ G = ForceArrow("gravity", "down")
 N = ForceArrow("normal", "up")
 CASES = (
     ForceMotionCase("cart_balance", "Cart on a smooth track", "horizontal", (G, N),
-        "A cart stays on a horizontal, frictionless track. Air resistance is neglected. Its initial velocity is not supplied."),
+        "A cart stays on a horizontal, frictionless track. Air resistance is ignored. Its initial velocity is not supplied."),
     ForceMotionCase("cart_right", "Cart pushed right", "horizontal", (G, N, ForceArrow("applied", "right")),
-        "A cart stays on a horizontal, frictionless track while a steady horizontal push acts to the right. Air resistance is neglected. Its initial velocity is not supplied."),
+        "A cart stays on a horizontal, frictionless track while a steady horizontal push acts to the right. Air resistance is ignored. Its initial velocity is not supplied."),
     ForceMotionCase("cart_left", "Cart pushed left", "horizontal", (G, N, ForceArrow("applied", "left")),
-        "A cart stays on a horizontal, frictionless track while a steady horizontal push acts to the left. Air resistance is neglected. Its initial velocity is not supplied."),
+        "A cart stays on a horizontal, frictionless track while a steady horizontal push acts to the left. Air resistance is ignored. Its initial velocity is not supplied."),
     ForceMotionCase("load_balance", "Load on a cable", "vertical", (G, ForceArrow("tension", "up")),
         "A winch keeps a vertical cable taut and pulls a load with constant tension equal to its weight. It stays clear of the floor and ceiling. Its initial velocity is not supplied."),
     ForceMotionCase("load_up", "Stronger cable pull", "vertical", (G, ForceArrow("tension", "up", 2)),
@@ -43,7 +45,7 @@ CASES = (
     ForceMotionCase("load_down", "Weaker cable pull", "vertical", (ForceArrow("gravity", "down", 2), ForceArrow("tension", "up")),
         "A winch keeps a vertical cable taut and pulls a load with constant tension smaller than its weight. It stays clear of the floor and ceiling. Its initial velocity is not supplied."),
     ForceMotionCase("ball_gravity", "Ball in flight", "vertical", (G,),
-        "A ball is in flight near Earth after leaving the hand. Neglect air resistance. It remains above the ground throughout the shown interval. Its initial velocity is not supplied."),
+        "A ball is in flight near Earth after leaving the hand. Ignore air resistance. It remains above the ground throughout the shown interval. Its initial velocity is not supplied."),
 )
 CASE_BY_ID = {c.id: c for c in CASES}
 
@@ -159,6 +161,59 @@ def render_motion(motion, axis):
         ax.set_title(motion.description(axis), fontsize=10, color="#173f56", wrap=True)
         fig.text(.02, .015, "Up ↑" if vertical else "Left ←                         → Right", fontsize=9, color="#173f56")
         fig.subplots_adjust(left=.05, right=.95, bottom=.16, top=.78)
+        buffer = BytesIO()
+        fig.savefig(buffer, format="png", facecolor="white")
+        return buffer.getvalue()
+    finally:
+        fig.clear()
+
+
+def graph_kind(display, index, question_id):
+    """Keep mixed boards stable across reruns, with two of each graph type."""
+    if display == "Mixed graph types":
+        return "position" if (index + question_id) % 2 == 0 else "velocity"
+    return {"Position–time graphs": "position", "Velocity–time graphs": "velocity"}[display]
+
+
+def motion_graph_data(motion):
+    """Same 0–3 interval as the dots; no motion stops or reverses within it."""
+    times = tuple(i / 20 for i in range(61))
+    positions = tuple(motion.v0 * t + .5 * motion.acceleration * t * t for t in times)
+    velocities = tuple(motion.v0 + motion.acceleration * t for t in times)
+    return times, positions, velocities
+
+
+def graph_description(motion, axis, kind):
+    positive = "right" if axis == "horizontal" else "upward"
+    position = "Positions at relative times 0, 1, 2, 3: " + ", ".join(f"{p:g}" for p in motion.positions) + "."
+    velocity = "Velocities at relative times 0, 1, 2, 3: " + ", ".join(
+        f"{motion.v0 + motion.acceleration * t:g}" for t in range(4)) + "."
+    values = position if kind == "position" else velocity
+    return f"Positive means {positive}. Schematic units. {values}"
+
+
+def render_motion_graph(motion, kind):
+    """Qualitative graphs from the same history used for checking and dot diagrams."""
+    from matplotlib.figure import Figure
+    if kind not in ("position", "velocity"):
+        raise ValueError("Unknown motion graph type")
+    times, positions, velocities = motion_graph_data(motion)
+    fig = Figure(figsize=(3.6, 2.9), dpi=180)
+    try:
+        axes = fig.subplots(1, 1, squeeze=False)
+        for ax in axes[:, 0]:
+            is_position = kind == "position"
+            ax.plot(times, positions if is_position else velocities, color="#176b9b", linewidth=3)
+            ax.axhline(0, color="#566777", linewidth=1)
+            ax.set(xlim=(0, 3), ylim=(-12, 12) if is_position else (-6, 6))
+            ax.set_xticks((0, 1, 2, 3))
+            ax.set_yticks((-10, 0, 10) if is_position else (-5, 0, 5))
+            ax.set_xlabel("Time", fontsize=14, color="#173f56")
+            ax.set_ylabel("Position" if is_position else "Velocity", fontsize=14, color="#173f56")
+            ax.tick_params(labelsize=12, colors="#173f56")
+            ax.grid(True, alpha=.18)
+            ax.spines[["top", "right"]].set_visible(False)
+        fig.subplots_adjust(left=.23, right=.96, bottom=.18, top=.96)
         buffer = BytesIO()
         fig.savefig(buffer, format="png", facecolor="white")
         return buffer.getvalue()

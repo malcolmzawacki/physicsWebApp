@@ -28,6 +28,8 @@ img { display:block; width:100%; height:clamp(130px,20vw,180px); object-fit:cont
 #board.row .card { display:flex; flex-direction:column; }
 #board.row img { height:auto; max-height:none; }
 .caption { margin-top:6px; font-size:15px; line-height:1.35; white-space:pre-line; }
+.card:not(:has(img)) { min-height:150px; }
+.card:not(:has(img)) .caption { font-size:17px; line-height:1.5; }
 @media(max-width:550px) {
  #board.row { grid-template-columns:repeat(2,minmax(0,1fr)); }
 }
@@ -72,7 +74,8 @@ function paintSelection() {
 }
 function render(message) {
  const next=message.args, rebuild=!args || next.question_id!==args.question_id || next.multi_select!==args.multi_select
-  || next.has_reference!==args.has_reference || next.layout!==args.layout;
+  || next.has_reference!==args.has_reference || next.layout!==args.layout
+  || next.images.length!==args.images.length || next.images.some((src,i)=>src!==args.images[i]);
  const focusIndex=[...board.querySelectorAll('button')].indexOf(document.activeElement);
  args=next; selected=Number.isInteger(args.selection) ? args.selection : null;
  selectedMany=new Set(Array.isArray(args.selection) ? args.selection : []);
@@ -92,9 +95,12 @@ function render(message) {
    const heading=document.createElement('div'); heading.className='heading';
    const title=document.createElement('strong'); title.textContent=reference ? (args.reference_label || 'Reference graph') : `${noun} ${args.labels[index]}`;
    const status=document.createElement('span'); status.className='status'; heading.append(title,status);
-   const img=document.createElement('img'); img.src=src;
-   img.alt=reference ? (args.reference_label || 'Reference motion graph') : (args.descriptions?.[index] || `${noun} option ${args.labels[index]}`);
-   img.onload=resize; card.append(heading,img);
+   card.append(heading);
+   if(src) {
+    const img=document.createElement('img'); img.src=src;
+    img.alt=reference ? (args.reference_label || 'Reference motion graph') : (args.descriptions?.[index] || `${noun} option ${args.labels[index]}`);
+    img.onload=resize; card.append(img);
+   }
    if(!reference && args.captions?.[index]) {
     const caption=document.createElement('div'); caption.className='caption';
     caption.textContent=args.captions[index]; card.append(caption);

@@ -1,5 +1,6 @@
 """C2 force/motion consistency, multi-answer sets, and routed interaction tests."""
 import itertools
+import math
 from pathlib import Path
 import random
 import sys
@@ -7,8 +8,9 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from utils.force_motion_match import (
-    CASES, CASE_BY_ID, MOTIONS, PRACTICE_SETS, available_cases,
+    CASES, CASE_BY_ID, MOTIONS, MOTION_DISPLAYS, PRACTICE_SETS, available_cases,
     check_motion_set, compatible, explanation, make_options, new_attempt, render_motion, submit_attempt,
+    graph_description, graph_kind, motion_graph_data, render_motion_graph,
 )
 from utils.graph_cards import selected_indices
 
@@ -46,6 +48,20 @@ def model_checks():
             assert velocities[0] * velocities[-1] > 0  # no reversal in the interval
         for axis in ("horizontal", "vertical"):
             assert render_motion(motion, axis).startswith(b"\x89PNG")
+        times, positions, velocities = motion_graph_data(motion)
+        assert tuple(positions[i * 20] for i in range(4)) == motion.positions
+        for i in range(len(times) - 1):
+            dt = times[i + 1] - times[i]
+            assert math.isclose((velocities[i + 1] - velocities[i]) / dt,
+                                motion.acceleration, abs_tol=1e-10)
+            assert math.isclose((positions[i + 1] - positions[i]) / dt,
+                                (velocities[i] + velocities[i + 1]) / 2, abs_tol=1e-10)
+        for kind in ("position", "velocity"):
+            assert render_motion_graph(motion, kind).startswith(b"\x89PNG")
+            assert "Schematic units" in graph_description(motion, "horizontal", kind)
+    for qid in range(4):
+        mixed = [graph_kind("Mixed graph types", i, qid) for i in range(4)]
+        assert mixed.count("position") == mixed.count("velocity") == 2
     assert selected_indices({"question_id": 2, "indices": []}, 2, 6) == ()
     assert selected_indices({"question_id": 2, "indices": [4, 1]}, 2, 6) == (1, 4)
     for event in (None, {}, {"question_id": 1, "indices": [0]},
@@ -61,11 +77,19 @@ def model_checks():
     assert submit_attempt(attempt) and attempt["completed"]
     assert attempt["outcome"] == "Corrected after feedback"
     assert not submit_attempt(attempt)
-    print(f"C2 model passed: seven cases, {count} answer sets, nine synchronized motion histories, and 18 rendered diagrams.")
+    print(f"C2 model passed: seven cases, {count} answer sets, nine synchronized motion histories, 18 dot diagrams and 18 motion graphs; graph slopes and mixed boards verified.")
 
 
 def ui_checks():
     from streamlit.testing.v1 import AppTest
+    migrated = AppTest.from_string('''
+import streamlit as st
+from utils.force_motion_match_ui import render_force_motion_match
+st.session_state["force_motion_match_display"] = "Position + velocity graphs"
+render_force_motion_match()
+''', default_timeout=30).run()
+    assert not migrated.exception
+    assert migrated.selectbox(key="force_motion_match_display").value == "Mixed graph types"
     at = AppTest.from_file(str(ROOT / "Home.py"), default_timeout=30)
     at.session_state["practice_auto_load"] = False
     at.run()
@@ -86,6 +110,9 @@ def ui_checks():
 
     click("Dynamics")
     click("Force and Motion Matching")
+    assert at.selectbox(key="force_motion_match_display").value == "Written descriptions"
+    assert not any(box.key == "force_motion_match_display" for box in at.sidebar.selectbox)
+    assert "Position + velocity graphs" not in at.selectbox(key="force_motion_match_display").options
     click("Check motions")
     assert at.warning and not at.session_state["force_motion_match_attempt"]["checks"]
     select([0, 1])
@@ -95,6 +122,17 @@ def ui_checks():
     assert at.session_state["force_motion_match_attempt"]["selection"] == ()
     good = expected()
     select([good[0]])
+    cases_before = at.session_state["force_motion_match_attempt"]["options"]
+    qid_before = at.session_state["force_motion_match_question_id"]
+    for display in MOTION_DISPLAYS[1:]:
+        at.selectbox(key="force_motion_match_display").set_value(display).run()
+        assert not at.exception
+        assert at.session_state["force_motion_match_attempt"]["options"] == cases_before
+        assert at.session_state["force_motion_match_attempt"]["selection"] == (good[0],)
+        assert at.session_state["force_motion_match_question_id"] == qid_before
+        assert not at.session_state["force_motion_match_attempt"]["checks"]
+    at.selectbox(key="force_motion_match_display").set_value("Written descriptions").run()
+    assert at.session_state["force_motion_match_attempt"]["selection"] == (good[0],)
     assert not at.session_state["force_motion_match_attempt"]["checks"]
     click("Check motions")
     assert at.warning and not at.session_state["force_motion_match_attempt"]["completed"]
@@ -112,6 +150,11 @@ def ui_checks():
     click("Check motions")
     assert at.success and any(t.value == "⭐ x 1" for t in at.title)
     assert at.session_state["force_motion_match_attempt"]["outcome"] == "Completed with help"
+    for display in MOTION_DISPLAYS[2:]:
+        at.selectbox(key="force_motion_match_display").set_value(display).run()
+        assert not at.exception and at.session_state["force_motion_match_attempt"]["completed"]
+        assert at.session_state["force_motion_match_attempt"]["selection"] == good
+        assert len(at.session_state["practice_answer_history"]) == 2
     select([])
     assert at.session_state["force_motion_match_attempt"]["selection"] == good
     assert len(at.session_state["practice_answer_history"]) == 2

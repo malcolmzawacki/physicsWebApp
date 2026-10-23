@@ -9,6 +9,55 @@ useful evidence but are not current completion claims.
 
 ## Site scope and tracking
 
+Compact force-activity layouts (2026-10-22): secondary instructions, conventions
+and modeling notes appear in a small hover-help ? beside the scenario title. The
+situation, target object, numeric givens, ranking mode and multiple-selection
+instruction remain beside the answer controls. Practice filters live in the
+sidebar on the five scenario activities; Ranking retains its visible mode selectors.
+Change of State puts initial P/T values with the question. These six activities
+own their page title, avoiding a duplicate Dynamics heading. The spatial builder
+uses tighter panels with inline length menus for single forces. The design goal
+is to keep the essential question and answer interface in the same frame on
+roughly 2:1 Chromebook screens; long scenarios, hints and extra forces can still
+require scrolling.
+
+Force and Motion Matching keeps Motion display (Written descriptions / Dot
+diagrams) visible beside the question, preserving the same case and selections
+when switched. Its reference diagram has a slightly wider column and is exempt
+from the small reference-image cap so fullscreen can enlarge the original artwork.
+
+The motion-graph prototype adds Position–time, Velocity–time and Mixed graph types
+(two of each type, one graph per card). The paired position/velocity view was
+removed after teacher review to keep the conceptual task focused on reading the
+y-axis and relating one graph to the forces. Existing sessions on that removed
+view switch to Mixed graph types without losing the question or selections.
+All representations use the same nine motion histories, answer sets and time
+interval; switching modes neither regenerates the case nor scores an answer.
+Graphs use signed position relative to the starting point rather than cumulative
+distance, schematic scales, and consistent axes within each graph type. Graph
+cards show their graph type without a verbal motion answer; accessible text gives
+sampled values. Existing automated
+checks verify graph slopes, all renderings, stable selections across modes,
+completion/history, and all seven force cases. Classroom evaluation is pending.
+
+The Free-Body Diagram Builder spatial prototype (2026-10-22) has force menus
+above, left, right and below the live diagram. Position determines direction;
+adding the same force elsewhere moves it and preserves its chosen length.
+Each force uses a Short/Medium/Long dropdown instead of a slider. Check diagram
+and Show interaction hint sit together below the editor. Existing grading,
+retry feedback, stars and countdown behavior remain in place. Automated builder
+checks cover movement, length persistence, navigation and completion snapshots;
+teacher/student review of this experimental layout remains pending.
+
+The post-classroom follow-up on 2026-10-22 uses "ignore" in place of "neglect"
+and removes rope-elasticity qualifications. Force and Motion Matching defaults to
+written motion descriptions, with dot diagrams available through Motion display;
+switching views preserves the question, selections and attempts. Multiple-answer
+instructions now appear in the main question area. Session progress shows a total
+star count across all activity history, plus stars per activity in the daily
+summary. Activity resets do not remove earned history; browser refresh restores
+the saved history within its fixed 24-hour lifetime.
+
 The 2026-10-22 comparison-layout follow-up puts Match the Free-Body Diagram,
 Force and Motion Matching, and Change of State choices in one four-across row,
 wrapping to two columns on narrow screens. Motion/change reference diagrams sit
@@ -32,16 +81,46 @@ is intended for a single screenshot of a typical class session; it groups checks
 instead of listing every question or diagram. Longer activity lists split into
 columns. Review answers shows one selected check at a time with its saved answers,
 explanation, and diagrams. Dates use America/New_York; dated checks from earlier
-days are excluded from today's view. Records from sessions opened before dates
-were added remain visible for compatibility. Everything remains session-local and
-resets on browser refresh. No download or persistent identification is added.
-The dated heading includes a random 16-digit session code, grouped for readability.
-It is created on the first answer check or progress-page visit, stays stable across
-activities and reruns, and resets with the session. It uses no device information
-and is not saved outside session memory. Matching codes can help spot reused
-screenshots; they do not authenticate a student or prevent edited screenshots.
-`tools/test_session_progress.py` covers summaries, date boundaries, review filters,
-session-code stability, session isolation, and existing question progression.
+days are excluded from today's view; a date selector appears when retained checks
+span dates. The total-star count covers all retained dates. Existing check/retry
+scoring and full answer-review snapshots are unchanged; no new performance
+measures, daily/weekly compression, accounts, or teacher exports are added.
+
+Browser progress persistence (2026-10-22): existing history, including answer
+review diagrams, and a random 16-digit code are saved in this browser profile's
+localStorage. A fixed 24-hour window begins when the saved record is first created;
+refreshes, visits and new answers do not extend it. Expiry discards the entire
+history while preserving the code. Data is removed before restoration on a later visit,
+or during polling while the page is open; deletion cannot run while the site is
+closed. Dates use New York midnight, independently of the 24-hour expiry window.
+Practice preferences, current questions and other activity state remain session-only.
+
+The code is stored under a separate, non-expiring localStorage key and remains
+until explicitly deleted through the combined delete control or browser site-data
+controls. Existing codes from the initial single-key format are preserved on
+migration, even if their progress has already expired. Expiry creates a new history
+generation without changing the code; corrupt progress also leaves the separate
+code intact. Switching browser profiles/devices does not transfer the code.
+
+The sidebar shows the saving status and expiry in New York time. Its confirmed
+delete control removes all saved answers, diagrams, stars and the old code,
+starting an empty window with a new code. A generation marker prevents stale tabs
+from restoring cleared/expired history. Record IDs deduplicate browser/session
+merges, and Web Locks serialize writes across Chromium tabs. Only new records are
+sent for saving; polling does not retransmit acknowledged diagrams. Stored JSON
+is versioned and validated. Browser storage limits or blocking produce a visible
+warning while current-session practice continues; data is not silently truncated.
+Clearing site data or switching profiles/devices can lose progress. The code uses
+no device information and does not authenticate a student or prevent edited
+screenshots. Restored history uses the normal Streamlit connection for display;
+there is no new durable server-side history store.
+
+`tools/test_session_progress.py` covers summaries, date selection, review filters,
+session isolation without a browser, and existing question progression.
+`tools/test_progress_storage.py` and `node tools/test_progress_storage_frontend.js`
+cover restoration, merging, fixed expiry with code preservation, code migration,
+explicit code deletion/rotation, stale tabs,
+serialization, corrupt input, blocked storage and quota failure.
 
 The current route inventory contains **47 activities and 166 problem-type/mode
 rows**, including Advanced routes, custom pages, explorers, labs, and two worksheet
