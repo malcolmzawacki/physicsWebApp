@@ -23,6 +23,8 @@ def builder_image(arrows):
 
 
 def render_force_diagram_builder():
+    from utils.worksheet_ui import worksheet_shortcut
+    worksheet_shortcut('Free-Body Diagram Builder')
     state = State("force_diagram_builder")
     state.ensure("records", [])
     state.ensure("question_id", 0)
@@ -181,7 +183,7 @@ def render_force_diagram_builder():
         if submit_builder(attempt, arrows):
             result = attempt["checks"][-1]
             record_answer("Free-Body Diagram Builder", case.prompt + " Forces on: " + case.scenario.target,
-                          describe_builder(arrows), describe_builder(case.arrows), result["correct"],
+                          describe_builder(arrows), describe_builder(case.arrows), result["correct"], problem_type=case.scenario.context,
                           explanation=case.explanation + " Any arrow lengths with the same required relationships are accepted.",
                           diagrams={label: "data:image/png;base64," + base64.b64encode(builder_image(a)).decode("ascii")
                                     for label, a in (("Your diagram", arrows), ("One valid diagram", case.arrows))})

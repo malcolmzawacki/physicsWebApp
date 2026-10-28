@@ -432,6 +432,19 @@ def create_doc(title: str, question_generator, number_of_docs: int, tables: bool
             last_question_para.paragraph_format.keep_with_next = bool(graph_data is not None or section_tables or spaces)
             if not include_graphs and raw_graph is not None:
                 container_cell.add_paragraph("Diagram omitted for this export.")
+            if problem.get("print_option_columns"):
+                choices = problem["print_option_columns"]
+                choice_table = container_cell.add_table(rows=1, cols=len(choices))
+                choice_table.autofit = False
+                _remove_table_borders(choice_table)
+                _prepare_table_block(choice_table)
+                for cell, column, entries in zip(choice_table.rows[0].cells, choice_table.columns, choices):
+                    column.width = Inches(3)
+                    cell.width = Inches(3)
+                    cell.text = "\n".join(entries)
+                    for paragraph in cell.paragraphs:
+                        paragraph.paragraph_format.space_before = Pt(0)
+                        paragraph.paragraph_format.space_after = Pt(0)
             if section.get("organizing_help"):
                 from xtrct_docs.print_organizer import add_print_organizer
                 add_print_organizer(container_cell, problem)
@@ -462,7 +475,7 @@ def create_doc(title: str, question_generator, number_of_docs: int, tables: bool
 
             if not side_by_side_layout and not inset_layout and graph_data is not None:
                 from utils.graph_utils import embed_graph_in_doc
-                embed_graph_in_doc(container_cell, graph_data)
+                embed_graph_in_doc(container_cell, graph_data, width_inches=problem.get("graph_doc_width", 5))
             writing_space = section.get("writing_space_inches")
             if writing_space is not None and not suppress_question_text:
                 blank_para = container_cell.add_paragraph()

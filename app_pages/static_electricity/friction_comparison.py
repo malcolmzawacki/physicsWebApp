@@ -91,11 +91,12 @@ def render() -> None:
         is_valid = positive_choice != negative_choice or positive_choice == "Neither / no reliable net charge difference"
         is_correct = is_valid and positive_choice == expected_positive and negative_choice == expected_negative
 
-        record_answer("Charging by Friction: Comparison Practice",
+        record_answer("Charging by Friction",
                       f"When {left.label} is rubbed with {right.label}, which becomes positive and which becomes negative?",
                       {"Positive": positive_choice, "Negative": negative_choice},
                       {"Positive": expected_positive, "Negative": expected_negative}, is_correct,
-                      difficulty=difficulty, explanation=outcome["summary"] + " " + outcome["electron_flow"])
+                      difficulty=difficulty, problem_type="Comparison Practice",
+                      explanation=outcome["summary"] + " " + outcome["electron_flow"])
         state.inc("attempt_count")
         if is_correct:
             state.inc("correct_count")

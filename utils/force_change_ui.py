@@ -22,6 +22,8 @@ def change_image(force_state):
 
 
 def render_force_change():
+    from utils.worksheet_ui import worksheet_shortcut
+    worksheet_shortcut('Change of State')
     state = State("force_change")
     state.ensure("records", [])
     state.ensure("question_id", 0)
@@ -68,16 +70,15 @@ def render_force_change():
     images = [data_url(change_image(after)) for after in attempt["options"]]
     expected = tuple(i for i, after in enumerate(attempt["options"]) if accepted(case, after))
     st.markdown("**Possible diagrams after the change**")
-    event = graph_cards(images, list(letters), qid, list(attempt["selection"]), attempt["completed"],
+    indices = selected_indices(state.get(f"cards_{qid}"), qid, len(images))
+    if not attempt["completed"] and indices is not None:
+        attempt["selection"] = indices
+        state.set("attempt", attempt)
+    graph_cards(images, list(letters), qid, list(attempt["selection"]), attempt["completed"],
                         "Four across", key=state.key(f"cards_{qid}"), has_reference=False, multi_select=True,
                         option_name="Change", check_label="Check changes", correct_indices=expected,
                         captions=[f"P = {after.push * 10} N →\nT = {after.pull * 10} N ←" for after in attempt["options"]],
                         descriptions=[d + " " + after.description for d, after in zip(descriptions, attempt["options"])])
-    indices = selected_indices(event, qid, len(images))
-    if not attempt["completed"] and indices is not None and indices != attempt["selection"]:
-        attempt["selection"] = indices
-        state.set("attempt", attempt)
-        st.rerun()
     a, b = st.columns(2)
     with a:
         checked = st.button("Check changes", key=state.key(f"check_{qid}"), type="primary", disabled=attempt["completed"], width="stretch")
@@ -97,7 +98,7 @@ def render_force_change():
         elif submit_attempt(attempt):
             record_answer("Change of State", case.motion + " " + case.request,
                           [descriptions[i] for i in attempt["selection"]], [descriptions[i] for i in expected],
-                          attempt["completed"], explanation=explanation(case),
+                          attempt["completed"], problem_type=case.category, explanation=explanation(case),
                           diagrams={"Before": data_url(change_image(case.initial)),
                                     **{f"Change {letter}": image for letter, image in zip(letters, images)}})
             state.set("attempt", attempt)

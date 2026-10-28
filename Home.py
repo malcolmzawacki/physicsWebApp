@@ -6,6 +6,7 @@ import streamlit as st
 from config import AUTHOR_MODE
 from utils.session_progress import render_session_controls, render_session_progress
 from utils.progress_storage import render_progress_storage
+from utils.calculator_ui import render_calculator
 st.set_page_config(page_title="Physics Practice", layout="wide")
 
 COURSE_LEVELS = (
@@ -402,6 +403,8 @@ else:
                 st.error("Activity handler is missing.")
             else:
                 resolve_handler(handler)()
+
+render_calculator()
 
 # Mount after activity handlers so a newly checked answer is saved on this run.
 # The fragment also handles expiry and cross-tab changes while a page sits open.

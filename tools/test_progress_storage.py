@@ -35,6 +35,19 @@ class StorageTests(unittest.TestCase):
         self.assertEqual(self.state[storage.CODE_KEY], saved["code"])
         self.assertFalse(storage.accept_snapshot(saved))
 
+    def test_optional_problem_type_round_trips_with_legacy_records(self):
+        saved = snapshot()
+        typed = {**row("typed"), "Problem type": "Type 2"}
+        saved["history"].append(typed)
+        self.assertTrue(storage.accept_snapshot(saved))
+        self.assertEqual(storage.history_for_storage(), saved["history"])
+        self.assertNotIn("Problem type", self.state[storage.HISTORY_KEY][0])
+        self.assertEqual(self.state[storage.HISTORY_KEY][1]["Problem type"], "Type 2")
+        for bad in (None, 123, [], {}):
+            invalid = deepcopy(saved)
+            invalid["history"][1]["Problem type"] = bad
+            self.assertFalse(storage.valid_snapshot(invalid))
+
     def test_late_restore_merges_work_without_duplicates(self):
         self.state[storage.HISTORY_KEY] = [row("two")]
         storage.accept_snapshot(snapshot())
@@ -82,6 +95,65 @@ class StorageTests(unittest.TestCase):
         saved["history"][0]["Diagrams"] = {"image": "data:image/png;base64,not base64"}
         self.assertFalse(storage.accept_snapshot(saved))
         self.assertEqual(self.state[storage.HISTORY_KEY], [row("live")])
+
+    def test_incremental_acknowledges_local_answer_without_echoed_diagram(self):
+        saved = snapshot()
+        storage.accept_snapshot(saved)
+        local = row("new")
+        local["Diagrams"] = {"Force": "data:image/png;base64,YWJj"}
+        self.state[storage.HISTORY_KEY].append(local)
+        event = {"delta": True, "record_ids": ["one", "new"],
+                 "snapshot": {**saved, "history": []}, "saved": True}
+        self.assertFalse(storage.accept_storage_event(event))
+        self.assertEqual(self.state[storage.STATE_KEY]["history"], [row(), local])
+        self.assertEqual(storage.history_for_storage({"one", "new"}), [])
+
+    def test_incremental_cross_tab_rows_merge_with_pending_local_work(self):
+        saved = snapshot()
+        storage.accept_snapshot(saved)
+        self.state[storage.HISTORY_KEY].append(row("local"))
+        event = {"delta": True, "record_ids": ["one", "other"],
+                 "snapshot": {**saved, "history": [row("other")]}}
+        self.assertTrue(storage.accept_storage_event(event))
+        self.assertEqual([r["_record_id"] for r in self.state[storage.HISTORY_KEY]], ["one", "other", "local"])
+        self.assertEqual(storage.history_for_storage({"one", "other"}), [row("local")])
+        self.assertFalse(storage.accept_storage_event(event), "duplicate response must not duplicate answers")
+
+    def test_incremental_local_numpy_answer_is_normalized(self):
+        import numpy as np
+        saved = snapshot()
+        storage.accept_snapshot(saved)
+        numeric = row("numeric")
+        numeric["Question"] = {"values": np.array([1, 2])}
+        numeric["Your answer"] = np.array([3, 4])
+        self.state[storage.HISTORY_KEY].append(numeric)
+        event = {"delta": True, "record_ids": ["one", "numeric"],
+                 "snapshot": {**saved, "history": []}}
+        self.assertFalse(storage.accept_storage_event(event))
+        restored = self.state[storage.HISTORY_KEY][-1]
+        self.assertEqual(restored["Question"], {"values": [1, 2]})
+        self.assertEqual(restored["Your answer"], [3, 4])
+
+    def test_invalid_delta_does_not_change_progress(self):
+        saved = snapshot()
+        storage.accept_snapshot(saved)
+        for ids, incoming, generation in [(["missing"], [], "first"),
+                                          (["one", "one"], [], "first"),
+                                          ([True], [], "first"),
+                                          (["one"], [], "wrong"),
+                                          (["one", "bad"], [{}], "first")]:
+            event = {"delta": True, "record_ids": ids,
+                     "snapshot": {**saved, "generation": generation, "history": incoming}}
+            self.assertFalse(storage.accept_storage_event(event))
+            self.assertEqual(self.state[storage.HISTORY_KEY], [row()])
+
+    def test_generation_reset_and_legacy_full_response_still_work(self):
+        storage.accept_snapshot(snapshot())
+        reset = {**snapshot(), "generation": "reset", "history": []}
+        self.assertTrue(storage.accept_storage_event({"snapshot": reset, "delta": False}))
+        self.assertEqual(self.state[storage.HISTORY_KEY], [])
+        self.assertTrue(storage.accept_storage_event({"snapshot": snapshot()}))
+        self.assertEqual(self.state[storage.HISTORY_KEY], [row()])
 
 
 if __name__ == "__main__":

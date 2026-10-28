@@ -9,6 +9,37 @@ useful evidence but are not current completion claims.
 
 ## Site scope and tracking
 
+Newton's Second Law classroom layout (2026-10-27): Medium/Hard organizing-help
+feedback now appears directly under its own input in each given/calculation
+column, including correct, incorrect and changed-entry messages. The final Submit
+button is primary/red, and New Question lives in the sidebar, away from the final
+answer form. These button-layout options are enabled only on Newton's Second Law;
+other standard pages retain their existing controls. Organizer checking remains
+independent of final scoring. The force-setup regression checks cover feedback
+placement, form isolation, reset, scoring and progression across difficulties.
+
+Calculator preview (2026-10-27): a shared lower-right Calculator button opens a
+scientific pop-over on every routed view. It supports keyboard expressions,
+arithmetic and scientific functions, degrees/radians, the last answer, and ten
+history entries. Draft, result, mode and history survive activity navigation in
+the current session; browser refresh starts a new calculator session. Calculator
+widgets run in a fragment to avoid rerunning the activity. No dependencies were
+added. `python tools/test_calculator.py` checks expression restrictions, numeric
+results, keypad callbacks and navigation persistence. Desktop browser layout and
+calculation were checked locally; deployment load times have not been measured.
+
+Performance follow-up (2026-10-23): routine browser-save acknowledgements now send
+record IDs and only answers missing from the server, instead of repeatedly
+uploading all earlier diagrams. Browser storage and initial refresh restoration
+remain complete; legacy full responses, cross-tab merging, fixed expiry, reset
+generations, code retention and storage-failure warnings remain supported. A
+30-answer synthetic image test reduced acknowledgement data from 18,718,440 to
+10,500 bytes (not total network traffic). The three card-matching pages reconcile
+selection before drawing their board, taking one activity execution per edit
+instead of two. Scoring, feedback and the countdown animation are unchanged.
+Storage and single-execution regression checks now run in CI. See the
+[baseline audit and follow-up](force_activity_performance_audit_2026-10-23.md).
+
 Compact force-activity layouts (2026-10-22): secondary instructions, conventions
 and modeling notes appear in a small hover-help ? beside the scenario title. The
 situation, target object, numeric givens, ranking mode and multiple-selection
@@ -76,7 +107,14 @@ selector borders. Regression checks cover corrected locked selections across rer
 and non-revealing motion feedback; core grading/history behavior is unchanged.
 
 Current Session Progress opens with **Progress for [today's date]** and a compact
-table of checks, correct answers, and incorrect answers by activity. The summary
+table of checks, correct answers, incorrect answers, and stars by activity and
+problem type. For example, attempted Projectiles Type 1, Type 2, and Type 3 appear
+as separate rows. Difficulty remains in answer review rather than adding rows.
+New checks capture the selected problem type; older saved checks without this
+field remain grouped as **Unspecified**. Numerical activities use their existing
+problem-type labels; custom activities capture their named modes or contexts
+where available. Saved browser history accepts the optional field without
+invalidating older records. The summary
 is intended for a single screenshot of a typical class session; it groups checks
 instead of listing every question or diagram. Longer activity lists split into
 columns. Review answers shows one selected check at a time with its saved answers,
@@ -604,7 +642,11 @@ the selection was Mixed or the task has fixed outputs.
 
 Kinematics and Dynamics have student worksheet routes, with per-section controls,
 PDF conversion and preview; LibreOffice is required for PDF conversion. Their
-activity catalogs live in `utils/worksheet_ui.py`. Instructor DOCX export remains
+activity catalogs live in `utils/worksheet_ui.py`. Dynamics now also exports its six conceptual
+activities: force recognition, diagram matching/construction, force-motion
+matching (including dot/graph choices), change of state, and force/acceleration
+ranking. Their paper adapters reuse authored cases and answer predicates;
+required diagrams remain included independently of optional sketches. Instructor DOCX export remains
 separate. Export scaffolding has not been reviewed just because a practice subtype
 supports organizing help. See [worksheet notes](student_worksheets.md).
 

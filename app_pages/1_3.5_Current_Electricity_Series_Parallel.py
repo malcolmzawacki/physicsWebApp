@@ -180,7 +180,7 @@ def current_electricity_series_parallel_page() -> None:
                 record_answer("Series and Parallel Circuits", {"Question": case["prompt"], "Givens": dict(case["givens"])},
                               format_answers([user_value], [case["unit"]]),
                               format_answers([case["answer"]], [case["unit"]]),
-                              is_correct, difficulty=difficulty, explanation=case["explanation"])
+                              is_correct, difficulty=difficulty, problem_type=problem_type, explanation=case["explanation"])
                 state.inc("attempt_count")
                 if is_correct:
                     state.inc("correct_count")

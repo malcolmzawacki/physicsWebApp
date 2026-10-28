@@ -32,8 +32,8 @@ function client() {
   const flush = async()=>{ await vm.runInContext('queue', context); };
   const event = ()=>messages.filter(message=>message.type==='streamlit:setComponentValue').at(-1)?.value;
   return {status, button, event, flush,
-    render:async(snapshot=null, history=[])=>{
-      handlers.message({source:parent, data:{type:'streamlit:render', args:{snapshot, history}}});
+    render:async(snapshot=null, history=[], known_record_ids=undefined)=>{
+      handlers.message({source:parent, data:{type:'streamlit:render', args:{snapshot, history, known_record_ids}}});
       await flush(); return event();
     },
     storageEvent:async()=>{ handlers.storage({key:KEY}); await flush(); return event(); },
@@ -108,5 +108,69 @@ const row = id=>({_record_id:id, Activity:'Motion', Result:'Correct', Date:'2026
   const failed = await full.render(current, [row('large')]);
   assert.equal(failed.saved, false);
   assert.equal(failed.snapshot.history.length, 1, 'quota failure does not silently discard current work');
+  quota = false;
+  values.clear();
+  const incremental = client();
+  let response = await incremental.render(null, [], []);
+  assert.equal(response.delta, false, 'initial hydration stays complete');
+  const meta = {...response.snapshot}; delete meta.history;
+  const serverRows = [];
+  let uploadBytes = 0, oldUploadBytes = 0;
+  for (let i = 0; i < 30; i++) {
+    const answer = {...row(`image-${i}`), Diagrams:{Forces:'data:image/png;base64,' + 'A'.repeat(40000)}};
+    serverRows.push(answer);
+    response = await incremental.render(meta, [answer], serverRows.map(r => r._record_id));
+    assert.equal(response.delta, true);
+    assert.equal(response.snapshot.history.length, 0, 'do not echo diagrams the server already owns');
+    assert.equal(response.record_ids.length, serverRows.length, 'acknowledge every saved record');
+    uploadBytes += JSON.stringify(response).length;
+    oldUploadBytes += JSON.stringify({snapshot:{...meta, history:serverRows}, saved:true}).length;
+  }
+  assert.equal(JSON.parse(values.get(KEY)).history.length, 30, 'all diagrams remain in browser storage');
+  assert.ok(uploadBytes < oldUploadBytes / 100, 'incremental saves remove over 99% of this repeated upload payload');
+  const restored = client();
+  const hydration = await restored.render(null, [], []);
+  assert.equal(hydration.snapshot.history.length, 30, 'refresh restores complete answers and images');
+  assert.equal(hydration.delta, false);
+  await restored.render(meta, [], serverRows.map(r => r._record_id));
+  const extra = row('from-other-tab'); serverRows.push(extra);
+  await incremental.render(meta, [extra], serverRows.map(r => r._record_id));
+  await restored.storageEvent();
+  assert.deepEqual(restored.event().snapshot.history.map(r => r._record_id), ['from-other-tab'], 'cross-tab updates upload only missing records');
+  assert.equal(restored.event().record_ids.length, 31);
+  assert.equal(restored.event().delta, true);
+  quota = true;
+  const quotaAnswer = row('quota-pending'); serverRows.push(quotaAnswer);
+  let pending = await incremental.render(meta, [quotaAnswer], serverRows.map(r => r._record_id));
+  assert.equal(pending.saved, false);
+  assert.equal(pending.delta, true);
+  assert.equal(pending.record_ids.length, 32, 'failed save keeps the pending answer in the open session');
+  assert.equal(JSON.parse(values.get(KEY)).history.length, 31);
+  quota = false;
+  pending = await incremental.render(meta, [quotaAnswer], serverRows.map(r => r._record_id));
+  assert.equal(pending.saved, true);
+  assert.equal(JSON.parse(values.get(KEY)).history.length, 32, 'retry saves pending work without duplicates');
+  blocked = true;
+  const blockedAnswer = row('blocked-pending'); serverRows.push(blockedAnswer);
+  pending = await incremental.render(meta, [blockedAnswer], serverRows.map(r => r._record_id));
+  assert.equal(pending.saved, false);
+  assert.equal(pending.record_ids.length, 33);
+  blocked = false;
+  pending = await incremental.render(meta, [blockedAnswer], serverRows.map(r => r._record_id));
+  assert.equal(pending.saved, true);
+  assert.equal(JSON.parse(values.get(KEY)).history.length, 33);
+  restored.button.click(); restored.button.click(); await restored.flush();
+  assert.equal(restored.event().delta, false, 'deletion/reset sends a new full generation');
+  assert.equal(restored.event().snapshot.history.length, 0);
+  const typed = client();
+  const initialTyped = (await typed.render()).snapshot;
+  await typed.render(initialTyped, [row('legacy'), {...row('typed'), 'Problem type':'Type 2'}]);
+  const typedHydration = (await client().render()).snapshot;
+  assert.equal(typedHydration.history[0]['Problem type'], undefined, 'legacy records stay compatible');
+  assert.equal(typedHydration.history[1]['Problem type'], 'Type 2', 'problem type survives refresh');
+  const invalidTyped = {...typedHydration, history:[{...row('invalid-type'), 'Problem type':42}]};
+  values.set(KEY, JSON.stringify(invalidTyped));
+  assert.equal((await client().render()).snapshot.history.length, 0, 'reject a malformed optional problem type');
+  console.log(`Incremental saves: ${uploadBytes} bytes versus ${oldUploadBytes} previous full-history bytes for 30 synthetic image answers.`);
   console.log('Browser persistence: refresh, fixed expiry, merging, clear, corrupt data, blocked storage and quota checks passed.');
 })().catch(error=>{console.error(error); process.exitCode=1;});

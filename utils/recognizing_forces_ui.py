@@ -15,6 +15,8 @@ from utils.force_activity_ui import force_activity_header as render_header
 
 
 def render_recognizing_forces():
+    from utils.worksheet_ui import worksheet_shortcut
+    worksheet_shortcut('Recognizing Forces')
     state = State("recognizing_forces")
     state.ensure("records", [])
     state.ensure("question_id", 0)
@@ -100,7 +102,8 @@ def render_recognizing_forces():
             record_answer("Recognizing Forces", scenario.situation + " Forces on: " + scenario.target,
                           [FORCE_LABELS[force] for force in selected] or "No forces",
                           [FORCE_LABELS[force] for force in scenario.forces] or "No forces",
-                          attempt["last_result"]["correct"], explanation=" ".join(text for _, text in scenario.interactions))
+                          attempt["last_result"]["correct"], problem_type=scenario.context,
+                          explanation=" ".join(text for _, text in scenario.interactions))
         state.set("attempt", attempt)
         st.rerun()
 

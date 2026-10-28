@@ -61,6 +61,8 @@ def valid_snapshot(snapshot):
         ids.add(record_id)
         if not isinstance(row.get("Activity"), str) or row.get("Result") not in ("Correct", "Incorrect"):
             return False
+        if "Problem type" in row and not isinstance(row["Problem type"], str):
+            return False
         if not all(key in row for key in ("Question", "Your answer", "Correct answer")):
             return False
         if not all(isinstance(row.get(key), str) for key in ("Date", "Difficulty", "Explanation")):
@@ -101,6 +103,40 @@ def accept_snapshot(snapshot):
     return changed
 
 
+def accept_storage_event(event):
+    """Reconstruct an incremental response using records this session owns.
+
+    Browser storage remains a complete snapshot. Only the wire response is a
+    delta; generation changes and initial hydration still replace/merge in full.
+    """
+    snapshot = event.get("snapshot")
+    if not event.get("delta"):
+        return accept_snapshot(snapshot)
+    previous = st.session_state.get(STATE_KEY)
+    if not previous or not valid_snapshot(snapshot) or previous["generation"] != snapshot["generation"]:
+        return False
+    record_ids = event.get("record_ids")
+    if (not isinstance(record_ids, list) or
+            any(not isinstance(value, str) or not value for value in record_ids) or
+            len(set(record_ids)) != len(record_ids)):
+        return False
+    known = {row["_record_id"]: row for row in previous["history"]}
+    # Newly checked numerical answers may contain NumPy values. Normalize just
+    # those pending rows, as the previous full browser response did for us.
+    try:
+        known.update({row["_record_id"]: row for row in history_for_storage(known)})
+    except (TypeError, ValueError):
+        return False
+    # Existing IDs are immutable. A delayed/cross-tab response cannot replace
+    # an answer that is already present in the current server session.
+    for row in snapshot["history"]:
+        known.setdefault(row["_record_id"], row)
+    if any(record_id not in known for record_id in record_ids):
+        return False
+    complete = {**snapshot, "history": [known[record_id] for record_id in record_ids]}
+    return accept_snapshot(complete)
+
+
 @st.fragment(run_every="30s")
 def render_progress_storage():
     """Mounted on every route, after submissions; poll expiry and other tabs too."""
@@ -115,14 +151,15 @@ def render_progress_storage():
     # Send only new records. In particular, do not retransmit saved diagrams on
     # every polling tick over the school's connection.
     metadata = {key: value for key, value in snapshot.items() if key != "history"} if snapshot else None
-    event = _storage(snapshot=metadata, history=history,
+    known_record_ids = [row["_record_id"] for row in st.session_state.get(HISTORY_KEY, [])]
+    event = _storage(snapshot=metadata, history=history, known_record_ids=known_record_ids,
                      key="practice_progress_browser", default=None)
     if isinstance(event, dict) and event.get("snapshot"):
         # Component values persist across reruns. Consume each response only once.
         if event != st.session_state.get("_progress_storage_event"):
             st.session_state["_progress_storage_event"] = event
             st.session_state["_progress_storage_saved"] = event.get("saved", False)
-            if accept_snapshot(event["snapshot"]):
+            if accept_storage_event(event):
                 st.rerun()
     # Midnight changes the selected default day even on a page left open overnight.
     from utils.session_progress import progress_date

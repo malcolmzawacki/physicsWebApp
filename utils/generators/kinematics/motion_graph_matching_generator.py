@@ -38,6 +38,7 @@ def generate_motion_graph_match_payload(primary_order: str) -> dict:
         prompt = "Match this Velocity-Time Graph to the correct Position-Time Graph:"
 
     return {
+        "problem_type": primary_order,
         "prompt": prompt,
         "primary_diagram": primary_diagram,
         "option_diagrams": option_diagrams,

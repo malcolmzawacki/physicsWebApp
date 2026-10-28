@@ -296,7 +296,8 @@ def check_answer():
         user_input_clean = user_input.strip().lower().replace(' ','').replace('-','')
         correct_name_clean = cn_state.correct_name.strip().lower().replace(' ','').replace('-','')
         record_answer("Compound Names Practice", f"Name this compound: {cn_state.formula}",
-                      user_input, cn_state.correct_name, user_input_clean == correct_name_clean)
+                      user_input, cn_state.correct_name, user_input_clean == correct_name_clean,
+                      problem_type=cn_state.get("problem_type", ""))
         if user_input_clean == correct_name_clean:
             cn_state.feedback = "Correct!"
         else:
@@ -319,6 +320,7 @@ def new_question():
     else:
         choice = random.randint(1, 2)  # 1=ionic, 2=covalent
     
+    cn_state.problem_type = {1: "Ionic", 2: "Covalent", 3: "Polyatomic"}[choice]
     if choice == 1:
         cn_state.formula, cn_state.correct_name = generate_ionic_formula()
     elif choice == 2:

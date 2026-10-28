@@ -356,3 +356,46 @@ Paper grids use three compact columns, nine-point labels and single-line blanks.
 Student final-answer rows shrink from 0.5 to 0.32 inches with paragraph spacing
 removed. These remain independent options from the answer key and writing space.
 The instructor exporter keeps its legacy default table spacing.
+
+In author mode, **Download Word document** offers the original editable DOCX
+alongside the PDF download. It uses the same generated questions and current
+layout settings. Author mode can generate DOCX even without LibreOffice or
+when PDF conversion fails. Student mode continues to offer PDF only. Preview
+always represents the PDF, not subsequent manual Word edits.
+
+## Conceptual Dynamics activities (2026-10-27)
+
+The Forces builder now includes Recognizing Forces, Match the Free-Body Diagram,
+Free-Body Diagram Builder, Force and Motion Matching, Change of State, and Net
+Force and Acceleration Ranking at High School level. Each practice page has a
+worksheet shortcut. Context selectors are preserved as worksheet problem types;
+Motion Matching also exposes its written, dot, position-time, velocity-time and
+mixed graph formats. Ranking exposes quantity, signed/magnitude mode, mass
+pattern and tie setting in its problem types. These activities use Standard
+internally with no difficulty selector or numerical solve-for targets.
+
+`xtrct_docs/dynamics_activity_adapter.py` reuses the original cases, option
+factories and answer predicates. Selected cases/options are stored with each
+question; repeated exports/layout changes do not resample. Case pools are drawn
+without replacement before cycling. Ranking boards use the original guaranteed
+tie/mass generator. Practice state and progress are not read or modified.
+
+Paper adaptations: force recognition has lettered check-all choices (none is
+allowed), diagram matching has four labeled panels, diagram construction has a
+blank point workspace and a descriptive example in the key, motion matching
+retains all compatible answers, changes have a before diagram and four written
+changes, ranking has four panels with numerical givens and a ranking with ties.
+Required diagrams survive the optional-sketch setting. Print panels use white
+backgrounds/grayscale; single-reference artwork is smaller than choice boards.
+The organizer, writing-space and answer-key options still apply. Final-answer
+boxes remain for multipart numeric answers; conceptual prompts use their own
+selection/drawing/ranking response format. Dense graph boards can use a full page.
+
+Validation: `tools/test_dynamics_worksheets.py` covers every available problem-type
+setting, exact-set/ranking answer semantics, diagram export, case variety, layout
+persistence, and builder/shortcut integration. The shared worksheet suite retains
+numerical Forces coverage. Actual PDF samples are visually checked separately.
+
+Recognizing Forces prints its seven options in two columns (A–D and E–G).
+Free-body diagram matching uses one compact four-across row, with labels drawn
+at print size rather than shrinking the browser artwork.

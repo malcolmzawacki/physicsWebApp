@@ -241,7 +241,7 @@ def charging_by_induction_page() -> None:
             f"{data['label']}: {charge_count_label(data['sign'], data['chunks'])} ({data['note']})"
             for data in case["before_states"].values())
         record_answer("Charging by Induction", question,
-                      submitted_answer, expected_answer, is_correct, difficulty=difficulty,
+                      submitted_answer, expected_answer, is_correct, difficulty=difficulty, problem_type=case["title"],
                       explanation=case["explanation"])
         state.inc("attempt_count")
         if is_correct:

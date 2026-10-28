@@ -67,7 +67,7 @@ def render_diagram_match_layout(title: str, prefix: str,
         else:
             correct = choice == payload["correct_index"]
             record_answer(title, payload.get("prompt", "Select the matching diagram:"),
-                          labels[choice], labels[payload["correct_index"]], correct,
+                          labels[choice], labels[payload["correct_index"]], correct, problem_type=payload.get("problem_type", ""),
                           diagrams=dict(zip(["Reference", *labels], state.get("card_images"))))
             state.set("submitted", True)
             state.set("last_result", correct)

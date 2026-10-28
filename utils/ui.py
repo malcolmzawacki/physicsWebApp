@@ -276,6 +276,8 @@ class Interface:
     def unified_smart_layout(self, **kwargs):
         """Co-ordinate the full question lifecycle, handling diagrams, hints, and answer UIs."""
         self.setup_workspace = kwargs.get("setup_workspace", False)
+        self.primary_submit = kwargs.get("primary_submit", False)
+        self.new_question_in_sidebar = kwargs.get("new_question_in_sidebar", False)
         self.initialize_session_state()
         self.header_component()
         equations = kwargs.get("equations", self.state.get("show_equations") is not False)
@@ -317,6 +319,11 @@ class Interface:
 
     def footer_dict(self) -> None:
         """Render the footer controls for generating new questions and showing performance."""
+        if getattr(self, "new_question_in_sidebar", False):
+            with st.sidebar:
+                self.new_question_dict(self.state.get("problem_type"), self.state.get("difficulty"))
+            self.performance_dropdown()
+            return
         col1, col2 = st.columns([1, 4], vertical_alignment="center")
         with col1:
             self.new_question_dict(self.state.get("problem_type"), self.state.get("difficulty"))
@@ -339,7 +346,8 @@ class Interface:
                 self.state.get("correct_answers", []),
                 self.state.get("question_id", 0),
             )
-            submitted = st.form_submit_button("Submit", disabled=bool(self.state.get("submitted")))
+            submitted = st.form_submit_button("Submit", disabled=bool(self.state.get("submitted")),
+                                              type="primary" if getattr(self, "primary_submit", False) else "secondary")
         if submitted and not self.state.get("submitted"):
             self.check_answers_dict(user_answers, timer)
         self.render_feedback(timer)
@@ -416,7 +424,7 @@ class Interface:
         record_answer(self.title, self.state.get("current_question"),
                       format_answers(user_answers, self.state.get("units", [])),
                       format_answers(expected, self.state.get("units", [])), correct,
-                      difficulty=difficulty, explanation=self.state.get("explanation") or "",
+                      difficulty=difficulty, problem_type=problem_type, explanation=self.state.get("explanation") or "",
                       equations=self.state.get("solution_equations"))
         self.state.set("submitted", True)
         self.state.set("last_result", correct)

@@ -24,6 +24,8 @@ def diagram_image(arrows):
 
 
 def render_force_diagram_match():
+    from utils.worksheet_ui import worksheet_shortcut
+    worksheet_shortcut('Match the Free-Body Diagram')
     state = State("force_diagram_match")
     state.ensure("records", [])
     state.ensure("question_id", 0)
@@ -71,7 +73,11 @@ def render_force_diagram_match():
               for option in attempt["options"]]
     correct_index = next(i for i, option in enumerate(attempt["options"])
                          if diagram_matches(case, option["arrows"]))
-    event = graph_cards(images, list(letters), qid, attempt["selection"],
+    index = selected_index(state.get(f"cards_{qid}"), qid, len(attempt["options"]))
+    if not attempt["completed"] and index is not None:
+        attempt["selection"] = index
+        state.set("attempt", attempt)
+    graph_cards(images, list(letters), qid, attempt["selection"],
                         attempt["completed"], "Four across", key=state.key(f"cards_{qid}"),
                         correct_index=correct_index, has_reference=False,
                         option_name="Diagram", check_label="Check diagram",
@@ -79,11 +85,6 @@ def render_force_diagram_match():
                                   {"up":"↑", "down":"↓", "left":"←", "right":"→"}[a.direction]
                                   for a in o["arrows"]) or "No forces" for o in attempt["options"]],
                         descriptions=[describe_diagram(o["arrows"]) for o in attempt["options"]])
-    index = selected_index(event, qid, len(attempt["options"]))
-    if not attempt["completed"] and index is not None and index != attempt["selection"]:
-        attempt["selection"] = index
-        state.set("attempt", attempt)
-        st.rerun()
     with st.expander("Text descriptions of diagrams"):
         for letter, option in zip(letters, attempt["options"]):
             st.write(f"**{letter}:** {describe_diagram(option['arrows'])}")
@@ -115,7 +116,7 @@ def render_force_diagram_match():
                                       "First try" if len(attempt["checks"]) == 1 else "Corrected after feedback")
             record_answer("Match the Free-Body Diagram", case.prompt + " Forces on: " + case.scenario.target,
                           describe_diagram(attempt["options"][selected]["arrows"]),
-                          describe_diagram(case.arrows), correct, explanation=case.explanation,
+                          describe_diagram(case.arrows), correct, problem_type=case.scenario.context, explanation=case.explanation,
                           diagrams={label: "data:image/png;base64," + base64.b64encode(diagram_image(arrows)).decode("ascii")
                                     for label, arrows in (("Your diagram", attempt["options"][selected]["arrows"]),
                                                           ("Correct diagram", case.arrows))})

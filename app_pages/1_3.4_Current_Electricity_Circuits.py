@@ -206,7 +206,7 @@ def current_electricity_circuits_page() -> None:
                 record_answer("Circuit Fundamentals", {"Question": case["prompt"], "Givens": dict(case["givens"])},
                               format_answers(user_values, [case["unit"]] * len(answers)),
                               format_answers(answers, [case["unit"]] * len(answers)),
-                              is_correct, difficulty=difficulty, explanation=case["explanation"])
+                              is_correct, difficulty=difficulty, problem_type=problem_type, explanation=case["explanation"])
                 state.inc("attempt_count")
                 if is_correct:
                     state.inc("correct_count")

@@ -33,6 +33,8 @@ def data_url(png):
 
 
 def render_force_motion_match():
+    from utils.worksheet_ui import worksheet_shortcut
+    worksheet_shortcut('Force and Motion Matching')
     state = State("force_motion_match")
     state.ensure("records", [])
     state.ensure("question_id", 0)
@@ -94,15 +96,14 @@ def render_force_motion_match():
         images = [data_url(motion_image(m, case.axis)) if display == "Dot diagrams" else None for m in attempt["options"]]
         captions = descriptions = [m.description(case.axis) for m in attempt["options"]]
     expected = tuple(i for i, m in enumerate(attempt["options"]) if compatible(case, m))
-    event = graph_cards(images, list(letters), qid, list(attempt["selection"]), attempt["completed"],
+    indices = selected_indices(state.get(f"cards_{qid}"), qid, len(images))
+    if not attempt["completed"] and indices is not None:
+        attempt["selection"] = indices
+        state.set("attempt", attempt)
+    graph_cards(images, list(letters), qid, list(attempt["selection"]), attempt["completed"],
                         "Four across", key=state.key(f"cards_{qid}"), has_reference=False,
                         option_name="Motion", check_label="Check motions", multi_select=True,
                         correct_indices=expected, captions=captions, descriptions=descriptions)
-    indices = selected_indices(event, qid, len(images))
-    if not attempt["completed"] and indices is not None and indices != attempt["selection"]:
-        attempt["selection"] = indices
-        state.set("attempt", attempt)
-        st.rerun()
     with st.expander("Text descriptions of forces and motion"):
         from utils.force_diagram_match import describe_diagram
         st.write(describe_diagram(case.arrows))
@@ -126,7 +127,7 @@ def render_force_motion_match():
         elif submit_attempt(attempt):
             record_answer("Force and Motion Matching", case.prompt,
                           [attempt["options"][i].description(case.axis) for i in attempt["selection"]],
-                          [attempt["options"][i].description(case.axis) for i in expected], attempt["completed"],
+                          [attempt["options"][i].description(case.axis) for i in expected], attempt["completed"], problem_type=case.category,
                           explanation=explanation(case), diagrams={"Forces": data_url(diagram_image(case.arrows)),
                                                                  **{f"Motion {letter}": image for letter, image in zip(letters, images) if image}})
             state.set("attempt", attempt)

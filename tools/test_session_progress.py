@@ -52,7 +52,7 @@ class SessionProgressTests(unittest.TestCase):
         app.run()
         self.assertEqual(next(m.value for m in app.metric if m.label == "Total stars in saved progress"), "⭐ 1")
         self.assertEqual(len(app.table), 1)
-        self.assertEqual(len(app.expander), 0)
+        self.assertEqual([e.label for e in app.expander if e.label != "Functions & history"], [])
         click(app, "Back to practice")
         self.assertFalse(app.checkbox(key=AUTO_LOAD_KEY).value)
         self.assertEqual(app.session_state["const_motion__question_id"], qid)
@@ -107,6 +107,7 @@ class SessionProgressTests(unittest.TestCase):
                 click(app, "Check Answer")
                 self.assertEqual(app.session_state[prefix + "_question_number"], qid)
                 self.assertEqual(app.session_state[HISTORY_KEY][0]["Question"]["Givens"], dict(case["givens"]))
+                self.assertEqual(app.session_state[HISTORY_KEY][0]["Problem type"], case["problem_type"])
                 app.run()
                 self.assertEqual(len(app.session_state[HISTORY_KEY]), 1)
 
@@ -166,6 +167,7 @@ class SessionProgressTests(unittest.TestCase):
         click(app, "Check Match")
         self.assertEqual(app.session_state["motion_graph_matching_question_id"], qid)
         record = app.session_state[HISTORY_KEY][0]
+        self.assertEqual(record["Problem type"], "Position-Time First")
         self.assertEqual(len(record["Diagrams"]), 1 + len(payload["option_diagrams"]))
         click(app, "My Current Session Progress")
         self.assertFalse(app.exception)
@@ -200,8 +202,8 @@ class SessionProgressTests(unittest.TestCase):
             {"Activity": "Motion", "Result": "Correct", "Date": "2026-10-20"},
         ]
         self.assertEqual(activity_summary(daily_history(history, day)), [
-            {"Activity": "Motion", "Checks": 2, "Correct": 1, "Incorrect": 1, "Stars": 1},
-            {"Activity": "Forces", "Checks": 1, "Correct": 1, "Incorrect": 0, "Stars": 1},
+            {"Activity": "Motion", "Problem type": "Unspecified", "Checks": 2, "Correct": 1, "Incorrect": 1, "Stars": 1},
+            {"Activity": "Forces", "Problem type": "Unspecified", "Checks": 1, "Correct": 1, "Incorrect": 0, "Stars": 1},
         ])
         # The daily table is filtered, but the running total spans this session.
         from unittest.mock import patch
@@ -236,14 +238,50 @@ class SessionProgressTests(unittest.TestCase):
             self.assertEqual(app.title[0].value, "Progress for October 21, 2026")
             self.assertEqual(len(app.table), 2)
             self.assertEqual(sum(len(table.value) for table in app.table), 12)
-            self.assertEqual(len(app.expander), 0)
+            self.assertEqual([e.label for e in app.expander if e.label != "Functions & history"], [])
             app.radio(key="progress_view").set_value("Review answers").run()
             self.assertFalse(app.exception)
             self.assertEqual(len(app.selectbox(key="progress_answer_selection").options), 180)
             app.selectbox(key="progress_activity_filter").select("Activity 1").run()
             self.assertFalse(app.exception)
             self.assertEqual(len(app.selectbox(key="progress_answer_selection").options), 15)
-            self.assertEqual(len(app.expander), 0)
+            self.assertEqual([e.label for e in app.expander if e.label != "Functions & history"], [])
+
+    def test_summary_separates_types_and_preserves_old_records(self):
+        history = [
+            {"Activity": "Projectiles", "Problem type": "Type 1", "Result": "Correct", "Difficulty": "Easy"},
+            {"Activity": "Projectiles", "Problem type": "Type 1", "Result": "Incorrect", "Difficulty": "Hard"},
+            {"Activity": "Projectiles", "Problem type": "Type 2", "Result": "Correct"},
+            {"Activity": "Another activity", "Problem type": "Type 1", "Result": "Correct"},
+            {"Activity": "Projectiles", "Result": "Correct"},
+            {"Activity": "Projectiles", "Problem type": "", "Result": "Incorrect"},
+        ]
+        rows = activity_summary(history)
+        self.assertEqual([(r["Activity"], r["Problem type"], r["Checks"]) for r in rows], [
+            ("Projectiles", "Type 1", 2), ("Projectiles", "Type 2", 1),
+            ("Another activity", "Type 1", 1), ("Projectiles", "Unspecified", 2)])
+        self.assertEqual(sum(r["Checks"] for r in rows), 6)
+        self.assertEqual(sum(r["Correct"] for r in rows), 4)
+        self.assertEqual(sum(r["Incorrect"] for r in rows), 2)
+        self.assertEqual(sum(r["Stars"] for r in rows), 4)
+
+    def test_projectile_types_are_captured_at_submission_and_grouped(self):
+        app = page("Kinematics", "Projectiles")
+        for kind, difficulty in [("Type 1", "Easy"), ("Type 2", "Easy"), ("Type 3", "Easy"), ("Type 1", "Medium")]:
+            app.selectbox(key="projectiles_problem_type_select_unified").select(kind).run()
+            app.selectbox(key="projectiles_difficulty_select_unified").select(difficulty).run()
+            fields = [f for f in app.text_input if f.key.startswith("projectiles_input_")]
+            self.assertTrue(fields)
+            for field, answer in zip(fields, app.session_state["projectiles_correct_answers"]):
+                field.set_value(str(answer))
+            click(app, "Submit")
+            self.assertEqual(app.session_state[HISTORY_KEY][-1]["Problem type"], kind)
+        click(app, "My Current Session Progress")
+        table = app.table[0].value
+        self.assertEqual(table["Problem type"].tolist(), ["Type 1", "Type 2", "Type 3"])
+        self.assertEqual(table["Checks"].tolist(), [2, 1, 1])
+        app.radio(key="progress_view").set_value("Review answers").run()
+        self.assertTrue(any("Type 3" in label for label in app.selectbox(key="progress_answer_selection").options))
 
 
 if __name__ == "__main__":

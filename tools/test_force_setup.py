@@ -63,6 +63,9 @@ def main():
     app.run()
     prefix = "newtons_2nd"
     assert not app.exception
+    assert next(b for b in app.button if b.label == "Submit").proto.type == "primary"
+    assert any(b.label == "New Question" for b in app.sidebar.button)
+    assert not any(b.label == "Submit" for b in app.sidebar.button)
     for target_id in [o["id"] for o in options] + ["mixed"]:
         app.selectbox(key=prefix + "_solve_for_select").select(target_id).run()
         assert not app.exception
@@ -108,6 +111,22 @@ def main():
         next(b for b in app.button if b.label == "Check organized work").click().run()
         assert not app.exception and len(app.success) == len(plan["given"]) + len(plan["steps"])
         assert not app.session_state[prefix + "_submitted"]
+        organizer_columns = [column for column in app.get("column")
+                             if any("force_plan_" in (field.key or "") for field in column.text_input)]
+        assert len(organizer_columns) == len(plan["given"]) + len(plan["steps"])
+        for column in organizer_columns:
+            assert len(column.text_input) == len(column.success) == 1, "feedback must stay below its own input"
+        # Incorrect and edited entries also stay attached to their own inputs.
+        given_key = f"{prefix}_force_plan_{qid}_given_0"
+        app.text_input(key=given_key).set_value("-12345")
+        next(b for b in app.button if b.label == "Check organized work").click().run()
+        given_column = next(column for column in app.get("column")
+                            if any(field.key == given_key for field in column.text_input))
+        assert len(given_column.error) == 1
+        app.text_input(key=given_key).set_value("changed").run()
+        given_column = next(column for column in app.get("column")
+                            if any(field.key == given_key for field in column.text_input))
+        assert not given_column.error and any("changed — check again" in item.value for item in given_column.caption)
     app.selectbox(key=prefix + "_difficulty_select_unified").select("Easy").run()
     assert not app.exception and any(e.label == "Organizing help" for e in app.expander)
     assert app.session_state[prefix + "_setup_submission"] is None

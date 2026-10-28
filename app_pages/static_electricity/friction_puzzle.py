@@ -171,9 +171,10 @@ def render() -> None:
         is_correct = not incomplete and not has_duplicates and normalized_order == tuple(hidden_order)
 
         if not incomplete and not has_duplicates:
-            record_answer("Charging by Friction: Ranking Logic Puzzle",
+            record_answer("Charging by Friction",
                           "Rank from most likely positive to most likely negative. " + " ".join(clue["text"] for clue in case["clues"]),
-                          " > ".join(selected_order), " > ".join(hidden_order), is_correct, difficulty=difficulty)
+                          " > ".join(selected_order), " > ".join(hidden_order), is_correct,
+                          difficulty=difficulty, problem_type="Ranking Logic Puzzle")
             performance = state.get("performance")
             state.set("performance", record_performance(performance, "Ranking Logic Puzzle", difficulty, is_correct))
         state.set("submitted", True)

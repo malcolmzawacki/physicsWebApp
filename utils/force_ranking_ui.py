@@ -20,6 +20,8 @@ def ranking_image(case,scale,include_values=True):
 
 
 def render_force_ranking():
+    from utils.worksheet_ui import worksheet_shortcut
+    worksheet_shortcut('Net Force and Acceleration Ranking')
     state=State("force_ranking")
     state.ensure("records",[])
     state.ensure("question_id",0)
@@ -106,6 +108,7 @@ def render_force_ranking():
             last=attempt["checks"][-1]
             record_answer("Net Force and Acceleration Ranking",f"Rank {quantity.lower()} by {comparison.lower()}, greatest to least.",
                           {letter:r for letter,r in zip("ABCD",ranks)},ranking_text(last["groups"]),last["correct"],
+                          problem_type=f"{quantity} / {comparison}",
                           explanation="Compare net force first; divide by mass when ranking acceleration. Equal values must tie.",
                           diagrams=dict(zip("ABCD",images)))
             state.set("attempt",attempt)

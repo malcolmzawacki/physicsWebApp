@@ -10,7 +10,7 @@ def newtons_2nd():
     generator = ForceGenerator()
     metadata = generator.stored_metadata()
     ui = interface(prefix, title, generator, metadata, difficulties)
-    ui.unified_smart_layout(setup_workspace=True)
+    ui.unified_smart_layout(setup_workspace=True, primary_submit=True, new_question_in_sidebar=True)
 
 
 def tension():

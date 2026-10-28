@@ -23,6 +23,11 @@ from xtrct_docs.pdf_preview import page_summary, render_page
 from xtrct_docs.motion_graph_adapter import WorksheetMotionGraphs
 from xtrct_docs.matching_graph_adapter import WorksheetMatchingGraphs
 
+from xtrct_docs.dynamics_activity_adapter import (
+    WorksheetRecognizingForces, WorksheetForceDiagramMatch, WorksheetForceDiagramBuilder,
+    WorksheetForceMotion, WorksheetForceChange, WorksheetForceRanking,
+)
+
 PREFIX = "kinematics_worksheet_"
 ACTIVITIES = {"Accelerated Motion": LinearMotionGenerator, "Constant Motion": ConstantMotionGenerator,
               "Distance & Displacement": DistDispGenerator, "Projectiles": ProjectileGenerator,
@@ -34,6 +39,16 @@ FORCES_ACTIVITIES = {
     "Tension": TensionGenerator, "Atwood Machines": AtwoodGenerator,
     "Inclined Planes": InclineGenerator,
 }
+NUMERICAL_FORCES = set(FORCES_ACTIVITIES)
+CONCEPTUAL_FORCES = {
+    "Recognizing Forces": WorksheetRecognizingForces,
+    "Match the Free-Body Diagram": WorksheetForceDiagramMatch,
+    "Free-Body Diagram Builder": WorksheetForceDiagramBuilder,
+    "Force and Motion Matching": WorksheetForceMotion,
+    "Change of State": WorksheetForceChange,
+    "Net Force and Acceleration Ranking": WorksheetForceRanking,
+}
+FORCES_ACTIVITIES = {**CONCEPTUAL_FORCES, **FORCES_ACTIVITIES}
 ACTIVITIES.update(FORCES_ACTIVITIES)
 UNIT_ACTIVITIES = {"Kinematics": KINEMATICS_ACTIVITIES, "Forces": tuple(FORCES_ACTIVITIES)}
 ACTIVITY_LEVELS = {name: "advanced" for name in ("Relative Motion", "Center of Mass", "Tension", "Atwood Machines", "Inclined Planes")}
@@ -91,7 +106,7 @@ def generate_sections(requests):
         generator = generators[activity]
         labels = {o["id"]: o["label"] for o in target_options(generator, kind, difficulty)}
         heading = f"{activity}: {kind} - {difficulty}"
-        if getattr(generator, "FIXED_DIFFICULTY", None):
+        if getattr(generator, "FIXED_DIFFICULTY", None) or getattr(generator, "WORKSHEET_NOTE", None):
             heading = f"{activity}: {kind}"
         if target != MIXED:
             heading += f" - {labels[target]}"
@@ -108,7 +123,7 @@ def generate_sections(requests):
                     problem.pop("diagram_renderer", None)
                     if activity == "Distance & Displacement":
                         problem["question"] += "\n\nFind the total distance travelled, the magnitude of the net displacement, and its direction."
-        if activity in FORCES_ACTIVITIES:
+        if activity in NUMERICAL_FORCES:
             for section in generated:
                 for problem in section["problems"]:
                     if activity != "Tension":
@@ -172,7 +187,11 @@ def _section_controls(prefix, unit="Kinematics", remove_key=None):
     levels = list(activity_difficulties(activity))
     if st.session_state.get(prefix + "difficulty") not in levels:
         st.session_state[prefix + "difficulty"] = levels[min(1, len(levels) - 1)]
-    if getattr(generator, "FIXED_DIFFICULTY", None):
+    if getattr(generator, "WORKSHEET_NOTE", None):
+        difficulty = "Standard"
+        st.session_state[prefix + "difficulty"] = difficulty
+        first_row[2].caption(generator.WORKSHEET_NOTE)
+    elif getattr(generator, "FIXED_DIFFICULTY", None):
         difficulty = generator.FIXED_DIFFICULTY
         st.session_state[prefix + "difficulty"] = difficulty
         first_row[2].caption("All six motion shapes included.")
@@ -199,8 +218,8 @@ def _section_controls(prefix, unit="Kinematics", remove_key=None):
     diagrams = False
     if activity in ("Tension", "Atwood Machines"):
         diagrams = options[1].checkbox("Include compact diagrams", key=prefix + "diagrams")
-    elif activity in ("Types of Motion Graphs", "Matching Motion Graphs"):
-        options[1].caption("Graphs included with these questions.")
+    elif activity in ("Types of Motion Graphs", "Matching Motion Graphs") or activity in CONCEPTUAL_FORCES and activity != "Recognizing Forces":
+        options[1].caption("Required diagrams included.")
     organizing = options[2].checkbox("Include organizing help", key=prefix + "organizing_help",
                                       help="Prints blank quantity and planning fields. Activities without a dedicated organizer use a general knowns / find / plan grid.")
     remove = bool(remove_key and st.button("Remove section", key=remove_key))
@@ -220,6 +239,7 @@ def worksheet_shortcut(activity):
 
 def render_unit_worksheet(unit):
     """Shared builder with unit-scoped choices and session state; no global unit selector."""
+    from config import AUTHOR_MODE
     prefix = unit.lower() + "_worksheet_"
     start_activity = st.session_state.pop(prefix + "start_activity", None)
     if start_activity in available_activities(unit):
@@ -274,7 +294,7 @@ def render_unit_worksheet(unit):
         if layout_changed:
             st.caption("Updating the layout keeps your questions and answers unchanged.")
         generate_column, download_column = st.columns(2)
-        if generate_column.button(action, key=prefix + "generate", type="primary", disabled=not available or over_limit):
+        if generate_column.button(action, key=prefix + "generate", type="primary", disabled=(not available and not AUTHOR_MODE) or over_limit):
             st.session_state.pop(prefix + "result", None)
             started = time.perf_counter()
             progress = st.empty()
@@ -304,6 +324,11 @@ def render_unit_worksheet(unit):
             st.info("Settings changed. Update the layout to keep these questions." if layout_changed else
                     "Settings changed. Generate a new worksheet to download these choices.")
             return
+        if AUTHOR_MODE and result.get("docx"):
+            download_column.download_button(
+                "Download Word document", result["docx"], f"{unit.lower()}-practice.docx",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                key=prefix + "docx", on_click="ignore")
         if result["error"]:
             st.warning(result["error"])
             if st.button("Retry PDF conversion", key=prefix + "retry", disabled=not available):
@@ -357,7 +382,6 @@ def render_unit_worksheet(unit):
                 logging.getLogger(__name__).exception("PDF preview failed")
                 st.info("Preview is unavailable. You can still download the PDF.")
 
-            from config import AUTHOR_MODE
             if AUTHOR_MODE and result.get("timings"):
                 st.caption("Timing (seconds): " + " · ".join(f"{name}: {seconds:.2f}" for name, seconds in result["timings"].items()))
 

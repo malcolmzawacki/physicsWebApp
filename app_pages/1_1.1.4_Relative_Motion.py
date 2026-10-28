@@ -62,7 +62,7 @@ def relative_motion():
                 correct = answer_matches(value, payload["answers"][0])
                 record_answer("Relative Motion", payload["question"],
                               format_answers([raw], payload["units"]), format_answers(payload["answers"], payload["units"]),
-                              correct, difficulty=difficulty, explanation=payload["extras"]["explanation"],
+                              correct, difficulty=difficulty, problem_type=kind, explanation=payload["extras"]["explanation"],
                               equations=payload["extras"]["solution_equations"])
                 ui.update_performance(kind, difficulty, correct)
                 if correct:

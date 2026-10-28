@@ -40,6 +40,7 @@ function valid(value) {
     new Set(value.history.map(row => row?._record_id)).size === value.history.length &&
     value.history.every(row => row && typeof row._record_id === 'string' && row._record_id.length > 0 &&
       typeof row.Activity === 'string' && ['Correct','Incorrect'].includes(row.Result) &&
+      (!Object.hasOwn(row, 'Problem type') || typeof row['Problem type'] === 'string') &&
       typeof row.Date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(row.Date) &&
       typeof row.Difficulty === 'string' && typeof row.Explanation === 'string' &&
       ['Question', 'Your answer', 'Correct answer'].every(key => Object.hasOwn(row, key)) &&
@@ -60,7 +61,13 @@ function read() {
   return fresh(code);
 }
 function publish(snapshot, saved) {
-  const value = {snapshot, saved};
+  // The server already owns its locally checked answers. Upload only records
+  // learned from browser restoration/another tab, not every previous diagram.
+  // A new connection or generation still receives a complete snapshot.
+  const delta = args.snapshot?.generation === snapshot.generation && Array.isArray(args.known_record_ids);
+  const known = new Set(delta ? args.known_record_ids : []);
+  const value = {snapshot:{...snapshot, history:snapshot.history.filter(row => !known.has(row._record_id))},
+    record_ids:snapshot.history.map(row => row._record_id), delta, saved};
   const encoded = JSON.stringify(value);
   if (encoded !== lastSent) {
     lastSent = encoded;

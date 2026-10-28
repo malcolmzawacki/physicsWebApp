@@ -177,9 +177,11 @@ class Worksheets(unittest.TestCase):
         self.assertEqual(sections[0]["problems"][0]["answers"], original)
 
     def test_forces_topics_and_targets(self):
-        from utils.worksheet_ui import FORCES_ACTIVITIES, activity_difficulties
+        from utils.worksheet_ui import FORCES_ACTIVITIES, NUMERICAL_FORCES, activity_difficulties
         from utils.solve_for import target_options
         for activity, cls in FORCES_ACTIVITIES.items():
+            if activity not in NUMERICAL_FORCES:
+                continue
             for kind in cls().get_problem_types():
                 for difficulty in activity_difficulties(activity):
                     for target in ["mixed"] + [o["id"] for o in target_options(cls(), kind, difficulty)]:
@@ -199,7 +201,8 @@ class Worksheets(unittest.TestCase):
         app.run()
         app.button(key="worksheet_shortcut_Newton's Second Law").click().run()
         self.assertFalse(app.exception)
-        self.assertEqual(app.selectbox(key="forces_worksheet_activity").options, ["Newton's Second Law"])
+        from utils.worksheet_ui import CONCEPTUAL_FORCES
+        self.assertEqual(app.selectbox(key="forces_worksheet_activity").options, [*CONCEPTUAL_FORCES, "Newton's Second Law"])
         self.assertEqual(app.session_state[PREFIX + "count"], 9)
         app.session_state["nav_level"] = "advanced"
         app.run()

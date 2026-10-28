@@ -37,7 +37,10 @@ def activity_summary(history):
     """Count checks, not unique questions: several activities allow retries."""
     summary = {}
     for row in history:
-        stats = summary.setdefault(row["Activity"], {"Activity": row["Activity"], "Checks": 0, "Correct": 0, "Incorrect": 0, "Stars": 0})
+        problem_type = row.get("Problem type") or "Unspecified"
+        key = (row["Activity"], problem_type)
+        stats = summary.setdefault(key, {"Activity": row["Activity"], "Problem type": problem_type,
+                                         "Checks": 0, "Correct": 0, "Incorrect": 0, "Stars": 0})
         stats["Checks"] += 1
         stats[row["Result"]] += 1
         stats["Stars"] += row["Result"] == "Correct"
@@ -45,13 +48,14 @@ def activity_summary(history):
 
 
 def record_answer(activity, question, submitted, expected, correct, *,
-                  difficulty="", explanation="", equations=None, diagrams=None):
+                  difficulty="", explanation="", equations=None, diagrams=None, problem_type=""):
     """Snapshot one valid answer check, called only in submission handlers."""
     session_code()
     history = st.session_state.setdefault(HISTORY_KEY, [])
     history.append(deepcopy({
         "Date": progress_date().isoformat(),
         "Activity": activity, "Question": question, "Your answer": submitted,
+        "Problem type": problem_type or "Unspecified",
         "Correct answer": expected, "Result": "Correct" if correct else "Incorrect",
         "Difficulty": difficulty, "Explanation": explanation,
         "Equations": equations or [],
@@ -97,7 +101,7 @@ def render_session_progress():
     if view == "Summary":
         rows = activity_summary(history)
         # A bounded number of rows per column keeps a varied class session compact.
-        columns = st.columns(min(3, (len(rows) + 7) // 8))
+        columns = st.columns(min(2, (len(rows) + 7) // 8))
         rows_per_column = (len(rows) + len(columns) - 1) // len(columns)
         for index, column in enumerate(columns):
             with column:
@@ -114,7 +118,7 @@ def render_answer_review(history):
     options = [index for index in reversed(range(len(history)))
                if selected == "All activities" or history[index]["Activity"] == selected]
     index = st.selectbox("Answer to review", options,
-                         format_func=lambda i: f"{i + 1}. {history[i]['Activity']} — {history[i]['Result']}",
+                         format_func=lambda i: f"{i + 1}. {history[i]['Activity']} / {history[i].get('Problem type') or 'Unspecified'} — {history[i]['Result']}",
                          key="progress_answer_selection")
     row = history[index]
     if row["Difficulty"]:

@@ -643,7 +643,7 @@ def stoichiometry_practice_page():
                 
                 record_answer("Stoichiometry Practice", state.get("question"),
                               f"{user_answer} {state.get('units')}", f"{correct_answer} {state.get('units')}",
-                              abs(user_answer - correct_answer) <= tolerance, difficulty=difficulty,
+                              abs(user_answer - correct_answer) <= tolerance, difficulty=difficulty, problem_type=reaction_type,
                               explanation=state.get("details")["explanation"])
                 if abs(user_answer - correct_answer) <= tolerance:
                     st.success("Correct! Well done.")
