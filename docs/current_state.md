@@ -21,7 +21,9 @@ placement, form isolation, reset, scoring and progression across difficulties.
 Calculator preview (2026-10-27): a shared lower-right Calculator button opens a
 scientific pop-over on every routed view. It supports keyboard expressions,
 arithmetic and scientific functions, degrees/radians, the last answer, and ten
-history entries. Draft, result, mode and history survive activity navigation in
+history entries. Successful calculations clear the input for the next step while
+retaining the result, Ans and history; invalid expressions stay available to edit
+(updated 2026-11-04). Draft, result, mode and history survive activity navigation in
 the current session; browser refresh starts a new calculator session. Calculator
 widgets run in a fragment to avoid rerunning the activity. No dependencies were
 added. `python tools/test_calculator.py` checks expression restrictions, numeric

@@ -40,6 +40,8 @@ def _evaluate():
     history = st.session_state.setdefault(PREFIX + "history", [])
     history.insert(0, (expression, format(result, ".12g"), st.session_state.get(PREFIX + "mode", "Degrees")))
     del history[10:]
+    st.session_state[PREFIX + "expression"] = ""
+    st.session_state[PREFIX + "draft"] = ""
 
 
 @st.fragment

@@ -41,7 +41,8 @@ class CalculatorTests(unittest.TestCase):
         next(b for b in app.button if b.label == "Kinematics").click().run()
         next(b for b in app.button if b.label == "Constant Motion").click().run()
         self.assertFalse(app.exception)
-        self.assertEqual(app.text_input(key="physics_calculator_expression").value, "12 * sin(30)")
+        self.assertEqual(app.text_input(key="physics_calculator_expression").value, "")
+        self.assertAlmostEqual(app.session_state["physics_calculator_answer"], 6)
         self.assertEqual(app.radio(key="physics_calculator_mode").value, "Radians")
         self.assertEqual(len(app.session_state["physics_calculator_history"]), 1)
         app.button(key="physics_calculator_clear").click().run()
@@ -49,6 +50,40 @@ class CalculatorTests(unittest.TestCase):
         app.button(key="physics_calculator_key_1_7").click().run()
         app.button(key="physics_calculator_equals").click().run()
         self.assertEqual(app.session_state["physics_calculator_answer"], 7)
+        self.assertEqual(app.text_input(key="physics_calculator_expression").value, "")
+
+    def test_multistep_input_clears_only_after_success(self):
+        from streamlit.testing.v1 import AppTest
+        app = AppTest.from_string(
+            "from utils.calculator_ui import render_calculator\nrender_calculator()"
+        ).run()
+        app.text_input(key="physics_calculator_expression").set_value("12 / 3").run()
+        self.assertFalse(app.exception)
+        self.assertEqual(app.text_input(key="physics_calculator_expression").value, "")
+        self.assertEqual(app.session_state["physics_calculator_draft"], "")
+        self.assertEqual(app.metric[0].value, "4")
+        self.assertEqual(app.session_state["physics_calculator_history"][0][:2], ("12 / 3", "4"))
+
+        # An empty submission must leave the last answer and history alone.
+        app.button(key="physics_calculator_equals").click().run()
+        self.assertEqual(len(app.session_state["physics_calculator_history"]), 1)
+        for key in ["key_5_Ans", "key_1_÷", "key_4_0"]:
+            app.button(key="physics_calculator_" + key).click().run()
+        app.button(key="physics_calculator_equals").click().run()
+        self.assertFalse(app.exception)
+        self.assertEqual(app.text_input(key="physics_calculator_expression").value, "ans/0")
+        self.assertEqual(app.session_state["physics_calculator_draft"], "ans/0")
+        self.assertEqual(app.session_state["physics_calculator_answer"], 4)
+        self.assertEqual(len(app.session_state["physics_calculator_history"]), 1)
+
+        app.button(key="physics_calculator_back").click().run()
+        app.button(key="physics_calculator_key_3_2").click().run()
+        app.button(key="physics_calculator_equals").click().run()
+        self.assertFalse(app.exception)
+        self.assertEqual(app.text_input(key="physics_calculator_expression").value, "")
+        self.assertEqual(app.metric[0].value, "2")
+        self.assertEqual(len(app.session_state["physics_calculator_history"]), 2)
+        self.assertEqual(len(app.error), 0)
 
 
 if __name__ == "__main__":
